@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const HomeScreen = () => {
   const [startTime] = useState(() => {
     return (
-      new Date().getTime() - (12 * 1000 * 60 * 60 + 24 * 1000 * 60 + 12 * 1000)
+      new Date().getTime() - (18 * 1000 * 60 * 60 + 24 * 1000 * 60 + 12 * 1000)
     );
   });
 

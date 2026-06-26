@@ -198,7 +198,9 @@ export const SwapButton = ({
                       <Animated.View
                         key={item.emoji}
                         entering={SlideInDown.springify()
-                          .damping(70)
+                          .damping(18)
+                          .stiffness(180)
+                          .mass(1)
                           .delay(index * 50)}
                         exiting={SlideOutDown.duration(100)}
                       >
