@@ -30,6 +30,8 @@ const colorRange = {
   start: Skia.Color("#FF0000"),
   end: Skia.Color("#00FF00"),
 };
+
+const padding = 12;
 const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
@@ -58,16 +60,15 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
     if (!layout) return null;
 
     const rect = Skia.XYWHRect(
-      strokeWidth / 2,
-      strokeWidth / 2,
+      padding + strokeWidth / 2,
+      padding + strokeWidth / 2 + 4,
       layout.width - strokeWidth,
       layout.height - strokeWidth,
     );
+
     const rRect = Skia.RRectXY(rect, layout.height / 2, layout.height / 2);
 
-    const path = Skia.Path.Make();
-    path.addRRect(rRect);
-    return path;
+    return Skia.Path.RRect(rRect);
   }, [layout, strokeWidth]);
 
   const centerX = layout?.width ? layout.width / 2 : 0;
@@ -114,7 +115,7 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
         <View
           key="skia-counter-render"
           style={{ width: layout.width, height: layout.height }}
-          className="justify-start items-start rounded-full "
+          className="justify-start items-start rounded-full"
         >
           {/* CANVAS SKIA DÙNG PATH CHUẨN ĐỂ SỬ DỤNG START/END */}
           <Canvas
@@ -122,9 +123,11 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
             style={{
               borderWidth: 1,
               borderColor: "white",
-              position: "absolute",
-              width: layout.width,
-              height: layout.height,
+              paddingTop: 20,
+              top: -padding,
+              left: -padding,
+              width: layout.width + padding * 2,
+              height: layout.height + padding * 2 + 4,
             }}
           >
             {capsulePath && (
@@ -132,11 +135,26 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
                 {/* 1. Đường viền nền tối phía sau */}
                 <Path
                   path={capsulePath}
-                  color="#555"
+                  color={"#333"}
                   style="stroke"
                   strokeWidth={strokeWidth}
                 />
+                {/* 2. Đường tiến độ hiện tại */}
+                <Path
+                  path={capsulePath}
+                  color={
+                    progress === 1
+                      ? theme.colors.primary + "dd"
+                      : theme.colors.primary + Math.floor(progress * 100)
+                  }
+                  style="stroke"
+                  strokeWidth={strokeWidth}
+                  strokeCap={"round"}
+                  start={0}
+                  end={progress}
+                />
 
+                {/* 3. Đường trắng chạy quanh */}
                 <Path
                   path={capsulePath}
                   style="stroke"
@@ -172,8 +190,8 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
           <View
             className="absolute bg-black rounded-full justify-center items-center"
             style={{
-              marginLeft: 4,
-              marginTop: 6,
+              marginLeft: 6,
+              marginTop: 9,
               width: layout.width - 20,
               height: layout.height - 25,
             }}

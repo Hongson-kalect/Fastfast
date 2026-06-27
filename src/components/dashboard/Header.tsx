@@ -1,22 +1,21 @@
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
-const HomeHeader = () => {
+const DashboardHeader = () => {
   return (
     <View className="flex-row justify-between items-center">
       <View>
         <ThemedText type="subtitle" color="white">
           {/* Hi, Kalect */}
-          FastFast
+          Dashboard
         </ThemedText>
         {/* <ThemedText type="small">A little encouragement!</ThemedText> */}
       </View>
       <View>
-        <TouchableOpacity>
-          <View className="flex-row items-center justify-center rounded-full h-11 w-11 bg-gray-400 shadow-xs shadow-white">
-            <View className="flex-row items-center justify-center rounded-full h-10 w-10 bg-black shadow-inner shadow-white">
-              <ThemedText color="white">24</ThemedText>
-            </View>
+        <TouchableOpacity className="flex-row items-center gap-2">
+          <ThemedText className="text-2xl!">🎯</ThemedText>
+          <View className="py-1">
+            <ThemedText color="secondary">65 kg</ThemedText>
           </View>
         </TouchableOpacity>
       </View>
@@ -24,4 +23,4 @@ const HomeHeader = () => {
   );
 };
 
-export default HomeHeader;
+export default DashboardHeader;
