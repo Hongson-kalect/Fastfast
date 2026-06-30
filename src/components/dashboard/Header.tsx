@@ -15,7 +15,9 @@ const DashboardHeader = () => {
         <TouchableOpacity className="flex-row items-center gap-2">
           <ThemedText className="text-2xl!">🎯</ThemedText>
           <View className="py-1">
-            <ThemedText color="secondary">65 kg</ThemedText>
+            <ThemedText color="error" className="font-bold!">
+              65 kg
+            </ThemedText>
           </View>
         </TouchableOpacity>
       </View>

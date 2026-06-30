@@ -1,14 +1,17 @@
+import { FastBarChart } from "@/components/dashboard/FastBarChart";
 import DashboardHeader from "@/components/dashboard/Header";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    LayoutChangeEvent,
-    ScrollView,
-    Text,
-    useWindowDimensions,
-    View,
+  LayoutChangeEvent,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,8 +27,9 @@ export const MOCK_DASHBOARD_DATA = Array.from({ length: 20 }).map(
 
     // 2. Tạo logic cân nặng với các điều kiện đặc biệt của bạn:
     // Xu hướng cân nặng giả định giảm dần từ 72kg về 70kg
-    const baseWeight = 72 - index * 0.1 + (Math.random() * 0.4 - 0.2);
-    let weightLogs: number[] = [Number(baseWeight.toFixed(1))];
+    const baseWeight =
+      Math.floor((72 - index * 0.2 + (Math.random() * 0.4 - 0.2)) * 10) / 10;
+    let weightLogs: number | null = Number(baseWeight.toFixed(1));
 
     // Điều kiện: 2 ngày không có dữ liệu (Ví dụ ngày index 5 và index 12)
     if (
@@ -33,20 +37,13 @@ export const MOCK_DASHBOARD_DATA = Array.from({ length: 20 }).map(
         index,
       )
     ) {
-      weightLogs = [];
+      weightLogs = null;
     }
     // Điều kiện: 2 ngày có 2 lần nhập dữ liệu (Ví dụ ngày index 8 và index 15)
-    else if (index === 8 || index === 15) {
-      weightLogs = [
-        Number((baseWeight + 0.3).toFixed(1)), // Lần 1 (Sáng)
-        Number(baseWeight.toFixed(1)), // Lần 2 (Tối - giảm tí)
-      ];
-    }
 
     return {
-      date: dateString,
-      fastingHours,
-      weightLogs, // Mảng chứa các lần cân trong ngày
+      x: dateString,
+      y: baseWeight,
     };
   },
 );
@@ -57,6 +54,7 @@ const DashboardScreen = () => {
     height: number;
   } | null>(null);
   const { width } = useWindowDimensions();
+  const { theme } = useAppSettingsStore();
 
   const detectCounterLayout = (e: LayoutChangeEvent) => {
     if (layout) return;
@@ -74,57 +72,70 @@ const DashboardScreen = () => {
         >
           <View className="px-3">
             <DashboardHeader />
-            <View className="mt-8" style={{ height: 200 }}>
-              <WeightLineChart />
-            </View>
 
             {/* 4. BIỂU ĐỒ 2: XU HƯỚNG CÂN NẶNG (LINE CHART PLACEHOLDER) */}
             <View className=" rounded-3xl my-4">
               <View className="flex-row justify-between items-center mb-4">
-                <ThemedText className="text-white!">Cân nặng</ThemedText>
+                <View className="items-center justify-center gap-2">
+                  <ThemedText className="text-white!">Weight</ThemedText>
+                </View>
                 <View className="flex-row items-center gap-1">
-                  <View className="flex-row items-center px-2 py-1 border border-[#7EF9FF] rounded-lg">
-                    <ThemedText className="text-xs! text-[#7EF9FF]!">
-                      Now: 70kg
-                    </ThemedText>
+                  <View
+                    style={{ borderColor: theme.colors.text }}
+                    className="flex-row items-center p-2 border rounded-lg gap-1"
+                  >
+                    <ThemedText className="text-xs!">Last 7 days</ThemedText>
+
+                    <Feather
+                      name="chevron-down"
+                      size={14}
+                      color={theme.colors.text}
+                    />
                   </View>
                 </View>
-                {/* <Text className="text-white font-semibold text-base">
-                  Biến động cân nặng
-                </Text> */}
               </View>
 
               {/* Hộp đen đại diện cho Line Chart */}
               <View
                 style={{ height: 200 }}
-                onLayout={detectCounterLayout}
-                className="bg-[#1A1C24] items-center justify-center border border-dashed border-gray-700 rounded-lg"
+                className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
               >
                 <WeightLineChart
                   layout={{ width: width - 24, height: 200 }}
-                  //   data={MOCK_DASHBOARD_DATA}
-                  //   targetWeight={70}
+                  data={MOCK_DASHBOARD_DATA}
+                  target={70}
                 />
               </View>
             </View>
 
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
-            <View className="bg-black rounded-3xl my-6 border border-gray-900">
+            <View className="rounded-3xl my-6 border">
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-white font-semibold text-base">
                   Hiệu suất nhịn ăn
                 </Text>
-                <Text className="text-gray-400 text-xs">Tuần này</Text>
+                <View className="flex-row items-center gap-1">
+                  <View
+                    style={{ borderColor: theme.colors.text }}
+                    className="flex-row items-center p-2 border rounded-lg gap-1"
+                  >
+                    <ThemedText className="text-xs!">Last 7 days</ThemedText>
+
+                    <Feather
+                      name="chevron-down"
+                      size={14}
+                      color={theme.colors.text}
+                    />
+                  </View>
+                </View>
               </View>
 
               {/* Hộp đen đại diện cho Bar Chart */}
-              <View className="h-48 bg-[#1A1C24] rounded-2xl items-center justify-center border border-dashed border-gray-700">
-                <Text className="text-gray-500 font-medium">
-                  [ BAR CHART PLACEHOLDER ]
-                </Text>
-                <Text className="text-gray-600 text-xs mt-1">
-                  (Tổng số giờ nhịn: Thứ 2 - Chủ Nhật)
-                </Text>
+              <View
+                style={{ height: 200 }}
+                className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
+              >
+                <FastBarChart />
               </View>
             </View>
 
