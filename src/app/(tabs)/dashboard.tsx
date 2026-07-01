@@ -4,10 +4,12 @@ import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAppSettingsStore } from "@/store/useAppSettingStore";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { useState } from "react";
 import {
+  Animated,
   LayoutChangeEvent,
+  Pressable,
   ScrollView,
   Text,
   useWindowDimensions,
@@ -32,13 +34,13 @@ export const MOCK_DASHBOARD_DATA = Array.from({ length: 20 }).map(
     let weightLogs: number | null = Number(baseWeight.toFixed(1));
 
     // Điều kiện: 2 ngày không có dữ liệu (Ví dụ ngày index 5 và index 12)
-    if (
-      [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(
-        index,
-      )
-    ) {
-      weightLogs = null;
-    }
+    // if (
+    //   [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(
+    //     index,
+    //   )
+    // ) {
+    //   weightLogs = null;
+    // }
     // Điều kiện: 2 ngày có 2 lần nhập dữ liệu (Ví dụ ngày index 8 và index 15)
 
     return {
@@ -55,6 +57,31 @@ const DashboardScreen = () => {
   } | null>(null);
   const { width } = useWindowDimensions();
   const { theme } = useAppSettingsStore();
+  const [enableScroll, setEnableScroll] = useState(true);
+
+  // Khởi tạo giá trị scale cho hiệu ứng bấm FAB
+  const scaleValue = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.9, // Thu nhỏ lại 10% khi nhấn giữ
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1, // Trở về kích thước cũ khi nhấc tay
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleOpenAddWeightModal = () => {
+    // 💡 Logic mở Bottom Sheet hoặc Modal nhập cân nặng của bạn ở đây
+    console.log("Mở modal cập nhật cân nặng...");
+  };
 
   const detectCounterLayout = (e: LayoutChangeEvent) => {
     if (layout) return;
@@ -66,6 +93,7 @@ const DashboardScreen = () => {
     <ThemedView className="flex-1 bg-main">
       <SafeAreaView>
         <ScrollView
+          scrollEnabled={enableScroll}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
@@ -80,9 +108,31 @@ const DashboardScreen = () => {
                   <ThemedText className="text-white!">Weight</ThemedText>
                 </View>
                 <View className="flex-row items-center gap-1">
+                  <Animated.View
+                    className="w-10 h-10 rounded-lg border border-success border-solid elevation-8 overflow-hidden"
+                    style={[
+                      {
+                        backgroundColor: theme.colors.success + "cc",
+                        transform: [{ scale: scaleValue }],
+                      },
+                    ]}
+                  >
+                    <Pressable
+                      hitSlop={{ top: 10, left: 20, bottom: 10 }}
+                      onPressIn={handlePressIn}
+                      onPressOut={handlePressOut}
+                      onPress={handleOpenAddWeightModal}
+                      className="w-full h-full justify-center items-center"
+                      android_ripple={{ color: "#ffffff33", borderless: true }}
+                    >
+                      {/* Icon "weight" (Hình chiếc cân điện tử mini) */}
+                      <FontAwesome5 name="weight" size={16} color="#FFF" />
+                    </Pressable>
+                  </Animated.View>
+
                   <View
                     style={{ borderColor: theme.colors.text }}
-                    className="flex-row items-center p-2 border rounded-lg gap-1"
+                    className="flex-row items-center px-2 h-10 border rounded-lg gap-1"
                   >
                     <ThemedText className="text-xs!">Last 7 days</ThemedText>
 
@@ -101,6 +151,8 @@ const DashboardScreen = () => {
                 className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
               >
                 <WeightLineChart
+                  onInteractionStart={() => setEnableScroll(false)}
+                  onInteractionEnd={() => setEnableScroll(true)}
                   layout={{ width: width - 24, height: 200 }}
                   data={MOCK_DASHBOARD_DATA}
                   target={70}
@@ -114,7 +166,7 @@ const DashboardScreen = () => {
                 <Text className="text-white font-semibold text-base">
                   Hiệu suất nhịn ăn
                 </Text>
-                <View className="flex-row items-center gap-1">
+                <View className="flex-row items-center gap-1 h-10">
                   <View
                     style={{ borderColor: theme.colors.text }}
                     className="flex-row items-center p-2 border rounded-lg gap-1"
