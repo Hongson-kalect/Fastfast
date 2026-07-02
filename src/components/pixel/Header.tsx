@@ -1,15 +1,13 @@
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
-const HomeHeader = () => {
+const PixelHeader = () => {
   return (
     <View className="flex-row justify-between items-center">
       <View>
         <ThemedText type="subtitle" color="white">
-          {/* Hi, Kalect */}
-          FastFast
+          Journey
         </ThemedText>
-        {/* <ThemedText type="small">A little encouragement!</ThemedText> */}
       </View>
       <View className="p-1">
         <TouchableOpacity
@@ -18,7 +16,7 @@ const HomeHeader = () => {
         >
           {/* Số target hiển thị (thêm z-10 để luôn nổi lên trên dấu chấm mờ nếu cần) */}
           <ThemedText className="text-white/80! text-base! font-semibold!">
-            24h
+            170
           </ThemedText>
 
           {/* 2. Đường TOP (Nằm phía trên border) */}
@@ -38,4 +36,4 @@ const HomeHeader = () => {
   );
 };
 
-export default HomeHeader;
+export default PixelHeader;

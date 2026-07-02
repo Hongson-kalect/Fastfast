@@ -108,25 +108,28 @@ const DashboardScreen = () => {
                   <ThemedText className="text-white!">Weight</ThemedText>
                 </View>
                 <View className="flex-row items-center gap-1">
-                  <Animated.View
-                    className="w-10 h-10 rounded-lg border border-success border-solid elevation-8 overflow-hidden"
-                    style={[
-                      {
-                        backgroundColor: theme.colors.success + "cc",
-                        transform: [{ scale: scaleValue }],
-                      },
-                    ]}
-                  >
+                  <Animated.View className="w-10 h-10 rounded-lg">
                     <Pressable
                       hitSlop={{ top: 10, left: 20, bottom: 10 }}
                       onPressIn={handlePressIn}
                       onPressOut={handlePressOut}
                       onPress={handleOpenAddWeightModal}
-                      className="w-full h-full justify-center items-center"
+                      className="w-full h-full flex-row justify-center items-center"
                       android_ripple={{ color: "#ffffff33", borderless: true }}
                     >
                       {/* Icon "weight" (Hình chiếc cân điện tử mini) */}
-                      <FontAwesome5 name="weight" size={16} color="#FFF" />
+                      <View className="absolute -top-1 -left-1 z-10 bg-black items-center justify-center h-5 w-5 rounded-full shadow-inner shadow-secondary">
+                        <FontAwesome5
+                          name="plus"
+                          size={10}
+                          color={theme.colors.secondary}
+                        />
+                      </View>
+                      <FontAwesome5
+                        name="weight"
+                        size={30}
+                        color={theme.colors.secondary}
+                      />
                     </Pressable>
                   </Animated.View>
 
@@ -161,7 +164,7 @@ const DashboardScreen = () => {
             </View>
 
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
-            <View className="rounded-3xl my-6 border">
+            <View className="rounded-3xl my-6">
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-white font-semibold text-base">
                   Hiệu suất nhịn ăn
