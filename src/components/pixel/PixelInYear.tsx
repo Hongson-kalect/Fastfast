@@ -1,23 +1,98 @@
 import { ThemedText } from "@/components/themed-text";
 import { useMemo, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
 interface DayItem {
   dateString: string;
   dayOfMonth: number;
   isCurrentYear: boolean;
+  data?: DayItemType;
 }
 
 interface WeekItem {
   weekIndex: number; // 0, 1, 2... tương ứng với hàng
   weekNumberInYear: number; // Số tuần thực tế trong năm (1, 2, 3...)
-  label: string; // Nhãn hiển thị bên trái (W1 hoặc JAN - 1)
+  month: string; // Nhãn hiển thị bên trái (W1 hoặc JAN - 1)
+  weekOfYear: string; // Nhãn hiển thị bên trái (W1 hoặc JAN - 1)
   isMonthHeader: boolean; // Dùng để xác định xem có cần in đậm label không
   days: DayItem[];
 }
 
 // ─── THUẬT TOÁN SINH LƯỚI PIXEL ĐÃ NÂNG CẤP NHÃN BIÊN ───
-const generateYearGrid = (targetYear: number): WeekItem[] => {
+type DayItemType = {
+  dateString: string;
+  moodIndex: number;
+  fastingHours: number;
+  fastingRange: number;
+  isCurrentYear: boolean;
+};
+
+type DayItemObj = {
+  [key: string]: DayItemType;
+};
+
+export const moodArr = [
+  { index: 1, emoji: "😫", label: "Tệ", color: "#451A1A" }, // Đỏ rượu rất trầm (Deep Muted Red)
+  { index: 2, emoji: "😮‍💨", label: "Oải", color: "#432014" }, // Nâu cam đất (Muted Terracotta)
+  { index: 3, emoji: "😐", label: "Bình thường", color: "#3E2723" }, // Nâu gỗ ấm (Warm Muted Brown)
+  { index: 4, emoji: "🙂", label: "Ổn", color: "#1A2E40" }, // Xanh biển đêm (Deep Navy/Slate)
+  { index: 5, emoji: "🥰", label: "Tuyệt vời", color: "#143525" }, // Xanh lá rừng sâu (Deep Forest Green)
+];
+
+const moodColorArr = [
+  "#EF4444", // Đỏ
+  "#F97316", // Cam
+  "#FBBF24", // Vàng
+  "#3B82F6", // Xanh dương
+  "#10B981", // Xanh lá
+];
+
+export const generateMockDataObj = (targetYear: number): DayItemObj => {
+  const mockData: DayItemObj = {};
+
+  // Tạo mốc thời gian bắt đầu từ 1/1 và kết thúc ở 31/12
+  const startDate = new Date(targetYear, 0, 1);
+  const endDate = new Date(targetYear, 11, 31);
+
+  const currentPointer = new Date(startDate);
+
+  while (currentPointer <= endDate) {
+    const currentYear = currentPointer.getFullYear();
+    const currentMonth = currentPointer.getMonth();
+    const currentDate = currentPointer.getDate();
+
+    // Format chuẩn key YYYY-MM-DD
+    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDate).padStart(2, "0")}`;
+
+    // Giả lập: Không phải ngày nào người dùng cũng điền log (tỷ lệ 85% có data)
+    if (Math.random() > 0.15) {
+      // Random ngẫu nhiên số giờ nhịn từ 14h đến 22h
+      const fastingHours = Math.floor(Math.random() * 9) + 14;
+      // Random target mục tiêu (ví dụ: 16h, 18h, 20h)
+      const targetOptions = [16, 18, 20];
+      const targetRange =
+        targetOptions[Math.floor(Math.random() * targetOptions.length)];
+
+      mockData[dateString] = {
+        dateString,
+        moodIndex: Math.floor(Math.random() * 5) + 1, // Random từ 1 -> 5
+        fastingHours,
+        fastingRange: targetRange, // Giờ mục tiêu nhịn đặt ra ngày đó
+        isCurrentYear: true,
+      };
+    }
+
+    // Tịnh tiến lên 1 ngày
+    currentPointer.setDate(currentPointer.getDate() + 1);
+  }
+
+  return mockData;
+};
+
+const generateYearGrid = (
+  targetYear: number,
+  dataObj?: DayItemObj,
+): WeekItem[] => {
   const weeks: WeekItem[] = [];
   const firstDayOfYear = new Date(targetYear, 0, 1);
 
@@ -86,10 +161,13 @@ const generateYearGrid = (targetYear: number): WeekItem[] => {
       const currentDate = currentPointer.getDate();
       const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDate).padStart(2, "0")}`;
 
+      const data = dataObj?.[dateString];
+
       days.push({
         dateString,
         dayOfMonth: currentDate,
         isCurrentYear: currentYear === targetYear,
+        data,
       });
 
       currentPointer.setDate(currentPointer.getDate() + 1);
@@ -98,14 +176,12 @@ const generateYearGrid = (targetYear: number): WeekItem[] => {
     // Xác định text hiển thị cho rìa trái
     const currentWeekStr = currentWeekNum.toString().padStart(2, "0");
     let finalLabel = currentWeekStr;
-    if (shouldBeMonthHeader && monthLabelToUse) {
-      finalLabel = monthLabelToUse;
-    }
 
     weeks.push({
       weekIndex: currentWeekNum - 1,
       weekNumberInYear: currentWeekNum,
-      label: finalLabel,
+      month: monthLabelToUse,
+      weekOfYear: currentWeekNum.toString().padStart(2, "0"),
       isMonthHeader: shouldBeMonthHeader,
       days,
     });
@@ -124,10 +200,10 @@ const PixelGridManager = () => {
     new Date().getFullYear(),
   );
 
-  const gridData = useMemo(
-    () => generateYearGrid(renderedYear),
-    [renderedYear],
-  );
+  const gridData = useMemo(() => {
+    const dataObj = generateMockDataObj(renderedYear);
+    return generateYearGrid(renderedYear, dataObj);
+  }, [renderedYear]);
 
   const handleRender = () => {
     const yearNum = parseInt(inputYear, 10);
@@ -137,51 +213,50 @@ const PixelGridManager = () => {
   };
 
   return (
-    <View className="p-3 bg-transparent">
+    <View className="bg-transparent mt-3">
       {/* KHU VỰC CONTROLLER */}
-      <View className="bg-white/5 p-4 rounded-2xl border border-white/10 mb-4 flex-row items-center gap-3">
-        <View className="flex-1">
-          <ThemedText className="text-xs opacity-60 mb-1">
-            Nhập năm cần xem
-          </ThemedText>
-          <TextInput
-            value={inputYear}
-            onChangeText={setInputYear}
-            keyboardType="number-pad"
-            maxLength={4}
-            className="bg-black/30 text-white font-bold text-base px-3 py-2 rounded-xl border border-white/5"
-          />
-        </View>
-        <TouchableOpacity
-          onPress={handleRender}
-          className="bg-emerald-600 active:opacity-80 px-5 py-3 rounded-xl justify-center h-[50px] mt-4"
-        >
-          <Text className="text-white font-bold text-sm">Render Bảng</Text>
-        </TouchableOpacity>
-      </View>
 
       {/* BẢNG PIXEL IN YEAR */}
-      <View className="bg-white/5 rounded-2xl p-3 border border-white/10">
-        <ThemedText className="text-center font-bold text-sm mb-4 text-secondary">
-          SƠ ĐỒ PIXEL NĂM {renderedYear}
-        </ThemedText>
+      <View className="flex-row justify-between items-center">
+        <ThemedText className="text-[11px]!">Layout:</ThemedText>
 
-        {/* Header Thứ (T2 -> CN) */}
-        <View className="flex-row mb-2 items-center">
-          {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
-          <View className="w-10 mr-2">
-            <ThemedText className="text-[11px]! font-semibold opacity-40">
+        <View className="flex-row items-center gap-1 justify-end">
+          <View className=" items-center px-3 py-1 bg-primary rounded-lg">
+            <ThemedText className="text-[11px]! text-white! font-bold">
               Week
             </ThemedText>
           </View>
+          <View className=" items-center px-3 py-1 bg-gray-600 rounded-lg">
+            <ThemedText className="text-[11px]! text-white/60! font-bold">
+              Month
+            </ThemedText>
+          </View>
+          <View className=" items-center px-3 py-1 bg-gray-600 rounded-lg">
+            <ThemedText className="text-[11px]! text-white/60! font-bold">
+              Year
+            </ThemedText>
+          </View>
+        </View>
+      </View>
+      <View className="bg-white/5 rounded-lg py-2 px-1 mt-3">
+        {/* Header Thứ (T2 -> CN) */}
+        <View className="flex-row mb-2 items-center">
+          {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
+          <View className="w-12">
+            {/* <ThemedText className="text-[12px]! text-white! font-bold">
+              Week
+            </ThemedText> */}
+          </View>
           <View className="flex-1 flex-row justify-between">
-            {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((day, idx) => (
-              <View key={idx} className="flex-1 items-center justify-center">
-                <ThemedText className="text-[11px]! font-semibold opacity-40">
-                  {day}
-                </ThemedText>
-              </View>
-            ))}
+            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+              (day, idx) => (
+                <View key={idx} className="flex-1 items-center justify-center">
+                  <ThemedText className="text-[10px]! text-white! opacity-70">
+                    {day}
+                  </ThemedText>
+                </View>
+              ),
+            )}
           </View>
         </View>
 
@@ -190,15 +265,20 @@ const PixelGridManager = () => {
           {gridData.map((week) => (
             <View key={week.weekIndex} className="flex-row items-center">
               {/* CỘT RIỀA TRÁI TỐI GIẢN (w-12) */}
-              <View className="w-10 items-start justify-center mr-2">
+              <View className="w-12 justify-center items-center">
+                {week.isMonthHeader && (
+                  <View className="absolute -top-2 left-0 -rotate-45">
+                    <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
+                      {week.month}
+                    </ThemedText>
+                  </View>
+                )}
                 <ThemedText
-                  className={`text-[11px] ${
-                    week.isMonthHeader
-                      ? "text-[11px]! font-bold text-emerald-400! opacity-100 text-xs" // Tên tháng: Sáng, Đậm, To hơn một chút
-                      : "text-[9px]! font-regular text-white/30" // Số tuần thường: Mờ, Nhẹ
-                  }`}
+                  className={
+                    "text-center text-[10px]! font-regular text-white/70!"
+                  }
                 >
-                  {week.label}
+                  {week.weekOfYear}
                 </ThemedText>
               </View>
 
@@ -206,20 +286,28 @@ const PixelGridManager = () => {
               <View className="flex-1 flex-row justify-between gap-x-1.5">
                 {week.days.map((day, dIdx) => (
                   <View
+                    style={{
+                      backgroundColor: day?.data?.moodIndex
+                        ? moodArr[day?.data?.moodIndex - 1].color + "dd"
+                        : "transparent",
+                    }}
                     key={dIdx}
                     className={`flex-1 aspect-square justify-center items-center rounded-md border 
                 ${
                   day.isCurrentYear
                     ? "bg-white/10 border-white/10"
-                    : "bg-white/[0.02] border-dashed border-white/5"
+                    : "bg-white/2 border-dashed border-white/5"
                 }`}
                   >
                     <Text
-                      className={`text-[10px] font-medium ${
-                        day.isCurrentYear ? "text-white/60" : "text-white/20"
+                      className={`text-[16px]! font-medium ${
+                        day.isCurrentYear ? "text-white" : "text-white/20"
                       }`}
                     >
-                      {day.dayOfMonth}
+                      {/* {day.dayOfMonth} */}
+                      {day?.data?.moodIndex
+                        ? moodArr[day?.data?.moodIndex - 1].emoji
+                        : ""}
                     </Text>
                   </View>
                 ))}

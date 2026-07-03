@@ -1,36 +1,27 @@
+import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
 const PixelHeader = () => {
   return (
     <View className="flex-row justify-between items-center">
-      <View>
+      <View className="flex-row items-center gap-2">
         <ThemedText type="subtitle" color="white">
-          Journey
+          Emotion
         </ThemedText>
+
+        <Feather name="chevron-down" size={36} color="white" />
       </View>
-      <View className="p-1">
+      <View className="p-1 flex-row items-center gap-1">
+        <Feather name="chevron-left" size={20} color="white" />
         <TouchableOpacity
           activeOpacity={0.7}
-          className="h-10 w-10 justify-center items-center rounded-lg border-2 border-red-800 relative"
+          className="h-10 w-12 justify-center items-center relative"
         >
           {/* Số target hiển thị (thêm z-10 để luôn nổi lên trên dấu chấm mờ nếu cần) */}
-          <ThemedText className="text-white/80! text-base! font-semibold!">
-            170
-          </ThemedText>
-
-          {/* 2. Đường TOP (Nằm phía trên border) */}
-          <View className="absolute w-0.5 h-2.5 bg-red-800 z-10 -top-2 left-4.5" />
-
-          {/* 3. Đường BOTTOM (Nằm phía dưới border) */}
-          <View className="absolute w-0.5 h-2.5 bg-red-800 z-10 -bottom-2 left-4.5" />
-
-          {/* 4. Đường LEFT (Nằm bên trái border) */}
-          <View className="absolute h-0.5 w-2.5 bg-red-800 z-10 -left-2 top-4.5" />
-
-          {/* 5. Đường RIGHT (Nằm bên phải border) */}
-          <View className="absolute h-0.5 w-2.5 bg-red-800 z-10 -right-2 top-4.5" />
+          <ThemedText className="text-white! text-base!">2026</ThemedText>
         </TouchableOpacity>
+        <Feather name="chevron-right" size={20} color="white" />
       </View>
     </View>
   );

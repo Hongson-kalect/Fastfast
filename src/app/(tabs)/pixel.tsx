@@ -97,12 +97,13 @@ const PixelScreen = () => {
         >
           <View className="px-3">
             <PixelHeader />
-
-            <PixelOptions
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              currentGuides={currentGuides}
-            />
+            <View className="py-4">
+              <PixelOptions
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                currentGuides={currentGuides}
+              />
+            </View>
 
             {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
             <PixelInYear />
