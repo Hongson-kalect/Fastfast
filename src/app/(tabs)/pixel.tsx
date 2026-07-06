@@ -1,6 +1,6 @@
 import PixelHeader from "@/components/pixel/Header";
 import PixelInYear from "@/components/pixel/PixelInYear";
-import PixelOptions from "@/components/pixel/PixelOptions";
+import PixelStatistic from "@/components/pixel/Statistic";
 import { ThemedView } from "@/components/themed-view";
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -97,13 +97,16 @@ const PixelScreen = () => {
         >
           <View className="px-3">
             <PixelHeader />
-            <View className="py-4">
+            <View className="mt-4">
+              <PixelStatistic />
+            </View>
+            {/* <View className="py-4">
               <PixelOptions
                 viewMode={viewMode}
                 setViewMode={setViewMode}
                 currentGuides={currentGuides}
               />
-            </View>
+            </View> */}
 
             {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
             <PixelInYear />

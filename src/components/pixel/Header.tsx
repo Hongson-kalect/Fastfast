@@ -7,10 +7,10 @@ const PixelHeader = () => {
     <View className="flex-row justify-between items-center">
       <View className="flex-row items-center gap-2">
         <ThemedText type="subtitle" color="white">
-          Emotion
+          Journey
         </ThemedText>
 
-        <Feather name="chevron-down" size={36} color="white" />
+        {/* <Feather name="chevron-down" size={36} color="white" /> */}
       </View>
       <View className="p-1 flex-row items-center gap-1">
         <Feather name="chevron-left" size={20} color="white" />

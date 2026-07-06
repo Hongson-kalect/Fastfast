@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 interface DayItem {
   dateString: string;
@@ -32,19 +32,11 @@ type DayItemObj = {
 };
 
 export const moodArr = [
-  { index: 1, emoji: "😫", label: "Tệ", color: "#451A1A" }, // Đỏ rượu rất trầm (Deep Muted Red)
-  { index: 2, emoji: "😮‍💨", label: "Oải", color: "#432014" }, // Nâu cam đất (Muted Terracotta)
-  { index: 3, emoji: "😐", label: "Bình thường", color: "#3E2723" }, // Nâu gỗ ấm (Warm Muted Brown)
-  { index: 4, emoji: "🙂", label: "Ổn", color: "#1A2E40" }, // Xanh biển đêm (Deep Navy/Slate)
-  { index: 5, emoji: "🥰", label: "Tuyệt vời", color: "#143525" }, // Xanh lá rừng sâu (Deep Forest Green)
-];
-
-const moodColorArr = [
-  "#EF4444", // Đỏ
-  "#F97316", // Cam
-  "#FBBF24", // Vàng
-  "#3B82F6", // Xanh dương
-  "#10B981", // Xanh lá
+  { index: 1, emoji: "😫", label: "Tired", color: "#541A1A" }, // Đỏ bã trầu đậm sâu (Deep Wine)
+  { index: 2, emoji: "😮‍💨", label: "Bad", color: "#5C3A15" }, // Nâu cam đất trầm (Dark Amber)
+  { index: 3, emoji: "🙂", label: "Fine", color: "#544D17" }, // Vàng rêu/Úa tối (Muted Olive) - Đủ phân biệt nhưng không bị chói như vàng chanh
+  { index: 4, emoji: "😃", label: "Good", color: "#164454" }, // Xanh slate/Cyan tối (Deep Ocean Blue)
+  { index: 5, emoji: "🥰", label: "Happy", color: "#2B4C15" }, // Xanh lá cây sẫm (Deep Forest Green)
 ];
 
 export const generateMockDataObj = (targetYear: number): DayItemObj => {
@@ -213,44 +205,29 @@ const PixelGridManager = () => {
   };
 
   return (
-    <View className="bg-transparent mt-3">
+    <View>
       {/* KHU VỰC CONTROLLER */}
-
-      {/* BẢNG PIXEL IN YEAR */}
-      <View className="flex-row justify-between items-center">
-        <ThemedText className="text-[11px]!">Layout:</ThemedText>
-
-        <View className="flex-row items-center gap-1 justify-end">
-          <View className=" items-center px-3 py-1 bg-primary rounded-lg">
-            <ThemedText className="text-[11px]! text-white! font-bold">
-              Week
-            </ThemedText>
-          </View>
-          <View className=" items-center px-3 py-1 bg-gray-600 rounded-lg">
-            <ThemedText className="text-[11px]! text-white/60! font-bold">
-              Month
-            </ThemedText>
-          </View>
-          <View className=" items-center px-3 py-1 bg-gray-600 rounded-lg">
-            <ThemedText className="text-[11px]! text-white/60! font-bold">
-              Year
-            </ThemedText>
-          </View>
-        </View>
-      </View>
-      <View className="bg-white/5 rounded-lg py-2 px-1 mt-3">
+      <View className="bg-white/5 rounded-lg pr-1 pb-1 mt-6 overflow-hidden">
         {/* Header Thứ (T2 -> CN) */}
         <View className="flex-row mb-2 items-center">
           {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
-          <View className="w-12">
-            {/* <ThemedText className="text-[12px]! text-white! font-bold">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            hitSlop={25}
+            style={{ borderTopLeftRadius: 4 }}
+            className="w-13 bg-primary justify-center items-center"
+          >
+            <ThemedText className="text-[12px]! py-1 text-white! font-bold">
               Week
-            </ThemedText> */}
-          </View>
+            </ThemedText>
+          </TouchableOpacity>
           <View className="flex-1 flex-row justify-between">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
               (day, idx) => (
-                <View key={idx} className="flex-1 items-center justify-center">
+                <View
+                  key={idx}
+                  className="flex-1 items-center justify-center pt-1"
+                >
                   <ThemedText className="text-[10px]! text-white! opacity-70">
                     {day}
                   </ThemedText>
@@ -262,58 +239,64 @@ const PixelGridManager = () => {
 
         {/* Danh sách các tuần */}
         <View className="gap-y-1.5">
-          {gridData.map((week) => (
-            <View key={week.weekIndex} className="flex-row items-center">
-              {/* CỘT RIỀA TRÁI TỐI GIẢN (w-12) */}
-              <View className="w-12 justify-center items-center">
-                {week.isMonthHeader && (
-                  <View className="absolute -top-2 left-0 -rotate-45">
-                    <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
-                      {week.month}
-                    </ThemedText>
-                  </View>
-                )}
-                <ThemedText
-                  className={
-                    "text-center text-[10px]! font-regular text-white/70!"
-                  }
-                >
-                  {week.weekOfYear}
-                </ThemedText>
-              </View>
+          <FlatList
+            scrollEnabled={false}
+            data={gridData}
+            contentContainerClassName="gap-1.5"
+            keyExtractor={(week) => week.weekIndex.toString()}
+            renderItem={({ item: week }) => (
+              <View key={week.weekIndex} className="flex-row items-center">
+                {/* CỘT RIỀA TRÁI TỐI GIẢN (w-12) */}
+                <View className="w-13 pl-1 justify-center items-center">
+                  {week.isMonthHeader && (
+                    <View className="absolute -top-2 left-0 -rotate-45">
+                      <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
+                        {week.month}
+                      </ThemedText>
+                    </View>
+                  )}
+                  <ThemedText
+                    className={
+                      "text-center text-[10px]! font-regular text-white/70!"
+                    }
+                  >
+                    {week.weekOfYear}
+                  </ThemedText>
+                </View>
 
-              {/* Hàng 7 ô pixel ngày */}
-              <View className="flex-1 flex-row justify-between gap-x-1.5">
-                {week.days.map((day, dIdx) => (
-                  <View
-                    style={{
-                      backgroundColor: day?.data?.moodIndex
-                        ? moodArr[day?.data?.moodIndex - 1].color + "dd"
-                        : "transparent",
-                    }}
-                    key={dIdx}
-                    className={`flex-1 aspect-square justify-center items-center rounded-md border 
+                {/* Hàng 7 ô pixel ngày */}
+                <View className="flex-1 flex-row justify-between gap-x-1.5">
+                  {week.days.map((day, dIdx) => (
+                    <View
+                      style={{
+                        backgroundColor: day?.data?.moodIndex
+                          ? moodArr[day?.data?.moodIndex - 1].color + "dd"
+                          : "transparent",
+                      }}
+                      key={dIdx}
+                      className={`flex-1 aspect-square justify-center items-center rounded-md border 
                 ${
                   day.isCurrentYear
                     ? "bg-white/10 border-white/10"
                     : "bg-white/2 border-dashed border-white/5"
                 }`}
-                  >
-                    <Text
-                      className={`text-[16px]! font-medium ${
-                        day.isCurrentYear ? "text-white" : "text-white/20"
-                      }`}
                     >
-                      {/* {day.dayOfMonth} */}
-                      {day?.data?.moodIndex
-                        ? moodArr[day?.data?.moodIndex - 1].emoji
-                        : ""}
-                    </Text>
-                  </View>
-                ))}
+                      <Text
+                        className={`text-[16px]! font-medium ${
+                          day.isCurrentYear ? "text-white" : "text-white/20"
+                        }`}
+                      >
+                        {/* {day.dayOfMonth} */}
+                        {day?.data?.moodIndex
+                          ? moodArr[day?.data?.moodIndex - 1].emoji
+                          : ""}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               </View>
-            </View>
-          ))}
+            )}
+          />
         </View>
       </View>
     </View>

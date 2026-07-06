@@ -44,7 +44,7 @@ export const defaultStyle: StyleStructure = {
     name: "Xanh Đậm Công Nghệ",
     mode: "dark",
     colors: {
-      primary: "#3B82F6", // Xanh chủ đạo (Nút bấm chính)
+      primary: "#60A5FA", // Xanh chủ đạo (Nút bấm chính)
       secondary: "#7EF9FF", // Xanh phụ
       title: "#F8FAFC", // Chữ tiêu đề lớn
       text: "#94A3B8", // Chữ nội dung
