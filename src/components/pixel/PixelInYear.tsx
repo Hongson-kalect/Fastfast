@@ -31,12 +31,20 @@ type DayItemObj = {
   [key: string]: DayItemType;
 };
 
+// export const moodArr = [
+//   { index: 1, emoji: "😫", label: "Tired", color: "#541A1A" }, // Đỏ bã trầu đậm sâu (Deep Wine)
+//   { index: 2, emoji: "😮‍💨", label: "Bad", color: "#5C3A15" }, // Nâu cam đất trầm (Dark Amber)
+//   { index: 3, emoji: "🙂", label: "Fine", color: "#544D17" }, // Vàng rêu/Úa tối (Muted Olive) - Đủ phân biệt nhưng không bị chói như vàng chanh
+//   { index: 4, emoji: "😃", label: "Good", color: "#164454" }, // Xanh slate/Cyan tối (Deep Ocean Blue)
+//   { index: 5, emoji: "🥰", label: "Happy", color: "#2B4C15" }, // Xanh lá cây sẫm (Deep Forest Green)
+// ];
+
 export const moodArr = [
-  { index: 1, emoji: "😫", label: "Tired", color: "#541A1A" }, // Đỏ bã trầu đậm sâu (Deep Wine)
-  { index: 2, emoji: "😮‍💨", label: "Bad", color: "#5C3A15" }, // Nâu cam đất trầm (Dark Amber)
-  { index: 3, emoji: "🙂", label: "Fine", color: "#544D17" }, // Vàng rêu/Úa tối (Muted Olive) - Đủ phân biệt nhưng không bị chói như vàng chanh
-  { index: 4, emoji: "😃", label: "Good", color: "#164454" }, // Xanh slate/Cyan tối (Deep Ocean Blue)
-  { index: 5, emoji: "🥰", label: "Happy", color: "#2B4C15" }, // Xanh lá cây sẫm (Deep Forest Green)
+  { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ trầm nhưng có sắc hồng (Crimson Dark) - Rõ ràng là tiêu cực
+  { index: 2, emoji: "😮‍💨", label: "Bad", color: "#874D14" }, // Cam cháy/Hổ phách (Amber Earth) - Tách biệt hẳn với đỏ
+  { index: 3, emoji: "🙂", label: "Fine", color: "#3A3F47" }, // Xám Slate trung tính - Đúng nghĩa "Bình thường", giúp các ngày vui/buồn khác nổi bật lên
+  { index: 4, emoji: "😃", label: "Good", color: "#1A5C70" }, // Xanh ngọc biển (Deep Teal) - Bắt đầu có năng lượng tích cực
+  { index: 5, emoji: "🥰", label: "Happy", color: "#2E6930" }, // Xanh lá Emerald trầm - Trạng thái tốt nhất
 ];
 
 export const generateMockDataObj = (targetYear: number): DayItemObj => {
@@ -242,7 +250,7 @@ const PixelGridManager = () => {
           <FlatList
             scrollEnabled={false}
             data={gridData}
-            contentContainerClassName="gap-1.5"
+            contentContainerClassName="gap-1"
             keyExtractor={(week) => week.weekIndex.toString()}
             renderItem={({ item: week }) => (
               <View key={week.weekIndex} className="flex-row items-center">
@@ -265,7 +273,7 @@ const PixelGridManager = () => {
                 </View>
 
                 {/* Hàng 7 ô pixel ngày */}
-                <View className="flex-1 flex-row justify-between gap-x-1.5">
+                <View className="flex-1 flex-row justify-between gap-x-1">
                   {week.days.map((day, dIdx) => (
                     <View
                       style={{

@@ -118,17 +118,17 @@ const DashboardScreen = () => {
                       android_ripple={{ color: "#ffffff33", borderless: true }}
                     >
                       {/* Icon "weight" (Hình chiếc cân điện tử mini) */}
-                      <View className="absolute -top-1 -left-1 z-10 bg-black items-center justify-center h-5 w-5 rounded-full shadow-inner shadow-secondary">
+                      <View className="absolute -top-1 -left-1 z-10 bg-black items-center justify-center h-5 w-5 rounded-full shadow-inner shadow-primary">
                         <FontAwesome5
                           name="plus"
                           size={10}
-                          color={theme.colors.secondary}
+                          color={theme.colors.primary}
                         />
                       </View>
                       <FontAwesome5
                         name="weight"
                         size={30}
-                        color={theme.colors.secondary}
+                        color={theme.colors.primary}
                       />
                     </Pressable>
                   </Animated.View>
