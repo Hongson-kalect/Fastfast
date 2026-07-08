@@ -1,4 +1,3 @@
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
 import {
   BlurMask,
   Canvas,
@@ -20,8 +19,10 @@ import {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
+import { useAppStore } from "@/stores/appStore";
 
 type Props = {
+  isCounting: boolean;
   counter: number;
   targetHours?: number;
 };
@@ -32,7 +33,7 @@ const colorRange = {
 };
 
 const padding = 12;
-const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
+const HomeTimeCounter = ({ isCounting, counter, targetHours }: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -43,9 +44,10 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
     const { width, height } = e.nativeEvent.layout;
     setLayout({ width: width + 10, height: height + 42 });
   };
-  const { theme } = useAppSettingsStore();
-  const targetSeconds = targetHours * 3600 * 1000;
-  const progress = Math.min(counter / targetSeconds, 1);
+  const { theme } = useAppStore();
+  const progress = targetHours
+    ? Math.min(Math.max((counter / targetHours) * 3600 * 1000, 0.05), 1)
+    : 1;
   const progressColor = useMemo(() => {
     return interpolateColors(
       progress,
@@ -135,53 +137,59 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
                 {/* 1. Đường viền nền tối phía sau */}
                 <Path
                   path={capsulePath}
-                  color={"#333"}
+                  color={isCounting ? "#333" : "#888"}
                   style="stroke"
                   strokeWidth={strokeWidth}
                 />
                 {/* 2. Đường tiến độ hiện tại */}
-                <Path
-                  path={capsulePath}
-                  color={
-                    progress === 1
-                      ? theme.colors.primary + "dd"
-                      : theme.colors.primary + Math.floor(progress * 100)
-                  }
-                  style="stroke"
-                  strokeWidth={strokeWidth}
-                  strokeCap={"round"}
-                  start={0}
-                  end={progress}
-                />
+                {isCounting && (
+                  <>
+                    <Path
+                      path={capsulePath}
+                      color={
+                        progress === 1
+                          ? theme.primary + "dd"
+                          : theme.primary + Math.floor(progress * 100)
+                      }
+                      style="stroke"
+                      strokeWidth={strokeWidth}
+                      strokeCap={"round"}
+                      start={0}
+                      end={progress}
+                    />
 
-                {/* 3. Đường trắng chạy quanh */}
-                <Path
-                  path={capsulePath}
-                  style="stroke"
-                  strokeWidth={strokeWidth}
-                  strokeCap="round"
-                  start={0}
-                  end={progress}
-                >
-                  <SweepGradient
-                    c={vec(layout.width / 2, layout.height / 2)}
-                    matrix={animatedMatrix}
-                    colors={[
-                      theme.colors.primary + "10",
-                      theme.colors.primary + "30",
-                      theme.colors.primary + "80",
-                      theme.colors.primary,
-                      "#FFFFFF",
-                      theme.colors.primary,
-                      theme.colors.primary + "80",
-                      theme.colors.primary + "30",
-                      theme.colors.primary + "10",
-                    ]}
-                    positions={[0, 0.45, 0.7, 0.82, 0.9, 0.94, 0.97, 0.99, 1]}
-                  />
+                    {/* 3. Đường trắng chạy quanh */}
+                    <Path
+                      path={capsulePath}
+                      style="stroke"
+                      strokeWidth={strokeWidth}
+                      strokeCap="round"
+                      start={0}
+                      end={progress}
+                    >
+                      <SweepGradient
+                        c={vec(layout.width / 2, layout.height / 2)}
+                        matrix={animatedMatrix}
+                        colors={[
+                          theme.primary + "10",
+                          theme.primary + "30",
+                          theme.primary + "80",
+                          theme.primary,
+                          "#FFFFFF",
+                          theme.primary,
+                          theme.primary + "80",
+                          theme.primary + "30",
+                          theme.primary + "10",
+                        ]}
+                        positions={[
+                          0, 0.45, 0.7, 0.82, 0.9, 0.94, 0.97, 0.99, 1,
+                        ]}
+                      />
 
-                  <BlurMask blur={10} style="solid" />
-                </Path>
+                      <BlurMask blur={10} style="solid" />
+                    </Path>
+                  </>
+                )}
               </>
             )}
           </Canvas>
@@ -196,11 +204,15 @@ const HomeTimeCounter = ({ counter, targetHours = 24 }: Props) => {
               height: layout.height - 25,
             }}
           >
-            <Counter
-              itemClassName="text-white!"
-              counter={counter}
-              type="large"
-            />
+            {isCounting ? (
+              <Counter
+                itemClassName="text-white!"
+                counter={counter}
+                type="large"
+              />
+            ) : (
+              <Counter itemClassName="text-white!" counter={0} type="large" />
+            )}
           </View>
         </View>
       )}

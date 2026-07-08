@@ -1,6 +1,6 @@
 import { timeString } from "@/util/timer";
-import { useEffect, useMemo, useState } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { useMemo } from "react";
+import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 
 type Props = {
@@ -20,10 +20,9 @@ const Counter = ({
   itemClassName,
   style,
 }: Props) => {
-  const timeLeft = useMemo (()=>{
+  const timeLeft = useMemo(() => {
     return Math.abs(countTo - counter);
-  }, [countTo, counter])
-
+  }, [countTo, counter]);
 
   return (
     <View className="flex-row items-center">

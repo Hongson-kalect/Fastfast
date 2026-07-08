@@ -1,7 +1,7 @@
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
 import { useRef } from "react";
 import { DimensionValue, StyleSheet, View } from "react-native";
 import { SkeletonReact } from "./ReactSkeleton";
+import { useAppStore } from "@/stores/appStore";
 
 export const WordSearchSkeleton = () => {
   const width = useRef(20 + Math.floor(Math.random() * 40));
@@ -45,7 +45,7 @@ export const WordSearchSkeleton = () => {
 };
 
 export const WordSkeleton = () => {
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const width = useRef(30 + Math.floor(Math.random() * 40));
   return (
     <View
@@ -53,7 +53,7 @@ export const WordSkeleton = () => {
       style={{
         elevation: 6,
         borderRadius: 8,
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.background,
       }}
     >
       <SkeletonReact width={112} height={63} style={{ borderRadius: 8 }} />
@@ -77,7 +77,7 @@ export const WordSkeleton = () => {
 };
 
 export const CollectionSkeleton = () => {
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const width = useRef(30 + Math.floor(Math.random() * 40));
   return (
     <View
@@ -85,7 +85,7 @@ export const CollectionSkeleton = () => {
       style={{
         elevation: 6,
         borderRadius: 8,
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.background,
       }}
     >
       <SkeletonReact width={112} height={63} style={{ borderRadius: 8 }} />

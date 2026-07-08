@@ -1,4 +1,3 @@
-
 import { Theme } from "@/interfaces/db.type";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -33,11 +32,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_theme_single_active
 ON theme(is_deleted);
 `;
 
-
-
 export const getActiveTheme = async (
   db: SQLiteDatabase,
-): Promise<Theme&{color_palette: any} | null> => {
+): Promise<(Theme & { color_palette: any }) | null> => {
   const now = new Date().toISOString();
   const row = await db.getFirstAsync<Theme>(
     `SELECT * FROM theme WHERE (expired_at IS NULL OR expired_at > "${now}") AND is_deleted = 0 ORDER BY priority DESC LIMIT 1;`,
@@ -51,7 +48,7 @@ export const getActiveTheme = async (
 };
 
 const lightTheme = {
-  primary: "#2563eb",
+  primary: "#ff0000",
   secondary: "#FF7700",
   tertiary: "#BBDEFB",
   title: "#0D47A1",
@@ -69,10 +66,24 @@ const lightTheme = {
   constract: "#FFFFFF",
   card: "#F5F5F5",
   white: "#FFFFFF",
+
+  // primary: "#60A5FA", // Xanh chủ đạo (Nút bấm chính)
+  // secondary: "#7EF9FF", // Xanh phụ
+  // title: "#F8FAFC", // Chữ tiêu đề lớn
+  // text: "#94A3B8", // Chữ nội dung
+  textSecondary: "#B0B4BA",
+  // background: "#0B1528", // Nền sâu nhất
+  backgroundSecondary: "#16223F", // Nền thẻ card
+  backgroundElement: "#212225",
+  backgroundSelected: "#2E3135",
+  // error: "#EF4444",
+  // success: "#22C55E",
+  // white: "#ffffff",
+  black: "#000000",
 };
 
 export const darkTheme = {
-  primary: "#90CAF9", // Xanh da trời sáng hơn (trên nền tối)
+  primary: "#7F92F8", // Xanh da trời sáng hơn (trên nền tối)
   secondary: "#64B5F6", // Xanh phụ giống theme sáng
   tertiary: "#BBDEFB", // Xanh phụ nhạt nhất
   title: "#E3F2FD", // Màu tiêu đề sáng hơn
@@ -93,18 +104,34 @@ export const darkTheme = {
   constract: "#1E1E1E", // Màu cho nút, tương phản với nền sáng
   card: "#1E1E1E", // Nền thẻ dạng tối
   white: "#FFFFFF",
+
+  // primary: "#3B82F6", // Xanh chủ đạo (Nút bấm chính)
+  // secondary: "#10B981", // Xanh phụ
+  // title: "#F8FAFC", // Chữ tiêu đề lớn
+  // text: "#000000",
+  textSecondary: "#60646C",
+  // background: "#ffffff",
+  backgroundSecondary: "#f5f5f5",
+  backgroundElement: "#F0F0F3",
+  backgroundSelected: "#E0E1E6",
+  // error: "#EF4444",
+  // success: "#22C55E",
+  // white: "#ffffff",
+  black: "#000000",
 };
 
-export const defaultTheme ={
-  name:'default',
-  light:lightTheme,
-  dark: darkTheme
-} 
+export const defaultTheme = {
+  name: "default",
+  light: lightTheme,
+  dark: darkTheme,
+};
 
-export const getLocalTheme = async ()=>{
-   const themeObj = JSON.parse(await AsyncStorage.getItem('themeObj')|| JSON.stringify(defaultTheme));
-    return themeObj
-}
+export const getLocalTheme = async () => {
+  const themeObj = JSON.parse(
+    (await AsyncStorage.getItem("themeObj")) || JSON.stringify(defaultTheme),
+  );
+  return themeObj;
+};
 
 const themes = [
   {

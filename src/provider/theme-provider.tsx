@@ -1,32 +1,31 @@
 // src/components/ThemeProvider.tsx
+import { useAppStore } from "@/stores/appStore";
 import { useColorScheme, VariableContextProvider } from "nativewind";
-import React, { useEffect } from "react";
+import React from "react";
 import { View } from "react-native";
-import { useAppSettingsStore } from "../store/useAppSettingStore";
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const { setColorScheme } = useColorScheme();
 
-  useEffect(() => {
-    // Đồng bộ cơ chế light/dark ẩn của NativeWind
-    setColorScheme(theme.mode);
-  }, [theme.mode]);
+  // useEffect(() => {
+  //   setColorScheme(theme.mode);
+  // }, [theme.mode]);
 
   return (
     <VariableContextProvider
       value={{
-        "--dynamic-primary": theme.colors.primary,
-        "--dynamic-secondary": theme.colors.secondary,
-        "--dynamic-title": theme.colors.title,
-        "--dynamic-text-base": theme.colors.text,
-        "--dynamic-textSecondary": theme.colors.textSecondary,
-        "--dynamic-background": theme.colors.background,
-        "--dynamic-backgroundSecondary": theme.colors.backgroundSecondary,
-        "--dynamic-backgroundElement": theme.colors.backgroundElement,
-        "--dynamic-backgroundSelected": theme.colors.backgroundSelected,
-        "--dynamic-error": theme.colors.error,
-        "--dynamic-success": theme.colors.success,
+        "--dynamic-primary": theme.primary,
+        "--dynamic-secondary": theme.secondary,
+        "--dynamic-title": theme.title,
+        "--dynamic-text-base": theme.text,
+        "--dynamic-textSecondary": theme.textSecondary,
+        "--dynamic-background": theme.background,
+        "--dynamic-backgroundSecondary": theme.backgroundSecondary,
+        "--dynamic-backgroundElement": theme.backgroundElement,
+        "--dynamic-backgroundSelected": theme.backgroundSelected,
+        "--dynamic-error": theme.error,
+        "--dynamic-success": theme.success,
       }}
     >
       <View className="flex-1">{children}</View>

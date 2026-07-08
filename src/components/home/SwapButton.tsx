@@ -1,7 +1,7 @@
 // @/components/Button.tsx
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -24,14 +24,21 @@ import Animated, {
 } from "react-native-reanimated";
 
 interface ButtonProps extends TouchableOpacityProps {
-  title: string;
+  isCounting: boolean;
+  toggleCounting: () => void;
   variant?: "primary" | "secondary";
   loading?: boolean;
   className?: string;
+  data?: {
+    note?: string;
+    mood: 0 | 1 | 2 | 3 | 4;
+    image?: string;
+  };
 }
 
 export const SwapButton = ({
-  title,
+  isCounting,
+  toggleCounting,
   variant = "primary",
   loading = false,
   className = "",
@@ -39,10 +46,9 @@ export const SwapButton = ({
 }: ButtonProps) => {
   const baseStyle =
     "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
-  const variantStyle =
-    variant !== "primary"
-      ? "bg-error shadow-md shadow-error"
-      : "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 ";
+  const variantStyle = isCounting
+    ? "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 "
+    : "bg-primary shadow-md shadow-primary";
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -80,7 +86,7 @@ export const SwapButton = ({
 
   const emojis = ["😡", "😢", "😐", "😊", "😍"];
   const [note, setNote] = useState("");
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
 
   return (
     <View className="flex-row items-end justify-center gap-8">
@@ -115,7 +121,7 @@ export const SwapButton = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={toggleMenu}
+          onPress={toggleCounting}
           activeOpacity={0.7}
           disabled={loading}
           className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
@@ -123,18 +129,15 @@ export const SwapButton = ({
         >
           {loading ? (
             <ActivityIndicator color="#38BDF8" />
+          ) : isCounting ? (
+            <FontAwesome6 name="stop" size={52} color="white" />
           ) : (
-            <ThemedText
-              color={variant !== "primary" ? "white" : "textSecondary"}
-              type="subtitle"
-              style={{ fontWeight: "bold" }}
-            >
-              {isMenuOpen ? (
-                <FontAwesome6 name="close" size={56} color="white" />
-              ) : (
-                <FontAwesome6 name="pause" size={56} color="white" />
-              )}
-            </ThemedText>
+            <FontAwesome6
+              name="play"
+              size={52}
+              style={{ marginLeft: 8 }}
+              color="white"
+            />
           )}
         </TouchableOpacity>
 
@@ -158,6 +161,7 @@ export const SwapButton = ({
           )}
         </TouchableOpacity>
 
+        {/* Note modal */}
         <Modal
           visible={visible}
           transparent
@@ -179,14 +183,14 @@ export const SwapButton = ({
                   <View className="mb-8">
                     <TextInput
                       textAlignVertical="top"
-                      cursorColor={theme.colors.white}
-                      selectionColor={theme.colors.white}
+                      cursorColor={theme.white}
+                      selectionColor={theme.white}
                       style={{ fontSize: 14 }}
                       value={note}
                       onChangeText={(text) => setNote(text)}
                       multiline
                       placeholder="What are you feeling today?"
-                      placeholderTextColor={theme.colors.white + "aa"}
+                      placeholderTextColor={theme.white + "aa"}
                       numberOfLines={3}
                       className="h-20 border border-gray-500 border-solid rounded-xl p-2 bg-gray-500  text-white"
                     ></TextInput>

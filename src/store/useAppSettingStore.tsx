@@ -1,5 +1,6 @@
 // src/store/useAppSettingsStore.ts
 
+import { darkTheme } from "@/database/shema/theme";
 import * as Localization from "expo-localization";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
@@ -7,21 +8,7 @@ import { create } from "zustand";
 const SECURE_STORAGE_KEY = "fastfast_app_settings";
 
 // 1. Định nghĩa cấu trúc Bảng màu động chi tiết theo yêu cầu của bạn
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  title: string;
-  text: string;
-  textSecondary: string; // Nền chính (VD: #0B1528)
-  background: string; // Nền thẻ card/surface (VD: #16223F)
-  backgroundSecondary: string;
-  backgroundElement: string;
-  backgroundSelected: string;
-  error: string;
-  success: string;
-  white: string;
-  black: string;
-}
+export type  ThemeColors = typeof darkTheme
 
 export interface ThemeStructure {
   id: string;

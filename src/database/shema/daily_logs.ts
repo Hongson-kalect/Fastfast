@@ -5,7 +5,6 @@ import { SQLiteDatabase } from "expo-sqlite";
 export const generateString = /*sql*/ `
 CREATE TABLE IF NOT EXISTS daily_logs (
     log_date TEXT NOT NULL,         -- Định dạng 'YYYY-MM-DD'
-    user_id TEXT NOT NULL,
     fast_id TEXT NOT NULL,          -- Liên kết đến phiên gốc chịu trách nhiệm số giờ lớn nhất
     hours_in_day REAL DEFAULT 0.0,  -- Số giờ nhịn thực tế đóng góp trong ngày dương lịch này (Tối đa 24h)
     mood_level INTEGER CHECK (mood_level BETWEEN 1 AND 5), -- Mức độ cảm xúc từ 1 đến 5
@@ -16,11 +15,12 @@ CREATE TABLE IF NOT EXISTS daily_logs (
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now')),
     PRIMARY KEY (log_date, fast_id), -- Khóa chính phức hợp để xử lý các phiên nhịn ăn dài ngày (48h/72h)
-    FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE,
     FOREIGN KEY (fast_id) REFERENCES fast_sessions(id) ON DELETE CASCADE
+    --user_id TEXT NOT NULL,
+    -- FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE,
   );
 
-CREATE INDEX IF NOT EXISTS idx_daily_logs_user_date ON daily_logs(user_id, log_date);
+--CREATE INDEX IF NOT EXISTS idx_daily_logs_user_date ON daily_logs(user_id, log_date);
 `;
 
 export const getDailyLogs = async (

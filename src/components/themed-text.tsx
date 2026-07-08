@@ -1,8 +1,9 @@
 import { Platform, StyleSheet, Text, type TextProps } from "react-native";
 
 import { Fonts } from "@/constants/theme";
-import { ThemeColors, useAppSettingsStore } from "@/store/useAppSettingStore";
+import { ThemeColors } from "@/store/useAppSettingStore";
 import { useMemo } from "react";
+import { useAppStore } from "@/stores/appStore";
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -20,13 +21,13 @@ export type ThemedTextProps = TextProps & {
 export function ThemedText({
   style,
   type = "default",
-  color = 'text',
+  color = "text",
   ...rest
 }: ThemedTextProps) {
   // const theme = useTheme();
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const colors = useMemo(() => {
-    return theme.colors;
+    return theme;
   }, [theme]);
 
   return (

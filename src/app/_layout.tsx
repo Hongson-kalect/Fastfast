@@ -1,4 +1,3 @@
-import { useColorScheme } from "react-native";
 
 import { Stack } from "expo-router";
 import "react-native-reanimated";
@@ -16,24 +15,13 @@ import { BottomSheetProvider } from "@/provider/BottomSheet";
 import { LanguageProvider } from "@/provider/Language";
 import { GlobalModal } from "@/provider/Modal";
 import { ThemeProvider } from "@/provider/theme-provider";
-import { useAppStore } from "@/stores/appStore";
-import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
-import { Suspense, useEffect } from "react";
+import { SQLiteProvider } from "expo-sqlite";
+import { Suspense } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
 const queryClient = new QueryClient();
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  const { init, isHydrated, theme } = useAppStore();
-
-  useEffect(() => {
-    // Bật app lên là quét SecureStore nạp vào Zustand ngay
-    const db = useSQLiteContext();
-    init(db);
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>

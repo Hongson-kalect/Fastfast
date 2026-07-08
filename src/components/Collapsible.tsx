@@ -1,11 +1,11 @@
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { SymbolView } from "expo-symbols";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 
 export function Collapsible({
@@ -17,7 +17,7 @@ export function Collapsible({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
 
   const progress = useSharedValue(0);
 
@@ -58,7 +58,7 @@ export function Collapsible({
             }}
             size={14}
             weight="bold"
-            tintColor={theme.colors.text}
+            tintColor={theme.text}
             style={{ transform: [{ rotate: isOpen ? "-90deg" : "90deg" }] }}
           />
         </Animated.View>

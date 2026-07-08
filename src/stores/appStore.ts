@@ -70,7 +70,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       // Giả sử Sơn lưu flag dark mode ở bảng app_settings với key là 'is_dark_mode'
       const isDarkMode =
         dbSettings?.is_dark_mode === "true" ||
-        dbSettings?.is_dark_mode === true;
+        dbSettings?.is_dark_mode === true || true
 
       // 3. Bốc palette màu tương ứng từ cái themeObj vừa băm từ AsyncStorage ra
       const activeThemeColors =

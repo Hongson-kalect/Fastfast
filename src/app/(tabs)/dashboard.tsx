@@ -3,17 +3,17 @@ import DashboardHeader from "@/components/dashboard/Header";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-  Animated,
-  LayoutChangeEvent,
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
+    Animated,
+    LayoutChangeEvent,
+    Pressable,
+    ScrollView,
+    Text,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -56,7 +56,7 @@ const DashboardScreen = () => {
     height: number;
   } | null>(null);
   const { width } = useWindowDimensions();
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const [enableScroll, setEnableScroll] = useState(true);
 
   // Khởi tạo giá trị scale cho hiệu ứng bấm FAB
@@ -122,28 +122,24 @@ const DashboardScreen = () => {
                         <FontAwesome5
                           name="plus"
                           size={10}
-                          color={theme.colors.primary}
+                          color={theme.primary}
                         />
                       </View>
                       <FontAwesome5
                         name="weight"
                         size={30}
-                        color={theme.colors.primary}
+                        color={theme.primary}
                       />
                     </Pressable>
                   </Animated.View>
 
                   <View
-                    style={{ borderColor: theme.colors.text }}
+                    style={{ borderColor: theme.text }}
                     className="flex-row items-center px-2 h-10 border rounded-lg gap-1"
                   >
                     <ThemedText className="text-xs!">Last 7 days</ThemedText>
 
-                    <Feather
-                      name="chevron-down"
-                      size={14}
-                      color={theme.colors.text}
-                    />
+                    <Feather name="chevron-down" size={14} color={theme.text} />
                   </View>
                 </View>
               </View>
@@ -171,16 +167,12 @@ const DashboardScreen = () => {
                 </Text>
                 <View className="flex-row items-center gap-1 h-10">
                   <View
-                    style={{ borderColor: theme.colors.text }}
+                    style={{ borderColor: theme.text }}
                     className="flex-row items-center p-2 border rounded-lg gap-1"
                   >
                     <ThemedText className="text-xs!">Last 7 days</ThemedText>
 
-                    <Feather
-                      name="chevron-down"
-                      size={14}
-                      color={theme.colors.text}
-                    />
+                    <Feather name="chevron-down" size={14} color={theme.text} />
                   </View>
                 </View>
               </View>

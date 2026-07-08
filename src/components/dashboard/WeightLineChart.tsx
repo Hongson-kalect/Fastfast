@@ -1,5 +1,5 @@
 import { fonts } from "@/configs/fonts";
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { Circle, Group, Text, useFont } from "@shopify/react-native-skia";
 import { useEffect, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -27,7 +27,7 @@ const WeightLineChart = ({
   const font = useFont(fonts.MulishRegular, 9);
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishBold, 18);
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
 
   // 👇 1. Khởi tạo State để quản lý hành động Press/Hover trên Chart
   const { state, isActive } = useChartPressState({
@@ -73,7 +73,7 @@ const WeightLineChart = ({
         chartPressState={state} // 👇 2. Truyền state vào đây để bắt các cử chỉ press/pan
         axisOptions={{
           font: font,
-          labelColor: theme.colors.white,
+          labelColor: theme.white,
           lineColor: {
             grid: { y: "#e2e2e2", x: "transparent" },
             frame: "#e2e2e2",
@@ -101,7 +101,7 @@ const WeightLineChart = ({
             <Line
               points={points.y}
               curveType="linear"
-              color={theme.colors.primary}
+              color={theme.primary}
               strokeWidth={3}
               animate={{ type: "timing", duration: 300 }}
             />
@@ -133,7 +133,7 @@ const WeightLineChart = ({
                       y={(point?.y || 0) - 4}
                       text={`${data[index]?.y}`}
                       font={font3}
-                      color={theme.colors.white}
+                      color={theme.white}
                     />
                   );
                 if (uniqueShowIndex.includes(index))
@@ -144,7 +144,7 @@ const WeightLineChart = ({
                       y={(point?.y || 0) - 4}
                       text={`${data[index]?.y}`}
                       font={font2}
-                      color={theme.colors.white + "cc"}
+                      color={theme.white + "cc"}
                     />
                   );
               })}
@@ -157,13 +157,13 @@ const WeightLineChart = ({
                   cx={state.x.position}
                   cy={state.y.y.position}
                   r={6}
-                  color={theme.colors.primary}
+                  color={theme.primary}
                 />
                 <Circle
                   cx={state.x.position}
                   cy={state.y.y.position}
                   r={20}
-                  color={theme.colors.primary + "33"} // Tạo hiệu ứng mờ bao quanh
+                  color={theme.primary + "33"} // Tạo hiệu ứng mờ bao quanh
                 />
 
                 {/* Hiển thị giá trị dạng Text nhảy động theo ngón tay/chuột */}
@@ -172,7 +172,7 @@ const WeightLineChart = ({
                   y={state.y.y.position} // Hoặc dùng state.y.y.position.value - 15 nếu muốn dịch chuyển
                   text={toolTipText}
                   font={font3}
-                  color={theme.colors.white}
+                  color={theme.white}
                 />
               </Group>
             )}

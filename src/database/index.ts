@@ -5,8 +5,13 @@ import {
   getDailyLogs,
 } from "./shema/daily_logs";
 import {
+  deleteSession,
   generateString as fast_sessionsGenerateString,
+  finishLastSession,
   getFastSessions,
+  getLastFastSession,
+  getYearFastSession,
+  startNewSession,
 } from "./shema/fast_sessions";
 import {
   getUserSettings,
@@ -24,7 +29,14 @@ export const DATABASE_NAME = "fast_fast";
 export const createDBService = (db: SQLiteDatabase) => ({
   getUserSettings: () => getUserSettings(db),
   getUserProfile: () => getUserProfile(db),
+
   getFastSessions: () => getFastSessions(db),
+  getLastFastSession: () => getLastFastSession(db),
+  getYearFastSession: (year: number) => getYearFastSession(db, year),
+  finishLastSession: (id:string, endTime: number, duration:number) => finishLastSession(db,id, endTime,duration),
+  deleteSession: (id:string) => deleteSession(db,id),
+
+  startNewSession: (startTime: number) => startNewSession(db, startTime),
   getDailyLogs: () => getDailyLogs(db),
   getActiveTheme: () => getActiveTheme(db),
   getLocalTheme: () => getLocalTheme(),
@@ -38,8 +50,6 @@ export const generateSchema = `
     ${daily_logsGenerateString}
 `;
 
-console.log("generateSchema", generateSchema);
-
 const generateSeedData = `
 `;
 
@@ -47,7 +57,7 @@ export const initDatabase = async (db: SQLiteDatabase) => {
   const DATABASE_VERSION = 1; // get from server
   // clearDatabase(db);
   let version = 0;
-  await clearDatabase(db);
+  // await clearDatabase(db);
   try {
     const db_version = await db.getFirstAsync<{ key: string; value: string }>(
       `select * from system_config where key='db_version'`,

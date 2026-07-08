@@ -1,6 +1,6 @@
 import { BarChartSkeleton } from "@/components/skeleton/ChartSkeleton";
 import { fonts } from "@/configs/fonts";
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { LinearGradient, Text, useFont, vec } from "@shopify/react-native-skia";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -16,7 +16,7 @@ const DATA = Array.from({ length: 7 }, (_, i) => ({
 export function FastBarChart() {
   const font = useFont(fonts.MulishRegular, 9);
   const font2 = useFont(fonts.MulishMedium, 14);
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const data = useMemo(() => [...DATA], []);
   const { width, height } = useWindowDimensions();
 
@@ -54,7 +54,7 @@ export function FastBarChart() {
            * This will tell CartesianChart to render axis labels.
            */
           font: font,
-          labelColor: theme.colors.white,
+          labelColor: theme.white,
           lineColor: "#ddd",
           /**
            * 👇 We will also use the formatXLabel prop to format the month number
@@ -75,7 +75,7 @@ export function FastBarChart() {
             <Bar
               points={points.y}
               chartBounds={chartBounds}
-              color={theme.colors.primary}
+              color={theme.primary}
               roundedCorners={{ topLeft: 4, topRight: 4 }}
               barWidth={32}
             >
@@ -84,8 +84,8 @@ export function FastBarChart() {
                 end={vec(0, 400)}
                 colors={[
                   // 👈 The colors are an array of strings that represent the colors of the gradient.
-                  theme.colors.primary,
-                  theme.colors.primary + "50", // 👈 The second color is the same as the first but with an alpha value of 50%.
+                  theme.primary,
+                  theme.primary + "50", // 👈 The second color is the same as the first but with an alpha value of 50%.
                 ]}
               />
             </Bar>
@@ -99,7 +99,7 @@ export function FastBarChart() {
                   y={(point?.y || 0) - 6}
                   text={`${data[index]?.y}`} // data có phần tử padding ở đầu
                   font={font2}
-                  color={theme.colors.white}
+                  color={theme.white}
                   // align="center"
                 />
               );

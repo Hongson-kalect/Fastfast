@@ -1,6 +1,7 @@
 import { View, type ViewProps } from "react-native";
 
-import { ThemeColors, useAppSettingsStore } from "@/store/useAppSettingStore";
+import { ThemeColors } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 
 export type ThemedViewProps = ViewProps & {
   lightColor?: string;
@@ -15,11 +16,11 @@ export function ThemedView({
   type,
   ...otherProps
 }: ThemedViewProps) {
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
 
   return (
     <View
-      style={[{ backgroundColor: theme.colors[type ?? "background"] }, style]}
+      style={[{ backgroundColor: theme[type ?? "background"] }, style]}
       {...otherProps}
     />
   );

@@ -1,9 +1,9 @@
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 const MainTab = () => {
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   return (
     <Tabs
       screenOptions={{
@@ -18,7 +18,7 @@ const MainTab = () => {
         },
 
         // 2. Màu sắc Trạng thái Active/Inactive của cả Icon và Chữ
-        tabBarActiveTintColor: theme.colors.primary, // Xanh Mint khi chọn
+        tabBarActiveTintColor: theme.primary, // Xanh Mint khi chọn
         tabBarInactiveTintColor: "#9CA3AF", // Xám nhạt khi chưa chọn
 
         // 3. Áp Font chữ hệ thống cho Label dưới Icon

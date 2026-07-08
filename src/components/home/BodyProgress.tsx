@@ -1,5 +1,5 @@
 import { getProcessLevelTitle, processData } from "@/constants/data";
-import { useAppSettingsStore } from "@/store/useAppSettingStore";
+import { useAppStore } from "@/stores/appStore";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -18,7 +18,7 @@ type Props = {
 const HomeBodyProgress = ({ counter }: Props) => {
   const [labelWidth, setLabelWidth] = useState(0);
   const { width: screenWidth } = useWindowDimensions();
-  const { theme } = useAppSettingsStore();
+  const { theme } = useAppStore();
   const [circle, setCircle] = useState(0);
 
   const detectLabelWidth = (e: LayoutChangeEvent) => {
@@ -62,7 +62,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
           <FontAwesome6
             name="question-circle"
             size={20}
-            color={theme.colors.primary + "aa"}
+            color={theme.primary + "aa"}
           />
         </TouchableOpacity>
       </View>
@@ -117,7 +117,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                       style={{ opacity: activeProcess ? 1 : 0.6 }}
                       name={icon}
                       size={14}
-                      color={activeProcess ? color : theme.colors.textSecondary} // Sáng icon lên nếu đã kích hoạt tiến trình
+                      color={activeProcess ? color : theme.subText2} // Sáng icon lên nếu đã kích hoạt tiến trình
                     />
                   </View>
                   <ThemedText
@@ -127,7 +127,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                     }}
                     onLayout={detectLabelWidth}
                     // type="small"
-                    color="textSecondary"
+                    color="subText2"
                     className="font-medium text-sm! mr-1"
                   >
                     {title}
@@ -179,9 +179,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                     <View className="w-16 items-end">
                       <ThemedText
                         style={{
-                          color: activeProcess
-                            ? color
-                            : theme.colors.textSecondary,
+                          color: activeProcess ? color : theme.textSecondary,
                         }}
                         className={`text-xs! font-semibold tracking-wide ${!activeProcess ? "opacity-40" : ""}`}
                         numberOfLines={1}
