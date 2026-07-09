@@ -43,10 +43,19 @@ export interface DailyLog {
   user_id: string;
   fast_id: string; // ID của phiên gốc đóng góp giờ lớn nhất ngày hôm đó
   hours_in_day: number; // Số giờ nhịn thực tế trong ngày (<= 24)
+  hours_in_fast: number; // Số giờ nhịn thực tế trong ngày (<= 24)
+  is_deleted: 0 | 1;
+  sync_status: SyncStatus;
+  created_at: number;
+  updated_at: number;
+}
+
+// 4. Interface cho bảng daily_logs
+export interface DailyNote {
+  log_date: string; // Định dạng 'YYYY-MM-DD'
   mood_level: MoodLevel | null;
   note: string | null;
   image_uri: string | null; // Ảnh gắn kèm note ngày hôm đó
-  is_deleted: 0 | 1;
   sync_status: SyncStatus;
   created_at: number;
   updated_at: number;

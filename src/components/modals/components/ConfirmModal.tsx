@@ -1,4 +1,4 @@
-import {ThemedText} from "@/components/themed-text"
+import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, ConfirmModalOptions } from "@/provider/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
@@ -12,7 +12,7 @@ const ConfirmModal = (modal: Props) => {
   return (
     <View>
       {modal.title && (
-        <ThemedText type='subtitle'>
+        <ThemedText className="mb-4" type="subtitle">
           {modal.title}
         </ThemedText>
       )}

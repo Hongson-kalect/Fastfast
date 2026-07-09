@@ -91,7 +91,7 @@ const WeightLineChart = ({
             return date;
           },
         }}
-        domainPadding={{ top: 37, right: 20, bottom: 0, left: 20 }}
+        domainPadding={{ top: 37, right: 20, bottom: 0, left: 0 }}
         domain={{
           y: [Math.min(target, Math.floor((min - (max - min) / 2) / 5) * 5)],
         }}

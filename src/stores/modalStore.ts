@@ -1,4 +1,5 @@
-import { GlobalModalOptions, ListModalOptions } from "@/providers/Modal";
+
+import { GlobalModalOptions, ListModalOptions } from "@/provider/Modal";
 import { create } from "zustand";
 
 interface ModalProps {

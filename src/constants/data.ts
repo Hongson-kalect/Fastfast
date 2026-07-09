@@ -1,3 +1,5 @@
+import { MoodLevel } from "@/interfaces/db.type";
+
 export const processData_old = [
   {
     key: "glucoseControl",
@@ -416,12 +418,12 @@ export function getProcessLevelTitle(
 }
 
 // data/emotions.ts
-export const EMOTIONS = [
-  { emoji: "🥵", label: "Exhausted" },
-  { emoji: "😐", label: "Neutral" },
-  { emoji: "😊", label: "Good" },
-  { emoji: "💎", label: "Focused" },
-  { emoji: "🤩", label: "Peak" },
+export const EMOTIONS: { level: MoodLevel; emoji: string; label: string }[] = [
+  { level:1,emoji: "😫", label: "Exhausted" },
+  { level:2,emoji: "😮‍💨", label: "Neutral" },
+  { level:3,emoji: "🙂", label: "Good" },
+  { level:4,emoji: "😃", label: "Focused" },
+  { level:5,emoji: "🥰", label: "Peak" },
 ];
 
 // Định nghĩa các góc bung (độ) để tính toán tọa độ

@@ -1,9 +1,13 @@
+import { MoodLevel } from "@/interfaces/db.type";
 import * as SQLite from "expo-sqlite";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
+  addDailyLogs,
   generateString as daily_logsGenerateString,
   getDailyLogs,
+  getTodayLog,
 } from "./shema/daily_logs";
+import { generateString as daily_noteGenerateString, getDailyNote, getDailyNotes, setDailyNote } from "./shema/daily_note";
 import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
@@ -23,6 +27,7 @@ import {
   getUserProfile,
   generateString as userGenerateString,
 } from "./shema/user";
+import { generateString as weight_trackerGenerateString } from "./shema/weight_tracker";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -33,11 +38,29 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastSessions: () => getFastSessions(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
-  finishLastSession: (id:string, endTime: number, duration:number) => finishLastSession(db,id, endTime,duration),
-  deleteSession: (id:string) => deleteSession(db,id),
-
+  finishLastSession: (id: string, endTime: number, duration: number) =>
+    finishLastSession(db, id, endTime, duration),
+  deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number) => startNewSession(db, startTime),
+
   getDailyLogs: () => getDailyLogs(db),
+  getTodayLog: () => getTodayLog(db),
+
+  getDailyNote: (date?: string) => getDailyNote(db, date),
+  getDailyNotes: () => getDailyNotes(db),
+  setDailyNote: (
+    moodLevel: MoodLevel,
+    note?: string,
+    image_uri?: string,
+    date?: string,
+  ) => setDailyNote(db, moodLevel, note, image_uri, date),
+  addDailyLogs: (data: {
+    log_date: string;
+    fast_id: string;
+    hours_in_day: number;
+    hour_in_fast: number;
+  }) => addDailyLogs(db, data),
+
   getActiveTheme: () => getActiveTheme(db),
   getLocalTheme: () => getLocalTheme(),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
@@ -48,6 +71,8 @@ export const generateSchema = `
     ${settingGenerateString}
     ${fast_sessionsGenerateString}
     ${daily_logsGenerateString}
+    ${daily_noteGenerateString}
+    ${weight_trackerGenerateString}
 `;
 
 const generateSeedData = `
@@ -55,19 +80,19 @@ const generateSeedData = `
 
 export const initDatabase = async (db: SQLiteDatabase) => {
   const DATABASE_VERSION = 1; // get from server
-  // clearDatabase(db);
-  let version = 0;
+  // let version = 0;
   // await clearDatabase(db);
-  try {
-    const db_version = await db.getFirstAsync<{ key: string; value: string }>(
-      `select * from system_config where key='db_version'`,
-    );
-    if (db_version) {
-      version = Number(db_version.value);
-    }
-  } catch {
-    console.log("no system_config");
-  }
+  const version = await getDatabaseVersion(db);
+  // try {
+  //   const db_version = await db.getFirstAsync<{ key: string; value: string }>(
+  //     `select * from system_config where key='db_version'`,
+  //   );
+  //   if (db_version) {
+  //     version = Number(db_version.value);
+  //   }
+  // } catch {
+  //   console.log("no system_config");
+  // }
 
   // if(version==DATABASE_VERSION){
   if (version >= 1) {
@@ -85,6 +110,23 @@ export const initDatabase = async (db: SQLiteDatabase) => {
   }
 
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+};
+
+export const getDatabaseVersion = async (
+  db: SQLiteDatabase,
+): Promise<number> => {
+  try {
+    // Câu lệnh SELECT lấy version
+    const result = await db.getFirstAsync<{ user_version: number }>(
+      "PRAGMA user_version;",
+    );
+
+    // Trả về số version, nếu lỗi không tìm thấy thì mặc định là 0
+    return result?.user_version ?? 0;
+  } catch (error) {
+    console.error("Lỗi khi lấy DB Version:", error);
+    return 0;
+  }
 };
 
 export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {

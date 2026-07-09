@@ -1,9 +1,9 @@
 import { useAppStore } from "@/stores/appStore";
 import {
-    ScrollView,
-    TouchableOpacity,
-    useWindowDimensions,
-    View,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import ReactNativeModal from "react-native-modal";
 import { Card, Divider } from "react-native-paper";
@@ -80,7 +80,7 @@ export default function ModalWrapper(props: Props) {
                   >
                     {props.title || " Title"}
                   </ThemedText>
-                  <Divider />
+                  <Divider className="bg-red-400" />
                 </View>
               ) : (
                 props.title

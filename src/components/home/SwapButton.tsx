@@ -1,9 +1,10 @@
 // @/components/Button.tsx
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
+import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -29,6 +30,7 @@ interface ButtonProps extends TouchableOpacityProps {
   variant?: "primary" | "secondary";
   loading?: boolean;
   className?: string;
+  todayNote: DailyNote | null;
   data?: {
     note?: string;
     mood: 0 | 1 | 2 | 3 | 4;
@@ -42,8 +44,27 @@ export const SwapButton = ({
   variant = "primary",
   loading = false,
   className = "",
+  todayNote,
   ...props
 }: ButtonProps) => {
+  const { dbService } = useAppStore();
+  const [todayData, setTodayData] = useState<{
+    note: string | null;
+    mood: MoodLevel | null;
+    image: string | null;
+  }>(() => {
+    return {
+      note: todayNote?.note || null,
+      image: todayNote?.image_uri || null,
+      mood: todayNote?.mood_level || null,
+    };
+  });
+
+  const [tempText, setTempText] = useState<string>(() => todayData?.note || "");
+  useEffect(() => {
+    setTempText(todayData?.note || "");
+  }, [todayData?.note]);
+
   const baseStyle =
     "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
   const variantStyle = isCounting
@@ -73,19 +94,25 @@ export const SwapButton = ({
     }
   };
 
-  const handleSelectEmoji = (emoji: string) => {
-    console.log("Selected Mood:", emoji);
+  const handleSelectEmoji = async (mood: MoodLevel) => {
+    if (!dbService) return console.log("db not ready");
+    if (!mood) return alert("m vào đây hay v");
+    console.log("Selected Mood:", mood);
     // Lưu vào database local của bạn tại đây...
 
     // Đóng menu an toàn
     animationProgress.value = 0;
     setIsMenuOpen(false);
+    setTodayData({ ...todayData, note: tempText, mood: mood });
+
+    await dbService.setDailyNote(mood, tempText);
+
+    // Thêm emoji và node(nếu có vào trong db)
   };
 
   const [visible, setVisible] = useState(false);
 
-  const emojis = ["😡", "😢", "😐", "😊", "😍"];
-  const [note, setNote] = useState("");
+  const emojis = ["😫", "😮‍💨", "🙂", "😃", "🥰"];
   const { theme } = useAppStore();
 
   return (
@@ -145,7 +172,7 @@ export const SwapButton = ({
           onPress={() => setVisible(true)}
           activeOpacity={0.7}
           disabled={loading}
-          className={`h-20 w-20 rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner shadow-gray-200 ${loading ? "opacity-60" : ""} ${className}`}
+          className={`h-20 w-20 ${todayData?.mood ? "bg-primary" : "bg-gray-700"} rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner shadow-gray-200 ${loading ? "opacity-60" : ""} ${className}`}
           {...props}
         >
           {loading ? (
@@ -186,8 +213,8 @@ export const SwapButton = ({
                       cursorColor={theme.white}
                       selectionColor={theme.white}
                       style={{ fontSize: 14 }}
-                      value={note}
-                      onChangeText={(text) => setNote(text)}
+                      value={tempText}
+                      onChangeText={(text) => setTempText(text)}
                       multiline
                       placeholder="What are you feeling today?"
                       placeholderTextColor={theme.white + "aa"}
@@ -220,12 +247,12 @@ export const SwapButton = ({
                           className="items-center justify-center"
                           key={index}
                           onPress={() => {
-                            (handleSelectEmoji(item.emoji),
+                            (handleSelectEmoji(item.level),
                               console.log(item.emoji),
                               setVisible(false));
                           }}
                         >
-                          <Text style={{ fontSize: 28 }} key={item.emoji}>
+                          <Text style={{ fontSize: 28 }} key={item.level}>
                             {item.emoji}
                           </Text>
                         </TouchableOpacity>
