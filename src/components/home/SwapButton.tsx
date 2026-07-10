@@ -3,7 +3,12 @@ import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome6,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -23,6 +28,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { PhotoPickerModal } from "./ImageModal";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
@@ -61,9 +67,19 @@ export const SwapButton = ({
   });
 
   const [tempText, setTempText] = useState<string>(() => todayData?.note || "");
+
   useEffect(() => {
     setTempText(todayData?.note || "");
   }, [todayData?.note]);
+
+  useEffect(() => {
+    if (!todayNote) return;
+    setTodayData({
+      note: todayNote?.note || null,
+      image: todayNote?.image_uri || null,
+      mood: todayNote?.mood_level || null,
+    });
+  }, [todayNote]);
 
   const baseStyle =
     "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
@@ -111,9 +127,12 @@ export const SwapButton = ({
   };
 
   const [visible, setVisible] = useState(false);
-
-  const emojis = ["😫", "😮‍💨", "🙂", "😃", "🥰"];
+  const [imageOptionVisible, setImageOptionVisible] = useState(false);
   const { theme } = useAppStore();
+
+  const handleUpdateImage = (uri: string | null) => {
+    console.log(uri);
+  };
 
   return (
     <View className="flex-row items-end justify-center gap-8">
@@ -126,10 +145,9 @@ export const SwapButton = ({
       </Animated.View>
 
       <View className="flex-row gap-8 items-center justify-center z-20 relative w-full h-20">
-        {/* VÒM 5 ICON EMOJI ẨN DƯỚI NÚT EDIT */}
-
         <TouchableOpacity
           activeOpacity={0.7}
+          onPress={() => setImageOptionVisible(true)}
           disabled={loading}
           className={`h-20 w-20 rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner shadow-gray-200 ${loading ? "opacity-60" : ""} ${className}`}
           {...props}
@@ -172,19 +190,32 @@ export const SwapButton = ({
           onPress={() => setVisible(true)}
           activeOpacity={0.7}
           disabled={loading}
-          className={`h-20 w-20 ${todayData?.mood ? "bg-primary" : "bg-gray-700"} rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner shadow-gray-200 ${loading ? "opacity-60" : ""} ${className}`}
+          className={`h-20 w-20 rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner ${todayData.mood ? "shadow-primary" : "shadow-gray-200"} ${loading ? "opacity-60" : ""} ${className}`}
           {...props}
         >
           {loading ? (
             <ActivityIndicator color="#38BDF8" />
           ) : (
-            <ThemedText
-              color={"white"}
-              type="subtitle"
-              style={{ fontWeight: "bold" }}
-            >
-              <Feather name="edit-2" size={28} color="white" />
-            </ThemedText>
+            <View className="flex items-center justify-center flex-1">
+              <ThemedText
+                color={"white"}
+                type="subtitle"
+                style={{ fontWeight: "bold" }}
+              >
+                {todayData?.mood ? (
+                  <ThemedText type="subtitle" className="">
+                    {EMOTIONS[todayData.mood - 1].emoji}
+                  </ThemedText>
+                ) : (
+                  <Feather name="edit-2" size={28} color="white" />
+                )}
+              </ThemedText>
+              {todayData.note && (
+                <View className="absolute -top-4 right-0">
+                  <Ionicons name="chatbox" size={24} color="white" />
+                </View>
+              )}
+            </View>
           )}
         </TouchableOpacity>
 
@@ -225,45 +256,54 @@ export const SwapButton = ({
                   <View
                     className={"flex-row items-center justify-center gap-2"}
                   >
-                    {EMOTIONS.map((item, index) => (
-                      <Animated.View
-                        key={item.emoji}
-                        entering={SlideInDown.springify()
-                          .damping(18)
-                          .stiffness(180)
-                          .mass(1)
-                          .delay(index * 50)}
-                        exiting={SlideOutDown.duration(100)}
-                      >
-                        <TouchableOpacity
-                          style={{
-                            width: 56,
-                            height: 56,
-                            borderRadius: 999,
-                            borderColor: "gray",
-                            borderWidth: 1,
-                            backgroundColor: "white",
-                          }}
-                          className="items-center justify-center"
-                          key={index}
-                          onPress={() => {
-                            (handleSelectEmoji(item.level),
-                              console.log(item.emoji),
-                              setVisible(false));
-                          }}
+                    {EMOTIONS.map((item, index) => {
+                      const isSelected = item.level === todayData.mood;
+                      return (
+                        <Animated.View
+                          key={item.emoji}
+                          entering={SlideInDown.springify()
+                            .damping(18)
+                            .stiffness(180)
+                            .mass(1)
+                            .delay(index * 50)}
+                          exiting={SlideOutDown.duration(100)}
                         >
-                          <Text style={{ fontSize: 28 }} key={item.level}>
-                            {item.emoji}
-                          </Text>
-                        </TouchableOpacity>
-                      </Animated.View>
-                    ))}
+                          <TouchableOpacity
+                            style={{
+                              width: 56,
+                              height: 56,
+                              borderRadius: 999,
+                              borderColor: "gray",
+                              borderWidth: 1,
+                            }}
+                            className={`items-center justify-center ${isSelected ? "bg-primary shadow-primary shadow-lg" : "bg-white flex-1"}`}
+                            key={index}
+                            onPress={() => {
+                              (handleSelectEmoji(item.level),
+                                console.log(item.emoji),
+                                setVisible(false));
+                            }}
+                          >
+                            <Text style={{ fontSize: 28 }} key={item.level}>
+                              {item.emoji}
+                            </Text>
+                          </TouchableOpacity>
+                        </Animated.View>
+                      );
+                    })}
                   </View>
                 </Pressable>
               </Animated.View>
             </View>
           </Pressable>
         </Modal>
+
+        <PhotoPickerModal
+          visible={imageOptionVisible}
+          setVisible={setImageOptionVisible}
+          photoUri={todayData.image}
+          updateImage={handleUpdateImage}
+        />
       </View>
     </View>
   );

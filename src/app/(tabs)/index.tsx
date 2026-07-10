@@ -3,11 +3,11 @@ import HomeHeader from "@/components/home/Header";
 import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
 import { ThemedText } from "@/components/themed-text";
-import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
+import { DailyNote, FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,7 +22,7 @@ const HomeScreen = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [lastSession, setLastSession] = useState<FastSession | null>(null);
   const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-  
+
   const { setGlobalModal } = useModalStore();
 
   const { dbService } = useAppStore();
@@ -96,10 +96,11 @@ const HomeScreen = () => {
     }
   };
 
-  const detectTodayNote =async ()=>{
+  const detectTodayNote = async () => {
     const todayNote = await dbService?.getDailyNote();
-    setTodayNote(todayNote||null)
-  }
+    console.log("todayNote", todayNote);
+    setTodayNote(todayNote || null);
+  };
 
   useEffect(() => {
     if (!dbService) return;
@@ -139,7 +140,7 @@ const HomeScreen = () => {
 
             <View className="py-4 mt-4 items-center justify-center">
               <SwapButton
-                todayNote ={todayNote}
+                todayNote={todayNote}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
                 variant="primary"
