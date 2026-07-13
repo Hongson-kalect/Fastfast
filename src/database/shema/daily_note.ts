@@ -35,7 +35,7 @@ export const getDailyNote = async (
 // Hàm lưu hoặc cập nhật Note của ngày hôm nay
 export const setDailyNote = async (
   db: SQLiteDatabase,
-  mood: MoodLevel,
+  mood?: MoodLevel,
   note?: string,
   image?: string,
   dateStr: string = getLocalTodayStr(),
@@ -45,5 +45,5 @@ export const setDailyNote = async (
     VALUES (?, ?, ?, ?, strftime('%s', 'now'));
   `;
 
-  await db.runAsync(query, [dateStr, mood, note || null, image || null]);
+  await db.runAsync(query, [dateStr, mood||null, note || null, image || null]);
 };

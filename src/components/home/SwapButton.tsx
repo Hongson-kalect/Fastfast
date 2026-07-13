@@ -3,32 +3,23 @@ import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import {
-  Feather,
-  FontAwesome6,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
+  Image,
   Pressable,
-  Text,
-  TextInput,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
 } from "react-native";
 import Animated, {
-  LinearTransition,
-  SlideInDown,
-  SlideOutDown,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { PhotoPickerModal } from "./ImageModal";
+import NoteModal from "./NoteModal";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
@@ -55,29 +46,23 @@ export const SwapButton = ({
 }: ButtonProps) => {
   const { dbService } = useAppStore();
   const [todayData, setTodayData] = useState<{
-    note: string | null;
-    mood: MoodLevel | null;
-    image: string | null;
+    note?: string;
+    mood?: MoodLevel;
+    image?: string;
   }>(() => {
     return {
-      note: todayNote?.note || null,
-      image: todayNote?.image_uri || null,
-      mood: todayNote?.mood_level || null,
+      note: todayNote?.note,
+      image: todayNote?.image_uri,
+      mood: todayNote?.mood_level,
     };
   });
-
-  const [tempText, setTempText] = useState<string>(() => todayData?.note || "");
-
-  useEffect(() => {
-    setTempText(todayData?.note || "");
-  }, [todayData?.note]);
 
   useEffect(() => {
     if (!todayNote) return;
     setTodayData({
-      note: todayNote?.note || null,
-      image: todayNote?.image_uri || null,
-      mood: todayNote?.mood_level || null,
+      note: todayNote?.note || undefined,
+      image: todayNote?.image_uri || undefined,
+      mood: todayNote?.mood_level || undefined,
     });
   }, [todayNote]);
 
@@ -110,28 +95,34 @@ export const SwapButton = ({
     }
   };
 
-  const handleSelectEmoji = async (mood: MoodLevel) => {
+  const handleSelectMood = async (mood?: MoodLevel, note?: string) => {
     if (!dbService) return console.log("db not ready");
-    if (!mood) return alert("m vào đây hay v");
     console.log("Selected Mood:", mood);
     // Lưu vào database local của bạn tại đây...
 
     // Đóng menu an toàn
     animationProgress.value = 0;
     setIsMenuOpen(false);
-    setTodayData({ ...todayData, note: tempText, mood: mood });
+    setTodayData({ ...todayData, note: note, mood: mood });
 
-    await dbService.setDailyNote(mood, tempText);
+    await dbService.setDailyNote(mood, note, todayData?.image);
 
     // Thêm emoji và node(nếu có vào trong db)
   };
 
-  const [visible, setVisible] = useState(false);
+  const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [imageOptionVisible, setImageOptionVisible] = useState(false);
   const { theme } = useAppStore();
 
-  const handleUpdateImage = (uri: string | null) => {
+  const [tempImage, setTempImage] = useState<string | undefined>(undefined);
+
+  const handleUpdateImage = async (uri: string | undefined) => {
+    if (!dbService) return console.log("db not ready");
+    setTodayData({ ...todayData, image: uri });
+
+    await dbService.setDailyNote(todayNote?.mood_level, todayNote?.note, uri);
     console.log(uri);
+    setTempImage(uri);
   };
 
   return (
@@ -149,7 +140,7 @@ export const SwapButton = ({
           activeOpacity={0.7}
           onPress={() => setImageOptionVisible(true)}
           disabled={loading}
-          className={`h-20 w-20 rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner shadow-gray-200 ${loading ? "opacity-60" : ""} ${className}`}
+          className={`h-20 w-20 rounded-full flex-row items-center justify-center border shadow-md ${todayData.image ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
           {...props}
         >
           {loading ? (
@@ -160,7 +151,15 @@ export const SwapButton = ({
               type="subtitle"
               style={{ fontWeight: "bold" }}
             >
-              <Feather name="image" size={28} color="white" />
+              {todayData.image ? (
+                <Image
+                  source={{ uri: todayData.image }}
+                  className="w-20 h-20 rounded-full"
+                />
+              ) : (
+                <Feather name="image" size={28} color="white" />
+              )}
+              {/* <Feather name="image" size={28} color="white" /> */}
             </ThemedText>
           )}
         </TouchableOpacity>
@@ -187,10 +186,10 @@ export const SwapButton = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => setVisible(true)}
+          onPress={() => setNoteModalVisible(true)}
           activeOpacity={0.7}
           disabled={loading}
-          className={`h-20 w-20 rounded-full flex-row items-center justify-center border border-gray-500 shadow-inner ${todayData.mood ? "shadow-primary" : "shadow-gray-200"} ${loading ? "opacity-60" : ""} ${className}`}
+          className={`h-20 w-20 rounded-full flex-row items-center justify-center border shadow-md ${todayData.mood ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
           {...props}
         >
           {loading ? (
@@ -220,88 +219,17 @@ export const SwapButton = ({
         </TouchableOpacity>
 
         {/* Note modal */}
-        <Modal
-          visible={visible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setVisible(false)}
-        >
-          {/* Overlay */}
-          <Pressable
-            className="flex-1 bg-gray-900/40"
-            onPress={() => setVisible(false)}
-          >
-            {/* Thanh reaction */}
-            <View className="absolute bottom-8 left-4 right-4">
-              <Animated.View
-                layout={LinearTransition.springify().duration(100).damping(80)}
-              >
-                <Pressable className="p-2" onPress={(e) => e.stopPropagation()}>
-                  <MaterialIcons name="notes" size={24} color={"#6a7282"} />
-                  <View className="mb-8">
-                    <TextInput
-                      textAlignVertical="top"
-                      cursorColor={theme.white}
-                      selectionColor={theme.white}
-                      style={{ fontSize: 14 }}
-                      value={tempText}
-                      onChangeText={(text) => setTempText(text)}
-                      multiline
-                      placeholder="What are you feeling today?"
-                      placeholderTextColor={theme.white + "aa"}
-                      numberOfLines={3}
-                      className="h-20 border border-gray-500 border-solid rounded-xl p-2 bg-gray-500  text-white"
-                    ></TextInput>
-                  </View>
-                  <View
-                    className={"flex-row items-center justify-center gap-2"}
-                  >
-                    {EMOTIONS.map((item, index) => {
-                      const isSelected = item.level === todayData.mood;
-                      return (
-                        <Animated.View
-                          key={item.emoji}
-                          entering={SlideInDown.springify()
-                            .damping(18)
-                            .stiffness(180)
-                            .mass(1)
-                            .delay(index * 50)}
-                          exiting={SlideOutDown.duration(100)}
-                        >
-                          <TouchableOpacity
-                            style={{
-                              width: 56,
-                              height: 56,
-                              borderRadius: 999,
-                              borderColor: "gray",
-                              borderWidth: 1,
-                            }}
-                            className={`items-center justify-center ${isSelected ? "bg-primary shadow-primary shadow-lg" : "bg-white flex-1"}`}
-                            key={index}
-                            onPress={() => {
-                              (handleSelectEmoji(item.level),
-                                console.log(item.emoji),
-                                setVisible(false));
-                            }}
-                          >
-                            <Text style={{ fontSize: 28 }} key={item.level}>
-                              {item.emoji}
-                            </Text>
-                          </TouchableOpacity>
-                        </Animated.View>
-                      );
-                    })}
-                  </View>
-                </Pressable>
-              </Animated.View>
-            </View>
-          </Pressable>
-        </Modal>
-
+        <NoteModal
+          visible={noteModalVisible}
+          setVisible={setNoteModalVisible}
+          note={todayData.note}
+          mood={todayData.mood}
+          onSelectMood={handleSelectMood}
+        />
         <PhotoPickerModal
           visible={imageOptionVisible}
           setVisible={setImageOptionVisible}
-          photoUri={todayData.image}
+          photoUri={todayData.image || tempImage}
           updateImage={handleUpdateImage}
         />
       </View>

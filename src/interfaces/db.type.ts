@@ -53,9 +53,9 @@ export interface DailyLog {
 // 4. Interface cho bảng daily_logs
 export interface DailyNote {
   log_date: string; // Định dạng 'YYYY-MM-DD'
-  mood_level: MoodLevel | null;
-  note: string | null;
-  image_uri: string | null; // Ảnh gắn kèm note ngày hôm đó
+  mood_level?: MoodLevel;
+  note?: string;
+  image_uri?: string; // Ảnh gắn kèm note ngày hôm đó
   sync_status: SyncStatus;
   created_at: number;
   updated_at: number;

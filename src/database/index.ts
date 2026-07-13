@@ -49,7 +49,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getDailyNote: (date?: string) => getDailyNote(db, date),
   getDailyNotes: () => getDailyNotes(db),
   setDailyNote: (
-    moodLevel: MoodLevel,
+    moodLevel?: MoodLevel,
     note?: string,
     image_uri?: string,
     date?: string,

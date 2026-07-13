@@ -2,25 +2,25 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import {
-    Alert,
-    Image,
-    Modal,
-    Pressable,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Modal,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Animated, {
-    LinearTransition,
-    SlideInDown,
-    SlideOutDown,
+  LinearTransition,
+  SlideInDown,
+  SlideOutDown,
 } from "react-native-reanimated";
 
 interface PhotoPickerModalProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  photoUri: string | null; // Uri hiện tại truyền từ DB lên để hiển thị preview
-  updateImage: (uri: string | null) => void; // Hàm callback trả lại kết quả (uri mới hoặc null)
+  photoUri?: string; // Uri hiện tại truyền từ DB lên để hiển thị preview
+  updateImage: (uri?: string) => void; // Hàm callback trả lại kết quả (uri mới hoặc null)
 }
 
 export const PhotoPickerModal = ({
@@ -32,22 +32,26 @@ export const PhotoPickerModal = ({
   // 1. Hàm xử lý lưu ảnh vĩnh viễn vào thư mục ứng dụng
   const saveImagePermanently = async (cacheUri: string) => {
     try {
-      const filename =
-        cacheUri.split("/").pop() || new Date().getTime().toString();
+      const filename = cacheUri.split("/").pop() ?? `${Date.now()}.jpg`;
 
-      const permanentUri = new FileSystem.Directory(
-        FileSystem.Paths.cache,
-        filename,
+      const file = new FileSystem.File(cacheUri);
+
+      const imagesDir = new FileSystem.Directory(
+        FileSystem.Paths.document,
+        "images",
       );
 
-      const file = new FileSystem.File(cacheUri, filename);
-      file.move(permanentUri);
+      if (!imagesDir.exists) {
+        imagesDir.create();
+      }
 
-      // Trả uri vĩnh viễn về cho component cha
-      updateImage(permanentUri.uri);
-    } catch (error) {
-      console.error("Lỗi khi lưu ảnh cục bộ:", error);
-      Alert.alert("Lỗi", "Không thể lưu tệp ảnh vào hệ thống.");
+      const destination = new FileSystem.File(imagesDir, filename);
+
+      file.move(destination);
+
+      updateImage(destination.uri);
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -111,7 +115,7 @@ export const PhotoPickerModal = ({
           text: "Xóa",
           style: "destructive",
           onPress: () => {
-            updateImage(null); // Truyền null báo hiệu xóa ảnh
+            updateImage(undefined); // Truyền null báo hiệu xóa ảnh
             setVisible(false);
           },
         },
