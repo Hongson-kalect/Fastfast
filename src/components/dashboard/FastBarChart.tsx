@@ -3,7 +3,7 @@ import { fonts } from "@/configs/fonts";
 import { useAppStore } from "@/stores/appStore";
 import { LinearGradient, Text, useFont, vec } from "@shopify/react-native-skia";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import Animated, { FadeOut } from "react-native-reanimated";
 import { Bar, CartesianChart } from "victory-native";
@@ -13,11 +13,15 @@ const DATA = Array.from({ length: 7 }, (_, i) => ({
   y: 20 + Math.floor(Math.random() * 80),
 }));
 
-export function FastBarChart() {
+type Props = {
+  data: { x: string; y: number }[];
+};
+
+export function FastBarChart({ data }: Props) {
   const font = useFont(fonts.MulishRegular, 9);
   const font2 = useFont(fonts.MulishMedium, 14);
   const { theme } = useAppStore();
-  const data = useMemo(() => [...DATA], []);
+  // const data = useMemo(() => [...DATA], []);
   const { width, height } = useWindowDimensions();
 
   const [isReady, setIsReady] = useState(false);
@@ -43,7 +47,7 @@ export function FastBarChart() {
   return (
     <>
       <CartesianChart
-        data={DATA}
+        data={data}
         xKey="x"
         yKeys={["y"]}
         // alignment='middle'
@@ -61,13 +65,13 @@ export function FastBarChart() {
            * from a number to a month name.
            */
           formatXLabel: (value) => {
-            if (value === 0) return "0";
+            // if (value === '0') return "0";
             // const date = new Date(2023, value - 1);
-            return "L " + value;
+            return value.slice(5);
           },
         }}
         domainPadding={{ top: 20, right: 32, bottom: 0, left: 32 }}
-        domain={{ y: [0, 100] }}
+        domain={{ y: [0, 24] }}
       >
         {({ points, chartBounds }) => (
           <>

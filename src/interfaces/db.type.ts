@@ -43,6 +43,7 @@ export interface DailyLog {
   user_id: string;
   fast_id: string; // ID của phiên gốc đóng góp giờ lớn nhất ngày hôm đó
   hours_in_day: number; // Số giờ nhịn thực tế trong ngày (<= 24)
+  elapsed_hours: number; // Số giờ nhịn thực tế trong ngày (<= 24)
   hours_in_fast: number; // Số giờ nhịn thực tế trong ngày (<= 24)
   is_deleted: 0 | 1;
   sync_status: SyncStatus;
@@ -59,6 +60,15 @@ export interface DailyNote {
   sync_status: SyncStatus;
   created_at: number;
   updated_at: number;
+}
+
+export interface WeightLog {
+  id: string; // UUID v7
+weight: number;
+log_date: string;
+sync_status: SyncStatus;
+created_at: string;
+updated_at: string;
 }
 
 

@@ -1,6 +1,7 @@
 // @/components/Button.tsx
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
+import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
@@ -27,7 +28,6 @@ interface ButtonProps extends TouchableOpacityProps {
   variant?: "primary" | "secondary";
   loading?: boolean;
   className?: string;
-  todayNote: DailyNote | null;
   data?: {
     note?: string;
     mood: 0 | 1 | 2 | 3 | 4;
@@ -41,10 +41,30 @@ export const SwapButton = ({
   variant = "primary",
   loading = false,
   className = "",
-  todayNote,
   ...props
 }: ButtonProps) => {
-  const { dbService } = useAppStore();
+  const dbService = useDBService();
+  const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
+  const [weight, setWeight] = useState<number | undefined>(undefined);
+
+  const detectTodayNote = async () => {
+    const todayNote = await dbService?.getDailyNote();
+    console.log("todayNote", todayNote);
+    setTodayNote(todayNote || null);
+  };
+
+  const getCurrrentWeight = async () => {
+    const weightObj = await dbService?.getCurrentWeight();
+    console.log("weight", weight);
+    setWeight(weightObj?.weight || undefined);
+  };
+
+  useEffect(() => {
+    if (!dbService) return;
+    detectTodayNote();
+    getCurrrentWeight();
+  }, [dbService]);
+
   const [todayData, setTodayData] = useState<{
     note?: string;
     mood?: MoodLevel;
@@ -95,7 +115,11 @@ export const SwapButton = ({
     }
   };
 
-  const handleSelectMood = async (mood?: MoodLevel, note?: string) => {
+  const handleSelectMood = async (
+    mood?: MoodLevel,
+    note?: string,
+    newWeight?: number,
+  ) => {
     if (!dbService) return console.log("db not ready");
     console.log("Selected Mood:", mood);
     // Lưu vào database local của bạn tại đây...
@@ -107,6 +131,10 @@ export const SwapButton = ({
 
     await dbService.setDailyNote(mood, note, todayData?.image);
 
+    if (newWeight && weight !== newWeight) {
+      await dbService.updateWeight(newWeight);
+      setWeight(newWeight);
+    }
     // Thêm emoji và node(nếu có vào trong db)
   };
 
@@ -224,6 +252,7 @@ export const SwapButton = ({
           setVisible={setNoteModalVisible}
           note={todayData.note}
           mood={todayData.mood}
+          weight={weight}
           onSelectMood={handleSelectMood}
         />
         <PhotoPickerModal

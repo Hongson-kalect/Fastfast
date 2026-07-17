@@ -1,19 +1,20 @@
+import DashboardOptions from "@/components/dashboard/DashboardOptions";
 import { FastBarChart } from "@/components/dashboard/FastBarChart";
 import DashboardHeader from "@/components/dashboard/Header";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
-import { Feather, FontAwesome5 } from "@expo/vector-icons";
-import { useState } from "react";
+import { getLocalTodayStr } from "@/util/timer";
+import { useEffect, useState } from "react";
 import {
-    Animated,
-    LayoutChangeEvent,
-    Pressable,
-    ScrollView,
-    Text,
-    useWindowDimensions,
-    View,
+  Animated,
+  LayoutChangeEvent,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -50,6 +51,39 @@ export const MOCK_DASHBOARD_DATA = Array.from({ length: 20 }).map(
   },
 );
 
+type ChartValue = {
+  days?: number;
+  showType?: "days" | "week" | "month";
+};
+type ChartType = "week" | "month" | "3month" | "6month" | "year" | "all";
+
+const chartType: { [key in ChartType]: ChartValue } = {
+  week: {
+    days: 7,
+    showType: "days",
+  },
+  month: {
+    days: 30,
+    showType: "days",
+  },
+  "3month": {
+    days: 90,
+    showType: "week",
+  },
+  "6month": {
+    days: 180,
+    showType: "week",
+  },
+  year: {
+    days: 365,
+    showType: "month",
+  },
+  all: {
+    days: undefined,
+    showType: undefined,
+  },
+};
+
 const DashboardScreen = () => {
   const [layout, setLayout] = useState<{
     width: number;
@@ -57,7 +91,75 @@ const DashboardScreen = () => {
   } | null>(null);
   const { width } = useWindowDimensions();
   const { theme } = useAppStore();
+  const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
+
+  const [weightChartType, setWeightChartType] = useState<ChartType>("week");
+  const [weightData, setWeightData] = useState<{ x: string; y: number }[]>([]);
+  const [dayFastData, setDayFastData] = useState<{ x: string; y: number }[]>(
+    [],
+  );
+
+  const getWeightData = async () => {
+    return dbService?.getWeightLogs(chartType[weightChartType].days);
+  };
+
+  const getDayFastData = async () => {
+    return dbService?.getDailyLogs(chartType[weightChartType].days);
+  };
+
+  const refreshData = async () => {
+    const days = chartType?.[weightChartType]?.days || 30;
+    const displayType = chartType?.[weightChartType]?.showType;
+    const dayPointer = new Date(getLocalTodayStr());
+    dayPointer.setDate(dayPointer.getDate() - days);
+
+    if (chartType?.[weightChartType]?.showType === "week") {
+      console.log("render data dạng tuần");
+    }
+
+    const [weights, dayFasts] = await Promise.all([
+      getWeightData(),
+      getDayFastData(),
+    ]);
+
+    const weightMap: { [day: string]: number } = {};
+    const fastMap: { [day: string]: number } = {};
+    const weightsArr = [] as { x: string; y: number }[];
+    const dayFastsArr = [] as { x: string; y: number }[];
+
+    weights.forEach((item) => {
+      weightMap[item.log_date] = item.weight;
+    });
+    dayFasts.forEach((item) => {
+      fastMap[item.log_date] = item.hours_in_day;
+    });
+    const logObj: { [day: string]: { weight: number; fast: number } } = {};
+    for (let i = 0; i < days; i++) {
+      const day = getLocalTodayStr(dayPointer);
+
+      logObj[day] = {
+        weight: weightMap[day] || 0,
+        fast: fastMap[day] || 0,
+      };
+
+      weightsArr.push({
+        x: day,
+        y: weightMap[day] || 0,
+      });
+
+      dayFastsArr.push({
+        x: day,
+        y: Math.round(fastMap[day]) || 0,
+      });
+      dayPointer.setDate(dayPointer.getDate() + 1);
+    }
+
+    console.log("chart data ", weightsArr, dayFastsArr);
+
+    setWeightData(weightsArr);
+    setDayFastData(dayFastsArr);
+  };
 
   // Khởi tạo giá trị scale cho hiệu ứng bấm FAB
   const scaleValue = new Animated.Value(1);
@@ -89,6 +191,10 @@ const DashboardScreen = () => {
     setLayout({ width: width + 10, height: height + 42 });
   };
 
+  useEffect(() => {
+    refreshData();
+  }, [chartType]);
+
   return (
     <ThemedView className="flex-1 bg-main">
       <SafeAreaView>
@@ -102,45 +208,11 @@ const DashboardScreen = () => {
             <DashboardHeader />
 
             {/* 4. BIỂU ĐỒ 2: XU HƯỚNG CÂN NẶNG (LINE CHART PLACEHOLDER) */}
+            <DashboardOptions />
             <View className=" rounded-3xl my-4">
-              <View className="flex-row justify-between items-center mb-4">
+              <View className="flex-row justify-between items-center mb-1">
                 <View className="items-center justify-center gap-2">
                   <ThemedText className="text-white!">Weight</ThemedText>
-                </View>
-                <View className="flex-row items-center gap-1">
-                  <Animated.View className="w-10 h-10 rounded-lg">
-                    <Pressable
-                      hitSlop={{ top: 10, left: 20, bottom: 10 }}
-                      onPressIn={handlePressIn}
-                      onPressOut={handlePressOut}
-                      onPress={handleOpenAddWeightModal}
-                      className="w-full h-full flex-row justify-center items-center"
-                      android_ripple={{ color: "#ffffff33", borderless: true }}
-                    >
-                      {/* Icon "weight" (Hình chiếc cân điện tử mini) */}
-                      <View className="absolute -top-1 -left-1 z-10 bg-black items-center justify-center h-5 w-5 rounded-full shadow-inner shadow-primary">
-                        <FontAwesome5
-                          name="plus"
-                          size={10}
-                          color={theme.primary}
-                        />
-                      </View>
-                      <FontAwesome5
-                        name="weight"
-                        size={30}
-                        color={theme.primary}
-                      />
-                    </Pressable>
-                  </Animated.View>
-
-                  <View
-                    style={{ borderColor: theme.text }}
-                    className="flex-row items-center px-2 h-10 border rounded-lg gap-1"
-                  >
-                    <ThemedText className="text-xs!">Last 7 days</ThemedText>
-
-                    <Feather name="chevron-down" size={14} color={theme.text} />
-                  </View>
                 </View>
               </View>
 
@@ -153,7 +225,7 @@ const DashboardScreen = () => {
                   onInteractionStart={() => setEnableScroll(false)}
                   onInteractionEnd={() => setEnableScroll(true)}
                   layout={{ width: width - 24, height: 200 }}
-                  data={MOCK_DASHBOARD_DATA}
+                  data={weightData}
                   target={70}
                 />
               </View>
@@ -161,20 +233,10 @@ const DashboardScreen = () => {
 
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
             <View className="rounded-3xl my-6">
-              <View className="flex-row justify-between items-center mb-4">
+              <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-white font-semibold text-base">
                   Hiệu suất nhịn ăn
                 </Text>
-                <View className="flex-row items-center gap-1 h-10">
-                  <View
-                    style={{ borderColor: theme.text }}
-                    className="flex-row items-center p-2 border rounded-lg gap-1"
-                  >
-                    <ThemedText className="text-xs!">Last 7 days</ThemedText>
-
-                    <Feather name="chevron-down" size={14} color={theme.text} />
-                  </View>
-                </View>
               </View>
 
               {/* Hộp đen đại diện cho Bar Chart */}
@@ -182,7 +244,7 @@ const DashboardScreen = () => {
                 style={{ height: 200 }}
                 className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
               >
-                <FastBarChart />
+                <FastBarChart data={dayFastData} />
               </View>
             </View>
 

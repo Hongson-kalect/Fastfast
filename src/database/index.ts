@@ -7,7 +7,12 @@ import {
   getDailyLogs,
   getTodayLog,
 } from "./shema/daily_logs";
-import { generateString as daily_noteGenerateString, getDailyNote, getDailyNotes, setDailyNote } from "./shema/daily_note";
+import {
+  generateString as daily_noteGenerateString,
+  getDailyNote,
+  getDailyNotes,
+  setDailyNote,
+} from "./shema/daily_note";
 import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
@@ -27,7 +32,12 @@ import {
   getUserProfile,
   generateString as userGenerateString,
 } from "./shema/user";
-import { generateString as weight_trackerGenerateString } from "./shema/weight_tracker";
+import {
+  getCurrentWeight,
+  getWeightLogs,
+  updateWeight,
+  generateString as weight_trackerGenerateString,
+} from "./shema/weight_tracker";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -43,7 +53,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number) => startNewSession(db, startTime),
 
-  getDailyLogs: () => getDailyLogs(db),
+  getDailyLogs: (days?: number) => getDailyLogs(db, days),
   getTodayLog: () => getTodayLog(db),
 
   getDailyNote: (date?: string) => getDailyNote(db, date),
@@ -58,12 +68,17 @@ export const createDBService = (db: SQLiteDatabase) => ({
     log_date: string;
     fast_id: string;
     hours_in_day: number;
+    elapsed_times: number;
     hour_in_fast: number;
   }) => addDailyLogs(db, data),
 
   getActiveTheme: () => getActiveTheme(db),
   getLocalTheme: () => getLocalTheme(),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
+
+  getCurrentWeight: () => getCurrentWeight(db),
+  getWeightLogs: (days?: number) => getWeightLogs(db, days),
+  updateWeight: (weight: number) => updateWeight(db, weight),
 });
 
 export const generateSchema = `

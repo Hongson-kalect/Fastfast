@@ -3,8 +3,8 @@ import HomeHeader from "@/components/home/Header";
 import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
 import { ThemedText } from "@/components/themed-text";
+import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, FastSession } from "@/interfaces/db.type";
-import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useEffect, useState } from "react";
@@ -21,11 +21,10 @@ const rating = [
 const HomeScreen = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [lastSession, setLastSession] = useState<FastSession | null>(null);
-  const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-
+  
   const { setGlobalModal } = useModalStore();
 
-  const { dbService } = useAppStore();
+  const dbService = useDBService();
   const [isLoading, setIsLoading] = useState(true);
 
   const [isCounting, setIsCounting] = useState(false);
@@ -48,6 +47,7 @@ const HomeScreen = () => {
             dbService?.finishLastSession(lastSession?.id, now, timeDiff);
             // Tính toán lưu giờ nhịn theo ngày của người dùng
             const parsedDays = splitSessionIntoDays(startTime, now);
+            console.log("parsedDays", parsedDays);
 
             // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
             // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
@@ -56,6 +56,7 @@ const HomeScreen = () => {
                 log_date: dayData.log_date,
                 fast_id: lastSession.id,
                 hours_in_day: dayData.hours_in_day,
+                elapsed_times: dayData.elapsed_hours,
                 hour_in_fast: parseFloat((timeDiff / 60 / 60).toFixed(2)),
                 // user_id, mood_level, note có thể bổ sung tùy thuộc form điền sau khi nhịn
               });
@@ -66,9 +67,10 @@ const HomeScreen = () => {
     } else {
       // Bắt đầu đếm
       setIsCounting(!isCounting);
-      const now = new Date().getTime() - 12 * 60 * 60 * 1000;
-      dbService?.startNewSession(now);
-      setCounter(12 * 60 * 60 * 1000);
+      const now = new Date().getTime() - 50 * 60 * 60 * 1000;
+      const newSession = await dbService?.startNewSession(now);
+      setLastSession(newSession);
+      setCounter(50 * 60 * 60 * 1000);
       setStartTime(now);
     }
     // lấy dữ liệu fast lần này để xem ghi vào db
@@ -96,17 +98,11 @@ const HomeScreen = () => {
     }
   };
 
-  const detectTodayNote = async () => {
-    const todayNote = await dbService?.getDailyNote();
-    console.log("todayNote", todayNote);
-    setTodayNote(todayNote || null);
-  };
 
   useEffect(() => {
     if (!dbService) return;
     setIsLoading(false);
     detectLastSession();
-    detectTodayNote();
   }, [dbService]);
 
   useEffect(() => {
@@ -140,7 +136,6 @@ const HomeScreen = () => {
 
             <View className="py-4 mt-4 items-center justify-center">
               <SwapButton
-                todayNote={todayNote}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
                 variant="primary"

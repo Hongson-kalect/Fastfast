@@ -46,21 +46,35 @@ export const getYearFastSession = async (
   return row;
 };
 
-export const finishLastSession = async (db: SQLiteDatabase, id:string, time: number, duration: number) => {
+export const finishLastSession = async (
+  db: SQLiteDatabase,
+  id: string,
+  time: number,
+  duration: number,
+) => {
   await db.runAsync(
     `UPDATE fast_sessions SET end_time = ?, duration = ? WHERE id = ?;`,
     [time, duration, id],
-  )
-};
-
-export const startNewSession = async (db: SQLiteDatabase, time: number, targetDuration: number|null= null) => {
-  const id = uuidv7();
-  await db.runAsync(
-    `INSERT INTO fast_sessions (id, start_time, target_duration) VALUES (?, ?, ?);`,
-    [id, time, targetDuration],
   );
 };
 
+export const startNewSession = async (
+  db: SQLiteDatabase,
+  time: number,
+  targetDuration: number | null = null,
+) => {
+  const id = uuidv7();
+  db.runAsync(
+    `INSERT INTO fast_sessions (id, start_time, target_duration) VALUES (?, ?, ?);`,
+    [id, time, targetDuration],
+  );
+
+  const res = await getLastFastSession(db);
+  return res;
+};
+
 export const deleteSession = async (db: SQLiteDatabase, id: string) => {
-  await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [id])
+  await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
+    id,
+  ]);
 };
