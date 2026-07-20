@@ -36,7 +36,7 @@ export const getCurrentWeight = async (
   db: SQLiteDatabase,
 ): Promise<WeightLog | null> => {
   const row = await db.getFirstAsync<WeightLog>(
-    `SELECT * FROM daily_logs Order by created_at DESC LIMIT 1`,
+    `SELECT * FROM weight_logs Order by created_at DESC LIMIT 1`,
   );
   return row;
 };

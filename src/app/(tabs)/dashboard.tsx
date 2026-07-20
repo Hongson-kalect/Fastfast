@@ -112,7 +112,7 @@ const DashboardScreen = () => {
     const days = chartType?.[weightChartType]?.days || 30;
     const displayType = chartType?.[weightChartType]?.showType;
     const dayPointer = new Date(getLocalTodayStr());
-    dayPointer.setDate(dayPointer.getDate() - days);
+    dayPointer.setDate(dayPointer.getDate() - days + 1); // Bao gồm ngày hôm nay
 
     if (chartType?.[weightChartType]?.showType === "week") {
       console.log("render data dạng tuần");
@@ -123,6 +123,8 @@ const DashboardScreen = () => {
       getDayFastData(),
     ]);
 
+    console.log(weights, dayFasts);
+
     const weightMap: { [day: string]: number } = {};
     const fastMap: { [day: string]: number } = {};
     const weightsArr = [] as { x: string; y: number }[];
@@ -132,7 +134,8 @@ const DashboardScreen = () => {
       weightMap[item.log_date] = item.weight;
     });
     dayFasts.forEach((item) => {
-      fastMap[item.log_date] = item.hours_in_day;
+      const currentFast = fastMap[item.log_date] || 0;
+      fastMap[item.log_date] = currentFast + item.hours_in_day;
     });
     const logObj: { [day: string]: { weight: number; fast: number } } = {};
     for (let i = 0; i < days; i++) {

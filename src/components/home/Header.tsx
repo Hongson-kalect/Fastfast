@@ -1,10 +1,22 @@
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import TargetSheet from "./TargetSheet";
 
 const HomeHeader = () => {
   const { theme } = useAppStore();
+  const { isPresent, present, close } = useBottomSheet();
+
+  const openTargetSheet = () => {
+    present({
+      render: () => <TargetSheet />,
+      title: "Target",
+      onClose: () => close(),
+      size: "long",
+    });
+  };
   return (
     <View className="flex-row justify-between items-center">
       <View>
@@ -16,6 +28,7 @@ const HomeHeader = () => {
       </View>
       <View className="p-1">
         <TouchableOpacity
+          onPress={() => openTargetSheet()}
           activeOpacity={0.7}
           style={{
             borderTopRightRadius: "20%",

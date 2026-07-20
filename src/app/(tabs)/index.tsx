@@ -4,7 +4,7 @@ import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyNote, FastSession } from "@/interfaces/db.type";
+import { FastSession } from "@/interfaces/db.type";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ const rating = [
 const HomeScreen = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [lastSession, setLastSession] = useState<FastSession | null>(null);
-  
+
   const { setGlobalModal } = useModalStore();
 
   const dbService = useDBService();
@@ -67,10 +67,11 @@ const HomeScreen = () => {
     } else {
       // Bắt đầu đếm
       setIsCounting(!isCounting);
-      const now = new Date().getTime() - 50 * 60 * 60 * 1000;
+      const now = new Date().getTime();
+      // const now = new Date().getTime() - 50 * 60 * 60 * 1000;
       const newSession = await dbService?.startNewSession(now);
       setLastSession(newSession);
-      setCounter(50 * 60 * 60 * 1000);
+      setCounter(0);
       setStartTime(now);
     }
     // lấy dữ liệu fast lần này để xem ghi vào db
@@ -97,7 +98,6 @@ const HomeScreen = () => {
       setStartTime(lastSession.start_time);
     }
   };
-
 
   useEffect(() => {
     if (!dbService) return;

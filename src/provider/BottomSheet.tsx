@@ -1,4 +1,7 @@
 // components/BottomSheetProvider.tsx
+import { ThemedText } from "@/components/themed-text";
+import { useAppStore } from "@/stores/appStore";
+import { AntDesign } from "@expo/vector-icons";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -16,7 +19,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { AntDesign } from "@expo/vector-icons";
 import {
   BackHandler,
   Pressable,
@@ -25,7 +27,6 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { ThemedText } from "@/components/themed-text";
 type SheetSize = "short" | "medium" | "long" | "full";
 
 const BottomSheetContext = createContext<{
@@ -52,9 +53,7 @@ export const BottomSheetProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [activeSheet, setActiveSheet] = useState<
-    "short" | "medium" | "long" | "full" | null
-  >(null);
+  const activeSheet = useRef<"short" | "medium" | "long" | "full" | null>(null);
 
   const shortSheetRef = useRef<BottomSheetModal>(null);
   const mediumSheetRef = useRef<BottomSheetModal>(null);
@@ -111,13 +110,13 @@ export const BottomSheetProvider = ({
       isOpen.current = true;
       setIsPresent(true);
       contentRef.current = render;
-      setActiveSheet(size || "medium");
+      activeSheet.current = size || "medium";
       setTitle(title || "");
       setScrollable(scrollable ?? true);
       setOnClose(() => onClose || null);
       sheetMap[size || "medium"].ref.current?.present();
     },
-    []
+    [],
   );
 
   const handleSheetChanges = useCallback((index: number) => {
@@ -129,11 +128,12 @@ export const BottomSheetProvider = ({
   const close = useCallback(() => {
     isOpen.current = false;
     setIsPresent(false);
-    sheetMap[activeSheet || "medium"].ref.current?.dismiss();
-  }, [activeSheet]);
+    console.log(activeSheet);
+    sheetMap[activeSheet.current || "medium"].ref.current?.dismiss();
+  }, [isPresent]);
 
   const backAction = () => {
-    if (sheetMap[activeSheet || "medium"].ref.current?.dismiss) {
+    if (sheetMap[activeSheet.current || "medium"].ref.current?.dismiss) {
       if (isOpen.current) {
         if (onClose) onClose();
         else {
@@ -150,7 +150,7 @@ export const BottomSheetProvider = ({
     if (isPresent) {
       backHandler.current = BackHandler.addEventListener(
         "hardwareBackPress",
-        backAction
+        backAction,
       );
 
       return () => {
@@ -212,8 +212,9 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
       snappoints,
       scrollable,
     }: BottomSheetProps,
-    ref
+    ref,
   ) => {
+    const { theme } = useAppStore();
     const { height } = useWindowDimensions();
     const contentHeight =
       typeof snappoints === "number"
@@ -222,6 +223,7 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
 
     return (
       <BottomSheetModal
+        // containerStyle={{ backgroundColor: "red" }}
         enableContentPanningGesture={false}
         ref={ref}
         snapPoints={[snappoints || "70%"]}
@@ -229,7 +231,7 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
         onChange={onSheetChanges}
         onDismiss={() => (content = () => null)}
       >
-        <BottomSheetView>
+        <BottomSheetView style={{ backgroundColor: theme.background2 }}>
           {/* <TouchableOpacity
             onPress={backAction}
             style={{ right: 16, top: 0 }}
@@ -243,7 +245,7 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
                 <ThemedText
                   numberOfLines={1}
                   className="flex-1"
-                  type='subtitle'
+                  type="subtitle"
                 >
                   {title}
                 </ThemedText>
@@ -260,7 +262,7 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
                 contentContainerStyle={{ flexGrow: 1 }}
                 enableOnAndroid
                 keyboardShouldPersistTaps="handled"
-                style={{ backgroundColor: "white" }}
+                style={{ backgroundColor: theme.background2 }}
               >
                 {content?.()}
                 <View style={{ height: 80 }}></View>
@@ -272,7 +274,7 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
         </BottomSheetView>
       </BottomSheetModal>
     );
-  }
+  },
 );
 
 BottomSheetInstance.displayName = "BottomSheetInstance";

@@ -100,7 +100,7 @@ export const darkTheme = {
   subText3: "#9E9E9E", // Text phụ cấp 3
 
   background: "#121212", // Nền tối
-  background2: "#1E1E1E",
+  background2: "#18181b",
   constract: "#1E1E1E", // Màu cho nút, tương phản với nền sáng
   card: "#1E1E1E", // Nền thẻ dạng tối
   white: "#FFFFFF",
