@@ -1,4 +1,6 @@
 import { FASTING_TARGETS, FastingTargetItem } from "@/constants/data";
+import { settingKey } from "@/constants/key";
+import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
@@ -16,13 +18,16 @@ const TargetSheet = ({
   onSelectTarget,
 }: TargetSheetProps) => {
   const { close } = useBottomSheet();
-  const { theme } = useAppStore();
+  const dbService = useDBService();
+  const { theme, settings, updateSetting } = useAppStore();
   const [selectedHours, setSelectedHours] =
     useState<number>(currentTargetHours);
   const [detailItem, setDetailItem] = useState<FastingTargetItem | null>(null);
 
   const handleSelect = (item: FastingTargetItem) => {
     setSelectedHours(item.hours);
+    updateSetting({ [settingKey.target]: item.hours.toString() });
+    dbService.setting(settingKey.target, item.hours.toString());
     if (onSelectTarget) onSelectTarget(item);
     close();
   };
@@ -46,12 +51,10 @@ const TargetSheet = ({
                 elevation: isSelected ? 10 : 10,
                 shadowColor: isSelected ? theme.primary : "#fff",
                 backgroundColor: "#364153",
-                // borderColor: isSelected ? theme.primary : item.borderColor,
+                borderColor: isSelected ? theme.primary : item.colors.border,
                 borderWidth: 0.5,
               }}
-              className={`flex-row items-center shadow justify-between overflow-hidden rounded-lg ${
-                isSelected ? item.borderColor : "border-zinc-700/40"
-              }`}
+              className={`flex-row items-center shadow justify-between overflow-hidden rounded-lg`}
             >
               {/* Cột trái: Số giờ & Chu kỳ */}
               <View
@@ -61,7 +64,7 @@ const TargetSheet = ({
                 className="flex-row items-center bg-gray-500  py-4 px-3"
               >
                 <ThemedText
-                  style={{ color: item.accentColor }}
+                  // style={{ color: item.colors.badgeText }}
                   className={`text-3xl! font-bold!`}
                 >
                   {item.hours}H
@@ -117,7 +120,8 @@ const TargetSheet = ({
             <View className="flex-row justify-between items-center border-b border-zinc-700/60 pb-3">
               <View className="flex-row items-center gap-2">
                 <ThemedText
-                  className={`text-2xl font-black ${detailItem?.accentColor}`}
+                  // style={{ color: detailItem?.colors.accent }}
+                  className={`text-2xl font-black`}
                 >
                   {detailItem?.hours}H
                 </ThemedText>

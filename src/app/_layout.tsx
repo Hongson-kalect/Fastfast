@@ -1,4 +1,3 @@
-
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import "../global.css";
@@ -23,18 +22,15 @@ const queryClient = new QueryClient();
 
 export default function TabLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <MenuProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Provider>
-              <LanguageProvider>
-                <BottomSheetProvider>
-                  <Suspense>
-                    <SQLiteProvider
-                      databaseName={DATABASE_NAME}
-                      onInit={initDatabase}
-                    >
+    <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <MenuProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <Provider>
+                <LanguageProvider>
+                  <BottomSheetProvider>
+                    <Suspense>
                       <AppWrapper>
                         <Stack screenOptions={{ headerShown: false }}>
                           <Stack.Screen
@@ -44,19 +40,19 @@ export default function TabLayout() {
                           {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
                         </Stack>
                       </AppWrapper>
-                    </SQLiteProvider>
-                  </Suspense>
-                </BottomSheetProvider>
-                <Portal>
-                  <ListModal />
-                  <GlobalModal />
-                </Portal>
-                {/* <StatusBar style="auto" /> */}
-              </LanguageProvider>
-            </Provider>
-          </GestureHandlerRootView>
-        </MenuProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+                    </Suspense>
+                  </BottomSheetProvider>
+                  <Portal>
+                    <ListModal />
+                    <GlobalModal />
+                  </Portal>
+                  {/* <StatusBar style="auto" /> */}
+                </LanguageProvider>
+              </Provider>
+            </GestureHandlerRootView>
+          </MenuProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SQLiteProvider>
   );
 }

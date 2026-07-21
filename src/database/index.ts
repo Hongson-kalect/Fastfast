@@ -24,6 +24,7 @@ import {
 } from "./shema/fast_sessions";
 import {
   getUserSettings,
+  setAppSetting,
   generateString as settingGenerateString,
   toggleTheme,
 } from "./shema/setting";
@@ -79,6 +80,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getCurrentWeight: () => getCurrentWeight(db),
   getWeightLogs: (days?: number) => getWeightLogs(db, days),
   updateWeight: (weight: number) => updateWeight(db, weight),
+
+  setting: (key: string, value: string) => setAppSetting(db, key, value),
 });
 
 export const generateSchema = `
@@ -98,18 +101,6 @@ export const initDatabase = async (db: SQLiteDatabase) => {
   // let version = 0;
   // await clearDatabase(db);
   const version = await getDatabaseVersion(db);
-  // try {
-  //   const db_version = await db.getFirstAsync<{ key: string; value: string }>(
-  //     `select * from system_config where key='db_version'`,
-  //   );
-  //   if (db_version) {
-  //     version = Number(db_version.value);
-  //   }
-  // } catch {
-  //   console.log("no system_config");
-  // }
-
-  // if(version==DATABASE_VERSION){
   if (version >= 1) {
     return;
   }

@@ -88,7 +88,6 @@ const HomeScreen = () => {
   const detectLastSession = async () => {
     const lastSession = await dbService?.getLastFastSession();
     const allSession = await dbService?.getFastSessions();
-    console.log("lastSession", lastSession, allSession);
     if (!lastSession || lastSession?.end_time) {
       // Nếu không có hoặc phiên cuối đã kết thúc
       setIsCounting(false);

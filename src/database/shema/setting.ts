@@ -50,3 +50,14 @@ export const toggleTheme = async (
     throw error;
   }
 };
+
+export const setAppSetting = async (
+  db: SQLiteDatabase,
+  key: string,
+  value: string,
+) => {
+  await db.runAsync(
+    `INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)`,
+    [key, value],
+  );
+};

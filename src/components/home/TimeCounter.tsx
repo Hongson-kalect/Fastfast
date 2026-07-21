@@ -1,3 +1,4 @@
+import { useAppStore } from "@/stores/appStore";
 import {
   BlurMask,
   Canvas,
@@ -19,12 +20,10 @@ import {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
-import { useAppStore } from "@/stores/appStore";
 
 type Props = {
   isCounting: boolean;
   counter: number;
-  targetHours?: number;
 };
 
 const colorRange = {
@@ -33,11 +32,17 @@ const colorRange = {
 };
 
 const padding = 12;
-const HomeTimeCounter = ({ isCounting, counter, targetHours }: Props) => {
+const HomeTimeCounter = ({ isCounting, counter }: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
   } | null>(null);
+  const { settings } = useAppStore();
+
+  const targetHours = useMemo<undefined | number>(() => {
+    if (!settings?.targetHours) return undefined;
+    return Number(settings?.targetHours);
+  }, [settings?.targetHours]);
 
   const detectCounterLayout = (e: LayoutChangeEvent) => {
     if (layout) return;
@@ -45,9 +50,12 @@ const HomeTimeCounter = ({ isCounting, counter, targetHours }: Props) => {
     setLayout({ width: width + 10, height: height + 42 });
   };
   const { theme } = useAppStore();
-  const progress = targetHours
-    ? Math.min(Math.max((counter / targetHours) * 3600 * 1000, 0.05), 1)
-    : 1;
+  const progress = useMemo(() => {
+    console.log("targetHours", targetHours);
+    return targetHours
+      ? Math.min(Math.max((counter / targetHours) * 3600 * 1000, 0.05), 1)
+      : 1;
+  }, [targetHours, counter]);
   const progressColor = useMemo(() => {
     return interpolateColors(
       progress,
