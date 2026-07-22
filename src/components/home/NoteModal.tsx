@@ -22,7 +22,7 @@ type Props = {
   setVisible: (visible: boolean) => void;
   note?: string;
   mood?: MoodLevel;
-  weight?: number;
+  weight: number | null;
   onSelectMood: (mood?: MoodLevel, note?: string, weight?: number) => void;
 };
 

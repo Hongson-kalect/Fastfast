@@ -1,5 +1,4 @@
 import { ThemedText } from "@/components/themed-text";
-import { fontFamily } from "@/configs/fonts";
 import { BasicModalOptions, InputModalOptions } from "@/provider/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
@@ -31,9 +30,7 @@ const InputModal = (modal: Props) => {
     <View>
       {modal.title && <ThemedText type="subtitle">{modal.title}</ThemedText>}
       {modal.message && (
-        <ThemedText className="mt-2">
-          {modal.message}
-        </ThemedText>
+        <ThemedText className="mt-2">{modal.message}</ThemedText>
       )}
       {modal.subMessage && (
         <ThemedText type={"small"} className="mt-1.5 opacity-70">
@@ -49,9 +46,10 @@ const InputModal = (modal: Props) => {
       >
         {modal.textInnerHeader}
         <TextInput
-          style={{ fontFamily: fontFamily.MulishMedium }}
+          style={{ textAlign: modal.textAlign || "center" }}
           //   style={{ textAlignVertical: "top", height: 90 }}
-          className="text-gray-700 text-xl h-14 px-2"
+          className={`text-gray-700 text-xl h-14 px-2`}
+          keyboardType={modal.keyboardType || "default"}
           ref={textRef}
           onSubmitEditing={submit}
           value={value}

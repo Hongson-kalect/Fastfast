@@ -28,7 +28,11 @@ import {
   generateString as settingGenerateString,
   toggleTheme,
 } from "./shema/setting";
-import { getActiveTheme, getLocalTheme } from "./shema/theme";
+import {
+  getActiveTheme,
+  getThemes,
+  generateString as themeGenerateString,
+} from "./shema/theme";
 import {
   getUserProfile,
   generateString as userGenerateString,
@@ -74,19 +78,20 @@ export const createDBService = (db: SQLiteDatabase) => ({
   }) => addDailyLogs(db, data),
 
   getActiveTheme: () => getActiveTheme(db),
-  getLocalTheme: () => getLocalTheme(),
+  getThemes: () => getThemes(db),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
   getCurrentWeight: () => getCurrentWeight(db),
   getWeightLogs: (days?: number) => getWeightLogs(db, days),
   updateWeight: (weight: number) => updateWeight(db, weight),
 
-  setting: (key: string, value: string) => setAppSetting(db, key, value),
+  setting: (key: string, value: any) => setAppSetting(db, key, value),
 });
 
 export const generateSchema = `
     ${userGenerateString}
     ${settingGenerateString}
+    ${themeGenerateString}
     ${fast_sessionsGenerateString}
     ${daily_logsGenerateString}
     ${daily_noteGenerateString}
@@ -105,7 +110,6 @@ export const initDatabase = async (db: SQLiteDatabase) => {
     return;
   }
 
-  let { user_version: currentDbVersion } = { user_version: 0 };
   if (version >= DATABASE_VERSION) {
     return;
   }
@@ -137,6 +141,7 @@ export const getDatabaseVersion = async (
 
 export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
   // 1. Tắt khóa ngoại tạm thời để xóa cho dễ
+  await db.execAsync(`PRAGMA user_version = 0;`);
   await db.execAsync("PRAGMA foreign_keys = OFF;");
 
   // 2. Lấy danh sách tất cả các bảng hiện có (trừ các bảng hệ thống của SQLite)

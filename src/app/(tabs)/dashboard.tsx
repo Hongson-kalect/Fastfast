@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
+import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr } from "@/util/timer";
 import { useEffect, useState } from "react";
 import {
@@ -84,39 +85,55 @@ const chartType: { [key in ChartType]: ChartValue } = {
   },
 };
 
+const initChartData = (range: number) => {
+  const dayPointer = new Date(getLocalTodayStr());
+  dayPointer.setDate(dayPointer.getDate() - range + 1); // Bao gồm ngày hôm nay
+
+  const res = [];
+
+  for (let i = 0; i < range; i++) {
+    const day = getLocalTodayStr(dayPointer);
+    res.push({
+      x: day,
+      y: 0,
+    });
+    dayPointer.setDate(dayPointer.getDate() + 1);
+  }
+
+  return res;
+};
+
 const DashboardScreen = () => {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
   } | null>(null);
   const { width } = useWindowDimensions();
-  const { theme } = useAppStore();
+  const { theme, currentFastSession, weight, settings } = useAppStore();
   const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
 
-  const [weightChartType, setWeightChartType] = useState<ChartType>("week");
-  const [weightData, setWeightData] = useState<{ x: string; y: number }[]>([]);
+  const [chartRange, setChartRange] = useState<number>(
+    settings?.chart_range || 7,
+  );
+  const [weightData, setWeightData] = useState<{ x: string; y: number }[]>(
+    initChartData(chartRange),
+  );
   const [dayFastData, setDayFastData] = useState<{ x: string; y: number }[]>(
-    [],
+    initChartData(chartRange),
   );
 
   const getWeightData = async () => {
-    return dbService?.getWeightLogs(chartType[weightChartType].days);
+    return dbService?.getWeightLogs(chartRange);
   };
 
   const getDayFastData = async () => {
-    return dbService?.getDailyLogs(chartType[weightChartType].days);
+    return dbService?.getDailyLogs(chartRange);
   };
 
   const refreshData = async () => {
-    const days = chartType?.[weightChartType]?.days || 30;
-    const displayType = chartType?.[weightChartType]?.showType;
     const dayPointer = new Date(getLocalTodayStr());
-    dayPointer.setDate(dayPointer.getDate() - days + 1); // Bao gồm ngày hôm nay
-
-    if (chartType?.[weightChartType]?.showType === "week") {
-      console.log("render data dạng tuần");
-    }
+    dayPointer.setDate(dayPointer.getDate() - chartRange + 1); // Bao gồm ngày hôm nay
 
     const [weights, dayFasts] = await Promise.all([
       getWeightData(),
@@ -137,18 +154,25 @@ const DashboardScreen = () => {
       const currentFast = fastMap[item.log_date] || 0;
       fastMap[item.log_date] = currentFast + item.hours_in_day;
     });
-    const logObj: { [day: string]: { weight: number; fast: number } } = {};
-    for (let i = 0; i < days; i++) {
-      const day = getLocalTodayStr(dayPointer);
 
-      logObj[day] = {
-        weight: weightMap[day] || 0,
-        fast: fastMap[day] || 0,
-      };
+    if (currentFastSession) {
+      const fasts = splitSessionIntoDays(
+        currentFastSession.start_time,
+        currentFastSession.end_time || new Date().getTime(),
+      );
+
+      for (const fast of fasts) {
+        const currentFast = fastMap[fast.log_date] || 0;
+        fastMap[fast.log_date] = currentFast + fast.hours_in_day;
+      }
+    }
+
+    for (let i = 0; i < chartRange; i++) {
+      const day = getLocalTodayStr(dayPointer);
 
       weightsArr.push({
         x: day,
-        y: weightMap[day] || 0,
+        y: weightMap[day] || weightsArr.at(-1)?.y || 0,
       });
 
       dayFastsArr.push({
@@ -196,7 +220,7 @@ const DashboardScreen = () => {
 
   useEffect(() => {
     refreshData();
-  }, [chartType]);
+  }, [chartRange, currentFastSession, weight]);
 
   return (
     <ThemedView className="flex-1 bg-main">
@@ -229,7 +253,6 @@ const DashboardScreen = () => {
                   onInteractionEnd={() => setEnableScroll(true)}
                   layout={{ width: width - 24, height: 200 }}
                   data={weightData}
-                  target={70}
                 />
               </View>
             </View>

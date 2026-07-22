@@ -1,5 +1,4 @@
-import { Theme } from "@/interfaces/db.type";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppSettings, Theme } from "@/interfaces/db.type";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const generateString = /*sql*/ `
@@ -32,11 +31,21 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_theme_single_active
 ON theme(is_deleted);
 `;
 
+export const getThemes = async (db: SQLiteDatabase): Promise<ThemeType[]> => {
+  const rows = await db.getAllAsync<Theme & { color_palette: string }>(
+    `SELECT * FROM theme WHERE is_deleted = 0 ORDER BY priority DESC;`,
+  );
+  return rows.map((row) => ({
+    ...row,
+    color_palette: JSON.parse(row.color_palette || "{}"),
+  }));
+};
+
 export const getActiveTheme = async (
   db: SQLiteDatabase,
-): Promise<(Theme & { color_palette: any }) | null> => {
+): Promise<ThemeType | null> => {
   const now = new Date().toISOString();
-  const row = await db.getFirstAsync<Theme>(
+  const row = await db.getFirstAsync<Theme & { color_palette: string }>(
     `SELECT * FROM theme WHERE (expired_at IS NULL OR expired_at > "${now}") AND is_deleted = 0 ORDER BY priority DESC LIMIT 1;`,
   );
   if (!row) return null;
@@ -120,17 +129,40 @@ export const darkTheme = {
   black: "#000000",
 };
 
+export type ColorPalette = typeof lightTheme;
+
 export const defaultTheme = {
+  id: "default_theme",
   name: "default",
-  light: lightTheme,
-  dark: darkTheme,
+  color_palette: {
+    light: lightTheme,
+    dark: darkTheme,
+  },
 };
 
-export const getLocalTheme = async () => {
-  const themeObj = JSON.parse(
-    (await AsyncStorage.getItem("themeObj")) || JSON.stringify(defaultTheme),
-  );
-  return themeObj;
+export type ThemeType = typeof defaultTheme;
+
+export const extractTheme = (
+  themes: (typeof defaultTheme)[],
+  settings: AppSettings | null,
+): {
+  themeObj: typeof defaultTheme;
+  theme: typeof lightTheme;
+  is_dark_mode: boolean;
+} => {
+  const theme =
+    themes.find((t) => t.id === settings?.theme) || themes[0] || defaultTheme;
+  const is_dark_mode = settings?.is_dark_mode || true;
+
+  return {
+    themeObj: {
+      id: theme.id,
+      name: theme.name,
+      color_palette: theme.color_palette,
+    },
+    theme: is_dark_mode ? theme.color_palette.dark : theme.color_palette.light,
+    is_dark_mode: is_dark_mode,
+  };
 };
 
 const themes = [

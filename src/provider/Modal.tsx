@@ -32,6 +32,8 @@ export type ConfirmModalOptions = {
 };
 export type InputModalOptions = {
   type: "input";
+  textAlign?: "center" | "left" | "right";
+  keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
   defaultValue?: string;
   placeholder?: string;
   isShowCancelButton?: boolean;
@@ -167,7 +169,7 @@ const GlobalModalComponent = () => {
   // hoặc chỉ set globalModal.show = null. Mà thôi 3 dòng này ngắn hơn
   const showValue = useMemo(
     () => (globalModal ? globalModal : placeholder),
-    [placeholder, globalModal]
+    [placeholder, globalModal],
   );
 
   const outAnimation = useDebounce(globalModal?.outAnimation, 200); // when close all modal will be null, include outAnimation, so keep this to close it correctly

@@ -26,6 +26,7 @@ const TargetSheet = ({
 
   const handleSelect = (item: FastingTargetItem) => {
     setSelectedHours(item.hours);
+    console.log(settings, item.hours);
     updateSetting({ [settingKey.target]: item.hours.toString() });
     dbService.setting(settingKey.target, item.hours.toString());
     if (onSelectTarget) onSelectTarget(item);

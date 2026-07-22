@@ -45,7 +45,7 @@ export const SwapButton = ({
 }: ButtonProps) => {
   const dbService = useDBService();
   const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-  const [weight, setWeight] = useState<number | undefined>(undefined);
+  const { weight, updateWeight } = useAppStore();
 
   const detectTodayNote = async () => {
     const todayNote = await dbService?.getDailyNote();
@@ -56,7 +56,7 @@ export const SwapButton = ({
   const getCurrrentWeight = async () => {
     const weightObj = await dbService?.getCurrentWeight();
     console.log("weight", weight);
-    setWeight(weightObj?.weight || undefined);
+    updateWeight(weightObj?.weight || 0);
   };
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export const SwapButton = ({
 
     if (newWeight && weight !== newWeight) {
       await dbService.updateWeight(newWeight);
-      setWeight(newWeight);
+      updateWeight(newWeight);
     }
     // Thêm emoji và node(nếu có vào trong db)
   };

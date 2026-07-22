@@ -1,12 +1,19 @@
 // @/interfaces/db.type.ts
 
-export type SyncStatus = 'synced' | 'pending' | 'failed';
-export type AccountType = 'free' | 'premium';
+import { ColorPalette } from "@/database/shema/theme";
+
+export type SyncStatus = "synced" | "pending" | "failed";
+export type AccountType = "free" | "premium";
 export type MoodLevel = 1 | 2 | 3 | 4 | 5; // 1: Tired -> 5: Happy
 
 // 1. Interface cho bảng app_settings
 export interface AppSettings {
-  [key: string]: string | number|boolean
+  target?: number;
+  weight_target?: number;
+  chart_range?: number;
+  is_dark_mode?: boolean;
+  theme?: string;
+  language?: string;
 }
 
 // 2. Interface cho bảng user_profile
@@ -14,6 +21,7 @@ export interface UserProfile {
   id: string; // UUID v7
   name: string | null;
   account_type: AccountType;
+  target: number;
   image_uri: string | null; // Đường dẫn ảnh local
   upload_url: string | null;
   backup_url: string | null;
@@ -64,25 +72,33 @@ export interface DailyNote {
 
 export interface WeightLog {
   id: string; // UUID v7
-weight: number;
-log_date: string;
-sync_status: SyncStatus;
-created_at: string;
-updated_at: string;
+  weight: number;
+  log_date: string;
+  sync_status: SyncStatus;
+  created_at: string;
+  updated_at: string;
 }
-
 
 export interface Theme {
   id: string;
   name: string;
-  color_palette: string; // JSON string
-  font: string | null;
-  priority: number;
+  color_palette: {
+    light: ColorPalette;
+    dark: ColorPalette;
+  };
+  font?: string | null;
+  priority?: number;
   is_deleted: number;
   created_at: string;
   updated_at: string;
 }
 
 // 💡 Gợi ý thêm các Type Utility phục vụ lúc INSERT (không cần truyền các trường tự sinh)
-export type InsertFastSessionInput = Omit<FastSession, 'created_at' | 'updated_at' | 'is_deleted' | 'sync_status'>;
-export type InsertDailyLogInput = Omit<DailyLog, 'created_at' | 'updated_at' | 'is_deleted' | 'sync_status'>;
+export type InsertFastSessionInput = Omit<
+  FastSession,
+  "created_at" | "updated_at" | "is_deleted" | "sync_status"
+>;
+export type InsertDailyLogInput = Omit<
+  DailyLog,
+  "created_at" | "updated_at" | "is_deleted" | "sync_status"
+>;

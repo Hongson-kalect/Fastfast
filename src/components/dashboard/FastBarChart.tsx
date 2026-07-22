@@ -6,7 +6,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import Animated, { FadeOut } from "react-native-reanimated";
-import { Bar, CartesianChart } from "victory-native";
+import { Bar, CartesianChart, useChartPressState } from "victory-native";
 
 const DATA = Array.from({ length: 7 }, (_, i) => ({
   x: i + 1,
@@ -20,6 +20,11 @@ type Props = {
 export function FastBarChart({ data }: Props) {
   const font = useFont(fonts.MulishRegular, 9);
   const font2 = useFont(fonts.MulishMedium, 14);
+  const font3 = useFont(fonts.MulishBold, 18);
+  const { state, isActive } = useChartPressState({
+    x: "0",
+    y: { y: 0, target: 0 },
+  });
   const { theme } = useAppStore();
   // const data = useMemo(() => [...DATA], []);
   const { width, height } = useWindowDimensions();
@@ -70,7 +75,7 @@ export function FastBarChart({ data }: Props) {
             return value.slice(5);
           },
         }}
-        domainPadding={{ top: 20, right: 32, bottom: 0, left: 32 }}
+        domainPadding={{ top: 35, right: 32, bottom: 0, left: 32 }}
         domain={{ y: [0, 24] }}
       >
         {({ points, chartBounds }) => (
@@ -82,6 +87,7 @@ export function FastBarChart({ data }: Props) {
               color={theme.primary}
               roundedCorners={{ topLeft: 4, topRight: 4 }}
               barWidth={32}
+              animate={{ type: "timing", duration: 500 }}
             >
               <LinearGradient
                 start={vec(0, 0)} // 👈 The start and end are vectors that represent the direction of the gradient.
@@ -95,18 +101,37 @@ export function FastBarChart({ data }: Props) {
             </Bar>
 
             {points.y.map((point, index) => {
-              // if (index === 0 || index === points.y.length - 1) return null;
-              return (
-                <Text
-                  key={index}
-                  x={point.x - 8}
-                  y={(point?.y || 0) - 6}
-                  text={`${data[index]?.y}`} // data có phần tử padding ở đầu
-                  font={font2}
-                  color={theme.white}
-                  // align="center"
-                />
+              const length = points.y.length - 1;
+              const showIndex = Array.from({ length: 4 }, (_, i) =>
+                Math.ceil((length / 4) * (i + 1)),
               );
+              const uniqueShowIndex = [...new Set(showIndex)].sort(
+                (a, b) => a - b,
+              );
+
+              if (index === length)
+                return (
+                  <Text
+                    key={index}
+                    x={point.x - data[index]?.y.toString().length * 4}
+                    y={(point?.y || 0) - 4}
+                    text={`${data[index]?.y}`}
+                    font={font2}
+                    color={isActive ? theme.white + "00" : theme.white}
+                  />
+                );
+              if (Number(data[index]?.y) === 0) return null;
+              if (uniqueShowIndex.includes(index))
+                return (
+                  <Text
+                    key={index}
+                    x={point.x - data[index]?.y.toString().length * 4}
+                    y={(point?.y || 0) - 4}
+                    text={`${data[index]?.y}`}
+                    font={font2}
+                    color={isActive ? theme.white + "00" : theme.white + "cc"}
+                  />
+                );
             })}
           </>
           //👇 pass a PointsArray to the Bar component, as well as options.

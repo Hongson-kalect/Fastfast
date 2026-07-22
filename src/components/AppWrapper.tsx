@@ -8,7 +8,10 @@ import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { theme, settings, dbService, isDarkMode } = useAppStore();
+  const { theme, settings, isDarkMode } = useAppStore();
+  const [isDBReady, setDBReady] = useState(false);
+  const [isFontReady, setFontReady] = useState(false);
+  SplashScreen.preventAutoHideAsync();
 
   const barStyle = useMemo(() => {
     if (isColorDark(theme.background)) return "light-content";
@@ -19,17 +22,15 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { init, isLoadingData, userProfile } = useAppStore();
 
   useEffect(() => {
-    if (db) {
-      const success = init(db);
-      // if (!success) {
-      //   router.replace("/screens/Start/screen");
-      // }
-    }
+    if (!db) return;
+
+    const load = async () => {
+      await init(db);
+      setDBReady(true);
+    };
+
+    load();
   }, [db]);
-
-  const [isReady, setIsReady] = useState(false);
-
-  SplashScreen.preventAutoHideAsync();
 
   useEffect(() => {
     // wordSocket.connect();
@@ -37,15 +38,10 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log("loading font...");
         await Font.loadAsync(fonts);
-        // setFontsLoaded(true);
-        // const hasStarted = await AsyncStorage.getItem("hasSeenStartPage");
-        // setHasSeenStart(hasStarted === "true");
-        // console.log(hasStarted);
-        // if (hasStarted === "true") router.replace("/screens/Start/screen");
       } catch (err) {
         console.log(err);
       } finally {
-        setIsReady(true);
+        setFontReady(true);
       }
     }
 
@@ -53,12 +49,12 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (isReady) {
+    if (isDBReady && isFontReady) {
       SplashScreen.hideAsync();
     }
-  }, [isReady]);
+  }, [isDBReady, isFontReady]);
 
-  if (!isReady) {
+  if (!isDBReady || !isFontReady) {
     // Async font loading only occurs in development.
     return null;
   }

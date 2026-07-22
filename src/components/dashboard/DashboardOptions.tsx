@@ -1,13 +1,49 @@
+import { useDBService } from "@/hooks/useDBService";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { Feather } from "@expo/vector-icons";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import ChartRangeSheet from "./ChartRangeSheet";
 
 const DashboardOptions = () => {
-  const { theme } = useAppStore();
+  const { theme, updateWeight, settings } = useAppStore();
+  const dbService = useDBService();
+  const { setGlobalModal } = useModalStore();
+  const { present, close } = useBottomSheet();
+
+  const openUpdateWeightModal = () => {
+    setGlobalModal({
+      type: "input",
+      keyboardType: "numeric",
+      title: "Update weight",
+      message: "Enter your weight target",
+      onOk: async (value) => {
+        const val = Number(value);
+        if (val && val > 0) {
+          await dbService?.updateWeight(val);
+          updateWeight(val);
+        }
+      },
+    });
+  };
+
+  const openTimeRangeSheet = () => {
+    present({
+      title: "Time range",
+      size: "long",
+      render: () => <ChartRangeSheet />,
+    });
+  };
+
   return (
     <View className="flex-row justify-between items-center my-4">
-      <View className="flex-row items-center justify-center gap-2">
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={openTimeRangeSheet}
+        className="flex-row items-center justify-center gap-2"
+      >
         <ThemedText
           type="small"
           className="text-white/60! font-light! text-sm!"
@@ -18,16 +54,22 @@ const DashboardOptions = () => {
           style={{ borderColor: theme.text }}
           className="flex-row items-center px-2 h-9 border rounded-lg gap-1"
         >
-          <ThemedText className="text-sm!">Last 7 days</ThemedText>
+          <ThemedText className="text-sm!">
+            Last {settings?.chart_range} days
+          </ThemedText>
 
           <Feather name="chevron-down" size={14} color={theme.text} />
         </View>
-      </View>
+      </TouchableOpacity>
 
-      <View className="flex-row items-center gap-1 px-2 h-9 bg-primary rounded-lg">
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={openUpdateWeightModal}
+        className="flex-row items-center gap-1 px-2 h-9 bg-primary rounded-lg"
+      >
         {/* <Feather name="plus" size={20} color={"white"} /> */}
         <ThemedText className="text-sm! text-white!">Update weight</ThemedText>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

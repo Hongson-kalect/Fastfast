@@ -6,7 +6,7 @@ import { ThemedText } from "../themed-text";
 import TargetSheet from "./TargetSheet";
 
 const HomeHeader = () => {
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
   const { isPresent, present, close } = useBottomSheet();
 
   const openTargetSheet = () => {
@@ -40,8 +40,9 @@ const HomeHeader = () => {
         >
           {/* Số target hiển thị (thêm z-10 để luôn nổi lên trên dấu chấm mờ nếu cần) */}
           <ThemedText className="text-primary! text-base! font-semibold!">
-            {/* 24h */}
-            <Feather name="trending-up" size={20} color={theme.primary} />
+            {settings?.target || (
+              <Feather name="trending-up" size={20} color={theme.primary} />
+            )}
           </ThemedText>
         </TouchableOpacity>
       </View>

@@ -39,10 +39,10 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
   } | null>(null);
   const { settings } = useAppStore();
 
-  const targetHours = useMemo<undefined | number>(() => {
-    if (!settings?.targetHours) return undefined;
-    return Number(settings?.targetHours);
-  }, [settings?.targetHours]);
+  const target = useMemo<undefined | number>(() => {
+    if (!settings?.target) return undefined;
+    return Number(settings.target * 3600000); // hour to milisecond
+  }, [settings?.target]);
 
   const detectCounterLayout = (e: LayoutChangeEvent) => {
     if (layout) return;
@@ -51,11 +51,8 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
   };
   const { theme } = useAppStore();
   const progress = useMemo(() => {
-    console.log("targetHours", targetHours);
-    return targetHours
-      ? Math.min(Math.max((counter / targetHours) * 3600 * 1000, 0.05), 1)
-      : 1;
-  }, [targetHours, counter]);
+    return target ? Math.min(Math.max(counter / target, 0.05), 1) : 1;
+  }, [target, counter]);
   const progressColor = useMemo(() => {
     return interpolateColors(
       progress,
@@ -89,9 +86,13 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
 
   // 2. Xử lý triệt để bài toán Cleanup khi Unmount / Hot Reload
   useEffect(() => {
+    const angle = Math.min(2 * Math.PI * progress + 3, 2 * Math.PI);
     rotation.value = 0; // Reset về 0 trước khi chạy
     rotation.value = withRepeat(
-      withTiming(2 * Math.PI, { duration: 7000, easing: Easing.linear }),
+      withTiming(angle, {
+        duration: 7000 - 4000 * (1 - progress),
+        easing: Easing.linear,
+      }), // Càng thấp thì lặp càng nhanh
       -1,
       false,
     );

@@ -2,9 +2,8 @@ import HomeBodyProgress from "@/components/home/BodyProgress";
 import HomeHeader from "@/components/home/Header";
 import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
-import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
-import { FastSession } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useEffect, useState } from "react";
@@ -19,18 +18,17 @@ const rating = [
 ];
 
 const HomeScreen = () => {
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [lastSession, setLastSession] = useState<FastSession | null>(null);
+  const { currentFastSession, setCurrentFastSession } = useAppStore();
+  const [startTime, setStartTime] = useState<number | null>(currentFastSession?.start_time || null);
 
   const { setGlobalModal } = useModalStore();
 
   const dbService = useDBService();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const [isCounting, setIsCounting] = useState(false);
+  const [isCounting, setIsCounting] = useState(currentFastSession?true:false);
   const toggleCounting = async () => {
     //Kết thúc đếm
-    if (isCounting && startTime && lastSession) {
+    if (isCounting && startTime && currentFastSession) {
       setGlobalModal({
         type: "confirm",
         title: "Finish",
@@ -44,7 +42,7 @@ const HomeScreen = () => {
             // Clear current session by id
           } else {
             // Qua 4 giờ là ghi hết, có gì filter bằng where
-            dbService?.finishLastSession(lastSession?.id, now, timeDiff);
+            dbService?.finishLastSession(currentFastSession?.id, now, timeDiff);
             // Tính toán lưu giờ nhịn theo ngày của người dùng
             const parsedDays = splitSessionIntoDays(startTime, now);
             console.log("parsedDays", parsedDays);
@@ -54,7 +52,7 @@ const HomeScreen = () => {
             for (const dayData of parsedDays) {
               await dbService?.addDailyLogs({
                 log_date: dayData.log_date,
-                fast_id: lastSession.id,
+                fast_id: currentFastSession.id,
                 hours_in_day: dayData.hours_in_day,
                 elapsed_times: dayData.elapsed_hours,
                 hour_in_fast: parseFloat((timeDiff / 60 / 60).toFixed(2)),
@@ -70,7 +68,7 @@ const HomeScreen = () => {
       const now = new Date().getTime();
       // const now = new Date().getTime() - 50 * 60 * 60 * 1000;
       const newSession = await dbService?.startNewSession(now);
-      setLastSession(newSession);
+      setCurrentFastSession(newSession);
       setCounter(0);
       setStartTime(now);
     }
@@ -84,25 +82,6 @@ const HomeScreen = () => {
     const now = new Date().getTime();
     setCounter(Math.abs(now - startTime));
   };
-
-  const detectLastSession = async () => {
-    const lastSession = await dbService?.getLastFastSession();
-    const allSession = await dbService?.getFastSessions();
-    if (!lastSession || lastSession?.end_time) {
-      // Nếu không có hoặc phiên cuối đã kết thúc
-      setIsCounting(false);
-    } else {
-      setLastSession(lastSession);
-      setIsCounting(true);
-      setStartTime(lastSession.start_time);
-    }
-  };
-
-  useEffect(() => {
-    if (!dbService) return;
-    setIsLoading(false);
-    detectLastSession();
-  }, [dbService]);
 
   useEffect(() => {
     let interval = undefined;
@@ -121,11 +100,6 @@ const HomeScreen = () => {
   return (
     <View className="flex-1 bg-main">
       <SafeAreaView>
-        {isLoading && (
-          <View className="flex-1 items-center justify-center absolute top-0 left-0">
-            <ThemedText>Loading...</ThemedText>
-          </View>
-        )}
         <ScrollView keyboardShouldPersistTaps="handled">
           <View className="px-3">
             <HomeHeader />

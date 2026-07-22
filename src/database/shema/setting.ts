@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS app_settings (
 export const getUserSettings = async (
   db: SQLiteDatabase,
 ): Promise<AppSettings | null> => {
-  const rows = await db.getAllAsync<{ key: string; value: string }>(
+  const rows = await db.getAllAsync<{ key: keyof AppSettings; value: string }>(
     `SELECT * FROM app_settings;`,
   );
   const settingsObj: AppSettings = {};
@@ -22,7 +22,7 @@ export const getUserSettings = async (
     try {
       settingsObj[row.key] = JSON.parse(row.value);
     } catch {
-      settingsObj[row.key] = row.value;
+      settingsObj[row.key] = row.value as any;
     }
   });
   return settingsObj;
@@ -54,10 +54,11 @@ export const toggleTheme = async (
 export const setAppSetting = async (
   db: SQLiteDatabase,
   key: string,
-  value: string,
+  value: any,
 ) => {
+  const jsonValue = JSON.stringify(value);
   await db.runAsync(
     `INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)`,
-    [key, value],
+    [key, jsonValue],
   );
 };
