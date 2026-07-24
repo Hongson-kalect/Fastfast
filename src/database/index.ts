@@ -17,6 +17,7 @@ import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
   finishLastSession,
+  getFastCount,
   getFastSessions,
   getLastFastSession,
   getYearFastSession,
@@ -51,6 +52,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getUserProfile: () => getUserProfile(db),
 
   getFastSessions: () => getFastSessions(db),
+  getFastCount: () => getFastCount(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
   finishLastSession: (id: string, endTime: number, duration: number) =>

@@ -7,9 +7,10 @@ import {
   Text,
   useFont,
 } from "@shopify/react-native-skia";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useDerivedValue } from "react-native-reanimated";
+import { useAnimatedReaction, useDerivedValue } from "react-native-reanimated";
+import { runOnJS } from "react-native-worklets";
 import { CartesianChart, Line, useChartPressState } from "victory-native";
 
 type Props = {
@@ -30,7 +31,7 @@ const WeightLineChart = ({
 }: Props) => {
   const font = useFont(fonts.MulishRegular, 9);
   const font2 = useFont(fonts.MulishBold, 12);
-  const font3 = useFont(fonts.MulishBold, 18);
+  const font3 = useFont(fonts.MulishBold, 15);
   const { theme, settings } = useAppStore();
 
   // 👇 1. Khởi tạo State để quản lý hành động Press/Hover trên Chart
@@ -64,9 +65,14 @@ const WeightLineChart = ({
     return val != null ? `${Math.round(val * 10) / 10} kg` : "";
   });
 
-  const tooltipX = useDerivedValue(() => state.x.position.value - 10);
+  const [selectedX, setSelectedX] = useState("");
 
-  const tooltipY = useDerivedValue(() => state.y.y.position.value - 6);
+  useAnimatedReaction(
+    () => state.x.value.value,
+    (value) => {
+      runOnJS(setSelectedX)(value);
+    },
+  );
 
   useEffect(() => {
     if (isActive) {
@@ -93,18 +99,6 @@ const WeightLineChart = ({
             grid: { y: "#e2e2e2", x: "transparent" },
             frame: "#e2e2e2",
           },
-          formatXLabel: (value) => {
-            const today =
-              (new Date().getMonth() + 1).toString().padStart(2, "0") +
-              "/" +
-              new Date().getDate().toString().padStart(2, "0");
-            const date =
-              (new Date(value).getMonth() + 1).toString().padStart(2, "0") +
-              "/" +
-              new Date(value).getDate().toString().padStart(2, "0");
-            if (date === today) return "Now";
-            return date;
-          },
         }}
         domainPadding={{ top: 35, right: 20, bottom: 0, left: 0 }}
         domain={{
@@ -120,11 +114,12 @@ const WeightLineChart = ({
         {({ points, chartBounds }) => (
           <>
             <Line
+              opacity={isActive ? 0.5 : 1}
               points={points.y}
               curveType="linear"
               color={theme.primary}
               strokeWidth={3}
-              animate={{ type: "timing", duration: 500 }}
+              animate={{ type: "spring", duration: 500 }}
             />
             {points.target && (
               <Line
@@ -132,7 +127,7 @@ const WeightLineChart = ({
                 curveType="linear"
                 color="#FF4D4Faa"
                 strokeWidth={1}
-                animate={{ type: "timing", duration: 500 }}
+                animate={{ type: "spring", duration: 500 }}
               />
             )}
 
@@ -150,7 +145,7 @@ const WeightLineChart = ({
                 return (
                   <Text
                     key={index}
-                    x={point.x - data[index]?.y.toString().length * 13}
+                    x={point.x - data[index]?.y.toString().length * 6}
                     y={(point?.y || 0) - 4}
                     text={`${data[index]?.y}`}
                     font={font3}
@@ -162,7 +157,7 @@ const WeightLineChart = ({
                 return (
                   <Text
                     key={index}
-                    x={point.x - data[index]?.y.toString().length * 10}
+                    x={point.x - data[index]?.y.toString().length * 4}
                     y={(point?.y || 0) - 4}
                     text={`${data[index]?.y}`}
                     font={font2}
@@ -192,7 +187,7 @@ const WeightLineChart = ({
               {/* Tooltip panel */}
               <RoundedRect
                 x={10}
-                y={8}
+                y={1}
                 width={140}
                 height={54}
                 r={12}
@@ -202,7 +197,7 @@ const WeightLineChart = ({
               {/* Label */}
               <Text
                 x={22}
-                y={25}
+                y={15}
                 text={labelText}
                 font={font}
                 color={isActive ? theme.white + "CC" : theme.white + "00"}
@@ -211,7 +206,7 @@ const WeightLineChart = ({
               {/* Value */}
               <Text
                 x={22}
-                y={48}
+                y={40}
                 text={toolTipText}
                 font={font3}
                 color={isActive ? theme.white : theme.white + "00"}

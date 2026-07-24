@@ -51,7 +51,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
     <View>
       <View className="flex-row items-center justify-between">
         <ThemedText type="default" className=" text-primary! font-bold!">
-          Biological progress
+          Estimated fasting phase
         </ThemedText>
 
         <TouchableOpacity

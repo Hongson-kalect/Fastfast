@@ -87,7 +87,7 @@ export const useAppStore = create<AppState>((set, get) => {
         // 3. Bốc palette màu tương ứng từ cái themeObj vừa băm từ AsyncStorage ra
 
         set({
-          currentFastSession: currentFast,
+          currentFastSession: !currentFast?.end_time ? currentFast : null,
           weight: weightObj?.weight,
           userProfile: profile,
           settings: dbSettings,

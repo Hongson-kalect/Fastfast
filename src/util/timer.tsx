@@ -15,3 +15,46 @@ export const getLocalTodayStr = (date: Date = new Date()): string => {
   
   return `${year}-${month}-${day}`; // Kết quả: "2026-07-09"
 };
+
+import { CHART_RANGES, ChartRangeKey } from '@/constants/data';
+import {
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  subMonths,
+  subWeeks
+} from 'date-fns';
+
+export const getStartDateFromRange = (key: ChartRangeKey, referenceDate = new Date()): Date => {
+  const config = CHART_RANGES.find((r) => r.key === key) || CHART_RANGES[0];
+
+  switch (config.unit) {
+    case 'day':
+      // Lùi đúng N ngày tính từ hôm nay
+      return subDays(referenceDate, config.value - 1);
+
+    case 'week': {
+      // Lùi N tuần, sau đó neo vào đúng Thứ 2 của tuần đó (weekStartsOn: 1)
+      const targetWeek = subWeeks(referenceDate, config.value - 1);
+      return startOfWeek(targetWeek, { weekStartsOn: 1 });
+    }
+
+    case 'month': {
+      // Lùi N tháng, sau đó neo vào ngày đầu tiên của tháng đó (ngày 1)
+      const targetMonth = subMonths(referenceDate, config.value - 1);
+      return startOfMonth(targetMonth);
+    }
+  }
+};
+
+export const getWeek = (date: Date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+
+  // ISO week
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+
+  return week;
+};

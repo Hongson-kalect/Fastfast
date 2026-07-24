@@ -1,5 +1,6 @@
 // @/interfaces/db.type.ts
 
+import { ChartRangeKey } from "@/components/dashboard/ChartRangeSheet";
 import { ColorPalette } from "@/database/shema/theme";
 
 export type SyncStatus = "synced" | "pending" | "failed";
@@ -10,7 +11,7 @@ export type MoodLevel = 1 | 2 | 3 | 4 | 5; // 1: Tired -> 5: Happy
 export interface AppSettings {
   target?: number;
   weight_target?: number;
-  chart_range?: number;
+  chart_range?: ChartRangeKey;
   is_dark_mode?: boolean;
   theme?: string;
   language?: string;

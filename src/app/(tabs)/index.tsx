@@ -19,13 +19,17 @@ const rating = [
 
 const HomeScreen = () => {
   const { currentFastSession, setCurrentFastSession } = useAppStore();
-  const [startTime, setStartTime] = useState<number | null>(currentFastSession?.start_time || null);
+  const [startTime, setStartTime] = useState<number | null>(
+    currentFastSession?.start_time || null,
+  );
 
   const { setGlobalModal } = useModalStore();
 
   const dbService = useDBService();
 
-  const [isCounting, setIsCounting] = useState(currentFastSession?true:false);
+  const [isCounting, setIsCounting] = useState(
+    currentFastSession ? true : false,
+  );
   const toggleCounting = async () => {
     //Kết thúc đếm
     if (isCounting && startTime && currentFastSession) {

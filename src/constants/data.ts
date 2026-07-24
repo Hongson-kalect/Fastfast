@@ -574,3 +574,44 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
 // Định nghĩa các góc bung (độ) để tính toán tọa độ
 export const RADIAL_ANGLES = [200, 235, 270, 305, 340];
 export const RADIUS = 90; // Khoảng cách bay xa (px)
+
+
+
+export type ChartRangeKey = '7d' | '30d' | '12w' | '24w' | '12m' | '24m';
+
+export interface ChartRangeConfig {
+  key: ChartRangeKey;
+  label: string;
+  unit: 'day' | 'week' | 'month';
+  value: number;
+}
+
+export const CHART_RANGES: ChartRangeConfig[] = [
+  { key: '7d', label: '7 ngày qua', unit: 'day', value: 7 },
+  { key: '30d', label: '30 ngày qua', unit: 'day', value: 30 },
+  { key: '12w', label: '12 tuần qua', unit: 'week', value: 12 },
+  { key: '24w', label: '24 tuần qua', unit: 'week', value: 24 },
+  { key: '12m', label: '12 tháng qua', unit: 'month', value: 12 },
+  { key: '24m', label: '24 tháng qua', unit: 'month', value: 24 },
+];
+
+export type ChartValue = {
+  days?: number;
+  showType?: "days" | "week" | "month";
+};
+export type ChartType = "week" | "month" | "3month" | "6month" | "year" | "all";
+
+export const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];

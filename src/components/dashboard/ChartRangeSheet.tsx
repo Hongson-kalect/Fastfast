@@ -4,49 +4,28 @@ import { useAppStore } from "@/stores/appStore";
 import { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { CHART_RANGES, ChartRangeKey } from "@/constants/data";
 
 interface Props {
   currentTargetHours?: number;
-  onSelectTarget?: (days: number) => void;
+  onSelectTarget?: (days: ChartRangeKey) => void;
 }
 
-const chartRanges = [
-  {
-    label: "Last 7 days",
-    days: 7,
-  },
-  {
-    label: "Last 30 days",
-    days: 30,
-  },
-  {
-    label: "Last 90 days",
-    days: 90,
-  },
-  {
-    label: "Last 180 days",
-    days: 180,
-  },
-  {
-    label: "Last 365 days",
-    days: 365,
-  },
-];
 
 const ChartRangeSheet = ({ onSelectTarget }: Props) => {
   const { close } = useBottomSheet();
   const dbService = useDBService();
   const { theme, settings, updateSetting } = useAppStore();
-  const [selectedRange, setSelectedRange] = useState<number>(
-    settings?.chart_range || 7,
+  const [selectedRange, setSelectedRange] = useState<ChartRangeKey>(
+    settings?.chart_range || '7d',
   );
 
-  const handleSelect = (days: number) => {
-    setSelectedRange(days);
+  const handleSelect = (key: ChartRangeKey) => {
+    setSelectedRange(key);
+    updateSetting({ chart_range: key });
+    dbService.setting("chart_range", key);
 
-    updateSetting({ chart_range: days });
-    dbService.setting("chart_range", days);
-    if (onSelectTarget) onSelectTarget(days);
+    if (onSelectTarget) onSelectTarget(key);
     close();
   };
 
@@ -57,14 +36,14 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 16, paddingBottom: 20, marginTop: 12 }}
       >
-        {chartRanges.map((item) => {
-          const isSelected = selectedRange === item.days;
+        {CHART_RANGES.map((item) => {
+          const isSelected = selectedRange === item.key;
 
           return (
             <TouchableOpacity
               key={item.label}
               activeOpacity={0.7}
-              onPress={() => handleSelect(item.days)}
+              onPress={() => handleSelect(item.key)}
               style={{
                 elevation: isSelected ? 10 : 10,
                 shadowColor: isSelected ? theme.primary : "#fff",
@@ -85,7 +64,7 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
                   // style={{ color: item.colors.badgeText }}
                   className={`text-3xl! font-bold!`}
                 >
-                  Last {item.days} days
+                  {item.label}
                 </ThemedText>
               </View>
 

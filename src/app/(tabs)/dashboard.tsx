@@ -4,218 +4,128 @@ import DashboardHeader from "@/components/dashboard/Header";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import {
+  CHART_RANGES,
+  ChartRangeConfig,
+  ChartRangeKey,
+} from "@/constants/data";
+import { FastCountType } from "@/database/shema/fast_sessions";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
+import { getBucketKey, initChartData } from "@/util/dashboard/utils";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
-import { getLocalTodayStr } from "@/util/timer";
-import { useEffect, useState } from "react";
-import {
-  Animated,
-  LayoutChangeEvent,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
+import { useEffect, useMemo, useState } from "react";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Tạo mảng thời gian 20 ngày liên tiếp (đếm ngược từ hôm nay)
-export const MOCK_DASHBOARD_DATA = Array.from({ length: 20 }).map(
-  (_, index) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (19 - index)); // Sắp xếp từ xa nhất đến hôm nay
-    const dateString = date.toISOString().split("T")[0]; // Định dạng YYYY-MM-DD
-
-    // 1. Khởi tạo hiệu suất nhịn (Giờ nhịn ngẫu nhiên từ 14h đến 24h)
-    const fastingHours = Math.floor(Math.random() * 11) + 14;
-
-    // 2. Tạo logic cân nặng với các điều kiện đặc biệt của bạn:
-    // Xu hướng cân nặng giả định giảm dần từ 72kg về 70kg
-    const baseWeight =
-      Math.floor((72 - index * 0.2 + (Math.random() * 0.4 - 0.2)) * 10) / 10;
-    let weightLogs: number | null = Number(baseWeight.toFixed(1));
-
-    // Điều kiện: 2 ngày không có dữ liệu (Ví dụ ngày index 5 và index 12)
-    // if (
-    //   [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(
-    //     index,
-    //   )
-    // ) {
-    //   weightLogs = null;
-    // }
-    // Điều kiện: 2 ngày có 2 lần nhập dữ liệu (Ví dụ ngày index 8 và index 15)
-
-    return {
-      x: dateString,
-      y: baseWeight,
-    };
-  },
-);
-
-type ChartValue = {
-  days?: number;
-  showType?: "days" | "week" | "month";
-};
-type ChartType = "week" | "month" | "3month" | "6month" | "year" | "all";
-
-const chartType: { [key in ChartType]: ChartValue } = {
-  week: {
-    days: 7,
-    showType: "days",
-  },
-  month: {
-    days: 30,
-    showType: "days",
-  },
-  "3month": {
-    days: 90,
-    showType: "week",
-  },
-  "6month": {
-    days: 180,
-    showType: "week",
-  },
-  year: {
-    days: 365,
-    showType: "month",
-  },
-  all: {
-    days: undefined,
-    showType: undefined,
-  },
-};
-
-const initChartData = (range: number) => {
-  const dayPointer = new Date(getLocalTodayStr());
-  dayPointer.setDate(dayPointer.getDate() - range + 1); // Bao gồm ngày hôm nay
-
-  const res = [];
-
-  for (let i = 0; i < range; i++) {
-    const day = getLocalTodayStr(dayPointer);
-    res.push({
-      x: day,
-      y: 0,
-    });
-    dayPointer.setDate(dayPointer.getDate() + 1);
-  }
-
-  return res;
-};
-
 const DashboardScreen = () => {
-  const [layout, setLayout] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
   const { width } = useWindowDimensions();
   const { theme, currentFastSession, weight, settings } = useAppStore();
   const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
 
-  const [chartRange, setChartRange] = useState<number>(
-    settings?.chart_range || 7,
+  const chartRange = useMemo<ChartRangeKey>(() => {
+    return settings?.chart_range || "7d";
+  }, [settings?.chart_range]);
+
+  const chartType = useMemo<ChartRangeConfig>(
+    () => CHART_RANGES.find((r) => r.key === chartRange) || CHART_RANGES[0],
+    [chartRange],
   );
-  const [weightData, setWeightData] = useState<{ x: string; y: number }[]>(
-    initChartData(chartRange),
-  );
-  const [dayFastData, setDayFastData] = useState<{ x: string; y: number }[]>(
-    initChartData(chartRange),
-  );
+  const chartDayRange = useMemo<number>(() => {
+    return Math.ceil(
+      (new Date(getLocalTodayStr()).getTime() -
+        new Date(getStartDateFromRange(chartRange)).getTime()) /
+        86400000,
+    );
+  }, [chartRange]);
+
+  const [weightData, setWeightData] = useState<
+    { key: string; x: string; y: number }[]
+  >(initChartData(chartType));
+  const [dayFastData, setDayFastData] = useState<
+    { key: string; x: string; y: number }[]
+  >(initChartData(chartType));
 
   const getWeightData = async () => {
-    return dbService?.getWeightLogs(chartRange);
+    console.log(chartDayRange);
+    return dbService?.getWeightLogs(chartDayRange);
   };
 
   const getDayFastData = async () => {
-    return dbService?.getDailyLogs(chartRange);
+    return dbService?.getDailyLogs(chartDayRange);
+  };
+
+  const [fastCount, setFastCount] = useState<FastCountType>({
+    above_16: 0,
+    above_20: 0,
+    above_24: 0,
+    above_36: 0,
+    above_48: 0,
+    above_72: 0,
+  });
+
+  const getFastCount = async () => {
+    return dbService?.getFastCount();
   };
 
   const refreshData = async () => {
-    const dayPointer = new Date(getLocalTodayStr());
-    dayPointer.setDate(dayPointer.getDate() - chartRange + 1); // Bao gồm ngày hôm nay
+    const dayPointer = new Date(getStartDateFromRange(chartRange)).getTime(); // Bao gồm ngày hôm nay
 
-    const [weights, dayFasts] = await Promise.all([
+    const [weights, dayFasts, fastCountDB] = await Promise.all([
       getWeightData(),
       getDayFastData(),
+      getFastCount(),
     ]);
+
+    const weightMap: Record<string, number> = {};
+    const fastMap: Record<string, number> = {};
 
     console.log(weights, dayFasts);
 
-    const weightMap: { [day: string]: number } = {};
-    const fastMap: { [day: string]: number } = {};
-    const weightsArr = [] as { x: string; y: number }[];
-    const dayFastsArr = [] as { x: string; y: number }[];
-
     weights.forEach((item) => {
-      weightMap[item.log_date] = item.weight;
+      const key = getBucketKey(new Date(item.log_date), chartType.unit);
+      weightMap[key] = item.weight; // hoặc lấy latest nếu có nhiều record
     });
+
     dayFasts.forEach((item) => {
-      const currentFast = fastMap[item.log_date] || 0;
-      fastMap[item.log_date] = currentFast + item.hours_in_day;
+      const key = getBucketKey(new Date(item.log_date), chartType.unit);
+      fastMap[key] = (fastMap[key] ?? 0) + item.hours_in_day;
     });
 
     if (currentFastSession) {
       const fasts = splitSessionIntoDays(
         currentFastSession.start_time,
-        currentFastSession.end_time || new Date().getTime(),
+        currentFastSession.end_time ?? Date.now(),
       );
 
-      for (const fast of fasts) {
-        const currentFast = fastMap[fast.log_date] || 0;
-        fastMap[fast.log_date] = currentFast + fast.hours_in_day;
-      }
+      fasts.forEach((fast) => {
+        const key = getBucketKey(new Date(fast.log_date), chartType.unit);
+        fastMap[key] = (fastMap[key] ?? 0) + fast.hours_in_day;
+      });
     }
+    let weightsArr: { key: string; x: string; y: number }[] = [];
 
-    for (let i = 0; i < chartRange; i++) {
-      const day = getLocalTodayStr(dayPointer);
-
+    initChartData(chartType).map((item, index, arr) =>
       weightsArr.push({
-        x: day,
-        y: weightMap[day] || weightsArr.at(-1)?.y || 0,
-      });
+        key: item.key,
+        x: item.x,
+        y: weightMap[item.key] ?? weightsArr[index - 1]?.y ?? 0,
+      }),
+    );
 
-      dayFastsArr.push({
-        x: day,
-        y: Math.round(fastMap[day]) || 0,
-      });
-      dayPointer.setDate(dayPointer.getDate() + 1);
-    }
+    const dayFastsArr = initChartData(chartType).map((item) => ({
+      key: item.key,
+      x: item.x,
+      y: Math.round(fastMap[item.key] ?? 0),
+    }));
 
-    console.log("chart data ", weightsArr, dayFastsArr);
+    console.log(weightsArr, dayFastsArr);
 
     setWeightData(weightsArr);
     setDayFastData(dayFastsArr);
-  };
-
-  // Khởi tạo giá trị scale cho hiệu ứng bấm FAB
-  const scaleValue = new Animated.Value(1);
-
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.9, // Thu nhỏ lại 10% khi nhấn giữ
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1, // Trở về kích thước cũ khi nhấc tay
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleOpenAddWeightModal = () => {
-    // 💡 Logic mở Bottom Sheet hoặc Modal nhập cân nặng của bạn ở đây
-    console.log("Mở modal cập nhật cân nặng...");
-  };
-
-  const detectCounterLayout = (e: LayoutChangeEvent) => {
-    if (layout) return;
-    const { width, height } = e.nativeEvent.layout;
-    setLayout({ width: width + 10, height: height + 42 });
+    setFastCount(fastCountDB);
   };
 
   useEffect(() => {
@@ -270,7 +180,9 @@ const DashboardScreen = () => {
                 style={{ height: 200 }}
                 className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
               >
-                <FastBarChart data={dayFastData} />
+                <FastBarChart onInteractionStart={() => setEnableScroll(false)}
+                  onInteractionEnd={() => setEnableScroll(true)}
+                  data={dayFastData} />
               </View>
             </View>
 
@@ -326,37 +238,43 @@ const DashboardScreen = () => {
             <View className="flex-row items-center justify-between flex-wrap my-4 gap-2">
               {/* Card 1: Streak */}
               <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">16+</Text>
+                <Text className="text-gray-400 text-xs mb-1">{"16+"}</Text>
                 <Text className="text-white text-center text-xl font-semibold">
-                  5
+                  {fastCount.above_16}
                 </Text>
               </View>
 
               {/* Card 2: Total Hours */}
               <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">24+</Text>
+                <Text className="text-gray-400 text-xs mb-1">{"20+"}</Text>
                 <Text className="text-white text-center text-xl font-semibold">
-                  128
+                  {fastCount.above_20}
                 </Text>
               </View>
               <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">36+</Text>
+                <Text className="text-gray-400 text-xs mb-1">{"24+"}</Text>
                 <Text className="text-white text-center text-xl font-semibold">
-                  5
+                  {fastCount.above_24}
                 </Text>
               </View>
 
               {/* Card 2: Total Hours */}
               <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">48+</Text>
+                <Text className="text-gray-400 text-xs mb-1">{"36+"}</Text>
                 <Text className="text-white text-center text-xl font-semibold">
-                  128
+                  {fastCount.above_36}
                 </Text>
               </View>
               <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">72+</Text>
+                <Text className="text-gray-400 text-xs mb-1">{"48+"}</Text>
                 <Text className="text-white text-center text-xl font-semibold">
-                  128
+                  {fastCount.above_48}
+                </Text>
+              </View>
+              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
+                <Text className="text-gray-400 text-xs mb-1">{"72+"}</Text>
+                <Text className="text-white text-center text-xl font-semibold">
+                  {fastCount.above_72}
                 </Text>
               </View>
             </View>

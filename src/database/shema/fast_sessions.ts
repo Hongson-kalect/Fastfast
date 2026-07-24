@@ -27,6 +27,46 @@ export const getFastSessions = async (
   return rows;
 };
 
+export type FastCountType = {
+  above_16: number;
+  above_20: number;
+  above_24: number;
+  above_36: number;
+  above_48: number;
+  above_72: number;
+};
+
+export const getFastCount = async (
+  db: SQLiteDatabase,
+): Promise<FastCountType> => {
+  const res = await db.getFirstAsync<FastCountType>(
+    `SELECT 
+    COUNT(CASE WHEN hours >= 16 AND hours < 20 THEN 1 END) AS above_16,
+    COUNT(CASE WHEN hours >= 20 AND hours < 24 THEN 1 END) AS above_20,
+    COUNT(CASE WHEN hours >= 24 AND hours < 36 THEN 1 END) AS above_24,
+    COUNT(CASE WHEN hours >= 36 AND hours < 48 THEN 1 END) AS above_36,
+    COUNT(CASE WHEN hours >= 48 AND hours < 72 THEN 1 END) AS above_48,
+    COUNT(CASE WHEN hours >= 72 THEN 1 END) AS above_72
+FROM (
+    SELECT (duration / 3600.0) AS hours
+    FROM fast_sessions
+    WHERE is_deleted = 0 
+      AND duration IS NOT NULL
+) AS completed_sessions;`,
+  );
+
+  return (
+    res || {
+      above_16: 0,
+      above_20: 0,
+      above_24: 0,
+      above_36: 0,
+      above_48: 0,
+      above_72: 0,
+    }
+  );
+};
+
 export const getLastFastSession = async (
   db: SQLiteDatabase,
 ): Promise<FastSession | null> => {
