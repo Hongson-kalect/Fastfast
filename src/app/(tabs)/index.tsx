@@ -47,6 +47,7 @@ const HomeScreen = () => {
           } else {
             // Qua 4 giờ là ghi hết, có gì filter bằng where
             dbService?.finishLastSession(currentFastSession?.id, now, timeDiff);
+            setCurrentFastSession(null);
             // Tính toán lưu giờ nhịn theo ngày của người dùng
             const parsedDays = splitSessionIntoDays(startTime, now);
             console.log("parsedDays", parsedDays);

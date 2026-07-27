@@ -1,5 +1,4 @@
 import DashboardOptions from "@/components/dashboard/DashboardOptions";
-import { FastBarChart } from "@/components/dashboard/FastBarChart";
 import DashboardHeader from "@/components/dashboard/Header";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
@@ -42,8 +41,8 @@ const DashboardScreen = () => {
   }, [chartRange]);
 
   const [weightData, setWeightData] = useState<
-    { key: string; x: string; y: number }[]
-  >(initChartData(chartType));
+    { key: string; x: string; fast: number; weight: number | null }[]
+  >([]);
   const [dayFastData, setDayFastData] = useState<
     { key: string; x: string; y: number }[]
   >(initChartData(chartType));
@@ -105,15 +104,28 @@ const DashboardScreen = () => {
         fastMap[key] = (fastMap[key] ?? 0) + fast.hours_in_day;
       });
     }
-    let weightsArr: { key: string; x: string; y: number }[] = [];
+    let weightsArr: {
+      key: string;
+      x: string;
+      fast: number;
+      weight: number | null;
+    }[] = [];
 
     initChartData(chartType).map((item, index, arr) =>
       weightsArr.push({
         key: item.key,
         x: item.x,
-        y: weightMap[item.key] ?? weightsArr[index - 1]?.y ?? 0,
+        weight: (weightMap[item.key] ?? weightsArr[index - 1]?.weight) || null,
+        fast: Math.round(fastMap[item.key] ?? 0),
       }),
     );
+
+    for (let i = weightsArr.length - 1; i < 0; i--) {
+      const item = weightsArr[i];
+      if (item.weight === 0) {
+        item.weight = weightsArr[i + 1]?.weight ?? 0;
+      }
+    }
 
     const dayFastsArr = initChartData(chartType).map((item) => ({
       key: item.key,
@@ -155,7 +167,7 @@ const DashboardScreen = () => {
 
               {/* Hộp đen đại diện cho Line Chart */}
               <View
-                style={{ height: 200 }}
+                style={{ height: 400 }}
                 className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
               >
                 <WeightLineChart
@@ -168,23 +180,7 @@ const DashboardScreen = () => {
             </View>
 
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
-            <View className="rounded-3xl my-6">
-              <View className="flex-row justify-between items-center mb-1">
-                <Text className="text-white font-semibold text-base">
-                  Hiệu suất nhịn ăn
-                </Text>
-              </View>
-
-              {/* Hộp đen đại diện cho Bar Chart */}
-              <View
-                style={{ height: 200 }}
-                className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
-              >
-                <FastBarChart onInteractionStart={() => setEnableScroll(false)}
-                  onInteractionEnd={() => setEnableScroll(true)}
-                  data={dayFastData} />
-              </View>
-            </View>
+            {/*  */}
 
             {/* 2. QUICK STATS (Thống kê nhanh dạng số) */}
             <Text className="text-white font-semibold text-base">
