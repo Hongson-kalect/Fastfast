@@ -1,6 +1,6 @@
 import { ChartRangeConfig, MONTHS } from "@/constants/data";
-import { getLocalTodayStr, getStartDateFromRange } from "../timer";
 import { getMonth, getWeek } from "date-fns";
+import { getLocalTodayStr, getStartDateFromRange } from "../timer";
 
 export const getBucketKey = (date: Date, unit: ChartRangeConfig["unit"]) => {
   switch (unit) {
@@ -26,7 +26,8 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
       res.push({
         key: getBucketKey(dayPointer, chart_range.unit),
         x: day.slice(5),
-        y: 0,
+        weight: 0,
+        fast: 0,
       });
       dayPointer.setDate(dayPointer.getDate() + 1);
     }
@@ -38,7 +39,8 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
       res.push({
         key: getBucketKey(dayPointer, chart_range.unit),
         x: "Week " + getWeek(dayPointer),
-        y: 0,
+        weight: 0,
+        fast: 0,
       });
       dayPointer.setDate(dayPointer.getDate() + 7);
     }
@@ -48,7 +50,8 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
     res.push({
       key: getBucketKey(dayPointer, chart_range.unit),
       x: MONTHS[getMonth(dayPointer)],
-      y: 0,
+      weight: 0,
+      fast: 0,
     });
     dayPointer.setMonth(dayPointer.getMonth() + 1);
   }

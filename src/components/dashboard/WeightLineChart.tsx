@@ -6,6 +6,7 @@ import {
   Group,
   LinearGradient,
   RoundedRect,
+  Line as SkiaLine,
   Text,
   useFont,
   vec,
@@ -34,7 +35,7 @@ const WeightLineChart = ({
   onInteractionStart,
   onInteractionEnd,
 }: Props) => {
-  const font = useFont(fonts.MulishRegular, 9);
+  const font = useFont(fonts.MulishRegular, 7);
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
   const font4 = useFont(fonts.MulishBold, 15);
@@ -60,16 +61,6 @@ const WeightLineChart = ({
     let max_fast = 0;
     let min_weight = settings?.weight_target || 9999;
     let min_fast = 9999;
-    // Chuẩn hóa cân nặng: min = 70%, max = 90 % => cần có min và max trước, vd min = 0 max =24
-    // max = 36 => min weight =65 -> 70. 65 = 65/70 * 0.9 = gap = 5 => 5 = 20% => = 70%+ gap/5*20
-    // slot 5 = Math.ceil(max_weight) = 80%
-    // Math.floor(min_weight) = 70%
-    // cần tính [0,1,2,3,4,5]
-    // cần tính [0,24,48,72,96%,120]?
-    // Đường 70 =
-    // Max = 100/120
-    // Min = 70/120
-
     data.map((item) => {
       if (item.fast > max_fast) max_fast = item.fast;
       if (item.fast < min_fast) min_fast = item.fast;
@@ -78,9 +69,9 @@ const WeightLineChart = ({
 
       arr.push({
         x: item.x,
-        fast: item.fast,
+        fast: item.fast || 0,
         weight: item.weight,
-        weightRatio: null,
+        weightRatio: 0,
         target: Number(settings?.weight_target),
       });
     });
@@ -88,7 +79,9 @@ const WeightLineChart = ({
     const barChartRatio = 60;
     const gap = 20;
     const lineChartRatio = 100 - barChartRatio - gap;
-    const chartHeight = Math.ceil((max_fast * 100) / barChartRatio);
+    const chartHeight = Math.ceil(
+      (Math.max(max_fast, 24) * 100) / barChartRatio,
+    );
     let targetRatio = null;
 
     if (settings?.weight_target) {
@@ -104,7 +97,7 @@ const WeightLineChart = ({
     }
     arr.forEach((item) => {
       item.target = targetRatio;
-      if (!item.weight) return;
+      if (!item.weight) return (item.weightRatio = null);
 
       item.weightRatio =
         Math.floor(
@@ -119,33 +112,23 @@ const WeightLineChart = ({
     const rightAxisData: number[] = [];
     const axisGap = ((max_weight - min_weight || 1) / lineChartRatio) * 25;
     for (let i = 0; i < 6; i++) {
+      const val = min_weight + (i - 4) * axisGap;
+      console.log(val);
       rightAxisData.push(
         Math.round((max_weight + (i - 4) * axisGap) * 10) / 10,
       );
     }
 
-    console.log(
-      settings?.weight_target,
-      min_weight,
-      max_weight,
-      min_fast,
-      max_fast,
-      arr,
-    );
     return [chartHeight, arr, rightAxisData];
   }, [data, settings]);
 
-  const labelText = useDerivedValue(() => {
-    const val = state.x.value.value;
-    return val + " :";
-  });
-  const toolTipText = useDerivedValue(() => {
-    const val = state.y.fast.value.value;
-    return val != null ? `${Math.round(val * 10) / 10} kg` : "";
+  const xPosition = useDerivedValue(() => {
+    return state.x.position.value;
   });
 
   const isDenseData = data.length > 15;
-  const activeFont = isDenseData ? font : font2;
+  const activeBarFont = isDenseData ? font : font3;
+  const activeLineFont = isDenseData ? font : font2;
   const charWidthOffset = isDenseData ? 3 : 4;
 
   useAnimatedReaction(
@@ -170,9 +153,6 @@ const WeightLineChart = ({
       onInteractionEnd?.();
     }
   }, [isActive]);
-
-  // Nếu bạn muốn làm tròn hoặc format số đẹp hơn:
-  //
 
   return (
     <GestureHandlerRootView style={{ flex: 1, paddingRight: 17 }}>
@@ -212,12 +192,6 @@ const WeightLineChart = ({
             </ThemedText>
           );
         })}
-        {/* <ThemedText className="text-[9px]!">5</ThemedText>
-        <ThemedText className="text-[9px]!">4</ThemedText>
-        <ThemedText className="text-[9px]!">3</ThemedText>
-        <ThemedText className="text-[9px]!">2</ThemedText>
-        <ThemedText className="text-[9px]!">1</ThemedText>
-        <ThemedText className="text-[9px]!">0</ThemedText> */}
       </View>
       <CartesianChart
         data={chartData}
@@ -229,14 +203,12 @@ const WeightLineChart = ({
           labelColor: theme.white + "88",
           lineColor: theme.white + "44",
         }}
-        domainPadding={{ top: 400 / 6, right: 40, bottom: 0, left: 25 }}
+        domainPadding={{ top: 400 / 6, right: 25, bottom: 0, left: 25 }}
         domain={{
           y: [0, chartHeight], // Domain cân nhắc sao cho khoảng dưới thoáng cho Bar
         }}
       >
         {({ points, chartBounds }) => {
-          const rightAxisTicks = [0, 6, 12, 18, 24];
-          const totalHeight = chartBounds.bottom - chartBounds.top;
           return (
             <>
               {/* 1. RENDER BAR (THỜI GIAN NHỊN ĂN) - Lớp nền dưới cùng */}
@@ -245,13 +217,13 @@ const WeightLineChart = ({
                   points={points.fast} // Truyền từng point riêng rẽ
                   chartBounds={chartBounds}
                   color={theme.primary}
-                  roundedCorners={{ topLeft: 4, topRight: 4 }}
+                  roundedCorners={{ topLeft: 2, topRight: 2 }}
                   barWidth={(width - 64 - 80) / data.length} //80 cho gap
                   animate={{ type: "timing", duration: 300 }}
                 >
                   <LinearGradient
-                    start={vec(0, 0)}
-                    end={vec(0, 600)}
+                    start={vec(0, 220)}
+                    end={vec(0, 400)}
                     colors={[theme.primary, theme.primary + "50"]}
                   />
                 </Bar>
@@ -269,7 +241,7 @@ const WeightLineChart = ({
                         x={textX}
                         y={(point.y ?? 0) - 4}
                         text={textStr}
-                        font={font3}
+                        font={activeBarFont}
                         color={theme.white + "dd"}
                       />
                     );
@@ -285,7 +257,6 @@ const WeightLineChart = ({
                   color={theme.error + "80"}
                   strokeWidth={1}
                 >
-                  {/* intervals={[độ dài nét liền, độ dài khoảng trống]} */}
                   <DashPathEffect intervals={[6, 4]} />
                 </Line>
               )}
@@ -294,10 +265,10 @@ const WeightLineChart = ({
               <Line
                 opacity={isActive ? 0.5 : 1}
                 points={points.weightRatio}
-                curveType="natural" // Dùng natural để đường cân nặng mềm mại hơn
+                curveType="linear" // Dùng natural để đường cân nặng mềm mại hơn
                 color={theme.secondary}
                 strokeWidth={2}
-                animate={{ type: "spring", duration: 500 }}
+                animate={{ type: "timing", duration: 300 }}
               />
 
               {/* 3. STATIC VALUE LABELS (Chỉ hiển thị khi KHÔNG Touch) */}
@@ -315,7 +286,7 @@ const WeightLineChart = ({
                       x={point.x - `${val}`.length * 3}
                       y={(point.y ?? 0) - 12}
                       text={`${val}`}
-                      font={font2}
+                      font={activeLineFont}
                       color={theme.secondary}
                     />
                   );
@@ -323,80 +294,130 @@ const WeightLineChart = ({
 
               {/* 4. TOOLTIP INTERACTIVE (Khi Press/Pan) */}
               {isActive && state.x.position && (
-                <Group>
-                  {/* Vạch kẻ dọc chỉ ngày đang chọn (Crosshair Line) */}
-                  <Line
-                    points={[
-                      { x: state.x.position.value, y: chartBounds.top },
-                      { x: state.x.position.value, y: chartBounds.bottom },
-                    ]}
-                    color={theme.white + "40"}
-                    strokeWidth={1}
-                  />
-
-                  {/* Dot điểm cân nặng */}
-                  <Circle
-                    cx={state.x.position}
-                    cy={state.y.weightRatio.position}
-                    r={6}
-                    color={theme.white}
-                  />
-
-                  {activeIndex !== null && (
-                    <Bar
-                      points={[points.fast[activeIndex]]}
-                      chartBounds={chartBounds}
-                      color={theme.primary}
-                      roundedCorners={{ topLeft: 4, topRight: 4 }}
-                      barWidth={(width - 64) / data.length - 4}
-                    >
-                      <LinearGradient
-                        start={vec(0, 0)}
-                        end={vec(0, 400)}
-                        colors={[theme.primary, theme.primary + "50"]}
-                      />
-                    </Bar>
-                  )}
-
-                  {/* Panel Tooltip hiển thị đồng thời cả 2 thông số */}
-                  <RoundedRect
-                    x={10}
-                    y={0}
-                    width={120}
-                    height={56}
-                    r={10}
-                    color={theme.background + "CC"}
-                  />
-
-                  <Text
-                    x={24}
-                    y={12}
-                    text={labelText}
-                    font={font}
-                    color={theme.white + "CC"}
-                  />
-
-                  <Text
-                    x={16}
-                    y={30}
-                    text={`⚖️ Cân: ${state.y.weight.value.value.toFixed(1)} kg`}
-                    font={font2}
-                    color={theme.secondary}
-                  />
-                  <Text
-                    x={16}
-                    y={46}
-                    text={`⏱️ Nhịn: ${state.y.fast.value.value} hrs`}
-                    font={font2}
-                    color={theme.primary}
-                  />
-                </Group>
+                <ActiveTooltip
+                  state={state}
+                  chartBounds={chartBounds}
+                  length={data.length}
+                />
               )}
             </>
           );
         }}
       </CartesianChart>
     </GestureHandlerRootView>
+  );
+};
+
+type TooltipProps = {
+  chartBounds: any;
+  state: any;
+  length: number;
+};
+const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
+  const { theme } = useAppStore();
+  const width = useWindowDimensions().width;
+  const p1 = useDerivedValue(() =>
+    vec(state.x.position.value, chartBounds.top),
+  );
+
+  const p2 = useDerivedValue(() =>
+    vec(state.x.position.value, chartBounds.bottom),
+  );
+
+  const labelText = useDerivedValue(() => {
+    const val = state.x.value.value;
+    return val + " :";
+  });
+  const weightText = useDerivedValue(() => {
+    const val = Math.round(state.y.weight.value.value * 10) / 10;
+    return val ? `- ${Math.round(val * 10) / 10} Kg` : "No Data";
+  });
+  const fastText = useDerivedValue(() => {
+    const val = Math.round(state.y.fast.value.value * 10) / 10;
+    return val != null ? `- ${Math.round(val * 10) / 10} Hours` : "No Data";
+  });
+
+  const [barWidth] = useState((width - 64 - 80) / length);
+
+  const font = useFont(fonts.MulishRegular, 8);
+  const font2 = useFont(fonts.MulishBold, 12);
+  const font3 = useFont(fonts.MulishRegular, 11);
+  const font4 = useFont(fonts.MulishBold, 15);
+  const activeFont = length > 15 ? font : font2;
+
+  // 3. Tùy chọn Opacity cho Bar nếu bạn muốn animation ẩn/hiện mượt mà
+  // 1. Tọa độ X trung tâm của cột active
+  const rectX = useDerivedValue(() => {
+    return state.x.position.value - barWidth / 2;
+  });
+
+  // 2. Tọa độ Y đỉnh của cột (Lấy trực tiếp từ state.y.fast.position)
+  const rectY = useDerivedValue(() => {
+    // Trường hợp giá trị Y không tồn tại hoặc null
+    const yPos = state.y.fast.position.value;
+    return yPos ?? chartBounds.bottom;
+  });
+
+  // 3. Chiều cao của cột = Đáy chart - Tọa độ Y đỉnh
+  const rectHeight = useDerivedValue(() => {
+    const yPos = state.y.fast.position.value;
+    if (yPos === undefined || yPos === null) return 0;
+    return Math.max(0, chartBounds.bottom - yPos);
+  });
+
+  // 4. Opacity điều khiển ẩn/hiện mượt bằng state.isActive
+  const barOpacity = useDerivedValue(() => {
+    return state.isActive.value ? 1 : 0;
+  });
+
+  return (
+    <Group opacity={barOpacity}>
+      {/* Vạch kẻ dọc chỉ ngày đang chọn (Crosshair Line) */}
+      <SkiaLine p1={p1} p2={p2} color={theme.white + "40"} strokeWidth={1} />
+
+      {/* Dot điểm cân nặng */}
+      <Circle
+        cx={state.x.position}
+        cy={state.y.weightRatio.position}
+        r={6}
+        color={theme.white}
+      />
+      <RoundedRect
+        x={rectX}
+        y={rectY}
+        width={barWidth}
+        height={rectHeight}
+        r={4}
+        color={theme.primary}
+      />
+
+      {/* Panel Tooltip hiển thị đồng thời cả 2 thông số */}
+      <RoundedRect
+        x={10}
+        y={0}
+        width={120}
+        height={56}
+        r={10}
+        color={theme.background + "CC"}
+      />
+
+      <Text
+        x={20}
+        y={20}
+        text={labelText}
+        font={font2}
+        color={theme.white + "CC"}
+      />
+
+      <Text
+        x={24}
+        y={40}
+        text={weightText}
+        font={font4}
+        color={theme.secondary}
+      />
+      <Text x={24} y={60} text={fastText} font={font4} color={theme.primary} />
+    </Group>
   );
 };
 

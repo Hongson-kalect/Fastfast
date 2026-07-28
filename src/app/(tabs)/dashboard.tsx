@@ -1,5 +1,7 @@
 import DashboardOptions from "@/components/dashboard/DashboardOptions";
+import { FastLevelBarChart } from "@/components/dashboard/FastLevelChart";
 import DashboardHeader from "@/components/dashboard/Header";
+import { StatisticsSection } from "@/components/dashboard/StatisticSession";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -15,7 +17,7 @@ import { getBucketKey, initChartData } from "@/util/dashboard/utils";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const DashboardScreen = () => {
@@ -42,9 +44,6 @@ const DashboardScreen = () => {
 
   const [weightData, setWeightData] = useState<
     { key: string; x: string; fast: number; weight: number | null }[]
-  >([]);
-  const [dayFastData, setDayFastData] = useState<
-    { key: string; x: string; y: number }[]
   >(initChartData(chartType));
 
   const getWeightData = async () => {
@@ -80,8 +79,6 @@ const DashboardScreen = () => {
 
     const weightMap: Record<string, number> = {};
     const fastMap: Record<string, number> = {};
-
-    console.log(weights, dayFasts);
 
     weights.forEach((item) => {
       const key = getBucketKey(new Date(item.log_date), chartType.unit);
@@ -127,16 +124,7 @@ const DashboardScreen = () => {
       }
     }
 
-    const dayFastsArr = initChartData(chartType).map((item) => ({
-      key: item.key,
-      x: item.x,
-      y: Math.round(fastMap[item.key] ?? 0),
-    }));
-
-    console.log(weightsArr, dayFastsArr);
-
     setWeightData(weightsArr);
-    setDayFastData(dayFastsArr);
     setFastCount(fastCountDB);
   };
 
@@ -161,7 +149,9 @@ const DashboardScreen = () => {
             <View className=" rounded-3xl my-4">
               <View className="flex-row justify-between items-center mb-1">
                 <View className="items-center justify-center gap-2">
-                  <ThemedText className="text-white!">Weight</ThemedText>
+                  <ThemedText className="font-bold! text-base! mb-3">
+                    Weight & Fast progress
+                  </ThemedText>
                 </View>
               </View>
 
@@ -179,101 +169,13 @@ const DashboardScreen = () => {
               </View>
             </View>
 
+            <FastLevelBarChart fastCount={fastCount} />
+
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
             {/*  */}
 
             {/* 2. QUICK STATS (Thống kê nhanh dạng số) */}
-            <Text className="text-white font-semibold text-base">
-              Statistics
-            </Text>
-            <View className="flex-row items-center justify-between flex-wrap my-4 gap-4">
-              {/* Card 1: Streak */}
-              <View className="bg-black p-4 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">
-                  Streak hiện tại
-                </Text>
-                <Text className="text-white text-xl font-semibold">
-                  5 ngày 🔥
-                </Text>
-              </View>
-
-              {/* Card 2: Total Hours */}
-              <View className="bg-black p-4 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">
-                  Tổng giờ nhịn
-                </Text>
-                <Text className="text-white text-xl font-semibold">
-                  128 giờ
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex-row items-center justify-between flex-wrap mb-6 gap-4">
-              {/* Card 1: Streak */}
-              <View className="bg-black p-4 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">Max Streak</Text>
-                <Text className="text-white text-xl font-semibold">
-                  105 ngày
-                </Text>
-              </View>
-
-              {/* Card 2: Total Hours */}
-              <View className="bg-black p-4 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">
-                  Trung bình giờ nhịn
-                </Text>
-                <Text className="text-white text-xl font-semibold">
-                  128 giờ
-                </Text>
-              </View>
-            </View>
-
-            <Text className="text-white font-semibold text-base">
-              Fast level
-            </Text>
-            <View className="flex-row items-center justify-between flex-wrap my-4 gap-2">
-              {/* Card 1: Streak */}
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"16+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_16}
-                </Text>
-              </View>
-
-              {/* Card 2: Total Hours */}
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"20+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_20}
-                </Text>
-              </View>
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"24+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_24}
-                </Text>
-              </View>
-
-              {/* Card 2: Total Hours */}
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"36+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_36}
-                </Text>
-              </View>
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"48+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_48}
-                </Text>
-              </View>
-              <View className="bg-black p-2 rounded-2xl flex-1 border border-gray-800 shadow shadow-gray-800">
-                <Text className="text-gray-400 text-xs mb-1">{"72+"}</Text>
-                <Text className="text-white text-center text-xl font-semibold">
-                  {fastCount.above_72}
-                </Text>
-              </View>
-            </View>
+            <StatisticsSection />
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -51,7 +51,7 @@ const DashboardOptions = () => {
           Time ranger
         </ThemedText>
         <View
-          style={{ borderColor: theme.text }}
+          style={{ borderColor: theme.text + "aa" }}
           className="flex-row items-center px-2 h-9 border rounded-lg gap-1"
         >
           <ThemedText className="text-sm!">
@@ -65,7 +65,7 @@ const DashboardOptions = () => {
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={openUpdateWeightModal}
-        className="flex-row items-center gap-1 px-2 h-9 bg-primary rounded-lg"
+        className="flex-row items-center gap-1 px-2 h-9 bg-success rounded-lg"
       >
         {/* <Feather name="plus" size={20} color={"white"} /> */}
         <ThemedText className="text-sm! text-white!">Update weight</ThemedText>

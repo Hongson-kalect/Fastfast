@@ -1,6 +1,6 @@
 // @/interfaces/db.type.ts
 
-import { ChartRangeKey } from "@/components/dashboard/ChartRangeSheet";
+import { ChartRangeKey } from "@/constants/data";
 import { ColorPalette } from "@/database/shema/theme";
 
 export type SyncStatus = "synced" | "pending" | "failed";
@@ -78,6 +78,23 @@ export interface WeightLog {
   sync_status: SyncStatus;
   created_at: string;
   updated_at: string;
+}
+
+// Dynamic type definition cho Target Goal
+export type TargetStatus = "active" | "completed" | "abandoned";
+
+export interface WeightTarget {
+  id: string; // UUID v7 hoặc string ID duy nhất
+  start_weight: number;
+  target_weight: number;
+  start_date: string; // YYYY-MM-DD
+  target_date?: string | null; // YYYY-MM-DD (nullable)
+  status: TargetStatus;
+  is_active: number;
+  is_completed: number;
+  sync_status: "synced" | "pending";
+  created_at: number;
+  updated_at: number;
 }
 
 export interface Theme {

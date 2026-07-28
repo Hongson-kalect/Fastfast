@@ -90,7 +90,7 @@ export const SwapButton = ({
     "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
   const variantStyle = isCounting
     ? "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 "
-    : "bg-primary shadow-md shadow-primary";
+    : "bg-success shadow-md shadow-success";
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

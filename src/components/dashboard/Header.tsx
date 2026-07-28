@@ -17,8 +17,9 @@ const DashboardHeader = () => {
       title: "Target",
       message: "Enter your weight target",
       onOk: async (value) => {
-        await dbService?.setting("weight_target", value);
-        updateSetting({ weight_target: value });
+        const target = Number(value);
+        await dbService?.setting("weight_target", target);
+        updateSetting({ weight_target: target });
       },
     });
   };
