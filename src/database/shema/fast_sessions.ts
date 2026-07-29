@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS fast_sessions (
     home_data_snapshot TEXT,           -- JSON string lưu chỉ số sinh học
     is_deleted INTEGER DEFAULT 0,       -- Xóa mềm cho Local-first: 0 = False, 1 = True
     sync_status TEXT DEFAULT 'pending', -- 'synced', 'pending'
+    status TEXT DEFAULT 'active',       -- 'active', 'completed', 'failed'
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
@@ -27,7 +28,14 @@ export const getFastSessions = async (
   return rows;
 };
 
-export type FastCountType = {
+export type FastStatsSummary = {
+  // Thống kê tổng quan
+  total_hours: number;
+  avg_hours: number;
+  max_hours: number;
+  total_sessions: number;
+
+  // Phân bố theo Level (Giờ nhịn)
   above_16: number;
   above_20: number;
   above_24: number;
@@ -36,27 +44,44 @@ export type FastCountType = {
   above_72: number;
 };
 
-export const getFastCount = async (
+/**
+ * Lấy toàn bộ chỉ số thống kê & phân bố level nhịn ăn trong 1 Query duy nhất
+ */
+export const getFastStatsSummary = async (
   db: SQLiteDatabase,
-): Promise<FastCountType> => {
-  const res = await db.getFirstAsync<FastCountType>(
-    `SELECT 
-    COUNT(CASE WHEN hours >= 16 AND hours < 20 THEN 1 END) AS above_16,
-    COUNT(CASE WHEN hours >= 20 AND hours < 24 THEN 1 END) AS above_20,
-    COUNT(CASE WHEN hours >= 24 AND hours < 36 THEN 1 END) AS above_24,
-    COUNT(CASE WHEN hours >= 36 AND hours < 48 THEN 1 END) AS above_36,
-    COUNT(CASE WHEN hours >= 48 AND hours < 72 THEN 1 END) AS above_48,
-    COUNT(CASE WHEN hours >= 72 THEN 1 END) AS above_72
-FROM (
-    SELECT (duration / 3600.0) AS hours
-    FROM fast_sessions
-    WHERE is_deleted = 0 
-      AND duration IS NOT NULL
-) AS completed_sessions;`,
-  );
+): Promise<FastStatsSummary> => {
+  const query = /*sql*/ `
+    SELECT 
+      -- 1. Các chỉ số tổng quan
+      COALESCE(SUM(hours), 0) AS total_hours,
+      COALESCE(AVG(hours), 0) AS avg_hours,
+      COALESCE(MAX(hours), 0) AS max_hours,
+      COUNT(*) AS total_sessions,
+
+      -- 2. Phân bố theo mốc Level (Conditional Aggregation)
+      COUNT(CASE WHEN hours >= 16 AND hours < 20 THEN 1 END) AS above_16,
+      COUNT(CASE WHEN hours >= 20 AND hours < 24 THEN 1 END) AS above_20,
+      COUNT(CASE WHEN hours >= 24 AND hours < 36 THEN 1 END) AS above_24,
+      COUNT(CASE WHEN hours >= 36 AND hours < 48 THEN 1 END) AS above_36,
+      COUNT(CASE WHEN hours >= 48 AND hours < 72 THEN 1 END) AS above_48,
+      COUNT(CASE WHEN hours >= 72 THEN 1 END) AS above_72
+    FROM (
+      SELECT (duration / 3600.0) AS hours
+      FROM fast_sessions
+      WHERE is_deleted = 0 
+        AND status = 'completed'
+        AND duration IS NOT NULL
+    ) AS completed_sessions;
+  `;
+
+  const res = await db.getFirstAsync<FastStatsSummary>(query);
 
   return (
     res || {
+      total_hours: 0,
+      avg_hours: 0,
+      max_hours: 0,
+      total_sessions: 0,
       above_16: 0,
       above_20: 0,
       above_24: 0,

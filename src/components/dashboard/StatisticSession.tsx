@@ -1,4 +1,3 @@
-import React from "react";
 import { Text, View } from "react-native";
 
 type StatCardProps = {
@@ -11,7 +10,14 @@ type StatCardProps = {
 };
 
 // Component Card linh hoạt: hỗ trợ cả dạng Hero (nổi bật) và Normal
-const StatCard = ({ icon, title, value, unit, color = "#7F92F8", isHero }: StatCardProps) => {
+const StatCard = ({
+  icon,
+  title,
+  value,
+  unit,
+  color = "#7F92F8",
+  isHero,
+}: StatCardProps) => {
   if (isHero) {
     return (
       <View className="mb-3 w-full flex-row items-center justify-between rounded-2xl border border-[#7F92F8]/30 bg-[#7F92F8]/10 p-4">
@@ -27,14 +33,22 @@ const StatCard = ({ icon, title, value, unit, color = "#7F92F8", isHero }: StatC
               {title}
             </Text>
             <View className="flex-row items-baseline gap-1">
-              <Text className="text-2xl font-extrabold text-white">{value}</Text>
-              {unit && <Text className="text-xs font-semibold text-zinc-300">{unit}</Text>}
+              <Text className="text-2xl font-extrabold text-white">
+                {value}
+              </Text>
+              {unit && (
+                <Text className="text-xs font-semibold text-zinc-300">
+                  {unit}
+                </Text>
+              )}
             </View>
           </View>
         </View>
 
         <View className="rounded-full bg-[#7F92F8]/20 px-3 py-1 border border-[#7F92F8]/30">
-          <Text className="text-[11px] font-bold text-[#7F92F8]">Active 🔥</Text>
+          <Text className="text-[11px] font-bold text-[#7F92F8]">
+            Active 🔥
+          </Text>
         </View>
       </View>
     );
@@ -49,7 +63,10 @@ const StatCard = ({ icon, title, value, unit, color = "#7F92F8", isHero }: StatC
         >
           <Text className="text-xs">{icon}</Text>
         </View>
-        <Text className="text-[11px] font-medium text-zinc-400" numberOfLines={1}>
+        <Text
+          className="text-[11px] font-medium text-zinc-400"
+          numberOfLines={1}
+        >
           {title}
         </Text>
       </View>
@@ -62,60 +79,6 @@ const StatCard = ({ icon, title, value, unit, color = "#7F92F8", isHero }: StatC
   );
 };
 
-const GoalCard = () => {
-  const startWeight = 72;
-  const currentWeight = 68.4;
-  const targetWeight = 65;
-
-  const progress = Math.min(
-    ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100,
-    100
-  );
-  const remaining = (currentWeight - targetWeight).toFixed(1);
-
-  return (
-    <View className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-900/90 p-4">
-      {/* Header Goal */}
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-2.5">
-          <View className="h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15">
-            <Text className="text-sm">🎯</Text>
-          </View>
-          <View>
-            <Text className="text-xs font-semibold text-white">Weight Goal</Text>
-            <Text className="text-[10px] text-zinc-400">Target: {targetWeight} kg</Text>
-          </View>
-        </View>
-
-        <View className="items-end">
-          <View className="flex-row items-baseline gap-0.5">
-            <Text className="text-lg font-bold text-white">{currentWeight}</Text>
-            <Text className="text-[10px] text-zinc-400">kg</Text>
-          </View>
-          <Text className="text-[10px] font-medium text-indigo-400">
-            -{remaining} kg to go
-          </Text>
-        </View>
-      </View>
-
-      {/* Modern Slim Progress Bar */}
-      <View className="mt-3.5">
-        <View className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-          <View
-            className="h-full rounded-full bg-indigo-500"
-            style={{ width: `${progress}%` }}
-          />
-        </View>
-        <View className="mt-1.5 flex-row justify-between">
-          <Text className="text-[10px] text-zinc-500">Start: {startWeight}kg</Text>
-          <Text className="text-[10px] font-semibold text-indigo-300">
-            {Math.round(progress)}%
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-};
 
 export const StatisticsSection = () => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
@@ -168,9 +131,6 @@ export const StatisticsSection = () => {
   return (
     <View className="mt-5">
       <Text className="mb-3 text-base font-bold text-white">Statistics</Text>
-
-      {/* Target Goal Progress */}
-      <GoalCard />
 
       {/* Streak Hero Card */}
       <StatCard {...heroStat} isHero />

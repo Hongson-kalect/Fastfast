@@ -1,8 +1,9 @@
-import { TargetStatus, WeightTarget } from "@/interfaces/db.type";
+import { WeightTarget } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
+import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 
-export const generateWeightTargetTable = /*sql*/ `
+export const generateString = /*sql*/ `
 CREATE TABLE IF NOT EXISTS weight_targets (
     id TEXT PRIMARY KEY,
     start_weight REAL NOT NULL,
@@ -65,14 +66,14 @@ export const checkAndUpdateActiveTarget = async (
 export const createWeightTarget = async (
   db: SQLiteDatabase,
   target: {
-    id: string;
     startWeight: number;
     targetWeight: number;
     startDate?: string;
-    targetDate?: string;
+    // targetDate?: string;
   },
 ) => {
   const startDate = target.startDate || getLocalTodayStr();
+  const id = uuidv7();
 
   await db.withTransactionAsync(async () => {
     // Chỉ cần tắt cờ is_active của tất cả target cũ
@@ -87,18 +88,18 @@ export const createWeightTarget = async (
     // Chèn Target mới với is_active = 1, is_completed = 0
     const query = /*sql*/ `
       INSERT INTO weight_targets (
-        id, start_weight, target_weight, start_date, target_date, 
+        id, start_weight, target_weight, start_date, 
         is_active, is_completed, sync_status, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, 1, 0, 'pending', strftime('%s', 'now'));
+      VALUES (?, ?, ?, ?, 1, 0, 'pending', strftime('%s', 'now'));
     `;
 
     await db.runAsync(query, [
-      target.id,
+      id,
       target.startWeight,
       target.targetWeight,
       startDate,
-      target.targetDate || null,
+      // target.targetDate || null,
     ]);
   });
 };
@@ -112,26 +113,4 @@ export const getAllWeightTargets = async (
     `SELECT * FROM weight_targets ORDER BY created_at DESC;`,
   );
   return rows;
-};
-
-/**
- * Tạo một Target mới
- * Tự động đóng (set 'abandoned') các target 'active' cũ trước khi thêm mới
- */
-
-/**
- * Cập nhật trạng thái của Target (ví dụ: khi user đã hoàn thành target)
- */
-export const updateTargetStatus = async (
-  db: SQLiteDatabase,
-  targetId: string,
-  status: TargetStatus,
-) => {
-  const query = /*sql*/ `
-    UPDATE weight_targets 
-    SET status = ?, sync_status = 'pending', updated_at = strftime('%s', 'now')
-    WHERE id = ?;
-  `;
-
-  await db.runAsync(query, [status, targetId]);
 };

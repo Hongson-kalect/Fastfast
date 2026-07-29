@@ -17,8 +17,8 @@ import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
   finishLastSession,
-  getFastCount,
   getFastSessions,
+  getFastStatsSummary,
   getLastFastSession,
   getYearFastSession,
   startNewSession,
@@ -29,6 +29,13 @@ import {
   generateString as settingGenerateString,
   toggleTheme,
 } from "./shema/setting";
+import {
+  checkAndUpdateActiveTarget,
+  createWeightTarget,
+  getActiveWeightTarget,
+  getAllWeightTargets,
+  generateString as target_GenerateString,
+} from "./shema/target";
 import {
   getActiveTheme,
   getThemes,
@@ -52,7 +59,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getUserProfile: () => getUserProfile(db),
 
   getFastSessions: () => getFastSessions(db),
-  getFastCount: () => getFastCount(db),
+  getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
   finishLastSession: (id: string, endTime: number, duration: number) =>
@@ -88,6 +95,17 @@ export const createDBService = (db: SQLiteDatabase) => ({
   updateWeight: (weight: number) => updateWeight(db, weight),
 
   setting: (key: string, value: any) => setAppSetting(db, key, value),
+
+  getActiveWeightTarget: () => getActiveWeightTarget(db),
+  checkAndUpdateActiveTarget: (newWeight: number) =>
+    checkAndUpdateActiveTarget(db, newWeight),
+  createWeightTarget: (newTarget: {
+    startWeight: number;
+    targetWeight: number;
+    startDate?: string;
+    targetDate?: string;
+  }) => createWeightTarget(db, newTarget),
+  getAllWeightTargets: () => getAllWeightTargets(db),
 });
 
 export const generateSchema = `
@@ -98,6 +116,7 @@ export const generateSchema = `
     ${daily_logsGenerateString}
     ${daily_noteGenerateString}
     ${weight_trackerGenerateString}
+    ${target_GenerateString}
 `;
 
 const generateSeedData = `

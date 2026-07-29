@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS user_profile (
     name TEXT,
     account_type TEXT DEFAULT 'free',
     image_uri TEXT,
+    -- Thêm các trường Thống kê Kỷ lục (Cache)
+    current_streak INTEGER DEFAULT 0,
+    max_streak INTEGER DEFAULT 0,
+    last_fast_completed_at INTEGER,           -- Unix timestamp của phiên fast hoàn thành mới nhất
+    streak_date TEXT,                         -- 'YYYY-MM-DD' ngày streak cuối, để tính cộng streak
+    next_expected_streak_date TEXT,           -- 'YYYY-MM-DD' quá ngày này thì mất streak
+    
     upload_url TEXT,
     backup_url TEXT,
     sync_status TEXT DEFAULT 'synced', -- 'synced', 'pending', 'failed'

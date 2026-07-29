@@ -1,16 +1,15 @@
-import DashboardOptions from "@/components/dashboard/DashboardOptions";
 import { FastLevelBarChart } from "@/components/dashboard/FastLevelChart";
+import { GoalCard } from "@/components/dashboard/GoalCard";
 import DashboardHeader from "@/components/dashboard/Header";
 import { StatisticsSection } from "@/components/dashboard/StatisticSession";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import {
   CHART_RANGES,
   ChartRangeConfig,
   ChartRangeKey,
 } from "@/constants/data";
-import { FastCountType } from "@/database/shema/fast_sessions";
+import { FastStatsSummary } from "@/database/shema/fast_sessions";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import { getBucketKey, initChartData } from "@/util/dashboard/utils";
@@ -55,17 +54,21 @@ const DashboardScreen = () => {
     return dbService?.getDailyLogs(chartDayRange);
   };
 
-  const [fastCount, setFastCount] = useState<FastCountType>({
+  const [fastCount, setFastCount] = useState<FastStatsSummary>({
     above_16: 0,
     above_20: 0,
     above_24: 0,
     above_36: 0,
     above_48: 0,
     above_72: 0,
+    avg_hours: 0,
+    max_hours: 0,
+    total_hours: 0,
+    total_sessions: 0,
   });
 
-  const getFastCount = async () => {
-    return dbService?.getFastCount();
+  const getFastStatsSummary = async () => {
+    return dbService?.getFastStatsSummary();
   };
 
   const refreshData = async () => {
@@ -74,7 +77,7 @@ const DashboardScreen = () => {
     const [weights, dayFasts, fastCountDB] = await Promise.all([
       getWeightData(),
       getDayFastData(),
-      getFastCount(),
+      getFastStatsSummary(),
     ]);
 
     const weightMap: Record<string, number> = {};
@@ -143,31 +146,19 @@ const DashboardScreen = () => {
         >
           <View className="px-3">
             <DashboardHeader />
+            <View className="mt-4">
+              <GoalCard />
+            </View>
 
             {/* 4. BIỂU ĐỒ 2: XU HƯỚNG CÂN NẶNG (LINE CHART PLACEHOLDER) */}
-            <DashboardOptions />
-            <View className=" rounded-3xl my-4">
-              <View className="flex-row justify-between items-center mb-1">
-                <View className="items-center justify-center gap-2">
-                  <ThemedText className="font-bold! text-base! mb-3">
-                    Weight & Fast progress
-                  </ThemedText>
-                </View>
-              </View>
+            {/* <DashboardOptions /> */}
 
-              {/* Hộp đen đại diện cho Line Chart */}
-              <View
-                style={{ height: 400 }}
-                className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
-              >
-                <WeightLineChart
-                  onInteractionStart={() => setEnableScroll(false)}
-                  onInteractionEnd={() => setEnableScroll(true)}
-                  layout={{ width: width - 24, height: 200 }}
-                  data={weightData}
-                />
-              </View>
-            </View>
+            <WeightLineChart
+              onInteractionStart={() => setEnableScroll(false)}
+              onInteractionEnd={() => setEnableScroll(true)}
+              layout={{ width: width - 24, height: 200 }}
+              data={weightData}
+            />
 
             <FastLevelBarChart fastCount={fastCount} />
 

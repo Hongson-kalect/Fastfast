@@ -1,5 +1,8 @@
 import { fonts } from "@/configs/fonts";
+import { useDBService } from "@/hooks/useDBService";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { Feather } from "@expo/vector-icons";
 import {
   Circle,
   DashPathEffect,
@@ -12,12 +15,13 @@ import {
   vec,
 } from "@shopify/react-native-skia";
 import { useEffect, useMemo, useState } from "react";
-import { useWindowDimensions, View } from "react-native";
+import { TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useAnimatedReaction, useDerivedValue } from "react-native-reanimated";
 import { runOnJS } from "react-native-worklets";
 import { Bar, CartesianChart, Line, useChartPressState } from "victory-native";
 import { ThemedText } from "../themed-text";
+import ChartRangeSheet from "./ChartRangeSheet";
 
 type Props = {
   data: { x: string; fast: number; weight: number | null }[];
@@ -39,8 +43,10 @@ const WeightLineChart = ({
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
   const font4 = useFont(fonts.MulishBold, 15);
-  const { theme, settings } = useAppStore();
+  const { theme, settings, updateWeight } = useAppStore();
   const { width } = useWindowDimensions();
+  const dbService = useDBService();
+  const { present } = useBottomSheet();
 
   // 👇 1. Khởi tạo State để quản lý hành động Press/Hover trên Chart
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -122,6 +128,14 @@ const WeightLineChart = ({
     return [chartHeight, arr, rightAxisData];
   }, [data, settings]);
 
+  const openTimeRangeSheet = () => {
+    present({
+      title: "Time range",
+      size: "long",
+      render: () => <ChartRangeSheet />,
+    });
+  };
+
   const xPosition = useDerivedValue(() => {
     return state.x.position.value;
   });
@@ -155,156 +169,221 @@ const WeightLineChart = ({
   }, [isActive]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, paddingRight: 17 }}>
-      <View className="absolute left-0 -top-4 items-end">
-        <ThemedText
-          style={{
-            fontFamily: "MulishRegular",
-          }}
-          className="text-[9px]! text-white/50!"
+    <View className="my-4">
+      <View className="flex-row justify-between items-center mb-3">
+        <View className="items-center justify-center gap-2">
+          <ThemedText className="font-bold! text-base!">
+            Weight & Fast progress
+          </ThemedText>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={openTimeRangeSheet}
+          className="flex-row items-center justify-center gap-2"
         >
-          (h)
-        </ThemedText>
+          <View
+            style={{ borderColor: theme.text + "aa" }}
+            className="flex-row items-center px-2 h-8 border rounded-lg gap-1"
+          >
+            <ThemedText className="text-sm!">
+              Last {settings?.chart_range || 7} days
+            </ThemedText>
+
+            <Feather name="chevron-down" size={14} color={theme.text} />
+          </View>
+        </TouchableOpacity>
       </View>
-      <View className="absolute -right-1 bottom-0 -top-4 justify-between ">
-        {rightAxis.reverse().map((item, index) => {
-          if (index === 0)
-            return (
-              <ThemedText
-                style={{
-                  fontFamily: "MulishRegular",
-                }}
-                key={index}
-                className="text-[9px]!  text-white/50!"
-              >
-                (kg)
-              </ThemedText>
-            );
-          return (
+
+      <View
+        style={{ height: 400 }}
+        className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
+      >
+        <GestureHandlerRootView
+          style={{ flex: 1, paddingRight: 17, paddingLeft: 5 }}
+        >
+          <View className="absolute left-0 -top-4 items-end">
             <ThemedText
               style={{
                 fontFamily: "MulishRegular",
               }}
-              key={index}
-              className={`text-[9px]!  ${[1, 2, 3, 4].includes(index) ? "text-white/50!" : "text-transparent!"} `}
+              className="text-[9px]! left-1 text-white/50!"
             >
-              {item}
+              (h)
             </ThemedText>
-          );
-        })}
-      </View>
-      <CartesianChart
-        data={chartData}
-        xKey="x"
-        yKeys={["weight", "target", "fast", "weightRatio"]} // fast đã normalize
-        chartPressState={state}
-        axisOptions={{
-          font: font,
-          labelColor: theme.white + "88",
-          lineColor: theme.white + "44",
-        }}
-        domainPadding={{ top: 400 / 6, right: 25, bottom: 0, left: 25 }}
-        domain={{
-          y: [0, chartHeight], // Domain cân nhắc sao cho khoảng dưới thoáng cho Bar
-        }}
-      >
-        {({ points, chartBounds }) => {
-          return (
-            <>
-              {/* 1. RENDER BAR (THỜI GIAN NHỊN ĂN) - Lớp nền dưới cùng */}
-              <Group opacity={isActive ? 0.5 : 1}>
-                <Bar
-                  points={points.fast} // Truyền từng point riêng rẽ
-                  chartBounds={chartBounds}
-                  color={theme.primary}
-                  roundedCorners={{ topLeft: 2, topRight: 2 }}
-                  barWidth={(width - 64 - 80) / data.length} //80 cho gap
-                  animate={{ type: "timing", duration: 300 }}
+          </View>
+          <View className="absolute -right-1 bottom-0 -top-4 justify-between ">
+            {rightAxis.reverse().map((item, index) => {
+              if (index === 0)
+                return (
+                  <ThemedText
+                    style={{
+                      fontFamily: "MulishRegular",
+                    }}
+                    key={index}
+                    className="text-[9px]!  text-white/50!"
+                  >
+                    (kg)
+                  </ThemedText>
+                );
+              return (
+                <ThemedText
+                  style={{
+                    fontFamily: "MulishRegular",
+                  }}
+                  key={index}
+                  className={`text-[7px]! text-white/50! ${![1, 2, 3, 4].includes(index) && "opacity-0!"} `}
                 >
-                  <LinearGradient
-                    start={vec(0, 220)}
-                    end={vec(0, 400)}
-                    colors={[theme.primary, theme.primary + "50"]}
-                  />
-                </Bar>
-                {!isActive &&
-                  points.fast.map((point, index) => {
-                    const val = Number(data[index]?.fast);
-                    if (!val || val === 0) return null;
-
-                    const textStr = `${val}`;
-                    const textX = point.x - textStr.length * charWidthOffset;
-
-                    return (
-                      <Text
-                        key={index}
-                        x={textX}
-                        y={(point.y ?? 0) - 4}
-                        text={textStr}
-                        font={activeBarFont}
-                        color={theme.white + "dd"}
+                  {item}
+                </ThemedText>
+              );
+            })}
+          </View>
+          <CartesianChart
+            data={chartData}
+            xKey="x"
+            yKeys={["weight", "target", "fast", "weightRatio"]} // fast đã normalize
+            chartPressState={state}
+            axisOptions={{
+              font: font,
+              labelColor: theme.white + "88",
+              lineColor: theme.white + "44",
+            }}
+            domainPadding={{ top: 400 / 6, right: 25, bottom: 0, left: 25 }}
+            domain={{
+              y: [0, chartHeight], // Domain cân nhắc sao cho khoảng dưới thoáng cho Bar
+            }}
+          >
+            {({ points, chartBounds }) => {
+              return (
+                <>
+                  {/* 1. RENDER BAR (THỜI GIAN NHỊN ĂN) - Lớp nền dưới cùng */}
+                  <Group opacity={isActive ? 0.5 : 1}>
+                    <Bar
+                      points={points.fast} // Truyền từng point riêng rẽ
+                      chartBounds={chartBounds}
+                      color={theme.primary}
+                      roundedCorners={{ topLeft: 2, topRight: 2 }}
+                      barWidth={(width - 64 - 80) / data.length} //80 cho gap
+                      animate={{ type: "timing", duration: 300 }}
+                    >
+                      <LinearGradient
+                        start={vec(0, 220)}
+                        end={vec(0, 400)}
+                        colors={[theme.primary, theme.primary + "50"]}
                       />
-                    );
-                  })}
-              </Group>
+                    </Bar>
+                    {!isActive &&
+                      points.fast.map((point, index) => {
+                        const val = Number(data[index]?.fast);
+                        if (!val || val === 0) return null;
 
-              {/* 2. RENDER LINE (CÂN NẶNG & TARGET) - Lớp đè phía trên */}
-              {/* Đường Target */}
-              {points.target && (
-                <Line
-                  points={points.target}
-                  curveType="cardinal"
-                  color={theme.error + "80"}
-                  strokeWidth={1}
-                >
-                  <DashPathEffect intervals={[6, 4]} />
-                </Line>
-              )}
+                        const textStr = `${val}`;
+                        const textX =
+                          point.x - textStr.length * charWidthOffset;
 
-              {/* Đường Cân Nặng Chính */}
-              <Line
-                opacity={isActive ? 0.5 : 1}
-                points={points.weightRatio}
-                curveType="linear" // Dùng natural để đường cân nặng mềm mại hơn
-                color={theme.secondary}
-                strokeWidth={2}
-                animate={{ type: "timing", duration: 300 }}
-              />
+                        return (
+                          <Text
+                            key={index}
+                            x={textX}
+                            y={(point.y ?? 0) - 4}
+                            text={textStr}
+                            font={activeBarFont}
+                            color={theme.white + "dd"}
+                          />
+                        );
+                      })}
+                  </Group>
 
-              {/* 3. STATIC VALUE LABELS (Chỉ hiển thị khi KHÔNG Touch) */}
-              {!isActive &&
-                points.weightRatio.map((point, index) => {
-                  const val = chartData[index]?.weight;
-                  const prevVal = chartData[index - 1]?.weight;
-                  const nextVal = chartData[index + 1]?.weight;
+                  {/* 2. RENDER LINE (CÂN NẶNG & TARGET) - Lớp đè phía trên */}
+                  {/* Đường Target */}
+                  {points.target && (
+                    <Line
+                      points={points.target}
+                      curveType="cardinal"
+                      color={theme.error + "80"}
+                      strokeWidth={1}
+                    >
+                      <DashPathEffect intervals={[6, 4]} />
+                    </Line>
+                  )}
 
-                  if (!val || (val === prevVal && val === nextVal)) return null;
+                  {/* Đường Cân Nặng Chính */}
+                  <Line
+                    opacity={isActive ? 0.5 : 1}
+                    points={points.weightRatio}
+                    curveType="linear" // Dùng natural để đường cân nặng mềm mại hơn
+                    color={theme.secondary}
+                    strokeWidth={2}
+                    animate={{ type: "timing", duration: 300 }}
+                  />
 
-                  return (
-                    <Text
-                      key={`weight-label-${index}`}
-                      x={point.x - `${val}`.length * 3}
-                      y={(point.y ?? 0) - 12}
-                      text={`${val}`}
-                      font={activeLineFont}
-                      color={theme.secondary}
+                  {/* 3. STATIC VALUE LABELS (Chỉ hiển thị khi KHÔNG Touch) */}
+                  {!isActive &&
+                    points.weightRatio.map((point, index) => {
+                      const val = chartData[index]?.weight;
+                      const prevVal = chartData[index - 1]?.weight;
+                      const nextVal = chartData[index + 1]?.weight;
+
+                      if (!val || (val === prevVal && val === nextVal))
+                        return null;
+
+                      if (index === chartData.length - 1) {
+                        return (
+                          <Group key={`weight-label-${index}`}>
+                            <Text
+                              key={`weight-label-${index}`}
+                              x={point.x - `${val}`.length * 3}
+                              y={(point.y ?? 0) - 12}
+                              text={`${val}`}
+                              font={activeLineFont}
+                              color={theme.secondary}
+                            />
+                            <Circle
+                              cx={point.x}
+                              cy={point.y ?? 0}
+                              r={6}
+                              color={theme.secondary}
+                              opacity={0.3}
+                            />
+                            {/* Nút tròn chính bên trong (Inner Solid Circle) */}
+                            <Circle
+                              cx={point.x}
+                              cy={point.y ?? 0}
+                              r={3.5}
+                              color={theme.secondary}
+                            />
+                          </Group>
+                        );
+                      }
+
+                      return (
+                        <Text
+                          key={`weight-label-${index}`}
+                          x={point.x - `${val}`.length * 3}
+                          y={(point.y ?? 0) - 12}
+                          text={`${val}`}
+                          font={activeLineFont}
+                          color={theme.secondary}
+                        />
+                      );
+                    })}
+
+                  {/* 4. TOOLTIP INTERACTIVE (Khi Press/Pan) */}
+                  {isActive && state.x.position && (
+                    <ActiveTooltip
+                      state={state}
+                      chartBounds={chartBounds}
+                      length={data.length}
                     />
-                  );
-                })}
-
-              {/* 4. TOOLTIP INTERACTIVE (Khi Press/Pan) */}
-              {isActive && state.x.position && (
-                <ActiveTooltip
-                  state={state}
-                  chartBounds={chartBounds}
-                  length={data.length}
-                />
-              )}
-            </>
-          );
-        }}
-      </CartesianChart>
-    </GestureHandlerRootView>
+                  )}
+                </>
+              );
+            }}
+          </CartesianChart>
+        </GestureHandlerRootView>
+      </View>
+    </View>
   );
 };
 

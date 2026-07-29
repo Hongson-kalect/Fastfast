@@ -6,9 +6,10 @@ import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
+import { GoalCard } from "./GoalCard";
 
 const DashboardOptions = () => {
-  const { theme, updateWeight, settings } = useAppStore();
+  const { theme, updateWeight, settings, weight } = useAppStore();
   const dbService = useDBService();
   const { setGlobalModal } = useModalStore();
   const { present, close } = useBottomSheet();
@@ -38,38 +39,42 @@ const DashboardOptions = () => {
   };
 
   return (
-    <View className="flex-row justify-between items-center my-4">
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={openTimeRangeSheet}
-        className="flex-row items-center justify-center gap-2"
-      >
-        <ThemedText
-          type="small"
-          className="text-white/60! font-light! text-sm!"
+    <View>
+      <View className="flex-row justify-between items-center my-4">
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={openTimeRangeSheet}
+          className="flex-row items-center justify-center gap-2"
         >
-          Time ranger
-        </ThemedText>
-        <View
-          style={{ borderColor: theme.text + "aa" }}
-          className="flex-row items-center px-2 h-9 border rounded-lg gap-1"
-        >
-          <ThemedText className="text-sm!">
-            Last {settings?.chart_range} days
+          <ThemedText
+            type="small"
+            className="text-white/60! font-light! text-sm!"
+          >
+            Time ranger
           </ThemedText>
+          <View
+            style={{ borderColor: theme.text + "aa" }}
+            className="flex-row items-center px-2 h-9 border rounded-lg gap-1"
+          >
+            <ThemedText className="text-sm!">
+              Last {settings?.chart_range} days
+            </ThemedText>
 
-          <Feather name="chevron-down" size={14} color={theme.text} />
-        </View>
-      </TouchableOpacity>
+            <Feather name="chevron-down" size={14} color={theme.text} />
+          </View>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={openUpdateWeightModal}
-        className="flex-row items-center gap-1 px-2 h-9 bg-success rounded-lg"
-      >
-        {/* <Feather name="plus" size={20} color={"white"} /> */}
-        <ThemedText className="text-sm! text-white!">Update weight</ThemedText>
-      </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={openUpdateWeightModal}
+          className="flex-row items-center gap-1 px-2 h-9 bg-success rounded-lg"
+        >
+          {/* <Feather name="plus" size={20} color={"white"} /> */}
+          <ThemedText className="text-sm! text-white!">
+            Update weight
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
