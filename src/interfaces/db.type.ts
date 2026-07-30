@@ -22,8 +22,12 @@ export interface UserProfile {
   id: string; // UUID v7
   name: string | null;
   account_type: AccountType;
-  target: number;
   image_uri: string | null; // Đường dẫn ảnh local
+  current_streak: number;
+  streak_date: string;
+  max_streak: number;
+  last_fast_completed_at: number;
+  rest_point: number;
   upload_url: string | null;
   backup_url: string | null;
   sync_status: SyncStatus;
@@ -42,6 +46,7 @@ export interface FastSession {
   rating: string | null; // Đánh giá phiên ('Excellent', 'Good', 'Failed')
   is_deleted: 0 | 1; // SQLite không có BOOLEAN, dùng 0 (false) và 1 (true)
   sync_status: SyncStatus;
+  status: 'active'|'completed'|'failed';
   created_at: number;
   updated_at: number;
 }

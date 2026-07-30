@@ -56,6 +56,9 @@ export const useAppStore = create<AppState>((set, get) => {
       set({ isLoadingData: true });
       try {
         const dbService = createDBService(db);
+        // next_expected_streak_date < now => streak = 0
+        // streak cal: Nếu ngày lấy streak < now => streak + = 1 max_streak = Math.max(streak, max_streak)
+        // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
 
         // Chạy song song cả 3 truy vấn để tối ưu hóa tốc độ khởi động
         const [currentFast, weightObj, profile, dbSettings, themes] =

@@ -1,9 +1,11 @@
+import { FastStatsSummary } from "@/database/shema/fast_sessions";
+import { useAppStore } from "@/stores/appStore";
 import { Text, View } from "react-native";
 
 type StatCardProps = {
   icon: string;
   title: string;
-  value: string;
+  value: string | number;
   unit?: string;
   color?: string;
   isHero?: boolean;
@@ -79,13 +81,17 @@ const StatCard = ({
   );
 };
 
+type Props = {
+  fastStatistics: FastStatsSummary;
+};
 
-export const StatisticsSection = () => {
+export const StatisticsSection = ({ fastStatistics }: Props) => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
+  const { userProfile } = useAppStore();
   const heroStat = {
     icon: "🔥",
     title: "Current streak",
-    value: "12",
+    value: userProfile?.current_streak || 0,
     unit: "days",
     color: "#FB923C", // Lửa Cam giữ nguyên vì mang tính biểu tượng
   };
@@ -94,35 +100,42 @@ export const StatisticsSection = () => {
     {
       icon: "⏱",
       title: "Total fasting",
-      value: "428",
+      value: Math.round(fastStatistics.total_hours * 10) / 10,
       unit: "hours",
       color: "#7F92F8",
     },
     {
       icon: "✅",
       title: "Completed",
-      value: "54",
+      value: fastStatistics.total_sessions,
       unit: "times",
       color: "#34D399",
     },
     {
       icon: "⭐",
       title: "Average fast",
-      value: "18.6",
+      value: Math.round(fastStatistics.avg_hours * 10) / 10,
       unit: "hours",
       color: "#7F92F8",
     },
     {
       icon: "🏆",
       title: "Longest fast",
-      value: "72",
+      value: Math.round(fastStatistics.max_hours * 10) / 10,
       unit: "hours",
       color: "#FBBF24",
     },
     {
       icon: "📅",
       title: "Active days",
-      value: "86",
+      value: fastStatistics.avg_hours,
+      unit: "days",
+      color: "#7F92F8",
+    },
+    {
+      icon: "📅",
+      title: "Max streaks",
+      value: userProfile?.max_streak || 0,
       unit: "days",
       color: "#7F92F8",
     },

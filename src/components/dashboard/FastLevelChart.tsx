@@ -21,7 +21,7 @@ interface FastCount {
 }
 
 interface Props {
-  fastCount: FastCount;
+  fastStatistics: FastCount;
 }
 
 const LEVEL_COLORS = [
@@ -147,34 +147,34 @@ const FastLevelItem = ({
   );
 };
 
-export const FastLevelBarChart = ({ fastCount }: Props) => {
+export const FastLevelBarChart = ({ fastStatistics }: Props) => {
   const levels = [
     {
       label: "16-20 hrs",
-      count: fastCount.above_16,
+      count: fastStatistics.above_16,
     },
     {
       label: "20-24 hrs",
-      count: fastCount.above_20,
+      count: fastStatistics.above_20,
     },
     {
       label: "24-36 hrs",
-      count: fastCount.above_24,
+      count: fastStatistics.above_24,
       //   badge: "🔥",
     },
     {
       label: "36-48 hrs",
-      count: fastCount.above_36,
+      count: fastStatistics.above_36,
       //   badge: "⚡",
     },
     {
       label: "48-72 hrs",
-      count: fastCount.above_48,
+      count: fastStatistics.above_48,
       //   badge: "👑",
     },
     {
       label: "72+ hrs",
-      count: fastCount.above_72,
+      count: fastStatistics.above_72,
       //   badge: "🏆",
     },
   ];

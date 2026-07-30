@@ -54,7 +54,7 @@ const DashboardScreen = () => {
     return dbService?.getDailyLogs(chartDayRange);
   };
 
-  const [fastCount, setFastCount] = useState<FastStatsSummary>({
+  const [fastStatistics, setFastStatistics] = useState<FastStatsSummary>({
     above_16: 0,
     above_20: 0,
     above_24: 0,
@@ -74,7 +74,7 @@ const DashboardScreen = () => {
   const refreshData = async () => {
     const dayPointer = new Date(getStartDateFromRange(chartRange)).getTime(); // Bao gồm ngày hôm nay
 
-    const [weights, dayFasts, fastCountDB] = await Promise.all([
+    const [weights, dayFasts, fastStatisticsDB] = await Promise.all([
       getWeightData(),
       getDayFastData(),
       getFastStatsSummary(),
@@ -128,7 +128,7 @@ const DashboardScreen = () => {
     }
 
     setWeightData(weightsArr);
-    setFastCount(fastCountDB);
+    setFastStatistics(fastStatisticsDB);
   };
 
   useEffect(() => {
@@ -160,13 +160,13 @@ const DashboardScreen = () => {
               data={weightData}
             />
 
-            <FastLevelBarChart fastCount={fastCount} />
+            <FastLevelBarChart fastStatistics={fastStatistics} />
 
             {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
             {/*  */}
 
             {/* 2. QUICK STATS (Thống kê nhanh dạng số) */}
-            <StatisticsSection />
+            <StatisticsSection fastStatistics={fastStatistics} />
           </View>
         </ScrollView>
       </SafeAreaView>
