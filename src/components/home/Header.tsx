@@ -1,18 +1,24 @@
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { Feather } from "@expo/vector-icons";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
+import CircularProgress from "../circleProgress";
 import { ThemedText } from "../themed-text";
 import TargetSheet from "./TargetSheet";
+
+const radius = 50;
+const strokeWidth = 10;
+const circumference = 2 * Math.PI * radius;
+
+const progress = 0.75;
 
 const HomeHeader = () => {
   const { theme, settings } = useAppStore();
   const { isPresent, present, close } = useBottomSheet();
 
-  const openTargetSheet = () => {
+  const openHabitModal = () => {
     present({
       render: () => <TargetSheet />,
-      title: "Target",
+      title: "HabitModal",
       onClose: () => close(),
       size: "long",
     });
@@ -26,7 +32,12 @@ const HomeHeader = () => {
         </ThemedText>
         {/* <ThemedText type="small">A little encouragement!</ThemedText> */}
       </View>
-      <View className="p-1">
+      {/* <View className="h-10 w-10 bg-red-400"> */}
+      <Pressable hitSlop={10} onPress={openHabitModal}>
+        <CircularProgress value={60} />
+      </Pressable>
+      {/* </View> */}
+      {/* <View className="p-1">
         <TouchableOpacity
           onPress={() => openTargetSheet()}
           activeOpacity={0.7}
@@ -38,14 +49,13 @@ const HomeHeader = () => {
           }}
           className="h-10 w-14 justify-center items-center rounded-full border-2 border-primary relative"
         >
-          {/* Số target hiển thị (thêm z-10 để luôn nổi lên trên dấu chấm mờ nếu cần) */}
           <ThemedText className="text-primary! text-base! font-semibold!">
             {settings?.target || (
               <Feather name="trending-up" size={20} color={theme.primary} />
             )}
           </ThemedText>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };

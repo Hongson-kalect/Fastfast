@@ -14,7 +14,9 @@ import { create } from "zustand";
 type ColorPalette = typeof darkTheme;
 
 interface AppState {
-  userProfile: UserProfile | null;
+  userProfile:
+    | (UserProfile & { habit_percent: number; shield_percent: number })
+    | null;
   settings: AppSettings | null;
   weight: number | null;
   currentFastSession: FastSession | null;
@@ -61,14 +63,17 @@ export const useAppStore = create<AppState>((set, get) => {
         // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
 
         // Chạy song song cả 3 truy vấn để tối ưu hóa tốc độ khởi động
-        const [currentFast, weightObj, profile, dbSettings, themes] =
+        const [currentFast, weightObj, profile, dbSettings, themes, habitLog] =
           await Promise.all([
             dbService.getLastFastSession(),
             dbService.getCurrentWeight(),
             dbService.getUserProfile(),
             dbService.getUserSettings(),
             dbService.getThemes(),
+            dbService.getLastHabitLog(),
           ]);
+
+          await handleLogin({currentFast,profile, habitLog})
 
         const { themeObj, theme, is_dark_mode } = extractTheme(
           themes,
@@ -92,7 +97,11 @@ export const useAppStore = create<AppState>((set, get) => {
         set({
           currentFastSession: !currentFast?.end_time ? currentFast : null,
           weight: weightObj?.weight,
-          userProfile: profile,
+          userProfile: profile && {
+            ...profile,
+            habit_percent: habitLog?.habit_snap || 0,
+            shield_percent: habitLog?.shield_snap || 0,
+          },
           settings: dbSettings,
           theme: theme,
           themeObj: themeObj,

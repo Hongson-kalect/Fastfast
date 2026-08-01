@@ -1,4 +1,6 @@
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { Feather } from "@expo/vector-icons";
 import {
   BlurMask,
   Canvas,
@@ -9,7 +11,7 @@ import {
   vec,
 } from "@shopify/react-native-skia";
 import { useEffect, useMemo, useState } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, Pressable, View } from "react-native";
 import {
   cancelAnimation,
   Easing,
@@ -20,6 +22,7 @@ import {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
+import TargetSheet from "./TargetSheet";
 
 type Props = {
   isCounting: boolean;
@@ -112,6 +115,26 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
     return matrix;
   }); // KHÔNG truyền mảng [rotation] ở đây nữa!
 
+  const { isPresent, present, close } = useBottomSheet();
+
+  const openTargetSheet = () => {
+    present({
+      render: () => <TargetSheet />,
+      title: "Target",
+      onClose: () => close(),
+      size: "long",
+    });
+  };
+
+  const openFastingSheet = () => {
+    present({
+      render: () => <TargetSheet />,
+      title: "Fasting",
+      onClose: () => close(),
+      size: "long",
+    });
+  };
+
   return (
     <View className="items-center justify-center">
       {!layout ? (
@@ -146,7 +169,7 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
                 {/* 1. Đường viền nền tối phía sau */}
                 <Path
                   path={capsulePath}
-                  color={isCounting ? "#333" : "#888"}
+                  color={isCounting ? "#333" : "#FFFFFF77"}
                   style="stroke"
                   strokeWidth={strokeWidth}
                 />
@@ -214,20 +237,53 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
             }}
           >
             {isCounting ? (
-              <Counter
-                itemClassName="text-white!"
-                counter={counter}
-                type="large"
-              />
+              <Pressable onPress={openFastingSheet} hitSlop={10}>
+                <Counter
+                  itemClassName="text-white!"
+                  counter={counter}
+                  type="large"
+                />
+              </Pressable>
             ) : (
-              <Counter itemClassName="text-white!" counter={0} type="large" />
+              <Pressable
+                hitSlop={10}
+                onPress={openTargetSheet}
+                className="justify-center items-center w-full h-full gap-2"
+              >
+                {settings?.target ? (
+                  <ThemedText type="title">
+                    {settings?.target + ":00:00"}
+                  </ThemedText>
+                ) : (
+                  <ThemedText type="title">00:00:00</ThemedText>
+                )}
+
+                <View
+                  className={`absolute border-b ${settings?.target ? "border-primary" : "border-warning"} flex-row items-center gap-1 bottom-2`}
+                >
+                  <ThemedText
+                    color={settings?.target ? "primary" : "warning"}
+                    type="small"
+                  >
+                    Target
+                  </ThemedText>
+
+                  <Feather
+                    name="edit"
+                    size={13}
+                    color={settings?.target ? theme.primary : theme.warning}
+                  />
+                </View>
+              </Pressable>
+              //
+              // <Counter itemClassName="text-white!" counter={0} type="large" />
             )}
           </View>
         </View>
       )}
 
       <ThemedText type="small" className="mt-4">
-        You're doing great, keep it up
+        {/* You're doing great, keep it up */}
       </ThemedText>
     </View>
   );

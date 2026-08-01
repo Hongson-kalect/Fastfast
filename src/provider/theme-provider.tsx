@@ -25,6 +25,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         "--dynamic-backgroundElement": theme.backgroundElement,
         "--dynamic-backgroundSelected": theme.backgroundSelected,
         "--dynamic-error": theme.error,
+        "--dynamic-warning": theme.warning,
         "--dynamic-success": theme.success,
       }}
     >

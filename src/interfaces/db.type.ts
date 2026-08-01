@@ -76,6 +76,22 @@ export interface DailyNote {
   updated_at: number;
 }
 
+export interface HabitLog{
+  id: string;
+  log_date: string;
+  fast_id: string;
+  type: 'habit'|'shield';
+  habit_delta: number;
+  habit_snap: number;
+  habit_retain: number;
+  shield_delta: number;
+  shield_snap: number;
+  is_deleted: number;
+  sync_status: SyncStatus;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface WeightLog {
   id: string; // UUID v7
   weight: number;

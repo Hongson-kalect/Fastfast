@@ -15,6 +15,7 @@
   --color-backgroundElement: var(--dynamic-backgroundElement);
   --color-backgroundSelected: var(--dynamic-backgroundSelected);
   --color-error: var(--dynamic-error);
+  --color-warning: var(--dynamic-warning);
   --color-success: var(--dynamic-success);
 
   --color-main: #0b1528; /* Nền chính Xanh Biển Đậm sâu */

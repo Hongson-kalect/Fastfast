@@ -92,7 +92,7 @@ const lightTheme = {
 };
 
 export const darkTheme = {
-  primary: "#7F92F8", // Xanh da trời sáng hơn (trên nền tối)
+  primary: "#3B82F6", // Xanh da trời sáng hơn (trên nền tối)
   secondary: "#64B5F6", // Xanh phụ giống theme sáng
   tertiary: "#BBDEFB", // Xanh phụ nhạt nhất
   title: "#E3F2FD", // Màu tiêu đề sáng hơn

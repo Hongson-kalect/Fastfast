@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS fast_sessions (
     is_deleted INTEGER DEFAULT 0,       -- Xóa mềm cho Local-first: 0 = False, 1 = True
     sync_status TEXT DEFAULT 'pending', -- 'synced', 'pending'
     status TEXT DEFAULT 'active',       -- 'active', 'completed', 'failed'
+    shield_point_clamable INTEGER DEFAULT 1,
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now'))
 );

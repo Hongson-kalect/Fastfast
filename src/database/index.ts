@@ -1,4 +1,9 @@
-import { MoodLevel } from "@/interfaces/db.type";
+import {
+  FastSession,
+  HabitLog,
+  MoodLevel,
+  UserProfile,
+} from "@/interfaces/db.type";
 import * as SQLite from "expo-sqlite";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
@@ -42,7 +47,9 @@ import {
   generateString as themeGenerateString,
 } from "./shema/theme";
 import {
+  clearStreak,
   getUserProfile,
+  increaseStreak,
   generateString as userGenerateString,
 } from "./shema/user";
 import {
@@ -51,6 +58,17 @@ import {
   updateWeight,
   generateString as weight_trackerGenerateString,
 } from "./shema/weight_tracker";
+
+import { getLocalTodayStr } from "@/util/timer";
+import {
+  addHabitLogs,
+  AddHabitType,
+  getHabitLogs,
+  getLastHabitLog,
+  generateString as habit_logsGenerateString,
+  reduceHabit,
+  reduceShield,
+} from "./shema/habit_logs";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -106,6 +124,9 @@ export const createDBService = (db: SQLiteDatabase) => ({
     targetDate?: string;
   }) => createWeightTarget(db, newTarget),
   getAllWeightTargets: () => getAllWeightTargets(db),
+  getHabitLogs: () => getHabitLogs(db),
+  addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
+  getLastHabitLog: () => getLastHabitLog(db),
 });
 
 export const generateSchema = `
@@ -117,6 +138,7 @@ export const generateSchema = `
     ${daily_noteGenerateString}
     ${weight_trackerGenerateString}
     ${target_GenerateString}
+    ${habit_logsGenerateString}
 `;
 
 const generateSeedData = `
@@ -179,4 +201,115 @@ export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
   await db.execAsync(`PRAGMA user_version = 0;`);
 
   console.log("Database cleared successfully!");
+};
+
+type HandleLoginParams = {
+  db: SQLiteDatabase;
+  lastFast: FastSession;
+  profile: UserProfile;
+  habitLog: HabitLog;
+};
+export const handleLogin = ({
+  db,
+  lastFast,
+  profile,
+  habitLog,
+}: HandleLoginParams) => {
+  const now = new Date();
+  const todayStr = getLocalTodayStr();
+
+  let isFastFail = false;
+  let isClearStreak = false;
+  let increaseStreakNumber = 0;
+  let reduceShieldNumber = 0;
+  let reduceHabitNumber = 0;
+
+  // 0.Hôm nay đã xử lý rồi
+  if (profile.streak_date === todayStr || !lastFast) {
+    return;
+  }
+  // 1. Kiểm tra có đang fast hay không
+  if (!lastFast.end_time) {
+    // Nếu thời gian hiện tại cách thời điểm start_fast quá 7 ngày => fast fail, xóa streak
+    const startFast = new Date(lastFast.start_time);
+
+    // BỎ QUA nếu hôm nay đã vào app và xử lý rồi (Check dựa vào last_login hoặc last_streak_date)
+
+    // Ngày hoàn thành fast trên lý thuyết
+    const targetDay = getLocalTodayStr(
+      new Date(
+        lastFast.start_time + (lastFast.target_duration || 24) * 60 * 60 * 1000,
+      ),
+    );
+    const startDay = getLocalTodayStr(startFast);
+    const diffInDays = Math.floor(
+      (now.getTime() - new Date(startDay).getTime()) / (1000 * 60 * 60 * 24),
+    );
+    const diffInDaysFromTarget = Math.floor(
+      (now.getTime() - new Date(targetDay).getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    if (diffInDaysFromTarget > 1) {
+      isFastFail = true;
+      // fast = fail, kết thúc vào hiện tại
+      const shield_need = diffInDaysFromTarget - 1;
+      if (habitLog.shield_snap < shield_need) {
+        const habitReduce =
+          3 +
+          Math.pow(
+            shield_need - habitLog.shield_snap,
+            1 + (shield_need - habitLog.shield_snap) / 20,
+          );
+        reduceHabitNumber = habitReduce;
+        isClearStreak = true;
+        // xóa shield, retain trừ habit với min = 0
+      } else {
+        // trừ shield tương ứng
+        reduceShieldNumber = shield_need;
+        increaseStreakNumber = diffInDays;
+      }
+    } else {
+      increaseStreakNumber = diffInDays;
+      // streak += diffInDays
+    }
+  } else {
+    const diffInDays = Math.floor(
+      (now.getTime() - new Date(profile.streak_date).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
+    if (diffInDays > 1) {
+      const shield_need = diffInDays - 1;
+      if (habitLog.shield_snap < shield_need) {
+        const habitReduce =
+          3 +
+          Math.round(
+            Math.pow(
+              shield_need - habitLog.shield_snap,
+              1 + (shield_need - habitLog.shield_snap) / 19,
+            ) * 10,
+          ) /
+            10;
+        reduceHabitNumber = habitReduce;
+        isClearStreak = true;
+        // xóa shield, retain trừ habit với min = 0
+      } else {
+        // trừ shield tương ứng
+        increaseStreakNumber = diffInDays;
+        reduceShieldNumber = shield_need;
+      }
+    } else {
+      increaseStreakNumber = diffInDays;
+      // streak += diffInDays
+    }
+  }
+
+  if (increaseStreakNumber) {
+    increaseStreak(db, profile, increaseStreakNumber);
+    if (reduceShieldNumber) reduceShield(db, habitLog, reduceShieldNumber);
+  } else {
+    clearStreak(db, profile);
+    if (reduceHabitNumber) reduceHabit(db, habitLog, reduceHabitNumber);
+  }
+  if (isFastFail) fastFail();
 };
