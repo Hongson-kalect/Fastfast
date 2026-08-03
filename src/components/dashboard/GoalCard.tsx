@@ -119,11 +119,26 @@ export const GoalCard = () => {
     getActiveWeightTarget();
   }, []);
 
+  if (!weight)
+    return (
+      <View className="items-end mb-4">
+        <Pressable
+          onPress={handleSetWeight}
+          className="px-2 py-3 rounded-lg bg-success flex-row items-center gap-1"
+        >
+          <Feather name="plus" size={16} color="white" />
+          <ThemedText color="white" className="text-sm!">
+            Add current Weigth
+          </ThemedText>
+        </Pressable>
+      </View>
+    );
+
   return (
     <View className="mb-4 rounded-2xl border border-zinc-800 bg-primary/40 p-4">
       {/* Header Goal */}
       <View className="flex-row items-center justify-between">
-        {weight ? (
+        {!!weight ? (
           activeTarget ? (
             <Pressable
               onPress={handleSetTarget}
@@ -156,39 +171,27 @@ export const GoalCard = () => {
           <View></View>
         )}
 
-        {weight ? (
-          <Pressable
-            onPress={handleSetWeight}
-            className="items-end p-1.5 border-dashed border-white/20 rounded-lg border bg-white/10"
-          >
-            <View className="flex-row items-baseline gap-0.5">
-              <MaterialCommunityIcons name="weight" size={16} color="white" />
-              <Text className="text-lg font-bold text-white">
-                {weight.toFixed(1)}
-              </Text>
-              <Text className="text-[10px] text-zinc-400">kg</Text>
-            </View>
-            {targetWeight && (
-              <Text className="text-[10px] font-medium text-green-400">
-                -{remaining} kg to go
-              </Text>
-            )}
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={handleSetWeight}
-            className="px-2 py-3 rounded-lg bg-success flex-row items-center gap-1"
-          >
-            <Feather name="plus" size={16} color="white" />
-            <ThemedText color="white" className="text-sm!">
-              Add current Weigth
-            </ThemedText>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={handleSetWeight}
+          className="items-end p-1.5 border-dashed border-white/20 rounded-lg border bg-white/10"
+        >
+          <View className="flex-row items-baseline gap-0.5">
+            <MaterialCommunityIcons name="weight" size={16} color="white" />
+            <Text className="text-lg font-bold text-white">
+              {weight.toFixed(1)}
+            </Text>
+            <Text className="text-[10px] text-zinc-400">kg</Text>
+          </View>
+          {targetWeight && (
+            <Text className="text-[10px] font-medium text-green-400">
+              -{remaining} kg to go
+            </Text>
+          )}
+        </Pressable>
       </View>
 
       {/* Modern Slim Progress Bar */}
-      {weight && targetWeight && (
+      {!!weight && !!targetWeight && (
         <View className="mt-3.5">
           <View className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
             <Animated.View

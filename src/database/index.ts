@@ -21,6 +21,7 @@ import {
 import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
+  fastFail,
   finishLastSession,
   getFastSessions,
   getFastStatsSummary,
@@ -80,8 +81,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
-  finishLastSession: (id: string, endTime: number, duration: number) =>
-    finishLastSession(db, id, endTime, duration),
+  finishLastSession: (id: string, endTime: number, duration: number, isValid: boolean) =>
+    finishLastSession(db, id, endTime, duration, isValid),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number) => startNewSession(db, startTime),
 
@@ -159,6 +160,8 @@ export const initDatabase = async (db: SQLiteDatabase) => {
 
   if (version === 0) {
     await db.execAsync(generateSchema);
+
+    console.log("generateSchema completed");
     // await db.execAsync(generateSeedData);
   }
 
@@ -205,11 +208,11 @@ export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
 
 type HandleLoginParams = {
   db: SQLiteDatabase;
-  lastFast: FastSession;
-  profile: UserProfile;
-  habitLog: HabitLog;
+  lastFast: FastSession | null;
+  profile: UserProfile | null;
+  habitLog: HabitLog | null;
 };
-export const handleLogin = ({
+export const handleLogin = async ({
   db,
   lastFast,
   profile,
@@ -224,12 +227,28 @@ export const handleLogin = ({
   let reduceShieldNumber = 0;
   let reduceHabitNumber = 0;
 
+  if (!profile) {
+    return {
+      lastFast,
+      profile,
+      habitLog,
+    };
+  }
+
   // 0.Hôm nay đã xử lý rồi
-  if (profile.streak_date === todayStr || !lastFast) {
-    return;
+  if (profile.streak_date === todayStr) {
+    return {
+      lastFast,
+      profile,
+      habitLog,
+    };
+  }
+
+  if (!lastFast) {
+    ((isClearStreak = true), (reduceHabitNumber = habitLog?.habit_snap || 0));
   }
   // 1. Kiểm tra có đang fast hay không
-  if (!lastFast.end_time) {
+  else if (!lastFast.end_time) {
     // Nếu thời gian hiện tại cách thời điểm start_fast quá 7 ngày => fast fail, xóa streak
     const startFast = new Date(lastFast.start_time);
 
@@ -253,12 +272,14 @@ export const handleLogin = ({
       isFastFail = true;
       // fast = fail, kết thúc vào hiện tại
       const shield_need = diffInDaysFromTarget - 1;
-      if (habitLog.shield_snap < shield_need) {
+      const currentShield = habitLog?.shield_snap || 0;
+
+      if (currentShield < shield_need) {
         const habitReduce =
           3 +
           Math.pow(
-            shield_need - habitLog.shield_snap,
-            1 + (shield_need - habitLog.shield_snap) / 20,
+            shield_need - currentShield,
+            1 + (shield_need - currentShield) / 20,
           );
         reduceHabitNumber = habitReduce;
         isClearStreak = true;
@@ -280,13 +301,15 @@ export const handleLogin = ({
 
     if (diffInDays > 1) {
       const shield_need = diffInDays - 1;
-      if (habitLog.shield_snap < shield_need) {
+      const currentShield = habitLog?.shield_snap || 0;
+
+      if (currentShield < shield_need) {
         const habitReduce =
-          3 +
+          5 +
           Math.round(
             Math.pow(
-              shield_need - habitLog.shield_snap,
-              1 + (shield_need - habitLog.shield_snap) / 19,
+              shield_need - currentShield,
+              1 + (shield_need - currentShield) / 19,
             ) * 10,
           ) /
             10;
@@ -304,12 +327,24 @@ export const handleLogin = ({
     }
   }
 
+  let returnLastFast = lastFast || null;
+  let returnHabitLog = habitLog || null;
+  let returnProfile = profile;
+
   if (increaseStreakNumber) {
-    increaseStreak(db, profile, increaseStreakNumber);
-    if (reduceShieldNumber) reduceShield(db, habitLog, reduceShieldNumber);
+    returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
+    if (habitLog && reduceShieldNumber)
+      returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
   } else {
-    clearStreak(db, profile);
-    if (reduceHabitNumber) reduceHabit(db, habitLog, reduceHabitNumber);
+    returnProfile = await clearStreak(db, profile);
+    if (habitLog && reduceHabitNumber)
+      returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber);
   }
-  if (isFastFail) fastFail();
+  if (isFastFail && lastFast) returnLastFast = await fastFail(db, lastFast);
+
+  return {
+    lastFast: returnLastFast,
+    profile: returnProfile,
+    habitLog: returnHabitLog,
+  };
 };

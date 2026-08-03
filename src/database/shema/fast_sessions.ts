@@ -1,6 +1,8 @@
 import { FastSession } from "@/interfaces/db.type";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
+import { addHabitLogs } from "./habit_logs";
+import { getLocalTodayStr } from "@/util/timer";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -97,7 +99,7 @@ export const getLastFastSession = async (
   db: SQLiteDatabase,
 ): Promise<FastSession | null> => {
   const row = await db.getFirstAsync<FastSession>(
-    `SELECT * FROM fast_sessions ORDER BY updated_at DESC LIMIT 1;`,
+    `SELECT * FROM fast_sessions where status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
   );
   return row;
 };
@@ -117,11 +119,37 @@ export const finishLastSession = async (
   id: string,
   time: number,
   duration: number,
+  isValid:boolean = true
 ) => {
-  await db.runAsync(
-    `UPDATE fast_sessions SET end_time = ?, duration = ? WHERE id = ?;`,
-    [time, duration, id],
+  let newHabitLog = null;
+  if(!isValid){
+    await db.runAsync(
+      `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'failed' WHERE id = ?;`,
+      [time, duration, id],
+    )
+  }
+
+  else{
+    const hours = duration / 3600;
+    const habitDelta = 3.0 + (hours - 16) * 0.2
+    const shieldGain = Math.min(0, Math.floor(hours/24)-1);
+    
+    await db.runAsync(
+      `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'completed' WHERE id = ?;`,
+      [time, duration, id],
+    );
+    
+    newHabitLog = await addHabitLogs(db, {fast_id:id, log_date:getLocalTodayStr(), habit_detla:habitDelta, shield_detla:shieldGain})
+  }
+
+  const res = await db.getFirstAsync<FastSession>(
+    `SELECT * FROM fast_sessions WHERE id = ?;`,
+    [id],
   );
+  return {
+    lastSession: res,
+    habitLog: newHabitLog
+  };
 };
 
 export const startNewSession = async (
@@ -143,4 +171,15 @@ export const deleteSession = async (db: SQLiteDatabase, id: string) => {
   await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
     id,
   ]);
+};
+
+export const fastFail = async (
+  db: SQLiteDatabase,
+  fastSession: FastSession,
+) => {
+  await db.runAsync(
+    `Update fast_sessions SET status = 'failed', shield_point_clamable = 0 WHERE id = ?;`,
+    [fastSession.id],
+  );
+  return await getLastFastSession(db);
 };

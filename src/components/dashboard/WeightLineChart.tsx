@@ -213,31 +213,32 @@ const WeightLineChart = ({
             </ThemedText>
           </View>
           <View className="absolute -right-1 bottom-0 -top-4 justify-between ">
-            {rightAxis.reverse().map((item, index) => {
-              if (index === 0)
+            {!!rightAxis[4] &&
+              rightAxis.reverse().map((item, index) => {
+                if (index === 0)
+                  return (
+                    <ThemedText
+                      style={{
+                        fontFamily: "MulishRegular",
+                      }}
+                      key={index}
+                      className="text-[9px]!  text-white/50!"
+                    >
+                      (kg)
+                    </ThemedText>
+                  );
                 return (
                   <ThemedText
                     style={{
                       fontFamily: "MulishRegular",
                     }}
                     key={index}
-                    className="text-[9px]!  text-white/50!"
+                    className={`text-[7px]! text-white/50! ${![1, 2, 3, 4].includes(index) && "opacity-0!"} `}
                   >
-                    (kg)
+                    {item}
                   </ThemedText>
                 );
-              return (
-                <ThemedText
-                  style={{
-                    fontFamily: "MulishRegular",
-                  }}
-                  key={index}
-                  className={`text-[7px]! text-white/50! ${![1, 2, 3, 4].includes(index) && "opacity-0!"} `}
-                >
-                  {item}
-                </ThemedText>
-              );
-            })}
+              })}
           </View>
           <CartesianChart
             data={chartData}

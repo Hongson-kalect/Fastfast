@@ -18,7 +18,8 @@ const rating = [
 ];
 
 const HomeScreen = () => {
-  const { currentFastSession, setCurrentFastSession } = useAppStore();
+  const { currentFastSession, setCurrentFastSession, updateHabit } =
+    useAppStore();
   const [startTime, setStartTime] = useState<number | null>(
     currentFastSession?.start_time || null,
   );
@@ -33,34 +34,64 @@ const HomeScreen = () => {
   const toggleCounting = async () => {
     //Kết thúc đếm
     if (isCounting && startTime && currentFastSession) {
+      let message = "Are you sure you want to finish your session?";
+      let subMessage =''
+      const now = new Date().getTime();
+      const duration = Math.floor(Math.abs(now - startTime) / 1000);
+      const isValid = duration > 16 * 3600;
+      const isReachTarget = currentFastSession?.target_duration ?duration > currentFastSession.target_duration:null
+      if (!isValid) {
+        message =
+          "This session will marked as FAILED, are you sure?";
+          subMessage = "The duration is less than 16 hours."
+      }
+
+      if(isReachTarget){
+        message ='You got the target, well done!';
+      }
+
+      if(isReachTarget === false){
+        message = "You not reach the target, finish it?";
+      }
+
       setGlobalModal({
         type: "confirm",
         title: "Finish",
-        message: "Are you sure you want to finish your session?",
+        message: message,
+
+        subMessage: subMessage || '',
         onOk: async () => {
           setIsCounting(!isCounting);
-          const now = new Date().getTime();
-          const timeDiff = Math.floor(Math.abs(now - startTime) / 1000);
           // Lấy thời gian, nếu nhỏ hơn x thì cho thành false nếu thời gian > 2 tiếng hoặc xóa luôn nếu dưới
-          if (timeDiff < 4 * 60 * 60) {
-            // Clear current session by id
-          } else {
-            // Qua 4 giờ là ghi hết, có gì filter bằng where
-            dbService?.finishLastSession(currentFastSession?.id, now, timeDiff);
-            setCurrentFastSession(null);
-            // Tính toán lưu giờ nhịn theo ngày của người dùng
-            const parsedDays = splitSessionIntoDays(startTime, now);
-            console.log("parsedDays", parsedDays);
 
-            // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
-            // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
+          const { lastSession, habitLog } = await dbService?.finishLastSession(
+            currentFastSession?.id,
+            now,
+            duration,
+            isValid,
+          );
+          if (habitLog) {
+            updateHabit({
+              habit_percent: habitLog?.habit_snap,
+              shield: habitLog?.shield_snap,
+            });
+          }
+
+          setCurrentFastSession(null);
+          // Tính toán lưu giờ nhịn theo ngày của người dùng
+
+          // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
+          // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
+          if (isValid) {
+            const parsedDays = splitSessionIntoDays(startTime, now);
+
             for (const dayData of parsedDays) {
               await dbService?.addDailyLogs({
                 log_date: dayData.log_date,
                 fast_id: currentFastSession.id,
                 hours_in_day: dayData.hours_in_day,
                 elapsed_times: dayData.elapsed_hours,
-                hour_in_fast: parseFloat((timeDiff / 60 / 60).toFixed(2)),
+                hour_in_fast: parseFloat((duration / 60 / 60).toFixed(2)),
                 // user_id, mood_level, note có thể bổ sung tùy thuộc form điền sau khi nhịn
               });
             }

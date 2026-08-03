@@ -120,7 +120,7 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
   const openTargetSheet = () => {
     present({
       render: () => <TargetSheet />,
-      title: "Target",
+      title: "",
       onClose: () => close(),
       size: "long",
     });
@@ -264,13 +264,14 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
                   <ThemedText
                     color={settings?.target ? "primary" : "warning"}
                     type="small"
+                    className="text-[11px]!"
                   >
-                    Target
+                    Set target
                   </ThemedText>
 
                   <Feather
                     name="edit"
-                    size={13}
+                    size={11}
                     color={settings?.target ? theme.primary : theme.warning}
                   />
                 </View>

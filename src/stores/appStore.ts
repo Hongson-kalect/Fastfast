@@ -5,7 +5,7 @@ import {
   ThemeType,
 } from "@/database/shema/theme";
 // src/store/appStore.ts
-import { createDBService } from "@/database";
+import { createDBService, handleLogin } from "@/database";
 import { AppSettings, FastSession, UserProfile } from "@/interfaces/db.type";
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -14,9 +14,7 @@ import { create } from "zustand";
 type ColorPalette = typeof darkTheme;
 
 interface AppState {
-  userProfile:
-    | (UserProfile & { habit_percent: number; shield_percent: number })
-    | null;
+  userProfile: (UserProfile & { habit_percent: number; shield: number }) | null;
   settings: AppSettings | null;
   weight: number | null;
   currentFastSession: FastSession | null;
@@ -30,6 +28,8 @@ interface AppState {
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
   init: (db: SQLiteDatabase) => Promise<boolean>;
+  updateProfile: (val: { [K in keyof UserProfile]: any }) => void,
+  updateHabit: (val: { habit_percent: number; shield: number }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -63,17 +63,28 @@ export const useAppStore = create<AppState>((set, get) => {
         // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
 
         // Chạy song song cả 3 truy vấn để tối ưu hóa tốc độ khởi động
-        const [currentFast, weightObj, profile, dbSettings, themes, habitLog] =
-          await Promise.all([
-            dbService.getLastFastSession(),
-            dbService.getCurrentWeight(),
-            dbService.getUserProfile(),
-            dbService.getUserSettings(),
-            dbService.getThemes(),
-            dbService.getLastHabitLog(),
-          ]);
+        let [
+          currentFast,
+          weightObj,
+          currentProfile,
+          dbSettings,
+          themes,
+          currentHabitLog,
+        ] = await Promise.all([
+          dbService.getLastFastSession(),
+          dbService.getCurrentWeight(),
+          dbService.getUserProfile(),
+          dbService.getUserSettings(),
+          dbService.getThemes(),
+          dbService.getLastHabitLog(),
+        ]);
 
-          await handleLogin({currentFast,profile, habitLog})
+        const { lastFast, profile, habitLog } = await handleLogin({
+          db,
+          lastFast: currentFast,
+          profile: currentProfile,
+          habitLog: currentHabitLog,
+        });
 
         const { themeObj, theme, is_dark_mode } = extractTheme(
           themes,
@@ -95,12 +106,12 @@ export const useAppStore = create<AppState>((set, get) => {
         // 3. Bốc palette màu tương ứng từ cái themeObj vừa băm từ AsyncStorage ra
 
         set({
-          currentFastSession: !currentFast?.end_time ? currentFast : null,
+          currentFastSession: lastFast || null,
           weight: weightObj?.weight,
           userProfile: profile && {
             ...profile,
             habit_percent: habitLog?.habit_snap || 0,
-            shield_percent: habitLog?.shield_snap || 0,
+            shield: habitLog?.shield_snap || 0,
           },
           settings: dbSettings,
           theme: theme,
@@ -119,6 +130,20 @@ export const useAppStore = create<AppState>((set, get) => {
         console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
         set({ isLoadingData: false });
         return false;
+      }
+    },
+
+    updateProfile: (val: { [K in keyof UserProfile]: any }) => {
+      const profile = get().userProfile;
+      if (profile) {
+        set({ userProfile: { ...profile, ...val } });
+      }
+    },
+
+    updateHabit: (val: { habit_percent: number; shield: number }) => {
+      const profile = get().userProfile;
+      if (profile) {
+        set({ userProfile: { ...profile, ...val } });
       }
     },
 

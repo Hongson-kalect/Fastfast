@@ -12,7 +12,7 @@ const circumference = 2 * Math.PI * radius;
 const progress = 0.75;
 
 const HomeHeader = () => {
-  const { theme, settings } = useAppStore();
+  const { theme, settings, userProfile } = useAppStore();
   const { isPresent, present, close } = useBottomSheet();
 
   const openHabitModal = () => {
@@ -34,7 +34,7 @@ const HomeHeader = () => {
       </View>
       {/* <View className="h-10 w-10 bg-red-400"> */}
       <Pressable hitSlop={10} onPress={openHabitModal}>
-        <CircularProgress value={60} />
+        <CircularProgress value={userProfile?.habit_percent || 0} />
       </Pressable>
       {/* </View> */}
       {/* <View className="p-1">

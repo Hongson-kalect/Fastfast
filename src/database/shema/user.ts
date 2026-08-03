@@ -53,12 +53,12 @@ export const increaseStreak =async (db: SQLiteDatabase, profile: UserProfile, st
   const newStreak = profile.current_streak + streakNumber
   await db.runAsync(`UPDATE user_profile SET current_streak = ${newStreak}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`);
   const newProfile = await getUserProfile(db)
-  return newProfile
+  return newProfile!
 }
 
 export const clearStreak = async(db: SQLiteDatabase, profile: UserProfile) =>{
   const today = getLocalTodayStr()
   await db.runAsync(`UPDATE user_profile SET current_streak = 1,  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`);
   const newProfile = await getUserProfile(db)
-  return newProfile
+  return newProfile!
 }

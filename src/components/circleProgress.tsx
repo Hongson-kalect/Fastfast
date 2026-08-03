@@ -2,12 +2,12 @@ import { useAppStore } from "@/stores/appStore";
 import React, { useEffect } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated, {
-    Easing,
-    runOnJS,
-    useAnimatedProps,
-    useAnimatedReaction,
-    useSharedValue,
-    withTiming,
+  Easing,
+  runOnJS,
+  useAnimatedProps,
+  useAnimatedReaction,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { ThemedText } from "./themed-text";
@@ -92,7 +92,7 @@ export default function CircularProgress({
   strokeColor,
   strokeWidth = 5,
 
-  inactiveStrokeColor = "#FFFFFF77",
+  inactiveStrokeColor = "#FFFFFF22",
   inactiveStrokeWidth,
 
   title,
@@ -161,8 +161,8 @@ export default function CircularProgress({
           >
             <Stop
               offset="0%"
-              stopColor={(strokeColor || theme.primary) + "88"}
-              stopOpacity={0}
+              stopColor={strokeColor || theme.primary}
+              stopOpacity={1}
             />
             <Stop
               offset="100%"
@@ -172,11 +172,20 @@ export default function CircularProgress({
           </LinearGradient>
         </Defs>
 
+        <Circle
+          cx={actualSize / 2}
+          cy={actualSize / 2}
+          r={r}
+          stroke={inactiveStrokeColor}
+          strokeWidth={inactiveStrokeWidth || strokeWidth - 1}
+          fill="none"
+        />
+
         <AnimatedCircle
           cx={actualSize / 2}
           cy={actualSize / 2}
           r={r}
-          stroke={strokeColor || theme.primary}
+          stroke="url(#progressGradient)"
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}

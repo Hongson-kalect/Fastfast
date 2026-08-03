@@ -3,10 +3,15 @@ import { settingKey } from "@/constants/key";
 import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
-import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
-import { ThemedText } from "../themed-text";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 interface TargetSheetProps {
   currentTargetHours?: number;
@@ -19,154 +24,231 @@ const TargetSheet = ({
 }: TargetSheetProps) => {
   const { close } = useBottomSheet();
   const dbService = useDBService();
-  const { theme, settings, updateSetting } = useAppStore();
-  const [selectedHours, setSelectedHours] =
-    useState<number>(currentTargetHours);
-  const [detailItem, setDetailItem] = useState<FastingTargetItem | null>(null);
+  const { settings, updateSetting, theme } = useAppStore();
+  const { width } = useWindowDimensions();
 
-  const handleSelect = (item: FastingTargetItem) => {
-    setSelectedHours(item.hours);
-    console.log(settings, item.hours);
-    updateSetting({ [settingKey.target]: item.hours.toString() });
-    dbService.setting(settingKey.target, item.hours.toString());
-    if (onSelectTarget) onSelectTarget(item);
+  const [selected, setSelected] = useState<FastingTargetItem>(() => {
+    return (
+      FASTING_TARGETS.find((item) => item.hours === settings?.target) ||
+      FASTING_TARGETS[0]
+    );
+  });
+
+  const handleSelect = () => {
+    console.log(settings, selected.hours);
+    updateSetting({ [settingKey.target]: selected.hours.toString() });
+    dbService.setting(settingKey.target, selected.hours.toString());
+    if (onSelectTarget) onSelectTarget(selected);
     close();
   };
 
+  const CARD_WIDTH = width - 32;
+  const GAP = 16;
+
+  const listRef = useRef<FlatList>(null);
+
   return (
-    <View className="flex-1 bg-zinc-900 px-2 pb-6">
-      {/* Danh sách thẻ ngang gọn gàng */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 16, paddingBottom: 20, marginTop: 12 }}
-      >
-        {FASTING_TARGETS.map((item) => {
-          const isSelected = selectedHours === item.hours;
+    <View className="flex-1 bg-zinc-900 px-2 pb-6 pt-8">
+      <View>
+        <FlatList
+          horizontal
+          data={FASTING_TARGETS}
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 8,
+            gap: GAP,
+          }}
+          snapToInterval={CARD_WIDTH + GAP}
+          snapToAlignment="start"
+          decelerationRate="fast"
+          disableIntervalMomentum
+          onMomentumScrollEnd={(e) => {
+            const offset = e.nativeEvent.contentOffset.x;
 
-          return (
-            <TouchableOpacity
-              key={item.id}
-              activeOpacity={0.7}
-              onPress={() => handleSelect(item)}
-              style={{
-                elevation: isSelected ? 10 : 10,
-                shadowColor: isSelected ? theme.primary : "#fff",
-                backgroundColor: "#364153",
-                borderColor: isSelected ? theme.primary : item.colors.border,
-                borderWidth: 0.5,
-              }}
-              className={`flex-row items-center shadow justify-between overflow-hidden rounded-lg`}
-            >
-              {/* Cột trái: Số giờ & Chu kỳ */}
-              <View
+            const index = Math.round(offset / (CARD_WIDTH + GAP));
+
+            setSelected(FASTING_TARGETS[index]);
+          }}
+          renderItem={({ item }) => {
+            const active = item.id === selected.id;
+
+            return (
+              <Pressable
+                onPress={() => setSelected(item)}
                 style={{
-                  backgroundColor: isSelected ? theme.primary : "#6a7282",
+                  width: CARD_WIDTH,
+                  borderRadius: 22,
+                  borderWidth: active ? 1 : 1,
+                  borderColor: active ? item.colors.border : "#2E2E2E",
+                  backgroundColor: active ? item.colors.badgeBg : "#161616",
+                  padding: 18,
+                  marginBottom: 0,
                 }}
-                className="flex-row items-center bg-gray-500  py-4 px-3"
               >
-                <ThemedText
-                  // style={{ color: item.colors.badgeText }}
-                  className={`text-3xl! font-bold!`}
-                >
-                  {item.hours}H
-                </ThemedText>
-              </View>
-
-              {/* Cột giữa: Lời khuyên siêu ngắn gọn */}
-              <View className="flex-1 px-2">
-                <View>
-                  <ThemedText className="text-[14px]! font-bold!">
-                    {item.label}
-                  </ThemedText>
+                <View className="flex-row items-center justify-between absolute top-0 bottom-0 -right-3 -left-3">
+                  <View>
+                    <View
+                      style={{ backgroundColor: item.colors.accent + "80" }}
+                      className="rounded-full h-8 w-8 items-center justify-center"
+                    >
+                      <Feather name="chevron-left" size={16} color="white" />
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      style={{ backgroundColor: item.colors.accent + "80" }}
+                      className="rounded-full h-8 w-8 items-center justify-center"
+                    >
+                      <Feather name="chevron-right" size={16} color="white" />
+                    </View>
+                  </View>
                 </View>
-                <ThemedText
-                  className="text-xs! text-zinc-300! font-medium! mt-2"
-                  numberOfLines={1}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
                 >
-                  {item.advice}
-                </ThemedText>
-              </View>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "600",
+                        color: "white",
+                      }}
+                    >
+                      {item.label}
+                    </Text>
 
-              {/* Cột phải: Nút Xem chi tiết & Radio Select */}
-              <View className="flex-row items-center gap-2 pl-2">
-                <TouchableOpacity
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  onPress={() => setDetailItem(item)}
-                  className="p-1"
+                    <Text
+                      style={{
+                        marginTop: 2,
+                        color: "white",
+                        fontWeight: "500",
+                        fontSize: 14,
+                      }}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      backgroundColor: item.colors.badgeBg,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 999,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: item.colors.badgeText,
+                        fontWeight: "500",
+                      }}
+                    >
+                      {item.level}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text
+                  style={{
+                    color: "#FFFFFF77",
+                    marginTop: 12,
+                    lineHeight: 22,
+                    fontSize: 13,
+                  }}
                 >
-                  <Feather name="info" size={16} color="#a1a1aa" />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+                  {item.description}
+                </Text>
 
-      {/* MODAL CHI TIẾT HIỂN THỊ NỔI BẬT KHUẬT NGỮ & CƠ CHẾ */}
-      <Modal
-        visible={!!detailItem}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setDetailItem(null)}
+                {active && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 12,
+                      bottom: 12,
+                    }}
+                  >
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={24}
+                      color={item.colors.accent}
+                    />
+                  </View>
+                )}
+              </Pressable>
+            );
+          }}
+        />
+      </View>
+
+      <View
+        style={{
+          // position: "absolute",
+          marginTop: 24,
+          backgroundColor: "#111",
+          paddingVertical: 28,
+          borderRadius: 12,
+          paddingHorizontal: 14,
+          elevation: 6,
+        }}
       >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setDetailItem(null)}
-          className="flex-1 bg-black/70 justify-center items-center p-6"
+        <Text
+          style={{
+            color: selected.colors.accent,
+            fontSize: 24,
+            fontWeight: "700",
+          }}
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            className="w-full bg-zinc-800 p-5 rounded-2xl border border-zinc-700 gap-3"
+          {selected.label}
+        </Text>
+        <Text>{selected.label}</Text>
+        <Text
+          style={{
+            color: theme.primary,
+            fontSize: 14,
+            fontWeight: "700",
+          }}
+        >
+          💡 {selected.advice}
+        </Text>
+
+        <Text
+          style={{
+            color: "#FFFFFF77",
+            fontSize: 13,
+            marginTop: 14,
+            lineHeight: 23,
+          }}
+        >
+          {selected.adviceLong}
+        </Text>
+
+        <Pressable
+          onPress={handleSelect}
+          style={{
+            marginTop: 20,
+            backgroundColor: selected.colors.accent,
+            height: 54,
+            borderRadius: 16,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "700",
+              fontSize: 17,
+            }}
           >
-            <View className="flex-row justify-between items-center border-b border-zinc-700/60 pb-3">
-              <View className="flex-row items-center gap-2">
-                <ThemedText
-                  // style={{ color: detailItem?.colors.accent }}
-                  className={`text-2xl font-black`}
-                >
-                  {detailItem?.hours}H
-                </ThemedText>
-                <ThemedText className="text-base font-bold text-white">
-                  ({detailItem?.label}) - {detailItem?.title}
-                </ThemedText>
-              </View>
-              <TouchableOpacity onPress={() => setDetailItem(null)}>
-                <Feather name="x" size={20} color="#a1a1aa" />
-              </TouchableOpacity>
-            </View>
-
-            <View className="gap-2">
-              <ThemedText className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                Cơ chế sinh học & Lợi ích:
-              </ThemedText>
-              <ThemedText className="text-sm text-zinc-200 leading-relaxed">
-                {detailItem?.description}
-              </ThemedText>
-            </View>
-
-            <View className="bg-zinc-900/80 p-3 rounded-xl border border-zinc-700/40 gap-1 mt-1">
-              <ThemedText className="text-xs font-bold text-primary">
-                💡 Lời khuyên thực hiện:
-              </ThemedText>
-              <ThemedText className="text-xs text-zinc-300 leading-normal">
-                {detailItem?.advice}
-              </ThemedText>
-            </View>
-
-            <TouchableOpacity
-              onPress={() => {
-                if (detailItem) handleSelect(detailItem);
-                setDetailItem(null);
-              }}
-              className="mt-2 py-3 rounded-xl bg-blue-600 active:bg-blue-700 items-center"
-            >
-              <ThemedText className="text-white font-bold text-sm">
-                Chọn mục tiêu này
-              </ThemedText>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
+            Chọn mục tiêu này
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 };

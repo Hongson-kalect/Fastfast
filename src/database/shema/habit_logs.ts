@@ -60,7 +60,6 @@ export const getLastHabitLog = async (
 export type AddHabitType = {
   log_date?: string;
   fast_id?: string;
-  type: "habit+" | "habit-" | "shield+" | "shield-";
   habit_detla?: number;
   shield_detla?: number;
 
@@ -110,6 +109,9 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
       retain,
     ],
   );
+
+  const res = await getLastHabitLog(db);
+  return res;
 };
 
 export const reduceShield =async (db: SQLiteDatabase, lastHabitLog:HabitLog, reduce:number)=>{
@@ -132,7 +134,7 @@ export const reduceHabit = async (db: SQLiteDatabase, lastHabitLog:HabitLog, red
   await db.runAsync(`INSERT INTO habit_logs 
     (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, retain) 
     VALUES (?, ?, ?, ?, ?,?,?)`,
-    [id, today, null, -reduce, lastHabitLog.habit_snap - reduce, 0, lastHabitLog.shield_snap, 0]);
+    [id, today, null, -reduce, Math.max(lastHabitLog.habit_snap - reduce, 0), 0, lastHabitLog.shield_snap, 0]);
 
   const lastHabit = await getLastHabitLog(db);
   return lastHabit
