@@ -431,7 +431,7 @@ export interface FastingTargetItem {
   hours: number;
   label: string;
   title: string;
-  level: "Trung bình" | "Thách thức" | "Nâng cao" | "Chuyên gia";
+  level: "Novice" | "Veteran" | "Expert" | "Master";
   description: string;
   advice: string; // Ngắn gọn (1 dòng) cho Item card
   adviceLong: string; // Chi tiết cho Modal
@@ -447,11 +447,11 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "16h",
     hours: 16,
-    label: "16:8",
-    title: "Giảm cân phổ biến",
-    level: "Trung bình",
+    label: "Intermittent",
+    title: "Phổ biến & Dễ bắt đầu",
+    level: "Novice",
     description:
-      "Kích hoạt quá trình đốt mỡ mạnh mẽ và cải thiện độ nhạy Insulin.",
+      "Hỗ trợ chuyển hóa năng lượng từ mỡ thừa và cải thiện độ nhạy Insulin.",
     advice: "Tiêu chuẩn! Ăn trong khung giờ 12h - 20h.",
     adviceLong:
       "Đây là mốc chuẩn vàng dễ duy trì nhất. Bạn chỉ cần bỏ qua bữa sáng và gom toàn bộ lượng calo cần thiết vào khung giờ ăn từ 12h trưa đến 8h tối. Đảm bảo uống đủ 2L nước trong thời gian nhịn.",
@@ -465,14 +465,14 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "18h",
     hours: 18,
-    label: "18:6",
+    label: "Fat Burner",
     title: "Đốt mỡ tăng cường",
-    level: "Trung bình",
+    level: "Novice",
     description:
-      "Bắt đầu quá trình Tự thực (Autophagy) - cơ thể tự dọn dẹp tế bào cũ hỏng.",
-    advice: "Bản nâng cao 1 chút của mốc 16H.",
+      "Kéo dài thời gian Ketosis và bắt đầu chớm bước vào quá trình Tự thực (Autophagy).",
+    advice: "Bản nâng cao nhẹ của mốc 16/8.",
     adviceLong:
-      "Nhịn thêm 2 tiếng so với mốc 16:8 giúp kéo dài trạng thái Ketosis (đốt mỡ) và chớm bước vào Autophagy. Trong 18 tiếng này, có thể uống cà phê đen hoặc trà xanh không đường để hỗ trợ vượt qua cơn đói.",
+      "Nhịn thêm 2 tiếng so with mốc 16/8 giúp tối ưu hóa việc đốt mỡ và chớm kích hoạt Autophagy. Trong 18 tiếng này, có thể uống cà phê đen hoặc trà xanh không đường để hỗ trợ vượt qua cơn đói.",
     colors: {
       accent: "#6366f1", // indigo-500
       border: "#6366f1",
@@ -483,12 +483,12 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "20h",
     hours: 20,
-    label: "20:4",
-    title: "Chế độ Warrior",
-    level: "Thách thức",
+    label: "Warrior",
+    title: "Chế độ Chiến binh",
+    level: "Veteran",
     description:
-      "Tăng cường Hormone tăng trưởng (HGH) giúp giữ cơ và đốt mỡ tối đa.",
-    advice: "Ăn trong 4 tiếng. Chú ý nạp đủ Protein.",
+      "Tối ưu hóa khả năng đốt mỡ và hỗ trợ duy trì khối lượng cơ bắp.",
+    advice: "Khung ăn 4 tiếng. Chú ý nạp đủ Protein.",
     adviceLong:
       "Khung giờ ăn rất hẹp (chỉ 4 tiếng). Cần tập trung nạp đủ lượng Protein (thịt, cá, trứng) và chất xơ để giữ cơ bắp. Tránh ăn dồn dập quá nhanh gây quá tải hệ tiêu hóa.",
     colors: {
@@ -499,16 +499,16 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     },
   },
   {
-    id: "24h",
-    hours: 24,
+    id: "23h",
+    hours: 23,
     label: "OMAD",
-    title: "1 Bữa 1 Ngày",
-    level: "Thách thức",
+    title: "Một bữa mỗi ngày",
+    level: "Veteran",
     description:
-      "Đẩy mạnh Autophagy, trẻ hóa tế bào và tái tạo hệ vi sinh đường ruột.",
+      "Thúc đẩy quá trình Tự thực (Autophagy) và cho hệ tiêu hóa nghỉ ngơi sâu.",
     advice: "(23h) Bữa ăn duy nhất cần giàu dinh dưỡng toàn phần.",
     adviceLong:
-      "Nhịn trọn vẹn 24 tiếng (ví dụ: ăn tối hôm nay đến tối hôm sau mới ăn lại). Bữa ăn duy nhất này phải là dinh dưỡng toàn phần (Whole foods), giàu chất béo tốt và đạm. Không áp dụng mốc này liên tục mỗi ngày.",
+      "Nhịn trọn vẹn gần 24 tiếng (ví dụ: ăn tối hôm nay đến tối hôm sau mới ăn lại). Bữa ăn duy nhất này phải là dinh dưỡng toàn phần (Whole foods), giàu chất béo tốt và đạm. Cần lắng nghe cơ thể nếu áp dụng liên tục.",
     colors: {
       accent: "#f59e0b", // amber-500
       border: "#f59e0b",
@@ -519,14 +519,14 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "36h",
     hours: 36,
-    label: "Monk Fast",
-    title: "Nhịn ăn cả ngày",
-    level: "Nâng cao",
+    label: "Monk",
+    title: "Thử thách nhịn xuyên ngày",
+    level: "Expert",
     description:
-      "Giảm viêm sâu, reset toàn bộ hệ thống trao đổi chất và làm mới hệ miễn dịch.",
-    advice: "(36h) Nên thực hiện khi ít áp lực vận động.",
+      "Tạo khoảng trống phục hồi lớn cho đường ruột và tối ưu hóa phản ứng viêm.",
+    advice: "(36h) Nên chọn ngày ít vận động nặng.",
     adviceLong:
-      "Nhịn trọn vẹn 1 ngày đêm (ví dụ: tối T2 ăn xong thì tối T3 bỏ qua, đến sáng T4 mới ăn sáng lại). Hãy chọn ngày làm việc nhẹ nhàng, uống nước kèm một chút muối khoáng (điện giải) để tránh đau đầu.",
+      "Nhịn trọn vẹn 1 ngày đêm (ví dụ: tối T2 ăn xong thì bỏ qua ngày T3, đến sáng T4 mới ăn lại). Hãy chọn ngày làm việc nhẹ nhàng, bổ sung thêm điện giải (muối khoáng) để giữ sự tỉnh táo.",
     colors: {
       accent: "#f97316", // orange-500
       border: "#f97316",
@@ -538,13 +538,13 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     id: "48h",
     hours: 48,
     label: "Extended",
-    title: "Tái tạo miễn dịch",
-    level: "Chuyên gia",
+    title: "Nhịn sâu nâng cao",
+    level: "Expert",
     description:
-      "Hệ miễn dịch được làm mới mạnh mẽ, lượng Glycogen trong gan kiệt hoàn toàn.",
-    advice: "(48h) Chú ý lắng nghe cơ thể và nạp điện giải.",
+      "Cạn kiệt hoàn toàn Glycogen dự trữ, thúc đẩy cơ thể tái cấu trúc năng lượng.",
+    advice: "(48h) Bắt buộc bổ sung điện giải đầy đủ.",
     adviceLong:
-      "Mức độ nhịn dài hạn này đòi hỏi phải bổ sung Điện giải (Muối, Kali, Magie) hàng ngày để giữ huyết áp ổn định. Nếu xuất hiện triệu chứng choáng váng, buồn nôn kéo dài thì cần dừng nhịn (Break fast) ngay lập tức.",
+      "Mức độ nhịn dài hạn này đòi hỏi phải bổ sung Điện giải (Muối, Kali, Magie) hàng ngày để giữ huyết áp ổn định. Nếu xuất hiện triệu chứng choáng váng, chóng mặt kéo dài thì cần ngắt nhịn (Break fast) ngay.",
     colors: {
       accent: "#f43f5e", // rose-500
       border: "#f43f5e",
@@ -555,14 +555,14 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "72h",
     hours: 72,
-    label: "Deep Autophagy",
-    title: "Reset sinh học toàn diện",
-    level: "Chuyên gia",
+    label: "Prolonged",
+    title: "Thử thách cực hạn",
+    level: "Master",
     description:
-      "Đạt đỉnh Tự thực (Autophagy). Tế bào gốc được kích hoạt mạnh mẽ.",
-    advice: "(72h) Chỉ dành cho người có kinh nghiệm dày dặn.",
+      "Đạt mức Autophagy sâu. Cần chuẩn bị kỹ lưỡng và thực hiện cẩn trọng.",
+    advice: "(72h) Chỉ dành cho người chơi rất kinh nghiệm.",
     adviceLong:
-      "Chỉ thực hiện tối đa 1-2 lần/năm nếu cơ thể đã quen với nhịn ăn dài ngày. Khi xả nhịn (Break fast) tuyệt đối không ăn bữa lớn ngay, chỉ bắt đầu bằng 1 chén nước hầm xương hoặc cháo loãng để tránh hội chứng Refeeding syndrome.",
+      "Chỉ nên thực hiện hiếm hoi khi cơ thể đã rất quen với Fasting. Khi xả nhịn (Break fast) tuyệt đối không ăn bữa lớn ngay, chỉ bắt đầu bằng nước hầm xương hoặc đồ ăn nhẹ để bảo vệ dạ dày.",
     colors: {
       accent: "#dc2626", // red-600
       border: "#dc2626",
