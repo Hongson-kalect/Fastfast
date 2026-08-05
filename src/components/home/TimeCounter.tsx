@@ -1,6 +1,6 @@
+import { FASTING_TARGETS } from "@/constants/data";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { Feather } from "@expo/vector-icons";
 import {
   BlurMask,
   Canvas,
@@ -135,6 +135,12 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
     });
   };
 
+  const currentTarget = useMemo(() => {
+    return settings?.target
+      ? FASTING_TARGETS.find((item) => item.hours === settings?.target)
+      : null;
+  }, [settings?.target]);
+
   return (
     <View className="items-center justify-center">
       {!layout ? (
@@ -259,21 +265,26 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
                 )}
 
                 <View
-                  className={`absolute border-b ${settings?.target ? "border-primary" : "border-warning"} flex-row items-center gap-1 bottom-2`}
+                  style={{
+                    borderColor: currentTarget?.colors.accent || theme.warning,
+                  }}
+                  className={`absolute border-b flex-row items-center gap-1 bottom-2`}
                 >
                   <ThemedText
-                    color={settings?.target ? "primary" : "warning"}
+                    style={{
+                      color: currentTarget?.colors.accent || theme.warning,
+                    }}
                     type="small"
-                    className="text-[11px]!"
+                    className={`text-[11px]!`}
                   >
-                    Set target
+                    {currentTarget?.label || "Set target"}
                   </ThemedText>
 
-                  <Feather
+                  {/* <Feather
                     name="edit"
                     size={11}
                     color={settings?.target ? theme.primary : theme.warning}
-                  />
+                  /> */}
                 </View>
               </Pressable>
               //

@@ -452,7 +452,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     level: "Novice",
     description:
       "Hỗ trợ chuyển hóa năng lượng từ mỡ thừa và cải thiện độ nhạy Insulin.",
-    advice: "Tiêu chuẩn! Ăn trong khung giờ 12h - 20h.",
+    advice: "(16h) Tiêu chuẩn! Ăn trong khung giờ 12h - 20h.",
     adviceLong:
       "Đây là mốc chuẩn vàng dễ duy trì nhất. Bạn chỉ cần bỏ qua bữa sáng và gom toàn bộ lượng calo cần thiết vào khung giờ ăn từ 12h trưa đến 8h tối. Đảm bảo uống đủ 2L nước trong thời gian nhịn.",
     colors: {
@@ -470,7 +470,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     level: "Novice",
     description:
       "Kéo dài thời gian Ketosis và bắt đầu chớm bước vào quá trình Tự thực (Autophagy).",
-    advice: "Bản nâng cao nhẹ của mốc 16/8.",
+    advice: "(18h) Bản nâng cao nhẹ của mốc 16/8.",
     adviceLong:
       "Nhịn thêm 2 tiếng so with mốc 16/8 giúp tối ưu hóa việc đốt mỡ và chớm kích hoạt Autophagy. Trong 18 tiếng này, có thể uống cà phê đen hoặc trà xanh không đường để hỗ trợ vượt qua cơn đói.",
     colors: {
@@ -488,7 +488,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     level: "Veteran",
     description:
       "Tối ưu hóa khả năng đốt mỡ và hỗ trợ duy trì khối lượng cơ bắp.",
-    advice: "Khung ăn 4 tiếng. Chú ý nạp đủ Protein.",
+    advice: "(20h) Khung ăn 4 tiếng. Chú ý nạp đủ Protein.",
     adviceLong:
       "Khung giờ ăn rất hẹp (chỉ 4 tiếng). Cần tập trung nạp đủ lượng Protein (thịt, cá, trứng) và chất xơ để giữ cơ bắp. Tránh ăn dồn dập quá nhanh gây quá tải hệ tiêu hóa.",
     colors: {
