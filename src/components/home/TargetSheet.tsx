@@ -98,7 +98,7 @@ const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
             }
           }}
           getItemLayout={(_, index) => ({
-            length: CARD_WIDTH,
+            length: CARD_WIDTH + GAP,
             offset: (CARD_WIDTH + GAP) * index,
             index,
           })}
@@ -201,89 +201,93 @@ const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
                 </Pressable>
 
                 {/* {active && ( */}
-                <Animated.View
-                  entering={FadeInDown}
-                  style={{
-                    width: CARD_WIDTH + 16,
-                    marginHorizontal: -8,
-                    marginTop: 16,
-                    backgroundColor: "#111",
-                    paddingVertical: 28,
-                    borderRadius: 12,
-                    paddingHorizontal: 14,
-                    elevation: 6,
-                  }}
-                >
-                  <Text
+                <View className="items-center">
+                  <Animated.View
+                    entering={FadeInDown}
                     style={{
-                      color: item.colors.accent,
-                      fontSize: 14,
-                      fontWeight: "700",
-                    }}
-                  >
-                    💡 {item.advice}
-                  </Text>
-
-                  <Text
-                    style={{
-                      opacity: 0.4,
-                      color: "#FFFFFF",
-                      fontSize: 13,
-                      marginTop: 14,
-                      lineHeight: 23,
-                    }}
-                  >
-                    {item.adviceLong}
-                  </Text>
-
-                  <Pressable
-                    onPress={isCurrent ? close : handleSelect}
-                    style={{
-                      marginTop: 20,
-                      backgroundColor: item.colors.accent,
-                      height: 54,
-                      borderRadius: 16,
-                      justifyContent: "center",
-                      alignItems: "center",
+                      width: CARD_WIDTH + 16,
+                      marginHorizontal: -8,
+                      marginTop: 16,
+                      backgroundColor: "transparent",
+                      paddingVertical: 28,
+                      borderRadius: 12,
+                      paddingHorizontal: 12,
+                      elevation: 6,
                     }}
                   >
                     <Text
                       style={{
-                        color: "white",
+                        color: item.colors.accent,
+                        fontSize: 14,
                         fontWeight: "700",
-                        fontSize: 17,
                       }}
                     >
-                      {isCurrent ? "Xác nhận" : "Chọn mục tiêu này"}
+                      💡 {item.advice}
                     </Text>
-                  </Pressable>
-                  {isCurrent && (
-                    <View className="flex-row justify-center items-center mt-4">
-                      <Pressable
-                        onPress={handleClearTarget}
-                        className="bg-gray-700"
+
+                    <Text
+                      style={{
+                        opacity: 0.4,
+                        color: "#FFFFFF",
+                        fontSize: 13,
+                        marginTop: 14,
+                        lineHeight: 23,
+                      }}
+                    >
+                      {item.adviceLong}
+                    </Text>
+
+                    <Pressable
+                      onPress={isCurrent ? close : handleSelect}
+                      style={{
+                        marginTop: 20,
+                        backgroundColor: item.colors.accent,
+                        height: 54,
+                        borderRadius: 16,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
                         style={{
-                          paddingHorizontal: 16,
-                          height: 40,
-                          borderRadius: 12,
-                          justifyContent: "center",
-                          alignItems: "center",
+                          color: "white",
+                          fontWeight: "700",
+                          fontSize: 17,
                         }}
                       >
-                        <Text
+                        {isCurrent ? "Xác nhận" : "Chọn mục tiêu này"}
+                      </Text>
+                    </Pressable>
+                    {isCurrent && (
+                      <View className="flex-row justify-center items-center mt-4">
+                        <Pressable
+                          onPress={handleClearTarget}
+                          // className="bg-gray-700"
                           style={{
-                            opacity: 0.6,
-                            color: "white",
-                            fontWeight: "500",
-                            fontSize: 13,
+                            paddingHorizontal: 16,
+                            height: 40,
+                            borderRadius: 12,
+                            // borderColor: "#FFFFFF" + "99",
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
-                          Hủy mục tiêu
-                        </Text>
-                      </Pressable>
-                    </View>
-                  )}
-                </Animated.View>
+                          <Text
+                            style={{
+                              opacity: 0.6,
+                              color: "#FFFFFF",
+                              fontWeight: "500",
+                              fontSize: 13,
+                            }}
+                            className="underline"
+                          >
+                            Hủy mục tiêu
+                          </Text>
+                        </Pressable>
+                      </View>
+                    )}
+                  </Animated.View>
+                </View>
                 {/* )} */}
               </View>
             );

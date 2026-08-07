@@ -140,7 +140,7 @@ const HomeScreen = () => {
           <View className="px-3">
             <HomeHeader />
             <View className="py-4 mt-4">
-              <HomeTimeCounter isCounting={isCounting} counter={counter} />
+              <HomeTimeCounter isCounting={isCounting} counter={counter} currentFast={currentFastSession} />
             </View>
 
             <View className="py-4 mt-4 items-center justify-center">

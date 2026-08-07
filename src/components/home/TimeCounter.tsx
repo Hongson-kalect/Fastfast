@@ -1,4 +1,5 @@
 import { FASTING_TARGETS } from "@/constants/data";
+import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import {
@@ -22,11 +23,13 @@ import {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
+import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
 
 type Props = {
   isCounting: boolean;
   counter: number;
+  currentFast: FastSession | null;
 };
 
 const colorRange = {
@@ -35,7 +38,7 @@ const colorRange = {
 };
 
 const padding = 12;
-const HomeTimeCounter = ({ isCounting, counter }: Props) => {
+const HomeTimeCounter = ({ isCounting, counter, currentFast }: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -117,6 +120,16 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
 
   const { isPresent, present, close } = useBottomSheet();
 
+  const currentTarget = useMemo(() => {
+    return settings?.target
+      ? FASTING_TARGETS.find((item) => item.hours === settings?.target)
+      : null;
+  }, [settings?.target]);
+
+  const color = useMemo(() => {
+    return currentTarget?.colors.accent || theme.primary;
+  }, [currentTarget]);
+
   const openTargetSheet = () => {
     present({
       render: () => <TargetSheet />,
@@ -127,19 +140,21 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
   };
 
   const openFastingSheet = () => {
-    present({
-      render: () => <TargetSheet />,
-      title: "Fasting",
-      onClose: () => close(),
-      size: "long",
-    });
+    if (currentTarget && currentFast)
+      present({
+        render: () => (
+          <FastingSheet
+            counter={counter}
+            fastTarget={currentTarget}
+            currentFast={currentFast}
+          />
+        ),
+        title: "Fasting",
+        onClose: () => close(),
+        size: "long",
+      });
+    else openTargetSheet();
   };
-
-  const currentTarget = useMemo(() => {
-    return settings?.target
-      ? FASTING_TARGETS.find((item) => item.hours === settings?.target)
-      : null;
-  }, [settings?.target]);
 
   return (
     <View className="items-center justify-center">
@@ -186,8 +201,8 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
                       path={capsulePath}
                       color={
                         progress === 1
-                          ? theme.primary + "dd"
-                          : theme.primary + Math.floor(progress * 100)
+                          ? color + "dd"
+                          : color + Math.floor(progress * 100)
                       }
                       style="stroke"
                       strokeWidth={strokeWidth}
@@ -209,15 +224,15 @@ const HomeTimeCounter = ({ isCounting, counter }: Props) => {
                         c={vec(layout.width / 2, layout.height / 2)}
                         matrix={animatedMatrix}
                         colors={[
-                          theme.primary + "10",
-                          theme.primary + "30",
-                          theme.primary + "80",
-                          theme.primary,
+                          color + "10",
+                          color + "30",
+                          color + "80",
+                          color,
                           "#FFFFFF",
-                          theme.primary,
-                          theme.primary + "80",
-                          theme.primary + "30",
-                          theme.primary + "10",
+                          color,
+                          color + "80",
+                          color + "30",
+                          color + "10",
                         ]}
                         positions={[
                           0, 0.45, 0.7, 0.82, 0.9, 0.94, 0.97, 0.99, 1,

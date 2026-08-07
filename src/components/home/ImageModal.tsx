@@ -94,7 +94,7 @@ export const PhotoPickerModal = ({
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [9, 16],
+      aspect: [2, 3],
       quality: 0.7,
     });
 
@@ -147,7 +147,7 @@ export const PhotoPickerModal = ({
             {photoUri && (
               <Animated.View
                 entering={SlideInDown.duration(200)}
-                className="w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-black border border-gray-700 relative"
+                className="aspect-2/3 rounded-2xl overflow-hidden mb-4 bg-black border border-gray-700 relative"
               >
                 <Image
                   source={{ uri: photoUri }}
@@ -158,17 +158,15 @@ export const PhotoPickerModal = ({
                 {/* Nút xóa ảnh nằm gọn trong Preview */}
                 <TouchableOpacity
                   onPress={handleDeletePhoto}
-                  className="absolute top-3 right-3 bg-red-600/80 p-2 rounded-full active:bg-red-700"
+                  className="absolute top-2 right-2 bg-red-600/80 p-3 rounded-full active:bg-red-700"
                 >
-                  <MaterialIcons name="delete" size={20} color="white" />
+                  <MaterialIcons name="delete" size={24} color="white" />
                 </TouchableOpacity>
               </Animated.View>
             )}
 
             <Text className="text-gray-400 text-sm text-center mb-4 font-medium">
-              {photoUri
-                ? "Cập nhật hình thể ngày hôm nay"
-                : "Thêm ảnh track hình thể"}
+              {photoUri ? "Cập nhật ảnh" : "Thêm ảnh đáng nhớ hôm nay"}
             </Text>
 
             {/* ─── HÀNH ĐỘNG CHỌN ─── */}

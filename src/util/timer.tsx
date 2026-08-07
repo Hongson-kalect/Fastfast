@@ -1,3 +1,12 @@
+import { CHART_RANGES, ChartRangeKey } from '@/constants/data';
+import {
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  subMonths,
+  subWeeks,format, differenceInCalendarDays
+} from 'date-fns';
+
 export const timeString = (time: number) => {
   const timeCheck = Math.floor(time / 1000);
   const seconds = timeCheck % 60;
@@ -16,14 +25,6 @@ export const getLocalTodayStr = (date: Date = new Date()): string => {
   return `${year}-${month}-${day}`; // Kết quả: "2026-07-09"
 };
 
-import { CHART_RANGES, ChartRangeKey } from '@/constants/data';
-import {
-  startOfMonth,
-  startOfWeek,
-  subDays,
-  subMonths,
-  subWeeks
-} from 'date-fns';
 
 export const getStartDateFromRange = (key: ChartRangeKey, referenceDate = new Date()): Date => {
   const config = CHART_RANGES.find((r) => r.key === key) || CHART_RANGES[0];
@@ -57,4 +58,16 @@ export const getWeek = (date: Date) => {
   const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 
   return week;
+};
+
+export const getRelativeTime = (targetDate: Date): string => {
+  const now = new Date();
+  const diffDays = differenceInCalendarDays(targetDate, now);
+  const timeStr = format(targetDate, 'HH:mm');
+
+  if (diffDays === 0) return `${timeStr} Hôm nay`;
+  if (diffDays === 1) return `${timeStr} Ngày mai`;
+  if (diffDays === 2) return `${timeStr} Ngày kia`;
+  
+  return `${timeStr} ngày ${format(targetDate, 'dd/MM')}`;
 };
