@@ -81,8 +81,12 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
-  finishLastSession: (id: string, endTime: number, duration: number, isValid: boolean) =>
-    finishLastSession(db, id, endTime, duration, isValid),
+  finishLastSession: (
+    id: string,
+    endTime: number,
+    duration: number,
+    isValid: boolean,
+  ) => finishLastSession(db, id, endTime, duration, isValid),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number) => startNewSession(db, startTime),
 
@@ -148,7 +152,7 @@ const generateSeedData = `
 export const initDatabase = async (db: SQLiteDatabase) => {
   const DATABASE_VERSION = 1; // get from server
   // let version = 0;
-  // await clearDatabase(db);
+  await clearDatabase(db);
   const version = await getDatabaseVersion(db);
   if (version >= 1) {
     return;

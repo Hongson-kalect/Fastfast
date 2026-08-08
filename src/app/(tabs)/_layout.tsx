@@ -6,7 +6,7 @@ const MainTab = () => {
   const { theme } = useAppStore();
   return (
     <Tabs
-      initialRouteName="dashboard"
+      // initialRouteName="dashboard"
       screenOptions={{
         // 1. Cấu hình thanh Tab Bar tổng thể
         tabBarStyle: {

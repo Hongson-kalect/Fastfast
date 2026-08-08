@@ -571,6 +571,109 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     },
   },
 ];
+
+export interface FastingStatusInfo {
+  minHours: number;
+  maxHours: number;
+  title: string;
+  icon: string;
+  color: string;
+  description: string;
+}
+
+export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
+  {
+    minHours: 0,
+    maxHours: 4,
+    title: "Đang tiêu hóa bữa gần nhất",
+    icon: "🍔",
+    color: "#10B981", // Emerald
+    description: "Cơ thể đang bận rộn xử lý và nạp bớt dưỡng chất từ bữa ăn vừa rồi.",
+  },
+  {
+    minHours: 4,
+    maxHours: 8,
+    title: "Đường huyết dần ổn định",
+    icon: "💧",
+    color: "#10B981",
+    description: "Insulin có xu hướng hạ xuống, cơ thể bắt đầu xài bớt lượng đường dự trữ.",
+  },
+  {
+    minHours: 8,
+    maxHours: 12,
+    title: "Dự trữ đường bắt đầu cạn",
+    icon: "⚡",
+    color: "#F59E0B", // Amber
+    description: "Nguồn đường dự trữ ở gan sắp hết, cơ thể rục rịch chuyển sang nguồn năng lượng mới.",
+  },
+  {
+    minHours: 12,
+    maxHours: 14,
+    title: "Bắt đầu bước vào pha đốt mỡ",
+    icon: "🔥",
+    color: "#FB923C", // Orange
+    description: "Nhiều khả năng cơ thể đã bắt đầu chuyển sang xài mỡ thừa làm năng lượng chính.",
+  },
+  {
+    minHours: 14,
+    maxHours: 18,
+    title: "Chế độ đốt mỡ tích cực hơn",
+    icon: "⚡",
+    color: "#8B5CF6", // Purple
+    description: "Lượng Ketone bắt đầu nhích nhẹ, hormone hỗ trợ cơ bắp có thể đang tăng dần.",
+  },
+  {
+    minHours: 18,
+    maxHours: 24,
+    title: "Đốt mỡ sâu & Chạm ngưỡng tự dọn dẹp",
+    icon: "🚀",
+    color: "#EC4899", // Pink
+    description: "Đốt mỡ khá mượt mà, cơ thể rục rịch kích hoạt cơ chế tự dọn dẹp tế bào (Autophagy).",
+  },
+  {
+    minHours: 24,
+    maxHours: 36,
+    title: "Cơ thể đang tự phục hồi",
+    icon: "🔄",
+    color: "#14B8A6", // Teal
+    description: "Nhiều tế bào cũ hỏng có thể đang được dọn dẹp và làm mới.",
+  },
+  {
+    minHours: 36,
+    maxHours: 48,
+    title: "Làm mới & Tái tạo chuyên sâu",
+    icon: "🛡️",
+    color: "#6366F1", // Indigo
+    description: "Hệ miễn dịch và các hormone phục hồi thường đạt trạng thái hoạt động rất tốt ở mốc này.",
+  },
+  {
+    minHours: 48,
+    maxHours: 999,
+    title: "Giai đoạn làm mới toàn diện",
+    icon: "👑",
+    color: "#EAB308", // Gold
+    description: "Mốc nhịn sâu, cơ thể tập trung năng lượng để sửa chữa và tái cấu trúc.",
+  },
+];
+
+/**
+ * Lấy thông tin trạng thái Fasting sinh học hiện tại
+ * @param elapsedSeconds Thời gian đã nhịn (tính bằng giây)
+ */
+export const getFastingStatus = (counter: number) => {
+  const elapsedHours = counter / 3600;
+
+  // Tìm mốc milestone tương ứng
+  const currentStatus = FASTING_STATUS_MILESTONES.find(
+    (m) => elapsedHours >= m.minHours && elapsedHours < m.maxHours
+  ) || FASTING_STATUS_MILESTONES[FASTING_STATUS_MILESTONES.length - 1];
+
+  return {
+    ...currentStatus,
+    elapsedHours,
+  };
+};
+
 // Định nghĩa các góc bung (độ) để tính toán tọa độ
 export const RADIAL_ANGLES = [200, 235, 270, 305, 340];
 export const RADIUS = 90; // Khoảng cách bay xa (px)

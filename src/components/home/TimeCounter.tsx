@@ -30,6 +30,8 @@ type Props = {
   isCounting: boolean;
   counter: number;
   currentFast: FastSession | null;
+  finishFasting: () => void;
+  cancelFasting: () => void;
 };
 
 const colorRange = {
@@ -38,7 +40,13 @@ const colorRange = {
 };
 
 const padding = 12;
-const HomeTimeCounter = ({ isCounting, counter, currentFast }: Props) => {
+const HomeTimeCounter = ({
+  isCounting,
+  counter,
+  currentFast,
+  finishFasting,
+  cancelFasting,
+}: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
     height: number;
@@ -147,6 +155,14 @@ const HomeTimeCounter = ({ isCounting, counter, currentFast }: Props) => {
             counter={counter}
             fastTarget={currentTarget}
             currentFast={currentFast}
+            onStopFasting={() => {
+              finishFasting();
+              close();
+            }}
+            onCancelFasting={() => {
+              cancelFasting();
+              close();
+            }}
           />
         ),
         title: "Fasting",

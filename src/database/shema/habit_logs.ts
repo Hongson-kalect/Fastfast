@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS habit_logs (
     log_date TEXT NOT NULL,         -- Định dạng 'YYYY-MM-DD'
     fast_id TEXT,          -- Liên kết đến phiên gốc chịu trách nhiệm số giờ lớn nhất
 
-    type TEXT NOT NULL,             -- 'habit+', 'habit-', 'shield+', 'shield-'
+    type TEXT,             -- 'habit+', 'habit-', 'shield+', 'shield-'
 
     habit_delta REAL,
     habit_snap REAL,
@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS habit_logs (
 
     is_deleted INTEGER DEFAULT 0,   -- Xóa mềm phục vụ đồng bộ
     sync_status TEXT DEFAULT 'pending',
+    description TEXT DEFAULT 'pending',
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now')),
     FOREIGN KEY (fast_id) REFERENCES fast_sessions(id) ON DELETE CASCADE
@@ -97,7 +98,7 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   //   await db.runAsync(`INSERT INTO habit_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
   // }
   await db.runAsync(
-    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, retain) VALUES (?, ?, ?, ?, ?,?,?)`,
+    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) VALUES (?, ?, ?, ?, ?,?,?,?)`,
     [
       id,
       log_date,
@@ -114,28 +115,58 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   return res;
 };
 
-export const reduceShield =async (db: SQLiteDatabase, lastHabitLog:HabitLog, reduce:number)=>{
-  const today = getLocalTodayStr()
-  const id =uuidv7()
+export const reduceShield = async (
+  db: SQLiteDatabase,
+  lastHabitLog: HabitLog,
+  reduce: number,
+) => {
+  const today = getLocalTodayStr();
+  const id = uuidv7();
 
-  await db.runAsync(`INSERT INTO habit_logs 
-    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, retain) 
+  await db.runAsync(
+    `INSERT INTO habit_logs 
+    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) 
     VALUES (?, ?, ?, ?, ?,?,?)`,
-    [id, today, null, 0, lastHabitLog.habit_snap, -reduce, lastHabitLog.shield_snap - reduce, lastHabitLog.habit_retain]);
+    [
+      id,
+      today,
+      null,
+      0,
+      lastHabitLog.habit_snap,
+      -reduce,
+      lastHabitLog.shield_snap - reduce,
+      lastHabitLog.habit_retain,
+    ],
+  );
 
   const lastHabit = await getLastHabitLog(db);
-  return lastHabit
-}
+  return lastHabit;
+};
 
-export const reduceHabit = async (db: SQLiteDatabase, lastHabitLog:HabitLog, reduce:number)=>{
-  const today = getLocalTodayStr()
-  const id =uuidv7()
+export const reduceHabit = async (
+  db: SQLiteDatabase,
+  lastHabitLog: HabitLog,
+  reduce: number,
+) => {
+  const today = getLocalTodayStr();
+  const id = uuidv7();
 
-  await db.runAsync(`INSERT INTO habit_logs 
-    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, retain) 
+  await db.runAsync(
+    `INSERT INTO habit_logs 
+    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) 
     VALUES (?, ?, ?, ?, ?,?,?)`,
-    [id, today, null, -reduce, Math.max(lastHabitLog.habit_snap - reduce, 0), 0, lastHabitLog.shield_snap, 0]);
+    [
+      id,
+      today,
+      null,
+      -reduce,
+      Math.max(lastHabitLog.habit_snap - reduce, 0),
+      0,
+      lastHabitLog.shield_snap,
+      0,
+    ],
+  );
 
   const lastHabit = await getLastHabitLog(db);
-  return lastHabit
-}
+  return lastHabit;
+};

@@ -3,7 +3,7 @@ import { useAppStore } from "@/stores/appStore";
 import { Pressable, View } from "react-native";
 import CircularProgress from "../circleProgress";
 import { ThemedText } from "../themed-text";
-import TargetSheet from "./TargetSheet";
+import HabitBottomSheet from "./HabitBottomSheet";
 
 const radius = 50;
 const strokeWidth = 10;
@@ -17,8 +17,8 @@ const HomeHeader = () => {
 
   const openHabitModal = () => {
     present({
-      render: () => <TargetSheet />,
-      title: "HabitModal",
+      render: () => <HabitBottomSheet />,
+      title: "",
       onClose: () => close(),
       size: "long",
     });

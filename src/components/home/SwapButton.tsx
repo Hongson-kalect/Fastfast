@@ -59,12 +59,6 @@ export const SwapButton = ({
     updateWeight(weightObj?.weight || 0);
   };
 
-  useEffect(() => {
-    if (!dbService) return;
-    detectTodayNote();
-    getCurrrentWeight();
-  }, [dbService]);
-
   const [todayData, setTodayData] = useState<{
     note?: string;
     mood?: MoodLevel;
@@ -76,15 +70,6 @@ export const SwapButton = ({
       mood: todayNote?.mood_level,
     };
   });
-
-  useEffect(() => {
-    if (!todayNote) return;
-    setTodayData({
-      note: todayNote?.note || undefined,
-      image: todayNote?.image_uri || undefined,
-      mood: todayNote?.mood_level || undefined,
-    });
-  }, [todayNote]);
 
   const baseStyle =
     "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
@@ -152,6 +137,21 @@ export const SwapButton = ({
     console.log(uri);
     setTempImage(uri);
   };
+
+  useEffect(() => {
+    if (!dbService) return;
+    detectTodayNote();
+    getCurrrentWeight();
+  }, [dbService]);
+  
+  useEffect(() => {
+    if (!todayNote) return;
+    setTodayData({
+      note: todayNote?.note || undefined,
+      image: todayNote?.image_uri || undefined,
+      mood: todayNote?.mood_level || undefined,
+    });
+  }, [todayNote]);
 
   return (
     <View className="flex-row items-end justify-center gap-8">

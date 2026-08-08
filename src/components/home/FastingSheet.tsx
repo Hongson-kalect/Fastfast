@@ -1,4 +1,4 @@
-import { FastingTargetItem } from "@/constants/data";
+import { FastingTargetItem, getFastingStatus } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { getRelativeTime, timeString } from "@/util/timer";
@@ -12,7 +12,7 @@ interface FastingSheetProps {
   currentFast: FastSession;
   counter: number;
   onStopFasting?: () => void;
-  onEditStartTime?: () => void;
+  onCancelFasting?: () => void;
 }
 
 const FastingSheet = ({
@@ -20,7 +20,7 @@ const FastingSheet = ({
   currentFast,
   fastTarget,
   onStopFasting,
-  onEditStartTime,
+  onCancelFasting,
 }: FastingSheetProps) => {
   const { theme } = useAppStore();
   // Giả lập dữ liệu demo
@@ -30,12 +30,26 @@ const FastingSheet = ({
   const [downCounter, setDownCounter] = useState(() => {
     return finishTime - new Date().getTime();
   });
+
+  const remainCounter = useMemo(() => {
+    return fastTarget.hours * 3600_000 - downCounter;
+  }, [downCounter]);
+
+  const counterStatus = useMemo(() => {
+    const status = getFastingStatus(remainCounter);
+
+    return `${status.title} ${status.icon}`;
+  }, [remainCounter]);
+
   const getDownCounter = () => {
     return finishTime - new Date().getTime();
   };
 
   const progressPercent = useMemo(() => {
-    return Math.round((counter / fastTarget.hours / 3600_000) * 1000) / 10;
+    return Math.min(
+      100,
+      Math.round((counter / fastTarget.hours / 3600_000) * 1000) / 10,
+    );
   }, [counter, fastTarget.hours]);
 
   const targetReward = useMemo(() => {
@@ -80,7 +94,7 @@ const FastingSheet = ({
       <View className="flex-row items-center self-center px-3 py-1.5 rounded-full gap-2 mt-4">
         <View className="w-2 h-2 rounded-full bg-success" />
         <ThemedText className="text-xs! font-bold! text-success! tracking-wide">
-          TRẠNG THÁI: ĐỐT MỠ TĂNG CƯỜNG 🔥
+          {counterStatus}
         </ThemedText>
       </View>
 
@@ -164,13 +178,17 @@ const FastingSheet = ({
             style={{
               borderColor:
                 theme.success +
-                Math.floor((counter / fastTarget.hours / 3600_000) * 99)
+                Math.floor(
+                  Math.min(counter / fastTarget.hours / 3600_000, 1) * 99,
+                )
                   .toString()
                   .padStart(2, "0"),
 
               backgroundColor:
                 theme.success +
-                Math.floor((counter / fastTarget.hours / 3600_000) * 15)
+                Math.floor(
+                  Math.min(counter / fastTarget.hours / 3600_000, 1) * 15,
+                )
                   .toString()
                   .padStart(2, "0"),
             }}
@@ -184,7 +202,7 @@ const FastingSheet = ({
             <ThemedText
               className={`text-sm! font-semibold! mb-1.5 ${downCounter <= 0 && "text-success"}`}
             >
-              Fasting: {timeString(fastTarget.hours * 3600_000 - downCounter)}
+              Fasting: {timeString(remainCounter)}
             </ThemedText>
             <View className="flex-row justify-between items-center">
               <ThemedText className="text-xs! text-zinc-400!">
@@ -267,10 +285,10 @@ const FastingSheet = ({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={onEditStartTime}
-          className="bg-zinc-800 rounded-[14px] py-3 items-center"
+          onPress={onCancelFasting}
+          className="mt-2 py-3 items-center"
         >
-          <ThemedText className="text-zinc-400! font-semibold! text-sm!">
+          <ThemedText className="text-zinc-400! text-sm! opacity-80">
             Từ bỏ phiên nhịn
           </ThemedText>
         </TouchableOpacity>
