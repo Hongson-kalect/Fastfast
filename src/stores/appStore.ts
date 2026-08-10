@@ -14,7 +14,13 @@ import { create } from "zustand";
 type ColorPalette = typeof darkTheme;
 
 interface AppState {
-  userProfile: (UserProfile & { habit_percent: number; shield: number }) | null;
+  userProfile:
+    | (UserProfile & {
+        habit_percent: number;
+        shield: number;
+        habit_retain: number;
+      })
+    | null;
   settings: AppSettings | null;
   weight: number | null;
   currentFastSession: FastSession | null;
@@ -28,7 +34,7 @@ interface AppState {
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
   init: (db: SQLiteDatabase) => Promise<boolean>;
-  updateProfile: (val: { [K in keyof UserProfile]: any }) => void,
+  updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
   updateHabit: (val: { habit_percent: number; shield: number }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
@@ -111,6 +117,7 @@ export const useAppStore = create<AppState>((set, get) => {
           userProfile: profile && {
             ...profile,
             habit_percent: habitLog?.habit_snap || 0,
+            habit_retain: habitLog?.habit_retain || 0,
             shield: habitLog?.shield_snap || 0,
           },
           settings: dbSettings,

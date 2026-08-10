@@ -1,8 +1,12 @@
 import { useAppStore } from "@/stores/appStore";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import Waterball from "./Waterball";
+import { useDBService } from "@/hooks/useDBService";
+import { FastSession, HabitLog } from "@/interfaces/db.type";
+import { FASTING_TARGETS } from "@/constants/data";
+import { getLocalTodayStr } from "@/util/timer";
 
 interface HabitHistoryItem {
   id: string;
@@ -58,13 +62,18 @@ interface HabitBottomSheetProps {
   onClose?: () => void;
 }
 
-const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
-  habitPercent = 45,
-  shieldCount = 1,
-  onClose,
-}) => {
+const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const { theme } = useAppStore();
+  const { theme, userProfile } = useAppStore();
+  const dbService = useDBService()
+
+  const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
+    return [
+      userProfile?.habit_percent || 0,
+      userProfile?.shield || 0,
+      userProfile?.habit_retain || 0,
+    ];
+  }, [userProfile]);
 
   // Trạng thái mốc (Đã đạt hay chưa)
   const isMilestone35Reached = habitPercent < 35;
@@ -80,6 +89,17 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
     if (percent >= 35) return "🌱 Bạn đang hình thành thói quen rất tốt!";
     return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
   };
+
+  const [habitLog, setHabitLog] = useState<(HabitLog&FastSession)[]>([]);
+
+  const getHabitLog= async ()=>{
+    const res = await dbService?.getHabitLogs();
+    setHabitLog(res)
+  }
+
+  useEffect(() => {
+    getHabitLog();
+  }, []);
 
   return (
     <View className="bg-[#121318] px-5 pt-4 pb-8 rounded-t-4xl w-full border-t border-white/10">
@@ -99,7 +119,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
           </Text>
           <View className="flex-row items-center gap-1">
             <Text className="text-white font-bold text-lg">{shieldCount}</Text>
-            <FontAwesome5 name="shield-alt" size={16} color={theme.success} />
+            <FontAwesome5 name="shield-alt" size={16} color={theme.primary} />
           </View>
         </View>
       </View>
@@ -122,9 +142,10 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
           </Text>
         </View> */}
         <Waterball
-          percent={100}
+          percent={habitPercent}
+          size={120}
           color={theme.primary}
-          retainPercent={45} // Ví dụ: 45% (Đang tích được 45% cho Shield tiếp theo)
+          retainPercent={habitRetain} // Ví dụ: 45% (Đang tích được 45% cho Shield tiếp theo)
           retainColor="#3B82F6" // Viền Retain màu Xanh Shield
         />
 
@@ -138,7 +159,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
       <View className="bg-zinc-900/80 p-4 rounded-2xl border border-white/5 my-4">
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-xs font-semibold text-zinc-400">
-            Tiến trình mốc phần thưởng
+            Tiến trình
           </Text>
           {/* <Text className="text-xs text-blue-400 font-medium">
             Khiên đang có: 🛡️ {shieldCount}
@@ -146,7 +167,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
         </View>
 
         {/* Thanh Progress Ngang (Chỉ để đo) */}
-        <View className="relative h-3 bg-zinc-800 rounded-full w-full overflow-hidden">
+        <View className="relative h-3 bg-zinc-700 rounded-full w-full overflow-hidden">
           <View
             className="h-full bg-primary rounded-full"
             style={{ width: `${Math.min(habitPercent, 100)}%` }}
@@ -218,16 +239,34 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
         </View>
 
         <ScrollView className="max-h-48">
-          {MOCK_HISTORY.map((item) => (
-            <View
-              key={item.id}
+          {habitLog.map((item) => (
+            <HabitLogComponent key={item.id} log={item} />
+          ))}
+        </ScrollView>
+      </View>
+    </View>
+  );
+};
+
+type HabitLogComProps = {
+  log: (HabitLog & FastSession)
+}
+const HabitLogComponent = ({log}:HabitLogComProps)=>{
+  const {theme} = useAppStore();
+  const target = useMemo(()=>{
+    return FASTING_TARGETS.find(item=>item.hours === log.target_duration)
+  },[])
+
+  if(!log?.habit_delta) return null
+
+  return <View
               className="flex-row justify-between items-center bg-zinc-900/40 p-3 rounded-xl mb-2 border border-white/5"
             >
               <View className="flex-row items-center gap-3">
                 <View
-                  className={`w-8 h-8 rounded-full items-center justify-center ${item.usedShield ? "bg-blue-500/20" : "bg-primary/20"}`}
+                  className={`w-8 h-8 rounded-full items-center justify-center ${log.shield_delta ? "bg-blue-500/20" : "bg-primary/20"}`}
                 >
-                  {item.usedShield ? (
+                  {log.shield_delta ? (
                     <FontAwesome5 name="shield-alt" size={12} color="#60A5FA" />
                   ) : (
                     <Ionicons name="flame" size={14} color={theme.primary} />
@@ -235,29 +274,23 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({
                 </View>
                 <View>
                   <Text className="text-xs font-semibold text-zinc-200">
-                    {item.targetName} ({item.durationHours}h)
+                    {target?.label} ({log.duration}h)
                   </Text>
-                  <Text className="text-[10px] text-zinc-500">{item.date}</Text>
+                  {
+                    log.end_time && (
+                      <Text className="text-[10px] text-zinc-500">{getLocalTodayStr(new Date(log.end_time))}</Text>
+                    )
+                  }
                 </View>
               </View>
 
-              {item.usedShield ? (
-                <View className="px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30">
-                  <Text className="text-[10px] text-blue-400 font-medium">
-                    Đã dùng Khiên
-                  </Text>
-                </View>
-              ) : (
-                <Text className="text-xs font-bold text-emerald-400">
-                  +{item.habitPointsGained}%
+
+
+              
+                <Text className={`text-xs font-bold ${log.habit_delta > 0 ? "text-success" : "text-error"}`}>
+                  {log.habit_delta > 0 ? "+" : ""}{log.habit_delta}%
                 </Text>
-              )}
             </View>
-          ))}
-        </ScrollView>
-      </View>
-    </View>
-  );
-};
+}
 
 export default HabitBottomSheet;

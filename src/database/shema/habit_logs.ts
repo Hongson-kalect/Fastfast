@@ -1,4 +1,4 @@
-import { HabitLog } from "@/interfaces/db.type";
+import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS habit_logs (
     description TEXT DEFAULT 'pending',
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now')),
-    FOREIGN KEY (fast_id) REFERENCES fast_sessions(id) ON DELETE CASCADE
+    FOREIGN KEY (fast_id) REFERENCES fast_sessions(id) ON DELETE SET NULL
     --user_id TEXT NOT NULL,
     -- FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE,
   );
@@ -35,15 +35,39 @@ CREATE TABLE IF NOT EXISTS habit_logs (
 export const getHabitLogs = async (
   db: SQLiteDatabase,
   days: number = 30,
-): Promise<HabitLog[]> => {
+): Promise<(HabitLog & FastSession)[]> => {
   const today = getLocalTodayStr();
   const startDay = new Date(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
-  const rows = await db.getAllAsync<HabitLog>(
-    `SELECT * FROM habit_logs WHERE log_date >= ?;`,
-    [startDate],
-  );
+  const rows = await db.getAllAsync<HabitLog & FastSession>(
+  `
+  SELECT
+    hl.*,
+
+    fs.start_time AS fast_start_time,
+    fs.end_time AS fast_end_time,
+    fs.target_duration AS fast_target_duration,
+    fs.duration AS fast_duration,
+    fs.home_data_snapshot AS fast_home_data_snapshot,
+    fs.status AS fast_status,
+    fs.shield_point_clamable AS fast_shield_point_clamable,
+    fs.created_at AS fast_created_at,
+    fs.updated_at AS fast_updated_at
+
+  FROM habit_logs hl
+
+  LEFT JOIN fast_sessions fs
+    ON hl.fast_id = fs.id
+
+  WHERE hl.log_date >= ?
+    AND hl.is_deleted = 0
+    AND (fs.is_deleted = 0 OR fs.id IS NULL)
+
+  ORDER BY hl.log_date DESC, hl.created_at DESC;
+  `,
+  [startDate],
+);
   // const rows = await db.getAllAsync<HabitLog>(`SELECT * FROM habit_logs;`);
   return rows;
 };

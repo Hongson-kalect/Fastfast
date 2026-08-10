@@ -41,6 +41,7 @@ export interface FastSession {
   user_id: string;
   start_time: number; // Epoch timestamp (giây)
   end_time: number | null; // NULL nếu phiên đang chạy real-time
+  duration: number; // Mục tiêu nhịn (16, 18, 20, 48...)
   target_duration: number; // Mục tiêu nhịn (16, 18, 20, 48...)
   home_data_snapshot: string | null; // JSON.stringify() của các chỉ số sinh học lúc kết thúc
   rating: string | null; // Đánh giá phiên ('Excellent', 'Good', 'Failed')
