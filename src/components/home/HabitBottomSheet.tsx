@@ -1,58 +1,244 @@
-import { useAppStore } from "@/stores/appStore";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
-import Waterball from "./Waterball";
+import { FASTING_TARGETS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
-import { FASTING_TARGETS } from "@/constants/data";
+import { useAppStore } from "@/stores/appStore";
 import { getLocalTodayStr } from "@/util/timer";
+import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useMemo, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeOutUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import Waterball from "./Waterball";
 
-interface HabitHistoryItem {
+export interface HabitLogItem {
   id: string;
-  date: string;
-  targetName: string;
-  durationHours: number;
-  habitPointsGained: number;
-  usedShield?: boolean;
+  log_date: string; // 'YYYY-MM-DD'
+  fast_id: string | null;
+  type: "habit+" | "habit-" | "shield+" | "shield-";
+  habit_delta: number;
+  habit_snap: number;
+  habit_retain: number;
+  shield_delta: number;
+  shield_snap: number;
+
+  // Các trường thời gian bổ sung
+  start_time: number | null; // Unix Timestamp (seconds)
+  end_time: number | null; // Unix Timestamp (seconds)
+  target_duration: number | null; // Mục tiêu nhịn (Giờ, VD: 16.0)
+  duration: number | null; // Thời gian nhịn thực tế (Giờ, VD: 16.5)
+
+  is_deleted: number;
+  sync_status: "synced" | "pending";
+  description: string;
+  created_at: number;
+  updated_at: number;
 }
 
-const MOCK_HISTORY: HabitHistoryItem[] = [
+export const MOCK_HABIT_LOGS: HabitLogItem[] = [
   {
-    id: "1",
-    date: "Hôm nay, 10:00",
-    targetName: "Warrior 20H",
-    durationHours: 23.9,
-    habitPointsGained: 4.4,
+    id: "log_001",
+    log_date: "2026-08-01",
+    fast_id: "fast_101",
+    type: "habit+",
+    habit_delta: 3.0,
+    habit_snap: 3.0,
+    habit_retain: 15.0,
+    shield_delta: 0,
+    shield_snap: 0,
+    start_time: 1785523200000, // 2026-07-31 18:00000
+    end_time: 1785582600000, // 2026-08-01 10:30000
+    target_duration: 16.0, // Mục tiêu 16h
+    duration: 16.5, // Thực tế 16.5h
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Hoàn thành 16:8 Fasting",
+    created_at: 1785580800,
+    updated_at: 1785580800,
   },
   {
-    id: "2",
-    date: "Hôm qua, 18:00",
-    targetName: "18:6 Fast",
-    durationHours: 18.2,
-    habitPointsGained: 3.5,
+    id: "log_002",
+    log_date: "2026-08-02",
+    fast_id: "fast_102",
+    type: "habit+",
+    habit_delta: 3.5,
+    habit_snap: 6.5,
+    habit_retain: 50.0,
+    shield_delta: 0,
+    shield_snap: 0,
+    start_time: 1785602400000,
+    end_time: 1785667200000,
+    target_duration: 18.0,
+    duration: 18.0,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Hoàn thành 18:6 Fasting",
+    created_at: 1785667200,
+    updated_at: 1785667200,
   },
   {
-    id: "3",
-    date: "05/08, 12:00",
-    targetName: "16:8 Fast",
-    durationHours: 16.0,
-    habitPointsGained: 3.0,
+    id: "log_003",
+    log_date: "2026-08-03",
+    fast_id: "fast_103",
+    type: "shield+",
+    habit_delta: 4.0,
+    habit_snap: 10.5,
+    habit_retain: 0.0,
+    shield_delta: 1.0,
+    shield_snap: 1.0,
+    start_time: 1785680000000,
+    end_time: 1785753800000,
+    target_duration: 20.0,
+    duration: 20.5,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Đạt mốc 100% Retain -> Nhận Khiên bảo vệ",
+    created_at: 1785753600,
+    updated_at: 1785753600,
   },
   {
-    id: "4",
-    date: "04/08, 20:00",
-    targetName: "Warrior 20H",
-    durationHours: 14.5,
-    habitPointsGained: 0,
-    usedShield: true,
+    id: "log_004",
+    log_date: "2026-08-04",
+    fast_id: null,
+    type: "shield-",
+    habit_delta: 0.0,
+    habit_snap: 10.5,
+    habit_retain: 0.0,
+    shield_delta: -1.0,
+    shield_snap: 0.0,
+    start_time: null, // Dùng Shield do bỏ lỡ phiên nhị000n
+    end_time: null,
+    target_duration: null,
+    duration: null,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Nghỉ 1 ngày",
+    created_at: 1785840000,
+    updated_at: 1785840000,
   },
   {
-    id: "5",
-    date: "03/08, 19:00",
-    targetName: "OMAD 24H",
-    durationHours: 24.1,
-    habitPointsGained: 5.0,
+    id: "log_005",
+    log_date: "2026-08-05",
+    fast_id: "fast_104",
+    type: "habit+",
+    habit_delta: 3.2,
+    habit_snap: 13.7,
+    habit_retain: 30.0,
+    shield_delta: 0,
+    shield_snap: 0,
+    start_time: 1785868800000,
+    end_time: 1785927120000,
+    target_duration: 16.0,
+    duration: 16.2,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Hoàn thành 16:8 Fasting",
+    created_at: 1785926400,
+    updated_at: 1785926400,
+  },
+  {
+    id: "log_006",
+    log_date: "2026-08-06",
+    fast_id: "fast_105",
+    type: "habit+",
+    habit_delta: 5.0,
+    habit_snap: 18.7,
+    habit_retain: 85.0,
+    shield_delta: 0,
+    shield_snap: 0,
+    start_time: 1785926400000,
+    end_time: 1786012800000,
+    target_duration: 23.0,
+    duration: 24.1,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Hoàn thành OMAD 24H",
+    created_at: 1786012800,
+    updated_at: 1786012800,
+  },
+  {
+    id: "log_007",
+    log_date: "2026-08-07",
+    fast_id: "fast_106",
+    type: "shield+",
+    habit_delta: 3.0,
+    habit_snap: 21.7,
+    habit_retain: 10.0,
+    shield_delta: 1.0,
+    shield_snap: 1.0,
+    start_time: 1786041600000,
+    end_time: 1786099200000,
+    target_duration: 16.0,
+    duration: 16.0,
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Đạt mốc phần thưởng -> Nhận Khiên",
+    created_at: 1786099200,
+    updated_at: 1786099200,
+  },
+  {
+    id: "log_008",
+    log_date: "2026-08-08",
+    fast_id: "fast_107",
+    type: "habit-",
+    habit_delta: -2.0,
+    habit_snap: 19.7,
+    habit_retain: 10.0,
+    shield_delta: 0,
+    shield_snap: 1.0,
+    start_time: 1786128000000,
+    end_time: 1786169400000,
+    target_duration: 16.0,
+    duration: 11.5, // Hủy sớm hơn mục tiêu
+    is_deleted: 0,
+    sync_status: "synced",
+    description: "Hủy phiên sớm quá 4 tiếng",
+    created_at: 1786185600,
+    updated_at: 1786185600,
+  },
+  {
+    id: "log_009",
+    log_date: "2026-08-09",
+    fast_id: "fast_108",
+    type: "habit+",
+    habit_delta: 4.5,
+    habit_snap: 24.2,
+    habit_retain: 55.0,
+    shield_delta: 0,
+    shield_snap: 1.0,
+    start_time: 1786200000000,
+    end_time: 1786272000000,
+    target_duration: 20.0,
+    duration: 20.0,
+    is_deleted: 0,
+    sync_status: "pending",
+    description: "Hoàn thành Warrior 20H",
+    created_at: 1786272000,
+    updated_at: 1786272000,
+  },
+  {
+    id: "log_010",
+    log_date: "2026-08-10",
+    fast_id: "fast_109",
+    type: "habit+",
+    habit_delta: 3.0,
+    habit_snap: 27.2,
+    habit_retain: 85.0,
+    shield_delta: 0,
+    shield_snap: 1.0,
+    start_time: 1786300800000,
+    end_time: 1786358400000,
+    target_duration: 16.0,
+    duration: 16.0,
+    is_deleted: 0,
+    sync_status: "pending",
+    description: "Hoàn thành 16:8 Fasting",
+    created_at: 1786358400,
+    updated_at: 1786358400,
   },
 ];
 
@@ -65,7 +251,7 @@ interface HabitBottomSheetProps {
 const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
   const [showAllHistory, setShowAllHistory] = useState(false);
   const { theme, userProfile } = useAppStore();
-  const dbService = useDBService()
+  const dbService = useDBService();
 
   const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
     return [
@@ -90,21 +276,21 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
     return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
   };
 
-  const [habitLog, setHabitLog] = useState<(HabitLog&FastSession)[]>([]);
+  const [habitLog, setHabitLog] = useState<(HabitLog & FastSession)[]>([]);
 
-  const getHabitLog= async ()=>{
+  const getHabitLog = async () => {
     const res = await dbService?.getHabitLogs();
-    setHabitLog(res)
-  }
+    setHabitLog(res);
+  };
 
   useEffect(() => {
     getHabitLog();
   }, []);
 
   return (
-    <View className="bg-[#121318] px-5 pt-4 pb-8 rounded-t-4xl w-full border-t border-white/10">
+    <View className="bg-[#121318] px-5 pt-4 pb-20 rounded-t-4xl w-full border-t border-white/10">
       {/* Handle bar */}
-      <View className="w-12 h-1.5 bg-zinc-700 rounded-full self-center mb-4 opacity-60" />
+      {/* <View className="w-12 h-1.5 bg-zinc-700 rounded-full self-center mb-4 opacity-60" /> */}
 
       {/* 1. HEADER SHEET */}
       <View className="flex-row justify-between items-center mb-4">
@@ -238,8 +424,8 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
           <Text className="text-xs text-zinc-500">7 phiên</Text>
         </View>
 
-        <ScrollView className="max-h-48">
-          {habitLog.map((item) => (
+        <ScrollView className="">
+          {MOCK_HABIT_LOGS.map((item) => (
             <HabitLogComponent key={item.id} log={item} />
           ))}
         </ScrollView>
@@ -249,48 +435,225 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
 };
 
 type HabitLogComProps = {
-  log: (HabitLog & FastSession)
-}
-const HabitLogComponent = ({log}:HabitLogComProps)=>{
-  const {theme} = useAppStore();
-  const target = useMemo(()=>{
-    return FASTING_TARGETS.find(item=>item.hours === log.target_duration)
-  },[])
+  log: HabitLog & FastSession;
+};
+const HabitLogComponent = ({ log }: HabitLogComProps) => {
+  const { theme } = useAppStore();
+  const [expanded, setExpanded] = useState(false);
+  const rotateValue = useSharedValue(0);
 
-  if(!log?.habit_delta) return null
+  // Sửa dependency array cho useMemo
+  const target = useMemo(() => {
+    if (!log?.target_duration) {
+      if (log.duration) {
+        const dynamicTarget = FASTING_TARGETS.findIndex(
+          (item) => item.hours >= log.duration,
+        );
 
-  return <View
-              className="flex-row justify-between items-center bg-zinc-900/40 p-3 rounded-xl mb-2 border border-white/5"
-            >
-              <View className="flex-row items-center gap-3">
-                <View
-                  className={`w-8 h-8 rounded-full items-center justify-center ${log.shield_delta ? "bg-blue-500/20" : "bg-primary/20"}`}
-                >
-                  {log.shield_delta ? (
-                    <FontAwesome5 name="shield-alt" size={12} color="#60A5FA" />
-                  ) : (
-                    <Ionicons name="flame" size={14} color={theme.primary} />
-                  )}
-                </View>
-                <View>
-                  <Text className="text-xs font-semibold text-zinc-200">
-                    {target?.label} ({log.duration}h)
-                  </Text>
-                  {
-                    log.end_time && (
-                      <Text className="text-[10px] text-zinc-500">{getLocalTodayStr(new Date(log.end_time))}</Text>
-                    )
-                  }
-                </View>
+        if (dynamicTarget === -1) return FASTING_TARGETS.at(-1); //Quá last target
+        if (dynamicTarget === 0) return FASTING_TARGETS[0]; // Thấp hơn first Target
+        return FASTING_TARGETS[dynamicTarget - 1];
+      }
+
+      return null;
+    }
+    return FASTING_TARGETS.find(
+      (item) => item.hours === Math.floor(log.target_duration),
+    );
+  }, [log?.target_duration]);
+
+  const toggleExpand = () => {
+    setExpanded((prev) => !prev);
+    rotateValue.value = withTiming(expanded ? 0 : 180, { duration: 250 });
+  };
+
+  const arrowStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotateValue.value}deg` }],
+  }));
+
+  if (!log) return null;
+
+  const isShieldEvent = Boolean(log.shield_delta);
+  const isPositiveHabit = log.habit_delta > 0;
+
+  return (
+    <View className="bg-zinc-900/60 rounded-xl mb-2.5 border border-white/5 overflow-hidden">
+      {/* 1. HEADER (CLICK ĐỂ ĐÓNG/MỞ) */}
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={toggleExpand}
+        className="p-3.5 flex-row justify-between items-center"
+      >
+        <View className="flex-row items-center gap-3 flex-1 pr-2">
+          {/* Icon Badge */}
+          <View
+            className={`w-9 h-9 rounded-full items-center justify-center ${
+              isShieldEvent
+                ? log.shield_delta > 0
+                  ? "bg-blue-500/20"
+                  : "bg-amber-500/20"
+                : isPositiveHabit
+                  ? "bg-purple-500/20"
+                  : "bg-red-500/20"
+            }`}
+          >
+            {isShieldEvent ? (
+              <FontAwesome5
+                name="shield-alt"
+                size={13}
+                color={log.shield_delta > 0 ? "#60A5FA" : "#F59E0B"}
+              />
+            ) : (
+              <Ionicons
+                name="flame"
+                size={15}
+                color={isPositiveHabit ? theme.primary || "#9333EA" : "#EF4444"}
+              />
+            )}
+          </View>
+
+          {/* Tiêu đề & Thời gian ngắn gọn */}
+          <View className="flex-1">
+            <View className="flex-row items-center gap-1">
+              <Text
+                style={{ color: target?.colors.accent || theme.primary }}
+                numberOfLines={1}
+                className="text-xs font-semibold text-zinc-100"
+              >
+                {target?.label || log?.description || "Fasting session"}
+              </Text>
+              {target &&
+                (Math.floor(log.duration) >= Math.floor(log.target_duration) ? (
+                  <Feather
+                    name="check-circle"
+                    color={theme.success}
+                    size={16}
+                  />
+                ) : (
+                  <Feather name="x-circle" color={theme.error} size={16} />
+                ))}
+            </View>
+
+            <Text className="text-[10px] text-zinc-400 mt-0.5">
+              {getLocalTodayStr(new Date(log.end_time || log.created_at))}
+              {log.duration ? ` • ${log.duration}h thực tế` : ""}
+            </Text>
+          </View>
+        </View>
+
+        {/* Cột phải: Delta + Mũi tên indicator */}
+        <View className="flex-row items-center gap-2">
+          <View className="items-end">
+            {/* Điểm Habit */}
+            {log.habit_delta !== 0 && (
+              <Text
+                className={`text-xs font-bold ${
+                  isPositiveHabit ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                {isPositiveHabit ? "+" : ""}
+                {log.habit_delta}%
+              </Text>
+            )}
+
+            {/* Shield Badge nhỏ gọn ở Header nếu có biến động khiên */}
+            {log.shield_delta !== 0 && (
+              <View className="flex-row items-center gap-1 mt-0.5 bg-blue-500/10 px-1.5 py-0.5 rounded">
+                <FontAwesome5 name="shield-alt" size={8} color="#60A5FA" />
+                <Text className="text-[9px] font-semibold text-blue-400">
+                  {log.shield_delta > 0
+                    ? `+${log.shield_delta}`
+                    : log.shield_delta}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Mũi tên xoay */}
+          <Animated.View style={arrowStyle} className="ml-1">
+            <Ionicons name="chevron-down" size={14} color="#71717A" />
+          </Animated.View>
+        </View>
+      </TouchableOpacity>
+
+      {/* 2. DETAIL EXPANDED PANEL (MỞ RA KHI BẤM) */}
+      {expanded && (
+        <Animated.View
+          entering={FadeInDown.duration(200)}
+          exiting={FadeOutUp.duration(150)}
+          className="px-3.5 pb-3.5 pt-2 border-t border-white/5 bg-black/20"
+        >
+          {/* Lưới thông số chi tiết (2 hàng 2 cột) */}
+          <View className="gap-3">
+            {/* Hàng 1: Thời gian Nhịn & Mục tiêu */}
+            <View className="flex-row justify-between items-center bg-zinc-800/40 p-2.5 rounded-lg">
+              <View>
+                <Text className="text-[10px] text-zinc-400">
+                  Thời gian nhịn
+                </Text>
+                <Text className="text-xs text-zinc-200 font-semibold mt-1">
+                  {getLocalTodayStr(log.start_time)} ➔{" "}
+                  {log.end_time ? getLocalTodayStr(log.end_time) : "#####"}
+                </Text>
               </View>
 
-
-
-              
-                <Text className={`text-xs font-bold ${log.habit_delta > 0 ? "text-success" : "text-error"}`}>
-                  {log.habit_delta > 0 ? "+" : ""}{log.habit_delta}%
+              <View className="items-end">
+                <Text className="text-[10px] text-zinc-400">
+                  Thực tế / Mục tiêu
                 </Text>
+                <Text className="text-xs text-purple-300 font-semibold mt-1">
+                  {log.duration ?? 0}h / {log.target_duration ?? 0}h
+                </Text>
+              </View>
             </View>
-}
+
+            {/* Hàng 2: Trạng thái Tích lũy (Habit Snap & Shield Retain) */}
+            <View className="flex-row justify-between items-center bg-zinc-800/40 p-2.5 rounded-lg">
+              <View className="item-center">
+                <Text className="text-[10px] text-zinc-400">Điểm Habit</Text>
+                <Text className="text-sm text-emerald-400 font-bold mt-1">
+                  {log.habit_snap ?? 0}%
+                </Text>
+              </View>
+
+              <View className="items-center">
+                <Text className="text-[10px] text-zinc-400">Retain</Text>
+                <Text className="text-sm text-blue-400 font-bold mt-1">
+                  {log.habit_retain ?? 0}%
+                </Text>
+              </View>
+
+              <View className="item-center">
+                <Text className="text-[10px] text-zinc-400">Số Khiên</Text>
+                <Text className="text-sm text-amber-400 font-bold mt-1">
+                  🛡️ {log.shield_snap ?? 0}
+                </Text>
+              </View>
+            </View>
+
+            {/* Trạng thái Đồng bộ Sync Status */}
+            {/* <View className="flex-row justify-between items-center pt-1 px-1">
+              <Text className="text-[10px] text-zinc-500">
+                Mã log: {log.id}
+              </Text>
+              <View className="flex-row items-center gap-1">
+                <View
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    log.sync_status === "synced"
+                      ? "bg-emerald-500"
+                      : "bg-amber-500"
+                  }`}
+                />
+                <Text className="text-[10px] text-zinc-400 capitalize">
+                  {log.sync_status}
+                </Text>
+              </View>
+            </View> */}
+          </View>
+        </Animated.View>
+      )}
+    </View>
+  );
+};
 
 export default HabitBottomSheet;

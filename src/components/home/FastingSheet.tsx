@@ -128,7 +128,7 @@ const FastingSheet = ({
             <View className="flex-row justify-between items-center"></View>
           </View>
 
-          <View className="h-4 bg-gray-600 rounded-full w-full">
+          <View className="h-4 bg-gray-600 rounded-full w-full overflow-hidden">
             <LinearGradient
               style={{ width: `${progressPercent}%`, borderRadius: 100 }}
               className="h-full rounded-full"

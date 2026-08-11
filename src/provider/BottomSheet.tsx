@@ -258,14 +258,13 @@ const BottomSheetInstance = forwardRef<BottomSheetModal, BottomSheetProps>(
           <View style={{ height: contentHeight, width: "100%" }}>
             {scrollable ? (
               <KeyboardAwareScrollView
-                extraScrollHeight={80}
                 contentContainerStyle={{ flexGrow: 1 }}
                 enableOnAndroid
                 keyboardShouldPersistTaps="handled"
                 style={{ backgroundColor: theme.background2 }}
               >
                 {content?.()}
-                <View style={{ height: 80 }}></View>
+                {/* <View style={{ height: 20 }}></View> */}
               </KeyboardAwareScrollView>
             ) : (
               <View className="h-full">{content?.()}</View>

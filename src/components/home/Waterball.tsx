@@ -2,11 +2,11 @@ import { useAppStore } from "@/stores/appStore";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedProps,
-    useSharedValue,
-    withRepeat,
-    withTiming,
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withRepeat,
+  withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
 
@@ -139,10 +139,18 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
 
         {/* TEXT HIỂN THỊ % ĐỢT SÓNG LÊN */}
         <View className="items-center justify-center z-10">
-          <Text className="text-2xl font-black text-white shadow-md">
+          <Text
+            style={{ fontSize: Math.floor(size / 3) }}
+            className="font-black text-white shadow-md"
+          >
             {Math.round(clampedPercent)}
           </Text>
-          <Text className="text-[10px] font-bold text-white/80 -mt-1">%</Text>
+          <Text
+            style={{ marginTop: 0 }}
+            className="text-[10px] font-bold text-white/80"
+          >
+            %
+          </Text>
         </View>
       </View>
 

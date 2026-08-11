@@ -61,7 +61,7 @@ const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
   const listRef = useRef<FlatList>(null);
 
   return (
-    <View className="flex-1 bg-zinc-900 px-2 pb-6 pt-8">
+    <View className="flex-1 bg-zinc-900 px-2 pb-20 pt-8">
       <View>
         <FlatList
           ref={listRef}
@@ -208,11 +208,9 @@ const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
                       width: CARD_WIDTH + 16,
                       marginHorizontal: -8,
                       marginTop: 16,
-                      backgroundColor: "transparent",
                       paddingVertical: 28,
                       borderRadius: 12,
                       paddingHorizontal: 12,
-                      elevation: 6,
                     }}
                   >
                     <Text

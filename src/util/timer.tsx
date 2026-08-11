@@ -20,7 +20,8 @@ export const timeString = (time: number) => {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
-export const getLocalTodayStr = (date: Date = new Date()): string => {
+export const getLocalTodayStr = (dateParam?: Date | number): string => {
+  const date = new Date(dateParam || Date.now());
   const year = date.getFullYear();
   // getMonth() trả về từ 0-11 nên phải +1, sau đó padStart để đảm bảo có 2 chữ số
   const month = String(date.getMonth() + 1).padStart(2, "0");

@@ -588,7 +588,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Đang tiêu hóa bữa gần nhất",
     icon: "🍔",
     color: "#10B981", // Emerald
-    description: "Cơ thể đang bận rộn xử lý và nạp bớt dưỡng chất từ bữa ăn vừa rồi.",
+    description:
+      "Cơ thể đang bận rộn xử lý và nạp bớt dưỡng chất từ bữa ăn vừa rồi.",
   },
   {
     minHours: 4,
@@ -596,7 +597,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Đường huyết dần ổn định",
     icon: "💧",
     color: "#10B981",
-    description: "Insulin có xu hướng hạ xuống, cơ thể bắt đầu xài bớt lượng đường dự trữ.",
+    description:
+      "Insulin có xu hướng hạ xuống, cơ thể bắt đầu xài bớt lượng đường dự trữ.",
   },
   {
     minHours: 8,
@@ -604,7 +606,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Dự trữ đường bắt đầu cạn",
     icon: "⚡",
     color: "#F59E0B", // Amber
-    description: "Nguồn đường dự trữ ở gan sắp hết, cơ thể rục rịch chuyển sang nguồn năng lượng mới.",
+    description:
+      "Nguồn đường dự trữ ở gan sắp hết, cơ thể rục rịch chuyển sang nguồn năng lượng mới.",
   },
   {
     minHours: 12,
@@ -612,7 +615,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Bắt đầu bước vào pha đốt mỡ",
     icon: "🔥",
     color: "#FB923C", // Orange
-    description: "Nhiều khả năng cơ thể đã bắt đầu chuyển sang xài mỡ thừa làm năng lượng chính.",
+    description:
+      "Nhiều khả năng cơ thể đã bắt đầu chuyển sang xài mỡ thừa làm năng lượng chính.",
   },
   {
     minHours: 14,
@@ -620,7 +624,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Chế độ đốt mỡ tích cực hơn",
     icon: "⚡",
     color: "#8B5CF6", // Purple
-    description: "Lượng Ketone bắt đầu nhích nhẹ, hormone hỗ trợ cơ bắp có thể đang tăng dần.",
+    description:
+      "Lượng Ketone bắt đầu nhích nhẹ, hormone hỗ trợ cơ bắp có thể đang tăng dần.",
   },
   {
     minHours: 18,
@@ -628,7 +633,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Đốt mỡ sâu & Chạm ngưỡng tự dọn dẹp",
     icon: "🚀",
     color: "#EC4899", // Pink
-    description: "Đốt mỡ khá mượt mà, cơ thể rục rịch kích hoạt cơ chế tự dọn dẹp tế bào (Autophagy).",
+    description:
+      "Đốt mỡ khá mượt mà, cơ thể rục rịch kích hoạt cơ chế tự dọn dẹp tế bào (Autophagy).",
   },
   {
     minHours: 24,
@@ -644,7 +650,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Làm mới & Tái tạo chuyên sâu",
     icon: "🛡️",
     color: "#6366F1", // Indigo
-    description: "Hệ miễn dịch và các hormone phục hồi thường đạt trạng thái hoạt động rất tốt ở mốc này.",
+    description:
+      "Hệ miễn dịch và các hormone phục hồi thường đạt trạng thái hoạt động rất tốt ở mốc này.",
   },
   {
     minHours: 48,
@@ -652,7 +659,8 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
     title: "Giai đoạn làm mới toàn diện",
     icon: "👑",
     color: "#EAB308", // Gold
-    description: "Mốc nhịn sâu, cơ thể tập trung năng lượng để sửa chữa và tái cấu trúc.",
+    description:
+      "Mốc nhịn sâu, cơ thể tập trung năng lượng để sửa chữa và tái cấu trúc.",
   },
 ];
 
@@ -661,12 +669,13 @@ export const FASTING_STATUS_MILESTONES: FastingStatusInfo[] = [
  * @param elapsedSeconds Thời gian đã nhịn (tính bằng giây)
  */
 export const getFastingStatus = (counter: number) => {
-  const elapsedHours = counter / 3600;
+  const elapsedHours = counter / 3600_000;
 
   // Tìm mốc milestone tương ứng
-  const currentStatus = FASTING_STATUS_MILESTONES.find(
-    (m) => elapsedHours >= m.minHours && elapsedHours < m.maxHours
-  ) || FASTING_STATUS_MILESTONES[FASTING_STATUS_MILESTONES.length - 1];
+  const currentStatus =
+    FASTING_STATUS_MILESTONES.find(
+      (m) => elapsedHours >= m.minHours && elapsedHours < m.maxHours,
+    ) || FASTING_STATUS_MILESTONES[FASTING_STATUS_MILESTONES.length - 1];
 
   return {
     ...currentStatus,
