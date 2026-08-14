@@ -196,7 +196,7 @@ export const MOCK_HABIT_LOGS: HabitLogItem[] = [
     duration: 11.5, // Hủy sớm hơn mục tiêu
     is_deleted: 0,
     sync_status: "synced",
-    description: "Hủy phiên sớm quá 4 tiếng",
+    description: "1",
     created_at: 1786185600,
     updated_at: 1786185600,
   },
@@ -276,15 +276,15 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
     return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
   };
 
-  const [habitLog, setHabitLog] = useState<(HabitLog & FastSession)[]>([]);
+  const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
 
-  const getHabitLog = async () => {
+  const getHabitLogs = async () => {
     const res = await dbService?.getHabitLogs();
-    setHabitLog(res);
+    setHabitLogs(res);
   };
 
   useEffect(() => {
-    getHabitLog();
+    getHabitLogs();
   }, []);
 
   return (
@@ -425,9 +425,17 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
         </View>
 
         <ScrollView className="">
-          {MOCK_HABIT_LOGS.map((item) => (
-            <HabitLogComponent key={item.id} log={item} />
-          ))}
+          {habitLogs?.length ? (
+            habitLogs.map((item) => (
+              <HabitLogComponent key={item.id} log={item} />
+            ))
+          ) : (
+            <View className="mt-8 gap-3 items-center">
+              <Text className="italic text-text-base/40">
+                Chưa có lịch sử phiên gần đây
+              </Text>
+            </View>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -441,7 +449,6 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   const { theme } = useAppStore();
   const [expanded, setExpanded] = useState(false);
   const rotateValue = useSharedValue(0);
-
   // Sửa dependency array cho useMemo
   const target = useMemo(() => {
     if (!log?.target_duration) {
@@ -462,6 +469,77 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
     );
   }, [log?.target_duration]);
 
+  const isFastSuccess = useMemo(() => {
+    if (log.habit_delta > 0) return true;
+    if (log.habit_delta < 0) return false;
+    return null;
+  }, [log]);
+
+  const isTargetSuccess = useMemo(() => {
+    if (!log.target_duration) return null;
+    if (log.duration >= log.target_duration) return true;
+    if (log.duration < log.target_duration) return false;
+    return null;
+  }, [log]);
+
+  const isShieldIncrease = useMemo(() => {
+    if (log.shield_delta > 0) return true;
+    if (log.shield_delta < 0) return false;
+    return null;
+  }, [log]);
+
+  const state = useMemo(() => {
+    // 1. Fasting, 2. Shield, 3. Rest, 4. Over Rest
+    if (log.habit_delta > 0) return 1;
+    if (log.habit_delta < 0) return 4;
+    if (log.shield_delta > 0) return 2;
+    if (log.shield_delta < 0) return 3;
+    return 0;
+  }, [log]);
+
+  const [labelColor, backgroundColor, borderColor] = useMemo(() => {
+    let labelColor = theme.primary;
+    if (state === 1) labelColor = target?.colors.accent || "theme.primary";
+    if (state === 2) labelColor = theme.primary;
+    if (state === 3) labelColor = theme.success;
+    if (state === 4) labelColor = theme.error;
+
+    let backgroundColor = theme.background;
+    if (state === 3) backgroundColor = theme.success + "20";
+    if (state === 4) backgroundColor = theme.error + "20";
+
+    let borderColor = theme.text + "20";
+    if (state === 3) borderColor = theme.success + "40";
+    if (state === 4) borderColor = theme.error + "40";
+
+    return [labelColor, backgroundColor, borderColor];
+  }, [state]);
+
+  const getTitle = () => {
+    return (
+      <View className="flex-row items-center gap-1">
+        <Text
+          style={{ color: labelColor }}
+          numberOfLines={1}
+          className="text-xs font-semibold text-zinc-100"
+        >
+          {isFastSuccess !== null
+            ? isFastSuccess
+              ? target?.label || log?.description || "Fasting session"
+              : `😞 You over rest ${log?.description} day(s)`
+            : isShieldIncrease
+              ? log?.description || "⬆️ Shield increase"
+              : `🌱 Rest ${log.shield_delta} days`}
+        </Text>
+        {log.target_duration && isTargetSuccess ? (
+          <Feather name="check-circle" color={theme.success} size={12} />
+        ) : (
+          <Feather name="x-circle" color={theme.error} size={12} />
+        )}
+      </View>
+    );
+  };
+
   const toggleExpand = () => {
     setExpanded((prev) => !prev);
     rotateValue.value = withTiming(expanded ? 0 : 180, { duration: 250 });
@@ -477,7 +555,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   const isPositiveHabit = log.habit_delta > 0;
 
   return (
-    <View className="bg-zinc-900/60 rounded-xl mb-2.5 border border-white/5 overflow-hidden">
+    <View
+      style={{ backgroundColor, borderColor }}
+      className="rounded-xl mb-2.5 border overflow-hidden"
+    >
       {/* 1. HEADER (CLICK ĐỂ ĐÓNG/MỞ) */}
       <TouchableOpacity
         activeOpacity={0.7}
@@ -487,56 +568,37 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
         <View className="flex-row items-center gap-3 flex-1 pr-2">
           {/* Icon Badge */}
           <View
-            className={`w-9 h-9 rounded-full items-center justify-center ${
-              isShieldEvent
-                ? log.shield_delta > 0
-                  ? "bg-blue-500/20"
-                  : "bg-amber-500/20"
+            style={{
+              backgroundColor: isShieldEvent
+                ? borderColor
                 : isPositiveHabit
-                  ? "bg-purple-500/20"
-                  : "bg-red-500/20"
-            }`}
+                  ? theme.primary + "40"
+                  : borderColor,
+            }}
+            className={`w-9 h-9 rounded-full items-center justify-center`}
           >
             {isShieldEvent ? (
               <FontAwesome5
                 name="shield-alt"
                 size={13}
-                color={log.shield_delta > 0 ? "#60A5FA" : "#F59E0B"}
+                color={log.shield_delta > 0 ? theme.primary : labelColor}
               />
             ) : (
               <Ionicons
                 name="flame"
                 size={15}
-                color={isPositiveHabit ? theme.primary || "#9333EA" : "#EF4444"}
+                color={isPositiveHabit ? theme.primary : labelColor}
               />
             )}
           </View>
 
           {/* Tiêu đề & Thời gian ngắn gọn */}
           <View className="flex-1">
-            <View className="flex-row items-center gap-1">
-              <Text
-                style={{ color: target?.colors.accent || theme.primary }}
-                numberOfLines={1}
-                className="text-xs font-semibold text-zinc-100"
-              >
-                {target?.label || log?.description || "Fasting session"}
-              </Text>
-              {target &&
-                (Math.floor(log.duration) >= Math.floor(log.target_duration) ? (
-                  <Feather
-                    name="check-circle"
-                    color={theme.success}
-                    size={16}
-                  />
-                ) : (
-                  <Feather name="x-circle" color={theme.error} size={16} />
-                ))}
-            </View>
+            {getTitle()}
 
             <Text className="text-[10px] text-zinc-400 mt-0.5">
               {getLocalTodayStr(new Date(log.end_time || log.created_at))}
-              {log.duration ? ` • ${log.duration}h thực tế` : ""}
+              {log.duration ? ` • Fasted ${log.duration}h` : ""}
             </Text>
           </View>
         </View>
@@ -588,12 +650,14 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
             {/* Hàng 1: Thời gian Nhịn & Mục tiêu */}
             <View className="flex-row justify-between items-center bg-zinc-800/40 p-2.5 rounded-lg">
               <View>
-                <Text className="text-[10px] text-zinc-400">
+                <Text className="text-[10px] text-text-base/60">
                   Thời gian nhịn
                 </Text>
-                <Text className="text-xs text-zinc-200 font-semibold mt-1">
+                <Text className="text-xs text-text-base/90 font-semibold mt-1">
                   {getLocalTodayStr(log.start_time)} ➔{" "}
-                  {log.end_time ? getLocalTodayStr(log.end_time) : "#####"}
+                  {log.end_time
+                    ? getLocalTodayStr(log.end_time).slice(5)
+                    : "#####"}
                 </Text>
               </View>
 
@@ -601,9 +665,29 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
                 <Text className="text-[10px] text-zinc-400">
                   Thực tế / Mục tiêu
                 </Text>
-                <Text className="text-xs text-purple-300 font-semibold mt-1">
-                  {log.duration ?? 0}h / {log.target_duration ?? 0}h
-                </Text>
+                <View className="flex-row items-center gap-1.5 mt-1">
+                  <Text
+                    style={{
+                      color:
+                        isTargetSuccess !== null
+                          ? isTargetSuccess
+                            ? theme.success
+                            : theme.error
+                          : theme.primary,
+                    }}
+                    className="text-xs font-semibold"
+                  >
+                    {log.duration ?? 0}h
+                  </Text>
+                  {log.target_duration && (
+                    <Text
+                      style={{ color: target?.colors.accent }}
+                      className="text-xs font-semibold"
+                    >
+                      {`/ ${log.target_duration ?? 0}h`}
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
 

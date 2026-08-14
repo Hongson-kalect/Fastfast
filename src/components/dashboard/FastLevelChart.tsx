@@ -3,12 +3,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import Animated, {
-    Easing,
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming
 } from "react-native-reanimated";
 
 interface FastCount {
@@ -77,10 +76,7 @@ const FastLevelItem = ({
   }));
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(index * 70).springify()}
-      className="mb-4 last:mb-0"
-    >
+    <View className="mb-4 last:mb-0">
       {/* Header */}
       <View
         style={{ opacity: count ? 1 : 0.5 }}
@@ -143,7 +139,7 @@ const FastLevelItem = ({
           </Animated.View>
         )}
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

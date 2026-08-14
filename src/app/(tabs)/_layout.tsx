@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 const MainTab = () => {
@@ -38,7 +38,7 @@ const MainTab = () => {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 size={size - 2} name="stopwatch" color={color} />
+            <Feather size={size - 2} name="home" color={color} />
           ),
         }}
       />
@@ -49,7 +49,7 @@ const MainTab = () => {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 size={size - 2} name="chart-simple" color={color} />
+            <Feather size={size - 2} name="bar-chart-2" color={color} />
           ),
         }}
       />
@@ -60,7 +60,7 @@ const MainTab = () => {
         options={{
           title: "Journey",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 size={size - 2} name="calendar-days" color={color} />
+            <Feather size={size - 2} name="activity" color={color} />
           ),
         }}
       />
@@ -71,7 +71,7 @@ const MainTab = () => {
         options={{
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 size={size - 2} name="sliders" color={color} />
+            <Feather size={size - 2} name="settings" color={color} />
           ),
         }}
       />

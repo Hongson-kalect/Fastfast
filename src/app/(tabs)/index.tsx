@@ -7,7 +7,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const rating = [
@@ -25,8 +25,6 @@ const HomeScreen = () => {
   );
 
   const { setGlobalModal } = useModalStore();
-
-  console.log("currentFastSession", currentFastSession);
 
   const dbService = useDBService();
 
@@ -203,7 +201,10 @@ const HomeScreen = () => {
 
   return (
     <View className="flex-1 bg-main">
-      <SafeAreaView>
+      <View
+              style={{ paddingTop: StatusBar.currentHeight||0 }}
+              className="h-full w-full"
+            >
         <ScrollView keyboardShouldPersistTaps="handled">
           <View className="px-3">
             <HomeHeader />
@@ -230,7 +231,7 @@ const HomeScreen = () => {
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };

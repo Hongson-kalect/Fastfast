@@ -152,7 +152,7 @@ const generateSeedData = `
 export const initDatabase = async (db: SQLiteDatabase) => {
   const DATABASE_VERSION = 1; // get from server
   // let version = 0;
-  await clearDatabase(db);
+  // await clearDatabase(db);
   const version = await getDatabaseVersion(db);
   if (version >= 1) {
     return;
@@ -230,6 +230,7 @@ export const handleLogin = async ({
   let increaseStreakNumber = 0;
   let reduceShieldNumber = 0;
   let reduceHabitNumber = 0;
+  let overRestDays = 0;
 
   if (!profile) {
     return {
@@ -277,13 +278,14 @@ export const handleLogin = async ({
       // fast = fail, kết thúc vào hiện tại
       const shield_need = diffInDaysFromTarget - 1;
       const currentShield = habitLog?.shield_snap || 0;
+      overRestDays = shield_need - currentShield;
 
-      if (currentShield < shield_need) {
+      if (overRestDays > 0) {
         const habitReduce =
           3 +
           Math.pow(
-            shield_need - currentShield,
-            1 + (shield_need - currentShield) / 20,
+            overRestDays,
+            1 + (overRestDays) / 20,
           );
         reduceHabitNumber = habitReduce;
         isClearStreak = true;
@@ -307,13 +309,15 @@ export const handleLogin = async ({
       const shield_need = diffInDays - 1;
       const currentShield = habitLog?.shield_snap || 0;
 
-      if (currentShield < shield_need) {
+      overRestDays = shield_need - currentShield;
+
+      if (overRestDays>0) {
         const habitReduce =
           5 +
           Math.round(
             Math.pow(
-              shield_need - currentShield,
-              1 + (shield_need - currentShield) / 19,
+              overRestDays,
+              1 + (overRestDays) / 19,
             ) * 10,
           ) /
             10;
@@ -342,7 +346,7 @@ export const handleLogin = async ({
   } else {
     returnProfile = await clearStreak(db, profile);
     if (habitLog && reduceHabitNumber)
-      returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber);
+      returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
   }
   if (isFastFail && lastFast) returnLastFast = await fastFail(db, lastFast);
 

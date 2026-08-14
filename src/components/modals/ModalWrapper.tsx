@@ -63,8 +63,8 @@ export default function ModalWrapper(props: Props) {
         layout={LinearTransition.mass(0.6)}
       >
         <Card
-          style={{ backgroundColor: theme.background }}
-          className="relative"
+          style={{ backgroundColor: theme.background, borderWidth: 0.5 }}
+          className="relative shadow-lg shadow-text-base/40 border border-text-base/60 rounded-2xl"
         >
           <View className="pb-5 pt-3" style={{ maxHeight: (height / 4) * 3 }}>
             {props.title &&

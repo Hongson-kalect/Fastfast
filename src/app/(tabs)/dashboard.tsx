@@ -16,8 +16,7 @@ import { getBucketKey, initChartData } from "@/util/dashboard/utils";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, StatusBar, useWindowDimensions, View } from "react-native";
 
 const DashboardScreen = () => {
   const { width } = useWindowDimensions();
@@ -137,7 +136,10 @@ const DashboardScreen = () => {
 
   return (
     <ThemedView className="flex-1 bg-main">
-      <SafeAreaView>
+      <View
+        style={{ paddingTop: StatusBar.currentHeight || 0 }}
+        className="h-full w-full"
+      >
         <ScrollView
           scrollEnabled={enableScroll}
           keyboardShouldPersistTaps="handled"
@@ -169,7 +171,7 @@ const DashboardScreen = () => {
             <StatisticsSection fastStatistics={fastStatistics} />
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 };

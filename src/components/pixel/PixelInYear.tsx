@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
-import { useMemo, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { FlatList, Text, View } from "react-native";
 
 interface DayItem {
   dateString: string;
@@ -199,6 +199,7 @@ const PixelGridManager = () => {
   const [renderedYear, setRenderedYear] = useState<number>(
     new Date().getFullYear(),
   );
+  const flatListRef = useRef(FlatList);
 
   const gridData = useMemo(() => {
     const dataObj = generateMockDataObj(renderedYear);
@@ -215,35 +216,8 @@ const PixelGridManager = () => {
   return (
     <View>
       {/* KHU VỰC CONTROLLER */}
-      <View className="bg-white/5 rounded-lg pr-1 pb-1 mt-6 overflow-hidden">
+      <View className="bg-white/5 rounded-lg pr-1 pb-1 overflow-hidden">
         {/* Header Thứ (T2 -> CN) */}
-        <View className="flex-row mb-2 items-center">
-          {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            hitSlop={25}
-            style={{ borderTopLeftRadius: 4 }}
-            className="w-13 bg-primary justify-center items-center"
-          >
-            <ThemedText className="text-[12px]! py-1 text-white! font-bold">
-              Week
-            </ThemedText>
-          </TouchableOpacity>
-          <View className="flex-1 flex-row justify-between">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-              (day, idx) => (
-                <View
-                  key={idx}
-                  className="flex-1 items-center justify-center pt-1"
-                >
-                  <ThemedText className="text-[10px]! text-white! opacity-70">
-                    {day}
-                  </ThemedText>
-                </View>
-              ),
-            )}
-          </View>
-        </View>
 
         {/* Danh sách các tuần */}
         <View className="gap-y-1.5">
@@ -255,7 +229,7 @@ const PixelGridManager = () => {
             renderItem={({ item: week }) => (
               <View key={week.weekIndex} className="flex-row items-center">
                 {/* CỘT RIỀA TRÁI TỐI GIẢN (w-12) */}
-                <View className="w-13 pl-1 justify-center items-center">
+                <View className="w-15 pl-1 justify-center items-center">
                   {week.isMonthHeader && (
                     <View className="absolute -top-2 left-0 -rotate-45">
                       <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
@@ -283,11 +257,11 @@ const PixelGridManager = () => {
                       }}
                       key={dIdx}
                       className={`flex-1 aspect-square justify-center items-center rounded-md border 
-                ${
-                  day.isCurrentYear
-                    ? "bg-white/10 border-white/10"
-                    : "bg-white/2 border-dashed border-white/5"
-                }`}
+                      ${
+                        day.isCurrentYear
+                          ? "bg-white/10 border-white/10"
+                          : "bg-white/2 border-dashed border-white/5"
+                      }`}
                     >
                       <Text
                         className={`text-[16px]! font-medium ${

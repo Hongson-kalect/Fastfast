@@ -1,10 +1,19 @@
 import PixelHeader from "@/components/pixel/Header";
 import PixelInYear from "@/components/pixel/PixelInYear";
 import PixelStatistic from "@/components/pixel/Statistic";
+import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
+import { getWeek } from "date-fns";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StatusBar,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 // 1. Định nghĩa các chế độ xem (View Options)
 type ViewMode = "fasting" | "mood";
@@ -80,27 +89,81 @@ const generateMockYearData = () => {
 const PixelScreen = () => {
   const [enableScroll, setEnableScroll] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("fasting");
+  const { width, height } = useWindowDimensions();
+  const scrollRef = useRef<ScrollView>(null);
+  const currentWeekY = useMemo(() => {
+    const extraScroll = 100;
+    const currentWeek = getWeek(new Date());
+    const weekHeight = (width - 21 - (14 * 15) / 4) / 7;
+    return Math.max(0, weekHeight * currentWeek - extraScroll);
+  }, [width]);
+
+  const [yIndex, setYIndex] = useState(0);
+  const [isScrollUp, setIsScrollUp] = useState(false);
 
   // Cache dữ liệu mock tránh re-render sinh data mới liên tục
   const yearData = useMemo(() => generateMockYearData(), []);
 
   const currentGuides = viewMode === "fasting" ? FASTING_GUIDES : MOOD_GUIDES;
 
+  const scrollTo = (y: number, animated: boolean = true) => {
+    scrollRef.current?.scrollTo({
+      y: y,
+      animated: animated,
+    });
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollTo(currentWeekY);
+    }, 500);
+  }, []);
+
   return (
     <ThemedView className="flex-1 bg-main">
-      <SafeAreaView className="flex-1">
+      <View className="absolute bottom-12 right-2 z-10">
+        {isScrollUp && yIndex > height ? (
+          <Pressable
+            onPress={() => scrollTo(0)}
+            className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
+          >
+            <Feather name="arrow-up" size={20} color="white" />
+          </Pressable>
+        ) : (
+          currentWeekY > height &&
+          yIndex < currentWeekY - height && (
+            <Pressable
+              onPress={() => scrollTo(currentWeekY)}
+              className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
+            >
+              <Feather name="arrow-down" size={20} color="white" />
+            </Pressable>
+          )
+        )}
+      </View>
+      <View
+        style={{ paddingTop: StatusBar.currentHeight || 0 }}
+        className="h-full w-full"
+      >
         <ScrollView
+          onScroll={(e) => {
+            const newY = e.nativeEvent.contentOffset.y;
+            setIsScrollUp(newY < yIndex);
+            setYIndex(e.nativeEvent.contentOffset.y);
+          }}
+          ref={scrollRef}
           scrollEnabled={enableScroll}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
+          className="px-3"
+          stickyHeaderIndices={[2]}
         >
-          <View className="px-3">
-            <PixelHeader />
-            <View className="mt-4">
-              <PixelStatistic />
-            </View>
-            {/* <View className="py-4">
+          <PixelHeader />
+          <View className="mt-4 mb-6">
+            <PixelStatistic />
+          </View>
+          {/* <View className="py-4">
               <PixelOptions
                 viewMode={viewMode}
                 setViewMode={setViewMode}
@@ -108,11 +171,41 @@ const PixelScreen = () => {
               />
             </View> */}
 
-            {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
-            <PixelInYear />
+          <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
+            {/* Header Thứ (T2 -> CN) */}
+            <View className="flex-row mb-2 items-center">
+              {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                hitSlop={25}
+                style={{ borderTopLeftRadius: 4 }}
+                className="w-15 bg-primary justify-center items-center"
+              >
+                <ThemedText className="text-[12px]! py-1 text-white! font-bold">
+                  Week
+                </ThemedText>
+              </TouchableOpacity>
+              <View className="flex-1 flex-row justify-between">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day, idx) => (
+                    <View
+                      key={idx}
+                      className="flex-1 items-center justify-center pt-1"
+                    >
+                      <ThemedText className="text-[10px]! text-white! opacity-70">
+                        {day}
+                      </ThemedText>
+                    </View>
+                  ),
+                )}
+              </View>
+            </View>
           </View>
+
+          {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
+          <PixelInYear />
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 };

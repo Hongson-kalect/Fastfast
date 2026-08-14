@@ -17,6 +17,10 @@ import { ThemeProvider } from "@/provider/theme-provider";
 import { SQLiteProvider } from "expo-sqlite";
 import { Suspense } from "react";
 import { MenuProvider } from "react-native-popup-menu";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+} from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 
@@ -31,15 +35,17 @@ export default function TabLayout() {
                 <LanguageProvider>
                   <BottomSheetProvider>
                     <Suspense>
-                      <AppWrapper>
-                        <Stack screenOptions={{ headerShown: false }}>
-                          <Stack.Screen
-                            name="(tabs)"
-                            options={{ title: "Home" }}
-                          />
-                          {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
-                        </Stack>
-                      </AppWrapper>
+                      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                        <AppWrapper>
+                          <Stack screenOptions={{ headerShown: false }}>
+                            <Stack.Screen
+                              name="(tabs)"
+                              options={{ title: "Home" }}
+                            />
+                            {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
+                          </Stack>
+                        </AppWrapper>
+                      </SafeAreaProvider>
                     </Suspense>
                   </BottomSheetProvider>
                   <Portal>

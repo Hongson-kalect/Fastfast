@@ -87,6 +87,7 @@ export interface HabitLog{
   habit_retain: number;
   shield_delta: number;
   shield_snap: number;
+  description: string;
   is_deleted: number;
   sync_status: SyncStatus;
   created_at: number;

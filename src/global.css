@@ -8,7 +8,7 @@
   --color-primary: var(--dynamic-primary);
   --color-secondary: var(--dynamic-secondary);
   --color-title: var(--dynamic-title);
-  --color-text-base: var(--dynamic-text-text);
+  --color-text-base: var(--dynamic-text-base);
   --color-textSecondary: var(--dynamic-textSecondary);
   --color-background: var(--dynamic-background);
   --color-backgroundSecondary: var(--dynamic-backgroundSecondary);
