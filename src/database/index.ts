@@ -70,6 +70,7 @@ import {
   reduceHabit,
   reduceShield,
 } from "./shema/habit_logs";
+import { StreakCheckResult } from "@/interfaces/home.type";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -237,6 +238,7 @@ export const handleLogin = async ({
       lastFast,
       profile,
       habitLog,
+      streak:null
     };
   }
 
@@ -246,8 +248,32 @@ export const handleLogin = async ({
       lastFast,
       profile,
       habitLog,
+      streak:null
     };
   }
+
+  const streakStat:StreakCheckResult = {
+    
+    streak:{
+      previous:profile.current_streak || 0,
+      current:profile.current_streak || 0,
+    },
+    habit:{
+      currentPercent:habitLog?.habit_snap || 0,
+      previousPercent:habitLog?.habit_retain || 0,
+    },
+    shield:{
+      previous:habitLog?.shield_snap || 0,
+      current:habitLog?.shield_snap || 0,
+    },
+    retain:{
+      previous:habitLog?.habit_retain || 0,
+      current:habitLog?.habit_retain || 0,
+    },
+    shouldShowModal: true,
+    status:'STREAK_MAINTAINED'
+
+  }  
 
   if (!lastFast) {
     ((isClearStreak = true), (reduceHabitNumber = habitLog?.habit_snap || 0));
@@ -256,8 +282,6 @@ export const handleLogin = async ({
   else if (!lastFast.end_time) {
     // Nếu thời gian hiện tại cách thời điểm start_fast quá 7 ngày => fast fail, xóa streak
     const startFast = new Date(lastFast.start_time);
-
-    // BỎ QUA nếu hôm nay đã vào app và xử lý rồi (Check dựa vào last_login hoặc last_streak_date)
 
     // Ngày hoàn thành fast trên lý thuyết
     const targetDay = getLocalTodayStr(
@@ -340,13 +364,23 @@ export const handleLogin = async ({
   let returnProfile = profile;
 
   if (increaseStreakNumber) {
+
+    streakStat.streak.current = streakStat.streak.previous + increaseStreakNumber;
+
     returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
     if (habitLog && reduceShieldNumber)
       returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
   } else {
+    streakStat.streak.current = 1;
+
     returnProfile = await clearStreak(db, profile);
-    if (habitLog && reduceHabitNumber)
+    if (habitLog && reduceHabitNumber){
       returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
+      streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
+      streakStat.shield.current = returnHabitLog?.shield_snap || 0;
+      streakStat.retain.current = returnHabitLog?.habit_retain || 0;
+      ;
+    }
   }
   if (isFastFail && lastFast) returnLastFast = await fastFail(db, lastFast);
 
@@ -354,5 +388,6 @@ export const handleLogin = async ({
     lastFast: returnLastFast,
     profile: returnProfile,
     habitLog: returnHabitLog,
+    streak:streakStat
   };
 };

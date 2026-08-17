@@ -10,6 +10,7 @@ import { AppSettings, FastSession, UserProfile } from "@/interfaces/db.type";
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 import { create } from "zustand";
+import { StreakCheckResult } from "@/interfaces/home.type";
 
 type ColorPalette = typeof darkTheme;
 
@@ -33,7 +34,7 @@ interface AppState {
   isHydrated: boolean;
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
-  init: (db: SQLiteDatabase) => Promise<boolean>;
+  init: (db: SQLiteDatabase) => Promise<StreakCheckResult|null>;
   updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
   updateHabit: (val: { habit_percent: number; shield: number }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
@@ -85,7 +86,7 @@ export const useAppStore = create<AppState>((set, get) => {
           dbService.getLastHabitLog(),
         ]);
 
-        const { lastFast, profile, habitLog } = await handleLogin({
+        const { lastFast, profile, habitLog, streak } = await handleLogin({
           db,
           lastFast: currentFast,
           profile: currentProfile,
@@ -132,11 +133,11 @@ export const useAppStore = create<AppState>((set, get) => {
           "=> [Zustand] Khởi tạo dữ liệu Local DB thành công!",
           Date.now() - start,
         );
-        return true;
+        return streak;
       } catch (error) {
         console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
         set({ isLoadingData: false });
-        return false;
+        return null;
       }
     },
 

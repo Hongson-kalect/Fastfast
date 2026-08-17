@@ -1,14 +1,17 @@
 import { fonts } from "@/configs/fonts";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { isColorDark } from "@/util/color";
 import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
+import { StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings, isDarkMode } = useAppStore();
+  const {setGlobalModal} = useModalStore();
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
   SplashScreen.preventAutoHideAsync();
@@ -25,7 +28,14 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!db) return;
 
     const load = async () => {
-      await init(db);
+      const streak = await init(db);
+
+      if(streak?.shouldShowModal){
+setGlobalModal({
+  type: "custom",
+  render: <StreakCheckModal data={streak}/>
+})
+      }
       setDBReady(true);
     };
 

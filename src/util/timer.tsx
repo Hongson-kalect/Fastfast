@@ -30,6 +30,14 @@ export const getLocalTodayStr = (dateParam?: Date | number): string => {
   return `${year}-${month}-${day}`; // Kết quả: "2026-07-09"
 };
 
+export const hourFormat = (duration: number) => {
+  const timeCheck = Math.floor(duration / 1);
+  const hours = Math.floor(timeCheck / 60 / 60);
+  const minutes = Math.floor(timeCheck / 60) % 60;
+  const seconds = timeCheck % 60;
+  return `${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m`;
+};
+
 export const getStartDateFromRange = (
   key: ChartRangeKey,
   referenceDate = new Date(),

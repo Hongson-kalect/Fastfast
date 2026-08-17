@@ -85,6 +85,7 @@ export interface HabitLog{
   habit_delta: number;
   habit_snap: number;
   habit_retain: number;
+  retain_delta: number;
   shield_delta: number;
   shield_snap: number;
   description: string;

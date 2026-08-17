@@ -1,14 +1,15 @@
 import HomeBodyProgress from "@/components/home/BodyProgress";
 import HomeHeader from "@/components/home/Header";
+import { FastResultData, ResultModal } from "@/components/home/ResultModal";
 import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
+import { SHIELD_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useEffect, useState } from "react";
 import { ScrollView, StatusBar, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const rating = [
   {
@@ -72,6 +73,8 @@ const HomeScreen = () => {
           duration,
           isValid,
         );
+
+        // update zustand
         if (habitLog) {
           updateHabit({
             habit_percent: habitLog?.habit_snap,
@@ -80,6 +83,28 @@ const HomeScreen = () => {
         }
 
         setCurrentFastSession(null);
+
+        // Nhập dữ liệu modal result: habit -> ok, lastSession -> duration, target -> ok
+
+        if (!isValid || !lastSession || !habitLog) return;
+        const resultData: FastResultData = {
+          fastingTime: lastSession?.duration,
+          habitDiff: habitLog?.habit_delta,
+          habitPercent: habitLog?.habit_snap,
+          shields: {
+            current: habitLog?.shield_snap,
+            max: SHIELD_LIMIT,
+            gained: habitLog?.shield_delta,
+          },
+          retainCount: habitLog?.habit_retain,
+          retainDiff: habitLog?.retain_delta,
+          targetHours: lastSession?.target_duration,
+        };
+
+        setGlobalModal({
+          type: "custom",
+          render: <ResultModal data={resultData} />,
+        });
         // Tính toán lưu giờ nhịn theo ngày của người dùng
 
         // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
@@ -202,9 +227,9 @@ const HomeScreen = () => {
   return (
     <View className="flex-1 bg-main">
       <View
-              style={{ paddingTop: StatusBar.currentHeight||0 }}
-              className="h-full w-full"
-            >
+        style={{ paddingTop: StatusBar.currentHeight || 0 }}
+        className="h-full w-full"
+      >
         <ScrollView keyboardShouldPersistTaps="handled">
           <View className="px-3">
             <HomeHeader />

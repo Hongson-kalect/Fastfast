@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS habit_logs (
 
     habit_delta REAL,
     habit_snap REAL,
-    habit_retain REAL,
-
+    
     shield_delta REAL,
     shield_snap REAL,
+    
+    habit_retain REAL,
+    retain_delta REAL,
 
     is_deleted INTEGER DEFAULT 0,   -- Xóa mềm phục vụ đồng bộ
     sync_status TEXT DEFAULT 'pending',
@@ -33,7 +35,8 @@ CREATE TABLE IF NOT EXISTS habit_logs (
 --CREATE INDEX IF NOT EXISTS idx_habit_logs_user_date ON habit_logs(user_id, log_date);
 `;
 
-const RETAIN_LIMIT = 25;
+export const RETAIN_LIMIT = 25;
+export const SHIELD_LIMIT = 3;
 
 export const getHabitLogs = async (
   db: SQLiteDatabase,
@@ -101,6 +104,8 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   const habit_data = { ...data };
   let retain = 0;
   let bonusShield = 0
+  let habitDetla = data.habit_detla||0
+  let retainDelta = 0
   
   const lastLog = await getLastHabitLog(db);
 
@@ -108,10 +113,13 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     // habit giảm
     if (habit_data.habit_detla) {
       if (habit_data.habit_detla < 0) retain = 0;
-      else
+      else{
         retain = (lastLog?.habit_retain || 0) + (habit_data.habit_detla || 0);
+        habitDetla = 0
+        retainDelta = habit_data.habit_detla
+      }
 
-      if (retain >=25){
+      if (retain >=RETAIN_LIMIT) {
         retain = 0
         bonusShield = 1
       }
@@ -134,16 +142,17 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   //   await db.runAsync(`INSERT INTO habit_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
   // }
   await db.runAsync(
-    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) VALUES (?, ?, ?, ?, ?,?,?,?)`,
+    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, snap_delta, shield_delta, shield_snap, habit_retain) VALUES (?, ?, ?, ?, ?,?,?,?)`,
     [
       id,
       log_date,
       data.fast_id || null,
-      numberLimit(habit_data.habit_detla || 0,0,100),
+      numberLimit(habitDetla || 0,0,100),
       habit_data.habit_snap || 0,
+      retainDelta,
       habit_data.shield_detla || 0,
-      numberLimit(habit_data.shield_snap||0,0,3),
-      numberLimit(retain,0,25),
+      numberLimit(habit_data.shield_snap||0,0,SHIELD_LIMIT),
+      numberLimit(retain,0,RETAIN_LIMIT),
     ],
   );
 
