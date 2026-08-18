@@ -21,6 +21,7 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
+import ToastManager, { Toast } from 'toastify-react-native'
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ export default function TabLayout() {
                             {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
                           </Stack>
                         </AppWrapper>
+                        <ToastManager />
                       </SafeAreaProvider>
                     </Suspense>
                   </BottomSheetProvider>

@@ -5,12 +5,11 @@ export type StreakCheckStatus =
   | 'STREAK_LOST';         // Trễ hạn & KHÔNG đủ Shield (Mất Streak/Retain)
 
 export interface StreakCheckResult {
-  status: StreakCheckStatus;
-  shouldShowModal: boolean; // true nếu status != 'ALREADY_CHECKED'
   
   // Thông số Streak
   streak: {
     previous: number;
+    max: number;
     current: number;
   };
 

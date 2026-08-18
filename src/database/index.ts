@@ -52,6 +52,7 @@ import {
   getUserProfile,
   increaseStreak,
   generateString as userGenerateString,
+  userSeedData,
 } from "./shema/user";
 import {
   getCurrentWeight,
@@ -60,6 +61,7 @@ import {
   generateString as weight_trackerGenerateString,
 } from "./shema/weight_tracker";
 
+import { StreakCheckResult } from "@/interfaces/home.type";
 import { getLocalTodayStr } from "@/util/timer";
 import {
   addHabitLogs,
@@ -70,7 +72,6 @@ import {
   reduceHabit,
   reduceShield,
 } from "./shema/habit_logs";
-import { StreakCheckResult } from "@/interfaces/home.type";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -148,6 +149,7 @@ export const generateSchema = `
 `;
 
 const generateSeedData = `
+${userSeedData}
 `;
 
 export const initDatabase = async (db: SQLiteDatabase) => {
@@ -167,7 +169,7 @@ export const initDatabase = async (db: SQLiteDatabase) => {
     await db.execAsync(generateSchema);
 
     console.log("generateSchema completed");
-    // await db.execAsync(generateSeedData);
+    await db.execAsync(generateSeedData);
   }
 
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
@@ -234,46 +236,45 @@ export const handleLogin = async ({
   let overRestDays = 0;
 
   if (!profile) {
+    console.log("case 1");
     return {
       lastFast,
       profile,
       habitLog,
-      streak:null
+      streak: null,
     };
   }
 
   // 0.Hôm nay đã xử lý rồi
   if (profile.streak_date === todayStr) {
+    console.log("case 2");
     return {
       lastFast,
       profile,
       habitLog,
-      streak:null
+      streak: null,
     };
   }
 
-  const streakStat:StreakCheckResult = {
-    
-    streak:{
-      previous:profile.current_streak || 0,
-      current:profile.current_streak || 0,
+  const streakStat: StreakCheckResult = {
+    streak: {
+      previous: profile.current_streak || 0,
+      max: profile.max_streak || 0,
+      current: profile.current_streak || 0,
     },
-    habit:{
-      currentPercent:habitLog?.habit_snap || 0,
-      previousPercent:habitLog?.habit_retain || 0,
+    habit: {
+      currentPercent: habitLog?.habit_snap || 0,
+      previousPercent: habitLog?.habit_retain || 0,
     },
-    shield:{
-      previous:habitLog?.shield_snap || 0,
-      current:habitLog?.shield_snap || 0,
+    shield: {
+      previous: habitLog?.shield_snap || 0,
+      current: habitLog?.shield_snap || 0,
     },
-    retain:{
-      previous:habitLog?.habit_retain || 0,
-      current:habitLog?.habit_retain || 0,
-    },
-    shouldShowModal: true,
-    status:'STREAK_MAINTAINED'
-
-  }  
+    retain: {
+      previous: habitLog?.habit_retain || 0,
+      current: habitLog?.habit_retain || 0,
+    }
+  };
 
   if (!lastFast) {
     ((isClearStreak = true), (reduceHabitNumber = habitLog?.habit_snap || 0));
@@ -305,12 +306,7 @@ export const handleLogin = async ({
       overRestDays = shield_need - currentShield;
 
       if (overRestDays > 0) {
-        const habitReduce =
-          3 +
-          Math.pow(
-            overRestDays,
-            1 + (overRestDays) / 20,
-          );
+        const habitReduce = 3 + Math.pow(overRestDays, 1 + overRestDays / 20);
         reduceHabitNumber = habitReduce;
         isClearStreak = true;
         // xóa shield, retain trừ habit với min = 0
@@ -335,16 +331,10 @@ export const handleLogin = async ({
 
       overRestDays = shield_need - currentShield;
 
-      if (overRestDays>0) {
+      if (overRestDays > 0) {
         const habitReduce =
           5 +
-          Math.round(
-            Math.pow(
-              overRestDays,
-              1 + (overRestDays) / 19,
-            ) * 10,
-          ) /
-            10;
+          Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
         reduceHabitNumber = habitReduce;
         isClearStreak = true;
         // xóa shield, retain trừ habit với min = 0
@@ -364,8 +354,8 @@ export const handleLogin = async ({
   let returnProfile = profile;
 
   if (increaseStreakNumber) {
-
-    streakStat.streak.current = streakStat.streak.previous + increaseStreakNumber;
+    streakStat.streak.current =
+      streakStat.streak.previous + increaseStreakNumber;
 
     returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
     if (habitLog && reduceShieldNumber)
@@ -374,20 +364,25 @@ export const handleLogin = async ({
     streakStat.streak.current = 1;
 
     returnProfile = await clearStreak(db, profile);
-    if (habitLog && reduceHabitNumber){
-      returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
+    if (habitLog && reduceHabitNumber) {
+      returnHabitLog = await reduceHabit(
+        db,
+        habitLog,
+        reduceHabitNumber,
+        overRestDays,
+      );
       streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
       streakStat.shield.current = returnHabitLog?.shield_snap || 0;
       streakStat.retain.current = returnHabitLog?.habit_retain || 0;
-      ;
     }
   }
   if (isFastFail && lastFast) returnLastFast = await fastFail(db, lastFast);
+  console.log("case 3");
 
   return {
     lastFast: returnLastFast,
     profile: returnProfile,
     habitLog: returnHabitLog,
-    streak:streakStat
+    streak: streakStat,
   };
 };

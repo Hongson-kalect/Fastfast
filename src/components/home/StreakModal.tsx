@@ -1,4 +1,5 @@
 import { StreakCheckResult } from "@/interfaces/home.type";
+import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -9,116 +10,227 @@ interface Props {
 }
 
 const MODAL_THEME = {
-  STREAK_MAINTAINED: {
-    icon: "🔥",
-    title: "Streak Maintained!",
+  STREAK_MILESTONE: {
+    icon: "🎉",
+    title: "Streak Milestone Hit!",
+    subtitle: "You're building an unstoppable fasting habit!",
     bgColor: "from-orange-500/20 to-amber-500/10",
     borderColor: "border-orange-500/30",
-    btnBg: "bg-orange-500",
-    btnText: "text-black",
+    btnText: "Keep It Up! 🔥",
   },
   SHIELD_USED: {
     icon: "🛡️",
-    title: "Shield Saved Your Streak!",
+    title: "Rest Day Active!",
+    subtitle: "Recovery is part of the journey. Your streak stays strong!",
     bgColor: "from-indigo-500/20 to-blue-500/10",
     borderColor: "border-indigo-500/30",
-    btnBg: "bg-indigo-500",
-    btnText: "text-white",
+    btnText: "Keep going! 🌿",
   },
   STREAK_LOST: {
-    icon: "💔",
-    title: "Streak Reset",
+    icon: "💪",
+    title: "Fresh Start Ahead",
+    subtitle: "Every master failed before succeeding. Let's rebuild today!",
     bgColor: "from-red-500/20 to-zinc-900",
     borderColor: "border-red-500/30",
-    btnBg: "bg-zinc-800",
-    btnText: "text-white",
+    btnText: "Start Fresh Now 🚀",
   },
 };
-
 export const StreakCheckModal = ({ data }: Props) => {
-  if (!data || data.status === "ALREADY_CHECKED") return null;
+  if (!data) return null;
+  const { theme } = useAppStore();
   const { setGlobalModal } = useModalStore();
-  const onClose = () => setGlobalModal(null);
-  const status = useMemo<keyof typeof MODAL_THEME>(() => {
-    if (data.streak.current <= data.streak.previous) return "STREAK_LOST";
-    if (data.shield.current <= data.shield.previous) return "SHIELD_USED";
-    return "STREAK_MAINTAINED";
-  }, []);
 
-  const config = MODAL_THEME[status] || MODAL_THEME.STREAK_MAINTAINED;
+  const onClose = () => setGlobalModal(null);
+
+  // 1. Xác định Status chính xác dựa trên biến cố dữ liệu
+  const status = useMemo<keyof typeof MODAL_THEME>(() => {
+    if (data.streak.current < data.streak.previous) {
+      return "STREAK_LOST";
+    }
+    if (data.shield.current < data.shield.previous) {
+      return "SHIELD_USED";
+    }
+    return "STREAK_MILESTONE";
+  }, [data]);
+
+  // 2. Check xem có phải Phá Kỷ Lục (Best Record) hay không
+  const isBestRecord = useMemo(() => {
+    return (
+      data.streak.current > 1 &&
+      data.streak.current >= (data.streak.max || 0) &&
+      status !== "STREAK_LOST"
+    );
+  }, [data, status]);
+
+  const config = MODAL_THEME[status];
+
+  // 3. Dynamic Color theo Theme System
+  const color = useMemo(() => {
+    if (status === "STREAK_LOST") return theme.error || "#ef4444";
+    if (status === "SHIELD_USED") return theme.secondary || "#6366f1";
+    return theme.primary || "#f97316";
+  }, [status, theme]);
 
   return (
-    <View>
-      {/* Header Icon */}
-      <Animated.View entering={ZoomIn.delay(100)} className="items-center">
-        <View className="mb-3 h-20 w-20 items-center justify-center rounded-3xl bg-zinc-800/80 border border-white/10 shadow-inner">
-          <Text className="text-4xl">{config.icon}</Text>
+    <View className="relative py-2">
+      {/* 🛡️ SHIELD — compact */}
+      <View className="absolute top-0 right-0 z-10">
+        <View className="flex-row items-center rounded-full border border-indigo-400/15 bg-indigo-500/10 px-2.5 py-1">
+          <Text className="text-xs">🛡️</Text>
+          <Text className="ml-1 text-[10px] font-bold text-indigo-300">
+            {data.shield.current}/3
+          </Text>
+        </View>
+      </View>
+
+      {/* --- HERO SECTION --- */}
+      <Animated.View
+        entering={ZoomIn.delay(100).springify()}
+        className="mt-7 items-center"
+      >
+        {/* STREAK */}
+        <View className="relative items-center justify-center px-8">
+          {/* BEST STAMP */}
+          {isBestRecord && (
+            <Animated.View
+              entering={ZoomIn.delay(280).springify().damping(17).mass(1)}
+              className=" absolute right-0 top-0 z-10"
+              style={{
+                transform: [{ rotate: "30deg" }],
+              }}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full border-2 border-amber-400/80 bg-amber-500/15">
+                <View className="absolute inset-1 rounded-full border border-amber-400/40" />
+
+                <Text className="text-[7px] font-black tracking-widest text-amber-300">
+                  BEST
+                </Text>
+              </View>
+            </Animated.View>
+          )}
+
+          {/* Main Streak Number */}
+          <Text className="text-8xl font-black leading-[0.9] tracking-tighter text-white">
+            {data.streak.current}
+          </Text>
+
+          {/* Small identity label */}
+          <Text className="mt-1 text-[9px] font-bold uppercase tracking-[0.28em] text-orange-400/80">
+            DAYS STREAK
+          </Text>
         </View>
 
-        <Text className="text-center text-xl font-black text-white">
-          {config.title}
-        </Text>
-        <Text className="mt-1 text-center text-xs text-zinc-400 px-2">
-          {data.message?.subtitle}
+        {/* TITLE */}
+        <View className="mt-5 flex-row items-center justify-center">
+          {/* Left icon */}
+          <Text className="text-base">{config.icon}</Text>
+
+          <Text className="mx-2 text-center text-lg font-black text-white">
+            {config.title}
+          </Text>
+
+          {/* Mirrored right icon */}
+          <Text
+            className="text-base"
+            style={{
+              transform: [{ scaleX: -1 }],
+            }}
+          >
+            {config.icon}
+          </Text>
+        </View>
+
+        {/* SUBTITLE */}
+        <Text className="mt-1.5 px-8 text-center text-xs leading-5 text-zinc-400">
+          {data.message?.subtitle || config.subtitle}
         </Text>
       </Animated.View>
 
-      {/* Dynamic Content Details */}
-      <Animated.View entering={FadeInUp.delay(200)} className="mt-5 space-y-2">
-        {/* STREAK COUNTER DISPLAY */}
-        <View className="flex-row items-center justify-between rounded-2xl bg-zinc-950/70 p-4 border border-zinc-800/80">
-          <View className="flex-row items-center">
-            <Text className="mr-2 text-lg">🔥</Text>
-            <Text className="text-xs font-semibold text-zinc-400">
-              Current Streak
+      {/* --- STATS SECTION --- */}
+      <Animated.View
+        entering={FadeInUp.delay(200)}
+        className="mt-7 flex-row gap-x-3"
+      >
+        {/* HABIT PANEL */}
+        <View className="flex-1 items-center justify-between rounded-2xl border border-white/5 bg-zinc-800/50 px-3 py-3">
+          <View className="mb-1.5 flex-row items-center self-start">
+            <Text className="text-sm">📈</Text>
+
+            <Text className="ml-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
+              Habit
             </Text>
           </View>
-          <View className="flex-row items-baseline">
-            <Text className="text-2xl font-black text-orange-400">
-              {data.streak.current}
+
+          <View className="my-1 items-center">
+            <Text className="text-2xl font-black text-emerald-400">
+              {data.habit.currentPercent}%
             </Text>
-            <Text className="ml-1 text-xs text-zinc-500">days</Text>
           </View>
+
+          {data.habit.currentPercent !== data.habit.previousPercent ? (
+            <Text
+              className={`text-[9px] font-medium mt-0.5 ${
+                data.habit.currentPercent >= data.habit.previousPercent
+                  ? "text-success/80"
+                  : "text-error/80"
+              }`}
+            >
+              {data.habit.currentPercent >= data.habit.previousPercent
+                ? "▲"
+                : "▼"}{" "}
+              {Math.abs(data.habit.currentPercent - data.habit.previousPercent)}
+              %
+            </Text>
+          ) : (
+            <Text className="mt-0.5 text-[8px] uppercase tracking-wide text-zinc-600">
+              Consistency
+            </Text>
+          )}
         </View>
 
-        {/* SHIELD STATUS (Neu dung Shield) */}
-        {status === "SHIELD_USED" && (
-          <View className="rounded-2xl bg-indigo-500/10 p-3.5 border border-indigo-500/20 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Text className="mr-2 text-base">🛡️</Text>
-              <Text className="text-xs text-indigo-200">Shield Consumed</Text>
-            </View>
-            <Text className="text-xs font-bold text-indigo-300">
-              {data.shield.previous} ➔ {data.shield.current} left
-            </Text>
-          </View>
-        )}
+        {/* RETAIN PANEL */}
+        <View className="flex-1 items-center justify-between rounded-2xl border border-white/5 bg-zinc-800/50 px-3 py-3">
+          <View className="mb-1.5 flex-row items-center self-start">
+            <Text className="text-sm">💎</Text>
 
-        {/* STREAK LOST / RETAIN PENALTY (Neu mat Streak) */}
-        {status === "STREAK_LOST" && (
-          <View className="rounded-2xl bg-red-500/10 p-3.5 border border-red-500/20">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-xs text-red-300">Retain Circle Lost</Text>
-              <Text className="text-xs font-bold text-red-400">
-                -{data.retain.previous - data.retain.current}
-              </Text>
-            </View>
-            <Text className="mt-1 text-[10px] text-zinc-500">
-              Don't worry! Start a new fast today to rebuild your habit.
+            <Text className="ml-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
+              Retain
             </Text>
           </View>
-        )}
+
+          <View className="my-1 items-center">
+            <Text className="text-2xl font-black text-amber-400">
+              {data.retain.current}
+            </Text>
+          </View>
+
+          {data.retain.current !== data.retain.previous ? (
+            <Text
+              className={`text-[9px] font-medium ${
+                data.retain.current >= data.retain.previous
+                  ? "text-emerald-400/80"
+                  : "text-red-400/80"
+              }`}
+            >
+              {data.retain.current >= data.retain.previous ? "+" : "-"}
+              {Math.abs(data.retain.current - data.retain.previous)} pts
+            </Text>
+          ) : (
+            <Text className="mt-0.5 text-[8px] uppercase tracking-wide text-zinc-600">
+              Points
+            </Text>
+          )}
+        </View>
       </Animated.View>
 
-      {/* Action Button */}
+      {/* --- ACTION BUTTON --- */}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onClose}
-        className={`mt-6 rounded-2xl ${config.btnBg} py-3.5 items-center justify-center shadow-lg`}
+        style={{ backgroundColor: color, boxShadow: "0px 4px 8px " + color }}
+        className="mt-6 items-center justify-center rounded-2xl py-3.5"
       >
-        <Text className={`text-sm font-bold ${config.btnText}`}>
-          {status === "STREAK_LOST" ? "Keep Going" : "Awesome!"}
-        </Text>
+        <Text className="text-sm font-bold text-white">{config.btnText}</Text>
       </TouchableOpacity>
     </View>
   );

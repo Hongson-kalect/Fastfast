@@ -1,9 +1,9 @@
-import { FastSession, UserProfile } from "@/interfaces/db.type";
+import { UserProfile } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
+import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
-import { getLastFastSession } from "./fast_sessions";
 
-export const shield_rewards = [35,70,100]
+export const shield_rewards = [35, 70, 100];
 // Bảng 2: Thông tin người dùng (User Profile)
 export const generateString = /*sql*/ `
 CREATE TABLE IF NOT EXISTS user_profile (
@@ -30,6 +30,61 @@ CREATE TABLE IF NOT EXISTS user_profile (
 );
 `;
 
+const today = new Date().toISOString().split("T")[0]; // Format 'YYYY-MM-DD'
+const nowTimestamp = Math.floor(Date.now() / 1000);
+
+// Mặc định bản ghi seed cơ bản
+const seedProfile = {
+  id: uuidv7(),
+  name: "Fasting Hero",
+  account_type: "free",
+  image_uri: null,
+  current_streak: 0,
+  max_streak: 0,
+  streak_date: null,
+  full_habit_at: null,
+  low_shield_clamable: 1,
+  mid_shield_clamable: 1,
+  full_shield_clamable: 1,
+  upload_url: null,
+  backup_url: null,
+  sync_status: "synced",
+};
+
+export const userSeedData = /*sql*/ `
+INSERT OR IGNORE INTO user_profile (
+    id,
+    name,
+    account_type,
+    image_uri,
+    current_streak,
+    max_streak,
+    streak_date,
+    full_habit_at,
+    low_shield_clamable,
+    mid_shield_clamable,
+    full_shield_clamable,
+    upload_url,
+    backup_url,
+    sync_status
+) VALUES (
+    '${seedProfile.id}',
+    '${seedProfile.name}',
+    '${seedProfile.account_type}',
+    ${seedProfile.image_uri},
+    ${seedProfile.current_streak},
+    ${seedProfile.max_streak},
+    ${seedProfile.streak_date},
+    ${seedProfile.full_habit_at},
+    ${seedProfile.low_shield_clamable},
+    ${seedProfile.mid_shield_clamable},
+    ${seedProfile.full_shield_clamable},
+    ${seedProfile.upload_url},
+    ${seedProfile.backup_url},
+    '${seedProfile.sync_status}'
+);
+`;
+
 // Chỉ lấy profile gần nhất, có thể dùng khi có update nhẹ bên trong
 export const getUserProfile = async (
   db: SQLiteDatabase,
@@ -48,17 +103,25 @@ export const getUserProfile = async (
 };
 
 // Kiểm trả streak và trả về profile mới
-export const increaseStreak =async (db: SQLiteDatabase, profile: UserProfile, streakNumber: number) => {
-  const today = getLocalTodayStr()
-  const newStreak = profile.current_streak + streakNumber
-  await db.runAsync(`UPDATE user_profile SET current_streak = ${newStreak}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`);
-  const newProfile = await getUserProfile(db)
-  return newProfile!
-}
+export const increaseStreak = async (
+  db: SQLiteDatabase,
+  profile: UserProfile,
+  streakNumber: number,
+) => {
+  const today = getLocalTodayStr();
+  const newStreak = profile.current_streak + streakNumber;
+  await db.runAsync(
+    `UPDATE user_profile SET current_streak = ${newStreak}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+  );
+  const newProfile = await getUserProfile(db);
+  return newProfile!;
+};
 
-export const clearStreak = async(db: SQLiteDatabase, profile: UserProfile) =>{
-  const today = getLocalTodayStr()
-  await db.runAsync(`UPDATE user_profile SET current_streak = 1,  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`);
-  const newProfile = await getUserProfile(db)
-  return newProfile!
-}
+export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile) => {
+  const today = getLocalTodayStr();
+  await db.runAsync(
+    `UPDATE user_profile SET current_streak = 1,  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+  );
+  const newProfile = await getUserProfile(db);
+  return newProfile!;
+};

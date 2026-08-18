@@ -7,11 +7,12 @@ import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
+import { Toast } from "toastify-react-native";
 import { StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings, isDarkMode } = useAppStore();
-  const {setGlobalModal} = useModalStore();
+  const { setGlobalModal } = useModalStore();
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
   SplashScreen.preventAutoHideAsync();
@@ -28,15 +29,100 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!db) return;
 
     const load = async () => {
-      const streak = await init(db);
-
-      if(streak?.shouldShowModal){
-setGlobalModal({
-  type: "custom",
-  render: <StreakCheckModal data={streak}/>
-})
-      }
+      const streakObj = await init(db);
+      const testData = {
+        streak: {
+          previous: 2,
+          max: 3,
+          current: 3,
+        },
+        habit: {
+          previousPercent: 90,
+          currentPercent: 90,
+        },
+        retain: {
+          previous: 0,
+          current: 0,
+        },
+        shield: {
+          previous: 0,
+          current: 0,
+        },
+      };
       setDBReady(true);
+
+      console.log("streak", streakObj);
+      if (!testData) return;
+
+      const { streak, habit, retain, shield } = testData;
+
+      // Danh sách các cột mốc quan trọng
+      const MILESTONES = [3, 7, 14, 21, 30, 60, 90, 100, 180, 365];
+
+      // 1. Check xem lần cập nhật này có vượt qua cột mốc nào trong MILESTONES hay không
+      const hitMilestone = MILESTONES.some(
+        (m) => streak.previous < m && streak.current >= m,
+      );
+
+      // 2. Check có dùng Shield hay không (Shield giảm)
+      const usedShield = shield.previous > shield.current;
+
+      // 3. Check có bị gãy Streak hay không (Streak giảm)
+      const lostStreak = streak.previous > streak.current;
+
+      // --- ĐIỀU KIỆN MỞ MODAL EVENT-DRIVEN ---
+      if (hitMilestone || usedShield || lostStreak) {
+        setGlobalModal({
+          type: "custom",
+          render: (
+            <StreakCheckModal
+              data={{
+                streak: {
+                  current: streak.current,
+                  max: streak.max,
+                  previous: streak.previous,
+                },
+                habit: {
+                  currentPercent: habit.currentPercent,
+                  previousPercent: habit.previousPercent,
+                },
+                retain: {
+                  current: retain.current,
+                  previous: retain.previous,
+                },
+                shield: {
+                  current: shield.current,
+                  previous: shield.previous,
+                },
+              }}
+            />
+          ),
+        });
+      } else if (streak.current > streak.previous) {
+        Toast.show({
+          type: "success",
+          text1: "Main message",
+          text2: "Secondary message",
+          position: "top",
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => console.log("Toast pressed"),
+          onShow: () => console.log("Toast shown"),
+          onHide: () => console.log("Toast hidden"),
+        });
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Main message",
+        text2: "Secondary message",
+        position: "bottom",
+        visibilityTime: 4000,
+        autoHide: true,
+        onPress: () => console.log("Toast pressed"),
+        onShow: () => console.log("Toast shown"),
+        onHide: () => console.log("Toast hidden"),
+      });
     };
 
     load();
@@ -59,6 +145,7 @@ setGlobalModal({
   }, []);
 
   useEffect(() => {
+    console.log(isDBReady, isFontReady);
     if (isDBReady && isFontReady) {
       SplashScreen.hideAsync();
     }
