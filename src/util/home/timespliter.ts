@@ -1,3 +1,5 @@
+import { fixed } from "../numberLimit";
+
 interface DissectedDay {
   log_date: string; // Định dạng 'YYYY-MM-DD' theo múi giờ local
   hours_in_day: number; // Số giờ nhịn thuộc về ngày đó (Ví dụ: 4.5, 24, 12)
@@ -45,8 +47,8 @@ export const splitSessionIntoDays = (
     // Đẩy kết quả của ngày này vào mảng
     result.push({
       log_date: dateStr,
-      hours_in_day: parseFloat(hoursInDay.toFixed(2)), // Làm tròn 2 chữ số thập phân cho đẹp DB
-      elapsed_hours: parseFloat(timeleap.toFixed(2)),
+      hours_in_day: fixed(hoursInDay), // Làm tròn 2 chữ số thập phân cho đẹp DB
+      elapsed_hours: fixed(timeleap),
     });
 
     // 5. Nhảy con trỏ sang đúng 00:00:00 của ngày hôm sau để tiếp tục vòng lặp

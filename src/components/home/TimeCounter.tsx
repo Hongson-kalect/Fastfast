@@ -140,11 +140,19 @@ const HomeTimeCounter = ({
 
   const openTargetSheet = () => {
     present({
-      render: () => <TargetSheet />,
+      render: () => <TargetSheet currentFast={currentFast} />,
       title: "",
       onClose: () => close(),
       size: "long",
     });
+  };
+
+  const changeTarget = () => {
+    close();
+
+    setTimeout(() => {
+      openTargetSheet();
+    }, 500);
   };
 
   const openFastingSheet = () => {
@@ -155,14 +163,9 @@ const HomeTimeCounter = ({
             counter={counter}
             fastTarget={currentTarget}
             currentFast={currentFast}
-            onStopFasting={() => {
-              finishFasting();
-              close();
-            }}
-            onCancelFasting={() => {
-              cancelFasting();
-              close();
-            }}
+            onStopFasting={finishFasting}
+            onCancelFasting={cancelFasting}
+            onChangeTarget={changeTarget}
           />
         ),
         title: "Fasting",

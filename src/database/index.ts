@@ -28,6 +28,7 @@ import {
   getLastFastSession,
   getYearFastSession,
   startNewSession,
+  updateSessionTarget,
 } from "./shema/fast_sessions";
 import {
   getUserSettings,
@@ -90,7 +91,10 @@ export const createDBService = (db: SQLiteDatabase) => ({
     isValid: boolean,
   ) => finishLastSession(db, id, endTime, duration, isValid),
   deleteSession: (id: string) => deleteSession(db, id),
-  startNewSession: (startTime: number) => startNewSession(db, startTime),
+  startNewSession: (startTime: number, targetDuration?: number) =>
+    startNewSession(db, startTime, targetDuration),
+  updateSessionTarget: (id: string, targetDuration: number | null) =>
+    updateSessionTarget(db, id, targetDuration),
 
   getDailyLogs: (days?: number) => getDailyLogs(db, days),
   getTodayLog: () => getTodayLog(db),
@@ -273,7 +277,7 @@ export const handleLogin = async ({
     retain: {
       previous: habitLog?.habit_retain || 0,
       current: habitLog?.habit_retain || 0,
-    }
+    },
   };
 
   if (!lastFast) {
@@ -358,6 +362,8 @@ export const handleLogin = async ({
       streakStat.streak.previous + increaseStreakNumber;
 
     returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
+    streakStat.streak.max = returnProfile.max_streak;
+    streakStat.streak.current = returnProfile.current_streak;
     if (habitLog && reduceShieldNumber)
       returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
   } else {

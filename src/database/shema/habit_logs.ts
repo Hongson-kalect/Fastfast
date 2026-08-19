@@ -1,8 +1,8 @@
-import { numberLimit } from './../../util/numberLimit';
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
+import { numberLimit } from "./../../util/numberLimit";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Habit Logs) để vẽ Chart và Grid
 export const generateString = /*sql*/ `
@@ -15,16 +15,18 @@ CREATE TABLE IF NOT EXISTS habit_logs (
 
     habit_delta REAL,
     habit_snap REAL,
+    shield_detail TEXT, -- [Số shield trừ do nghỉ or cộng do fast, số shield tăng bởi retain, tăng bởi bonus mốc, tăng bởi sự kiện]
     
     shield_delta REAL,
     shield_snap REAL,
+    overest INTEGER,
     
     habit_retain REAL,
     retain_delta REAL,
 
     is_deleted INTEGER DEFAULT 0,   -- Xóa mềm phục vụ đồng bộ
     sync_status TEXT DEFAULT 'pending',
-    description TEXT DEFAULT 'pending',
+    description TEXT,
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now')),
     FOREIGN KEY (fast_id) REFERENCES fast_sessions(id) ON DELETE SET NULL
@@ -47,7 +49,7 @@ export const getHabitLogs = async (
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
   const rows = await db.getAllAsync<HabitLog & FastSession>(
-  `
+    `
   SELECT
     hl.*,
 
@@ -72,8 +74,8 @@ export const getHabitLogs = async (
 
   ORDER BY hl.log_date DESC, hl.created_at DESC;
   `,
-  [startDate],
-);
+    [startDate],
+  );
   // const rows = await db.getAllAsync<HabitLog>(`SELECT * FROM habit_logs;`);
   return rows;
 };
@@ -103,25 +105,25 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
 
   const habit_data = { ...data };
   let retain = 0;
-  let bonusShield = 0
-  let habitDetla = data.habit_detla||0
-  let retainDelta = 0
-  
+  let bonusShield = 0;
+  let habitDetla = data.habit_detla || 0;
+  let retainDelta = 0;
+
   const lastLog = await getLastHabitLog(db);
 
   if (lastLog?.habit_snap === 100) {
     // habit giảm
     if (habit_data.habit_detla) {
       if (habit_data.habit_detla < 0) retain = 0;
-      else{
+      else {
         retain = (lastLog?.habit_retain || 0) + (habit_data.habit_detla || 0);
-        habitDetla = 0
-        retainDelta = habit_data.habit_detla
+        habitDetla = 0;
+        retainDelta = habit_data.habit_detla;
       }
 
-      if (retain >=RETAIN_LIMIT) {
-        retain = 0
-        bonusShield = 1
+      if (retain >= RETAIN_LIMIT) {
+        retain = 0;
+        bonusShield = 1;
       }
     }
   }
@@ -130,9 +132,20 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     habit_data.habit_snap =
       (lastLog?.habit_snap || 0) + (habit_data.habit_detla || 0);
     habit_data.shield_snap =
-      (lastLog?.shield_snap || 0) + (habit_data.shield_detla || 0) + bonusShield;
+      (lastLog?.shield_snap || 0) +
+      (habit_data.shield_detla || 0) +
+      bonusShield;
   }
-  
+
+  let shield_detail = null;
+
+  if (habit_data.shield_detla || bonusShield) {
+    shield_detail = JSON.stringify([
+      habit_data.shield_detla || 0,
+      bonusShield || 0,
+    ]);
+  }
+
   // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
   // const currentLog = await db.getFirstAsync<HabitLog>(`SELECT * FROM habit_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);
 
@@ -142,17 +155,18 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   //   await db.runAsync(`INSERT INTO habit_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
   // }
   await db.runAsync(
-    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, snap_delta, shield_delta, shield_snap, habit_retain) VALUES (?, ?, ?, ?, ?,?,?,?)`,
+    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, retain_delta, shield_delta, shield_snap, habit_retain, shield_detail) VALUES (?, ?, ?, ?, ?,?,?,?,?,?)`,
     [
       id,
       log_date,
       data.fast_id || null,
-      numberLimit(habitDetla || 0,0,100),
+      numberLimit(habitDetla || 0, 0, 100),
       habit_data.habit_snap || 0,
       retainDelta,
       habit_data.shield_detla || 0,
-      numberLimit(habit_data.shield_snap||0,0,SHIELD_LIMIT),
-      numberLimit(retain,0,RETAIN_LIMIT),
+      numberLimit(habit_data.shield_snap || 0, 0, SHIELD_LIMIT),
+      numberLimit(retain, 0, RETAIN_LIMIT),
+      shield_detail,
     ],
   );
 
@@ -180,7 +194,7 @@ export const reduceShield = async (
       lastHabitLog.habit_snap,
       -reduce,
       lastHabitLog.shield_snap - reduce,
-      lastHabitLog.habit_retain,
+      lastHabitLog.habit_retain || 0,
     ],
   );
 
@@ -192,14 +206,14 @@ export const reduceHabit = async (
   db: SQLiteDatabase,
   lastHabitLog: HabitLog,
   reduce: number,
-  days: number
+  days: number,
 ) => {
   const today = getLocalTodayStr();
   const id = uuidv7();
 
   await db.runAsync(
     `INSERT INTO habit_logs 
-    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, description) 
+    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, overest) 
     VALUES (?, ?, ?, ?, ?,?,?,?)`,
     [
       id,
@@ -210,7 +224,7 @@ export const reduceHabit = async (
       0,
       lastHabitLog.shield_snap,
       0,
-      days.toString()
+      days,
     ],
   );
 

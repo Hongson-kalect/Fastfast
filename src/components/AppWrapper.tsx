@@ -8,7 +8,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
 import { Toast } from "toastify-react-native";
-import { StreakCheckModal } from "./home/StreakModal";
+import { MILESTONES, StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings, isDarkMode } = useAppStore();
@@ -32,9 +32,9 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       const streakObj = await init(db);
       const testData = {
         streak: {
-          previous: 2,
-          max: 3,
-          current: 3,
+          previous: 57,
+          max: 60,
+          current: 61,
         },
         habit: {
           previousPercent: 90,
@@ -45,20 +45,18 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
           current: 0,
         },
         shield: {
-          previous: 0,
-          current: 0,
+          previous: 3,
+          current: 3,
         },
       };
       setDBReady(true);
 
       console.log("streak", streakObj);
-      if (!testData) return;
+      if (!streakObj) return;
 
-      const { streak, habit, retain, shield } = testData;
+      const { streak, habit, retain, shield } = streakObj;
 
       // Danh sách các cột mốc quan trọng
-      const MILESTONES = [3, 7, 14, 21, 30, 60, 90, 100, 180, 365];
-
       // 1. Check xem lần cập nhật này có vượt qua cột mốc nào trong MILESTONES hay không
       const hitMilestone = MILESTONES.some(
         (m) => streak.previous < m && streak.current >= m,
@@ -72,39 +70,48 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
       // --- ĐIỀU KIỆN MỞ MODAL EVENT-DRIVEN ---
       if (hitMilestone || usedShield || lostStreak) {
-        setGlobalModal({
-          type: "custom",
-          render: (
-            <StreakCheckModal
-              data={{
-                streak: {
-                  current: streak.current,
-                  max: streak.max,
-                  previous: streak.previous,
-                },
-                habit: {
-                  currentPercent: habit.currentPercent,
-                  previousPercent: habit.previousPercent,
-                },
-                retain: {
-                  current: retain.current,
-                  previous: retain.previous,
-                },
-                shield: {
-                  current: shield.current,
-                  previous: shield.previous,
-                },
-              }}
-            />
-          ),
-        });
-      } else if (streak.current > streak.previous) {
+        setTimeout(
+          () =>
+            setGlobalModal({
+              type: "custom",
+              render: (
+                <StreakCheckModal
+                  data={{
+                    streak: {
+                      current: streak.current,
+                      max: streak.max,
+                      previous: streak.previous,
+                    },
+                    habit: {
+                      currentPercent: habit.currentPercent,
+                      previousPercent: habit.previousPercent,
+                    },
+                    retain: {
+                      current: retain.current,
+                      previous: retain.previous,
+                    },
+                    shield: {
+                      current: shield.current,
+                      previous: shield.previous,
+                    },
+                  }}
+                />
+              ),
+            }),
+          1000,
+        );
+      } else if (streak.current < 1 && streak.current > streak.previous) {
         Toast.show({
           type: "success",
-          text1: "Main message",
-          text2: "Secondary message",
+          text2: "Sreak increased!",
+          text1:
+            "+" +
+            (streak.current - streak.previous) +
+            ", Current Streak: " +
+            streak.current +
+            " 🔥",
           position: "top",
-          visibilityTime: 3000,
+          visibilityTime: 5000,
           autoHide: true,
           onPress: () => console.log("Toast pressed"),
           onShow: () => console.log("Toast shown"),
@@ -112,17 +119,17 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         });
       }
 
-      Toast.show({
-        type: "success",
-        text1: "Main message",
-        text2: "Secondary message",
-        position: "bottom",
-        visibilityTime: 4000,
-        autoHide: true,
-        onPress: () => console.log("Toast pressed"),
-        onShow: () => console.log("Toast shown"),
-        onHide: () => console.log("Toast hidden"),
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Main message",
+      //   text2: "Secondary message",
+      //   position: "bottom",
+      //   visibilityTime: 4000,
+      //   autoHide: true,
+      //   onPress: () => console.log("Toast pressed"),
+      //   onShow: () => console.log("Toast shown"),
+      //   onHide: () => console.log("Toast hidden"),
+      // });
     };
 
     load();

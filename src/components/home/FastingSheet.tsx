@@ -1,11 +1,13 @@
 import { FastingTargetItem, getFastingStatus } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { getRelativeTime, timeString } from "@/util/timer";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { fixed } from "@/util/numberLimit";
 
 interface FastingSheetProps {
   fastTarget: FastingTargetItem;
@@ -13,6 +15,7 @@ interface FastingSheetProps {
   counter: number;
   onStopFasting?: () => void;
   onCancelFasting?: () => void;
+  onChangeTarget: () => void;
 }
 
 const FastingSheet = ({
@@ -21,8 +24,10 @@ const FastingSheet = ({
   fastTarget,
   onStopFasting,
   onCancelFasting,
+  onChangeTarget,
 }: FastingSheetProps) => {
   const { theme } = useAppStore();
+  const { setGlobalModal } = useModalStore();
   // Giả lập dữ liệu demo
   const finishTime = useMemo(() => {
     return currentFast?.start_time + fastTarget.hours * 3600_000;
@@ -61,7 +66,7 @@ const FastingSheet = ({
     const relativeTime = getRelativeTime(new Date(finishTime));
     return {
       finishTime: relativeTime,
-      habitGain: habitGain,
+      habitGain: fixed(habitGain),
       shieldBonus: shieldBonus,
     };
   }, []);
@@ -74,10 +79,21 @@ const FastingSheet = ({
     );
     return {
       // achievedLabel: `Đạt mốc ${currentHour}/${fastTarget.hours}`,
-      habitGain: habitGain,
+      habitGain: fixed(habitGain),
       shieldBonus: shieldBonus,
     };
   }, []);
+
+  const changeTargetConfirm = () => {
+    setGlobalModal({
+      type: "confirm",
+      title: "Change Target",
+      message: "Are you sure to change target?",
+      onOk: async () => {
+        onChangeTarget();
+      },
+    });
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -229,7 +245,8 @@ const FastingSheet = ({
           </View>
 
           {/* Card A: Nếu hoàn thành Target */}
-          <View
+          <Pressable
+            onPress={changeTargetConfirm}
             style={{
               borderColor: fastTarget.colors.accent,
               backgroundColor: fastTarget.colors.badgeBg,
@@ -267,7 +284,7 @@ const FastingSheet = ({
                 {targetReward.shieldBonus ? `+${targetReward.shieldBonus}` : 0}
               </ThemedText>
             </View>
-          </View>
+          </Pressable>
         </View>
       </View>
 

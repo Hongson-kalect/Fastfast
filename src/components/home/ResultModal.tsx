@@ -1,6 +1,7 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { hourFormat } from "@/util/timer";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -10,7 +11,7 @@ export type FastResultStatus = "COMPLETED" | "ENDED_EARLY" | "OVERACHIEVED";
 
 export interface FastResultData {
   fastingTime: number;
-  targetHours: number;
+  targetHours: number | null;
   habitPercent: number; // VD: 92
   habitDiff: number; // VD: 3.4
   shields: {
@@ -82,17 +83,16 @@ export const ResultModal = ({ data = testData }: Props) => {
       status: "COMPLETED",
     };
     const fastingHour = data.fastingTime / 3600;
-    if (fastingHour > data.targetHours) {
+    if (!data.targetHours || fastingHour > data.targetHours) {
       returnData.status = "COMPLETED";
     } else returnData.status = "ENDED_EARLY";
     return returnData;
   }, [data]);
 
   const config = STATUS_CONFIG[status];
-  const progressRatio = Math.min(
-    1,
-    data.fastingTime / 3600 / data.targetHours,
-  );
+  const progressRatio = data.targetHours
+    ? Math.min(1, data.fastingTime / 3600 / data.targetHours)
+    : 1;
   const { theme } = useAppStore();
 
   return (
@@ -139,9 +139,11 @@ export const ResultModal = ({ data = testData }: Props) => {
             }}
           />
         </View>
-        <Text className="mt-1.5 text-right text-[11px] text-zinc-500">
-          Target: {data.targetHours}h ({Math.round(progressRatio * 100)}%)
-        </Text>
+        {data.targetHours && (
+          <Text className="mt-1.5 text-right text-[11px] text-zinc-500">
+            Target: {data.targetHours}h ({Math.floor(progressRatio * 100)}%)
+          </Text>
+        )}
       </Animated.View>
 
       {/* Metrics Grid */}
@@ -153,11 +155,11 @@ export const ResultModal = ({ data = testData }: Props) => {
         <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
           <Text className="text-[11px] text-zinc-400">Habit</Text>
           <Text className="mt-1 text-base font-bold text-white">
-            {data.habitPercent}%
+            {data.habitPercent.toFixed(1)}%
           </Text>
           {data.habitDiff > 0 && (
             <Text className="text-[10px] text-success font-semibold">
-              +{data.habitDiff}%
+              +{data.habitDiff.toFixed(1)}%
             </Text>
           )}
         </View>
@@ -166,7 +168,8 @@ export const ResultModal = ({ data = testData }: Props) => {
         <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
           <Text className="text-[11px] text-zinc-400">Shield</Text>
           <Text className="mt-1 text-base font-bold text-white">
-            🛡️ {data.shields.current}/{data.shields.max}
+            <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />{" "}
+            {data.shields.current}/{data.shields.max}
           </Text>
           {data.shields.gained > 0 ? (
             <Text className="text-[10px] text-success font-semibold">

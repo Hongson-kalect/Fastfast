@@ -21,10 +21,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { PhotoPickerModal } from "./ImageModal";
 import NoteModal from "./NoteModal";
+import DelayModal from "./DelayModal";
+import useModalStore from "@/stores/modalStore";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
-  toggleCounting: () => void;
+  toggleCounting: (time?: number) => void;
   variant?: "primary" | "secondary";
   loading?: boolean;
   className?: string;
@@ -138,6 +140,20 @@ export const SwapButton = ({
     setTempImage(uri);
   };
 
+  const {setGlobalModal} = useModalStore();
+  const handleDelaySubmit = (startTime:number) => {
+    setGlobalModal(null);
+    toggleCounting(startTime);  
+  }
+
+  const showDelayModal = () => {
+    setGlobalModal({type: "custom",
+      render: <DelayModal
+        isCounting={isCounting}
+        onSubmit={handleDelaySubmit}
+        />
+    });
+  }
   useEffect(() => {
     if (!dbService) return;
     detectTodayNote();
@@ -192,8 +208,9 @@ export const SwapButton = ({
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={toggleCounting}
+        <Pressable
+        onLongPress={showDelayModal}
+          onPress={()=>toggleCounting()}
           activeOpacity={0.7}
           disabled={loading}
           className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
@@ -211,7 +228,7 @@ export const SwapButton = ({
               color="white"
             />
           )}
-        </TouchableOpacity>
+        </Pressable>
 
         <TouchableOpacity
           onPress={() => setNoteModalVisible(true)}

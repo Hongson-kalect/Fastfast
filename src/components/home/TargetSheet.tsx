@@ -1,6 +1,7 @@
 import { FASTING_TARGETS, FastingTargetItem } from "@/constants/data";
 import { settingKey } from "@/constants/key";
 import { useDBService } from "@/hooks/useDBService";
+import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,9 +17,10 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
+  currentFast: FastSession | null
 }
 
-const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
+const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
   const { close } = useBottomSheet();
   const dbService = useDBService();
   const { settings, updateSetting, theme } = useAppStore();
@@ -44,12 +46,22 @@ const TargetSheet = ({ onSelectTarget }: TargetSheetProps) => {
     updateSetting({ [settingKey.target]: selected.hours });
     dbService.setting(settingKey.target, selected.hours);
     if (onSelectTarget) onSelectTarget(selected);
+
+    // Nếu đang có phiên hiện tại thì cập nhật target vào phiên
+    if(currentFast){
+      dbService.updateSessionTarget(currentFast.id, selected.hours);
+    }
     close();
   };
 
   const handleClearTarget = () => {
     updateSetting({ [settingKey.target]: null });
     dbService.setting(settingKey.target, null);
+
+    if(currentFast){
+      dbService.updateSessionTarget(currentFast.id, null);
+    }
+
     close();
   };
 

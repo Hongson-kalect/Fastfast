@@ -18,6 +18,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { fixed } from "@/util/numberLimit";
 
 export const GoalCard = () => {
   const dbService = useDBService();
@@ -108,8 +109,6 @@ export const GoalCard = () => {
     openWeightTargetModal();
   };
 
-  console.log(targetWeight);
-
   const getActiveWeightTarget = async () => {
     const res = await dbService?.getActiveWeightTarget();
     if (res) setActiveTarget(res);
@@ -178,7 +177,7 @@ export const GoalCard = () => {
           <View className="flex-row items-baseline gap-0.5">
             <MaterialCommunityIcons name="weight" size={16} color="white" />
             <Text className="text-lg font-bold text-white">
-              {weight.toFixed(1)}
+              {fixed(weight)}
             </Text>
             <Text className="text-[10px] text-zinc-400">kg</Text>
           </View>

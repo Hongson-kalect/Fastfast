@@ -470,6 +470,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   }, [log?.target_duration]);
 
   const isFastSuccess = useMemo(() => {
+    if (!log.habit_delta) return null;
     if (log.habit_delta > 0) return true;
     if (log.habit_delta < 0) return false;
     return null;
@@ -483,6 +484,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   }, [log]);
 
   const isShieldIncrease = useMemo(() => {
+    if (!log.shield_delta) return null;
     if (log.shield_delta > 0) return true;
     if (log.shield_delta < 0) return false;
     return null;
@@ -490,10 +492,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
 
   const state = useMemo(() => {
     // 1. Fasting, 2. Shield, 3. Rest, 4. Over Rest
-    if (log.habit_delta > 0) return 1;
-    if (log.habit_delta < 0) return 4;
-    if (log.shield_delta > 0) return 2;
-    if (log.shield_delta < 0) return 3;
+    if (log?.habit_delta && log.habit_delta > 0) return 1;
+    if (log?.habit_delta && log.habit_delta < 0) return 4;
+    if (log?.shield_delta && log.shield_delta > 0) return 2;
+    if (log?.shield_delta && log.shield_delta < 0) return 3;
     return 0;
   }, [log]);
 
@@ -526,10 +528,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
           {isFastSuccess !== null
             ? isFastSuccess
               ? target?.label || log?.description || "Fasting session"
-              : `😞 You over rest ${log?.description} day(s)`
+              : `😞 You over rest ${log?.overest} day(s)`
             : isShieldIncrease
               ? log?.description || "⬆️ Shield increase"
-              : `🌱 Rest ${log.shield_delta} days`}
+              : `🌱 Rest ${Math.abs(log?.shield_delta || 0)} days`}
         </Text>
         {log.target_duration && isTargetSuccess ? (
           <Feather name="check-circle" color={theme.success} size={12} />
@@ -552,7 +554,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   if (!log) return null;
 
   const isShieldEvent = Boolean(log.shield_delta);
-  const isPositiveHabit = log.habit_delta > 0;
+  const isPositiveHabit = log.habit_delta && log.habit_delta > 0;
 
   return (
     <View
@@ -581,7 +583,9 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
               <FontAwesome5
                 name="shield-alt"
                 size={13}
-                color={log.shield_delta > 0 ? theme.primary : labelColor}
+                color={
+                  Number(log?.shield_delta) > 0 ? theme.primary : labelColor
+                }
               />
             ) : (
               <Ionicons
@@ -623,7 +627,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
               <View className="flex-row items-center gap-1 mt-0.5 bg-blue-500/10 px-1.5 py-0.5 rounded">
                 <FontAwesome5 name="shield-alt" size={8} color="#60A5FA" />
                 <Text className="text-[9px] font-semibold text-blue-400">
-                  {log.shield_delta > 0
+                  {Number(log.shield_delta) > 0
                     ? `+${log.shield_delta}`
                     : log.shield_delta}
                 </Text>

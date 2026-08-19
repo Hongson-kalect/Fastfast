@@ -6,7 +6,6 @@ import MenuModal from "@/components/modals/components/MenuModal";
 import PromptModal from "@/components/modals/components/PromptModal";
 import TabsModal from "@/components/modals/components/TabModal";
 import ModalWrapper from "@/components/modals/ModalWrapper";
-import { useDebounce } from "@/hooks/useDebouce";
 import useModalStore from "@/stores/modalStore";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
@@ -108,19 +107,8 @@ export type BasicModalOptions = {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   middle?: React.ReactNode;
-  inAnimation?:
-    | "fadeIn"
-    | "slideInDown"
-    | "slideInUp"
-    | "slideInUp"
-    | "zoomIn"
-    | "zoomInDown";
-  outAnimation?:
-    | "fadeOut"
-    | "slideOutDown"
-    | "slideOutUp"
-    | "zoomOut"
-    | "zoomOutDown";
+  inAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
+  outAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
 };
 export type GlobalModalOptions = BasicModalOptions &
   (
@@ -140,70 +128,61 @@ export type ListModalOptions = {
   options: { label: string; value: number | string }[];
   onDismiss?: () => void;
   onSubmit: (val: number | string) => void;
-  inAnimation?:
-    | "fadeIn"
-    | "slideInDown"
-    | "slideInUp"
-    | "slideInUp"
-    | "zoomIn"
-    | "zoomInDown";
-  outAnimation?:
-    | "fadeOut"
-    | "slideOutDown"
-    | "slideOutUp"
-    | "zoomOut"
-    | "zoomOutDown";
+  inAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
+  outAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
 };
 
 const GlobalModalComponent = () => {
   const { globalModal, setGlobalModal } = useModalStore();
 
-  // Modal sẽ ẩn khi props = null => Dữ liệu bị mất ngay lập tức
-  // Animation out sẽ thực hiện với màn trắng => dùng cái này để cache dữ liệu trước đó
+  /**
+   * Giữ lại modal cũ trong thời gian exit animation.
+   *
+   * Khi:
+   *
+   * globalModal = modal
+   *        ↓
+   * show = true
+   *
+   * Sau đó:
+   *
+   * globalModal = null
+   *        ↓
+   * show = false
+   *
+   * placeholder vẫn giữ modal cũ để content
+   * không biến mất trước khi exit animation hoàn tất.
+   */
   const [placeholder, setPlaceholder] = useState(globalModal);
+
   useEffect(() => {
-    globalModal && setPlaceholder(globalModal);
+    if (globalModal) {
+      setPlaceholder(globalModal);
+    }
   }, [globalModal]);
 
-  // Khi hủy global để ẩn model thì cái đang hiển thị sẽ biến mất => cache lại dữ liệu trước đó
-  // hoặc chỉ set globalModal.show = null. Mà thôi 3 dòng này ngắn hơn
-  const showValue = useMemo(
-    () => (globalModal ? globalModal : placeholder),
-    [placeholder, globalModal],
-  );
+  /**
+   * Khi đang mở:
+   *   dùng globalModal
+   *
+   * Khi đang đóng:
+   *   dùng placeholder
+   */
+  const showValue = useMemo(() => {
+    return globalModal ?? placeholder;
+  }, [globalModal, placeholder]);
 
-  const outAnimation = useDebounce(globalModal?.outAnimation, 200); // when close all modal will be null, include outAnimation, so keep this to close it correctly
-
+  /**
+   * Khi close:
+   *
+   * globalModal sẽ trở thành null ngay lập tức.
+   *
+   * ModalWrapper vẫn còn mounted nhờ placeholder
+   * và tự chạy exit animation.
+   */
   const closeModal = () => {
     globalModal?.onDismiss?.();
     setGlobalModal(null);
-  };
-
-  const RenderContent = ({ modal }: { modal: typeof globalModal }) => {
-    if (!modal) return null;
-
-    switch (modal.type) {
-      case "alert":
-        return <AlertModal {...modal} />;
-
-      case "confirm":
-        return <ConfirmModal {...modal} />;
-
-      case "menu":
-        return <MenuModal {...modal} />;
-
-      case "input":
-        return <InputModal {...modal} />;
-
-      case "prompt":
-        return <PromptModal {...modal} />;
-
-      case "tabs":
-        return <TabsModal {...modal} />;
-
-      case "custom":
-        return <CustomModal {...modal} />;
-    }
   };
 
   return (
@@ -212,16 +191,51 @@ const GlobalModalComponent = () => {
       show={!!globalModal}
       onCancel={closeModal}
       inAnimation={showValue?.inAnimation}
-      outAnimation={outAnimation}
+      outAnimation={showValue?.outAnimation}
       type={showValue?.type}
+      // padding={showValue?.padding||0}
+      // titlePosition={showValue?.titlePosition}
+      bottom={showValue?.footer}
     >
       <View className="px-3 rounded-lg">
         {showValue?.header}
+
         {showValue && <RenderContent modal={showValue} />}
+
         {showValue?.footer}
       </View>
     </ModalWrapper>
   );
 };
 
+const RenderContent = ({ modal }: { modal: GlobalModalOptions }) => {
+  switch (modal.type) {
+    case "alert":
+      return <AlertModal {...modal} />;
+
+    case "confirm":
+      return <ConfirmModal {...modal} />;
+
+    case "menu":
+      return <MenuModal {...modal} />;
+
+    case "input":
+      return <InputModal {...modal} />;
+
+    case "prompt":
+      return <PromptModal {...modal} />;
+
+    case "tabs":
+      return <TabsModal {...modal} />;
+
+    case "custom":
+      return <CustomModal {...modal} />;
+
+    default:
+      return null;
+  }
+};
+
 export const GlobalModal = memo(GlobalModalComponent);
+
+export default GlobalModal;
