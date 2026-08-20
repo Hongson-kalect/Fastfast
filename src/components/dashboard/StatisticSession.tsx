@@ -128,7 +128,7 @@ export const StatisticsSection = ({ fastStatistics }: Props) => {
     {
       icon: "📅",
       title: "Active days",
-      value: fastStatistics.avg_hours,
+      value: userProfile?.active_days || 0,
       unit: "days",
       color: "#7F92F8",
     },

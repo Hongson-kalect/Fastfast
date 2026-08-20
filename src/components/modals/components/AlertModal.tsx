@@ -7,7 +7,7 @@ import { TouchableOpacity, View } from "react-native";
 type Props = AlertModalOptions & BasicModalOptions;
 
 const AlertModal = (modal: Props) => {
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const { theme } = useAppStore();
   return (
     <View>
@@ -25,7 +25,7 @@ const AlertModal = (modal: Props) => {
         className="rounded-lg py-3 mt-5 mx-2"
         onPress={() => {
           modal.onOk?.();
-          setGlobalModal(null);
+          addModal(null);
         }}
       >
         <ThemedText

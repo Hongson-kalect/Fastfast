@@ -6,6 +6,7 @@ import MenuModal from "@/components/modals/components/MenuModal";
 import PromptModal from "@/components/modals/components/PromptModal";
 import TabsModal from "@/components/modals/components/TabModal";
 import ModalWrapper from "@/components/modals/ModalWrapper";
+import "@/global.css";
 import useModalStore from "@/stores/modalStore";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
@@ -131,71 +132,59 @@ export type ListModalOptions = {
   inAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
   outAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
 };
-
 const GlobalModalComponent = () => {
-  const { globalModal, setGlobalModal } = useModalStore();
+  const {
+    currentModal,
+    modalQueue,
+    closeCurrentModal,
+  } = useModalStore();
 
-  /**
-   * Giữ lại modal cũ trong thời gian exit animation.
-   *
-   * Khi:
-   *
-   * globalModal = modal
-   *        ↓
-   * show = true
-   *
-   * Sau đó:
-   *
-   * globalModal = null
-   *        ↓
-   * show = false
-   *
-   * placeholder vẫn giữ modal cũ để content
-   * không biến mất trước khi exit animation hoàn tất.
-   */
-  const [placeholder, setPlaceholder] = useState(globalModal);
+  const [placeholder, setPlaceholder] =
+    useState<GlobalModalOptions | null>(currentModal);
+
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    if (globalModal) {
-      setPlaceholder(globalModal);
+    if (currentModal) {
+      setPlaceholder(currentModal);
     }
-  }, [globalModal]);
+  }, [currentModal]);
 
-  /**
-   * Khi đang mở:
-   *   dùng globalModal
-   *
-   * Khi đang đóng:
-   *   dùng placeholder
-   */
-  const showValue = useMemo(() => {
-    return globalModal ?? placeholder;
-  }, [globalModal, placeholder]);
+  const showValue = currentModal ?? placeholder;
 
-  /**
-   * Khi close:
-   *
-   * globalModal sẽ trở thành null ngay lập tức.
-   *
-   * ModalWrapper vẫn còn mounted nhờ placeholder
-   * và tự chạy exit animation.
-   */
   const closeModal = () => {
-    globalModal?.onDismiss?.();
-    setGlobalModal(null);
+    showValue?.onDismiss?.();
+
+    setIsClosing(true);
+    closeCurrentModal();
   };
+
+  const handleExitComplete = () => {
+  setTimeout(() => {
+    const nextModal = useModalStore.getState().modalQueue[0];
+
+    if (!nextModal) {
+      setPlaceholder(null);
+      return;
+    }
+
+    useModalStore.setState((state) => ({
+      currentModal: nextModal,
+      modalQueue: state.modalQueue.slice(1),
+    }));
+  }, 300);
+};
 
   return (
     <ModalWrapper
       title={showValue?.modalTitle}
-      show={!!globalModal}
+      show={!!currentModal}
       onCancel={closeModal}
       inAnimation={showValue?.inAnimation}
       outAnimation={showValue?.outAnimation}
       type={showValue?.type}
-      // padding={showValue?.padding||0}
-      // titlePosition={showValue?.titlePosition}
       bottom={showValue?.footer}
+      onExitComplete={handleExitComplete}
     >
       <View className="px-3 rounded-lg">
         {showValue?.header}

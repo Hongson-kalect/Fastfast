@@ -15,7 +15,12 @@ CREATE TABLE IF NOT EXISTS user_profile (
     -- Thêm các trường Thống kê Kỷ lục (Cache)
     current_streak INTEGER DEFAULT 0,
     max_streak INTEGER DEFAULT 0,
-    streak_date TEXT,                         -- 'YYYY-MM-DD' ngày streak cuối, để tính cộng streak
+    active_days INTEGER DEFAULT 0,
+    streak_date TEXT,                -- 'YYYY-MM-DD' ngày streak cuối, để tính cộng streak
+
+    total_shield_used INTEGER DEFAULT 0,
+    total_shield_clamable INTEGER DEFAULT 0,
+    total_shield_wasted INTEGER DEFAULT 0,
     
     full_habit_at TEXT,              -- 'YYYY-MM-DD'
     low_shield_clamable INTEGER,     -- Khi đạt 1 ngưỡng (35%), nếu ngưỡng này còn thì nhận 1 shield
@@ -111,7 +116,7 @@ export const increaseStreak = async (
   const today = getLocalTodayStr();
   const newStreak = profile.current_streak + streakNumber;
   await db.runAsync(
-    `UPDATE user_profile SET current_streak = ${newStreak}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+    `UPDATE user_profile SET current_streak = ${newStreak}, active_days = ${profile.active_days + streakNumber}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
   );
   const newProfile = await getUserProfile(db);
   return newProfile!;
@@ -120,7 +125,7 @@ export const increaseStreak = async (
 export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile) => {
   const today = getLocalTodayStr();
   await db.runAsync(
-    `UPDATE user_profile SET current_streak = 1,  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+    `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
   );
   const newProfile = await getUserProfile(db);
   return newProfile!;

@@ -8,7 +8,7 @@ type Props = TabsModalOptions & BasicModalOptions;
 
 const TabsModal = (modal: Props) => {
   const [width, setWidth] = useState(0);
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const [tabIndex, setTabIndex] = useState(0);
   return (
     <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
@@ -53,7 +53,7 @@ const TabsModal = (modal: Props) => {
             className="bg-gray-300 rounded-lg py-3 px-4"
             onPress={() => {
               modal.onCancel?.();
-              setGlobalModal(null);
+              addModal(null);
             }}
           >
             <ThemedText className="text-gray-600">
@@ -67,7 +67,7 @@ const TabsModal = (modal: Props) => {
           } min-w-28`}
           onPress={() => {
             modal.onOk?.();
-            setGlobalModal(null);
+            addModal(null);
           }}
         >
           <ThemedText className="text-white">{modal.okText || "OK"}</ThemedText>

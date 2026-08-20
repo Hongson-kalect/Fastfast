@@ -249,6 +249,17 @@ export const handleLogin = async ({
     };
   }
 
+  if (!profile.streak_date) {
+    // Nếu là lần đầu vào app, chưa có streak_date
+    const returnProfile = await clearStreak(db, profile);
+    return {
+      lastFast,
+      profile: returnProfile,
+      habitLog,
+      streak: null,
+    };
+  }
+
   // 0.Hôm nay đã xử lý rồi
   if (profile.streak_date === todayStr) {
     console.log("case 2");
@@ -325,7 +336,7 @@ export const handleLogin = async ({
     }
   } else {
     const diffInDays = Math.floor(
-      (now.getTime() - new Date(profile.streak_date).getTime()) /
+      (now.getTime() - new Date(profile.streak_date!).getTime()) /
         (1000 * 60 * 60 * 24),
     );
 
@@ -366,8 +377,11 @@ export const handleLogin = async ({
     streakStat.streak.current = returnProfile.current_streak;
     if (habitLog && reduceShieldNumber)
       returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
+
+    // thêm shield bị trừ ở profile
   } else {
     streakStat.streak.current = 1;
+    // thêm shield bị trừ ở profile
 
     returnProfile = await clearStreak(db, profile);
     if (habitLog && reduceHabitNumber) {

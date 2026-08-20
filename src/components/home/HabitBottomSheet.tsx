@@ -2,6 +2,7 @@ import { FASTING_TARGETS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
@@ -312,21 +313,6 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
 
       {/* 2. HERO: VÒNG TRÒN % Ở CHÍNH GIỮA */}
       <View className="items-center my-3">
-        {/* <View className="w-24 h-24 rounded-full bg-zinc-900 border-2 border-primary/50 items-center justify-center relative overflow-hidden shadow-lg shadow-primary/20">
-          <View
-            className="absolute bottom-0 w-full bg-primary/70"
-            style={{ height: `${Math.min(habitPercent, 100)}%` }}
-          >
-            <View className="h-1.5 bg-primary/40 w-full" />
-          </View>
-
-          <Text className="text-2xl font-black text-white z-10">
-            {habitPercent}
-          </Text>
-          <Text className="text-sm text-white opacity-70 z-10 absolute bottom-3 left-1/2 translate-x-[-50%]">
-            %
-          </Text>
-        </View> */}
         <Waterball
           percent={habitPercent}
           size={120}
@@ -601,8 +587,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
             {getTitle()}
 
             <Text className="text-[10px] text-zinc-400 mt-0.5">
-              {getLocalTodayStr(new Date(log.end_time || log.created_at))}
-              {log.duration ? ` • Fasted ${log.duration}h` : ""}
+              {log.end_time
+                ? getLocalTodayStr(new Date(log.end_time))
+                : "########"}
+              {log.duration ? ` • Fasted ${fixed(log.duration / 3600)}h` : ""}
             </Text>
           </View>
         </View>
@@ -611,19 +599,19 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
         <View className="flex-row items-center gap-2">
           <View className="items-end">
             {/* Điểm Habit */}
-            {log.habit_delta !== 0 && (
+            {log.habit_delta ? (
               <Text
                 className={`text-xs font-bold ${
                   isPositiveHabit ? "text-emerald-400" : "text-rose-400"
                 }`}
               >
                 {isPositiveHabit ? "+" : ""}
-                {log.habit_delta}%
+                {fixed(log.habit_delta)}%
               </Text>
-            )}
+            ) : null}
 
             {/* Shield Badge nhỏ gọn ở Header nếu có biến động khiên */}
-            {log.shield_delta !== 0 && (
+            {log.shield_delta !== 0 ? (
               <View className="flex-row items-center gap-1 mt-0.5 bg-blue-500/10 px-1.5 py-0.5 rounded">
                 <FontAwesome5 name="shield-alt" size={8} color="#60A5FA" />
                 <Text className="text-[9px] font-semibold text-blue-400">
@@ -632,7 +620,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
                     : log.shield_delta}
                 </Text>
               </View>
-            )}
+            ) : null}
           </View>
 
           {/* Mũi tên xoay */}
@@ -681,7 +669,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
                     }}
                     className="text-xs font-semibold"
                   >
-                    {log.duration ?? 0}h
+                    {fixed(log.duration ? log.duration / 3600 : 0)}h
                   </Text>
                   {log.target_duration && (
                     <Text
@@ -700,43 +688,31 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
               <View className="item-center">
                 <Text className="text-[10px] text-zinc-400">Điểm Habit</Text>
                 <Text className="text-sm text-emerald-400 font-bold mt-1">
-                  {log.habit_snap ?? 0}%
+                  {fixed(log.habit_snap ?? 0)}%
                 </Text>
               </View>
 
               <View className="items-center">
                 <Text className="text-[10px] text-zinc-400">Retain</Text>
                 <Text className="text-sm text-blue-400 font-bold mt-1">
-                  {log.habit_retain ?? 0}%
+                  {fixed(log.habit_retain ?? 0)}%
                 </Text>
               </View>
 
               <View className="item-center">
                 <Text className="text-[10px] text-zinc-400">Số Khiên</Text>
-                <Text className="text-sm text-amber-400 font-bold mt-1">
-                  🛡️ {log.shield_snap ?? 0}
-                </Text>
+                <View className="items-center justify-center flex-row gap-1 mt-1">
+                  <FontAwesome5
+                    name="shield-alt"
+                    size={13}
+                    color={theme.primary}
+                  />
+                  <Text className="text-sm text-amber-400 font-bold">
+                    {log.shield_snap ?? 0}
+                  </Text>
+                </View>
               </View>
             </View>
-
-            {/* Trạng thái Đồng bộ Sync Status */}
-            {/* <View className="flex-row justify-between items-center pt-1 px-1">
-              <Text className="text-[10px] text-zinc-500">
-                Mã log: {log.id}
-              </Text>
-              <View className="flex-row items-center gap-1">
-                <View
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    log.sync_status === "synced"
-                      ? "bg-emerald-500"
-                      : "bg-amber-500"
-                  }`}
-                />
-                <Text className="text-[10px] text-zinc-400 capitalize">
-                  {log.sync_status}
-                </Text>
-              </View>
-            </View> */}
           </View>
         </Animated.View>
       )}

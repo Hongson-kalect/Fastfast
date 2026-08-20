@@ -62,7 +62,7 @@ const lightTheme = {
   tertiary: "#BBDEFB",
   title: "#0D47A1",
   success: "#4CAF50",
-  error: "#F44336",
+  error: "#E60000",
   warning: "#FF9800",
   disabled: "#BDBDBD",
   link: "#3F51B5",
@@ -98,7 +98,7 @@ export const darkTheme = {
   title: "#E3F2FD", // Màu tiêu đề sáng hơn
 
   success: "#81C784", // Xanh thành công dịu hơn
-  error: "#E57373", // Đỏ nhẹ cho lỗi
+  error: "#E60000", // Đỏ nhẹ cho lỗi
   warning: "#FFB74D", // Cam cảnh báo mềm
   disabled: "#BDBDBD", // Màu vô hiệu hóa
   link: "#3F51B5", // Màu liên kết

@@ -104,7 +104,8 @@ const HomeTimeCounter = ({
     rotation.value = 0; // Reset về 0 trước khi chạy
     rotation.value = withRepeat(
       withTiming(angle, {
-        duration: 7000 - 4000 * (1 - progress),
+        duration: 5000,
+        // duration: 7000 - 4000 * (1 - progress),
         easing: Easing.linear,
       }), // Càng thấp thì lặp càng nhanh
       -1,
@@ -115,7 +116,7 @@ const HomeTimeCounter = ({
     return () => {
       cancelAnimation(rotation);
     };
-  }, [layout]); // Trigger lại nếu layout thay đổi để tính ma trận chuẩn xác nhất
+  }, [layout, isCounting]); // Trigger lại nếu layout thay đổi để tính ma trận chuẩn xác nhất
 
   // 3. Loại bỏ mảng dependency thủ công để Skia tự động tracking luồng native mượt 100%
   const animatedMatrix = useDerivedValue(() => {

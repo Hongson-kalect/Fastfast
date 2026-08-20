@@ -60,14 +60,6 @@ export const addDailyLogs = async (
     hour_in_fast: number;
   },
 ) => {
-  // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
-  // const currentLog = await db.getFirstAsync<DailyLog>(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);
-
-  // if(currentLog){
-  //   await db.runAsync(`UPDATE daily_logs SET hours_in_day = ?,  hours_in_fast = ? WHERE log_date = ? AND fast_id = ?`, [data.hours_in_day, data.hour_in_fast, data.log_date, data.fast_id]);
-  // }else{
-  //   await db.runAsync(`INSERT INTO daily_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
-  // }
   await db.runAsync(
     `INSERT INTO daily_logs (log_date, fast_id, hours_in_day, elapsed_hours, hours_in_fast) VALUES (?, ?, ?, ?, ?)`,
     [

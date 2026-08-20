@@ -1,4 +1,5 @@
 import HomeBodyProgress from "@/components/home/BodyProgress";
+import FullHabitModal from "@/components/home/FullHabitModal";
 import HomeHeader from "@/components/home/Header";
 import { FastResultData, ResultModal } from "@/components/home/ResultModal";
 import { SwapButton } from "@/components/home/SwapButton";
@@ -26,7 +27,7 @@ const HomeScreen = () => {
     currentFastSession?.start_time || null,
   );
 
-  const { setGlobalModal } = useModalStore();
+  const { addModal, modalQueue } = useModalStore();
   const { close } = useBottomSheet();
 
   const dbService = useDBService();
@@ -35,16 +36,30 @@ const HomeScreen = () => {
     currentFastSession ? (currentFastSession.end_time ? false : true) : false,
   );
 
-  const finishFast = async (now:number = Date.now()) => {
+  const finishFast = async (now: number = Date.now()) => {
     if (!(isCounting && startTime && currentFastSession))
       return alert("Invalid action");
+
+    if (startTime >= now) {
+      return addModal({
+        type: "alert",
+        title: "Invalid",
+        message: "Time finish must be greater than start time",
+      });
+    }
     let message = "Are you sure you want to finish your session?";
     let subMessage = "";
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
-    // const isValid = duration > 16 * 3600;
-    const isValid = true;
+    const isValid = duration > 16 * 3600;
+    // const isValid = true;
+    console.log(
+      "target",
+      currentFastSession?.target_duration,
+      duration,
+      duration / 3600,
+    );
     const isReachTarget = currentFastSession?.target_duration
-      ? duration > currentFastSession.target_duration
+      ? duration / 3600 > currentFastSession.target_duration
       : null;
     if (!isValid) {
       message = "This session will marked as FAILED, are you sure?";
@@ -59,7 +74,9 @@ const HomeScreen = () => {
       message = "You not reach the target, are you sure to finish?";
     }
 
-    setGlobalModal({
+    console.log("modalQueue", modalQueue);
+
+    addModal({
       type: "confirm",
       title: "Finish",
       message: message,
@@ -71,7 +88,7 @@ const HomeScreen = () => {
         // Lấy thời gian, nếu nhỏ hơn x thì cho thành false nếu thời gian > 2 tiếng hoặc xóa luôn nếu dưới
         close();
 
-        console.log(currentFastSession);
+        console.log("current ", currentFastSession.id);
 
         const { lastSession, habitLog } = await dbService?.finishLastSession(
           currentFastSession?.id,
@@ -84,6 +101,7 @@ const HomeScreen = () => {
         if (habitLog) {
           updateHabit({
             habit_percent: habitLog?.habit_snap,
+            habit_retain: habitLog?.habit_retain || 0,
             shield: habitLog?.shield_snap,
           });
         }
@@ -101,6 +119,9 @@ const HomeScreen = () => {
             current: habitLog?.shield_snap,
             max: SHIELD_LIMIT,
             gained: habitLog?.shield_delta || 0,
+            detail: habitLog?.shield_detail
+              ? JSON.parse(habitLog?.shield_detail)
+              : null,
           },
           retainCount: habitLog?.habit_retain || 0,
           retainDiff: habitLog?.retain_delta || 0,
@@ -108,16 +129,31 @@ const HomeScreen = () => {
           note: habitLog?.description,
         };
 
-        setGlobalModal({
+        console.log("result data", resultData, habitLog);
+
+        addModal({
           type: "custom",
           render: <ResultModal data={resultData} />,
         });
+
+        // Đạt được 100 snap thông báo
+        if (habitLog?.habit_snap === 100 && !habitLog?.habit_retain) {
+          addModal({
+            type: "custom",
+            render: <FullHabitModal habitName="Fast" />,
+          });
+        }
+
+        // Nhận được shield // Hoặc có thể Thêm trực tiếp vào result pannel
+        // if (habitLog?.shield_delta&&habitLog?.shield_delta>0) {
+        // }
         // Tính toán lưu giờ nhịn theo ngày của người dùng
 
         // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
         // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
         if (isValid) {
           const parsedDays = splitSessionIntoDays(startTime, now);
+          console.log(parsedDays.map((x) => x.log_date));
 
           for (const dayData of parsedDays) {
             await dbService?.addDailyLogs({
@@ -143,7 +179,7 @@ const HomeScreen = () => {
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
     const isValid = false;
 
-    setGlobalModal({
+    addModal({
       type: "confirm",
       title: "Cancel",
       message: message,
@@ -164,6 +200,7 @@ const HomeScreen = () => {
           updateHabit({
             habit_percent: habitLog?.habit_snap,
             shield: habitLog?.shield_snap,
+            habit_retain: habitLog?.habit_retain || 0,
           });
         }
 
@@ -190,7 +227,14 @@ const HomeScreen = () => {
     });
   };
 
-  const startFast = async (now:number = Date.now()- 50 * 60 * 60 * 1000) => {
+  const startFast = async (now: number = Date.now() - 50 * 60 * 60 * 1000) => {
+    // if (currentFastSession?.end_time && now <= currentFastSession?.end_time) {
+    //   return addModal({
+    //     type: "alert",
+    //     title: "Invalid",
+    //     message: "Start time must be greater than the last session",
+    //   });
+    // }
     // Bắt đầu đếm
     setIsCounting(!isCounting);
     // const now = new Date().getTime();
@@ -198,6 +242,7 @@ const HomeScreen = () => {
     setStartTime(now);
 
     const newSession = await dbService?.startNewSession(now, settings?.target);
+    console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
   const toggleCounting = async (delay?: number) => {

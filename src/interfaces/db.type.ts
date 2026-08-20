@@ -23,9 +23,16 @@ export interface UserProfile {
   name: string | null;
   account_type: AccountType;
   image_uri: string | null; // Đường dẫn ảnh local
+
   current_streak: number;
-  streak_date: string;
+  active_days: number;
   max_streak: number;
+  streak_date: string|null;
+
+  total_shield_used :number,
+total_shield_clamable :number,
+total_shield_wasted :number,
+
   last_fast_completed_at: number;
   rest_point: number;
   upload_url: string | null;

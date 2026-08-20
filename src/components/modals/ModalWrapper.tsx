@@ -34,6 +34,7 @@ type Props = {
   padding?: number;
   children: React.ReactNode;
   backdropOpacity?: number;
+  onExitComplete?: () => void;
 };
 
 const ANIMATION_DURATION = 200;
@@ -49,30 +50,19 @@ export default function ModalWrapper({
 
   inAnimation = "slideUp",
   outAnimation = "slideDown",
+  onExitComplete,
 
   backdropOpacity = 0.5,
 }: Props) {
   const { height, width } = useWindowDimensions();
   const { theme } = useAppStore();
-
-  /**
-   * `mounted` khác `show`.
-   *
-   * show:
-   *   muốn modal hiển thị hay không
-   *
-   * mounted:
-   *   native Modal có còn mounted hay không
-   *
-   * Đây là phần quan trọng để exit animation hoạt động.
-   */
   const [mounted, setMounted] = useState(show);
-
-  /**
-   * 0 = invisible
-   * 1 = visible
-   */
   const progress = useSharedValue(show ? 1 : 0);
+
+  const handleExitComplete = () => {
+  setMounted(false);
+  onExitComplete?.();
+};
 
   /**
    * ================================
@@ -101,7 +91,7 @@ export default function ModalWrapper({
         (finished) => {
           if (finished) {
             // ⚠️ BẮT BUỘC dùng runOnJS để chuyển call về JS Thread an toàn
-            runOnJS(setMounted)(false);
+            runOnJS(handleExitComplete)();
           }
         },
       );
@@ -118,23 +108,8 @@ export default function ModalWrapper({
     };
   });
 
-  /**
-   * ================================
-   * CONTENT
-   * ================================
-   */
   const contentStyle = useAnimatedStyle(() => {
     const p = progress.value;
-
-    /**
-     * Khi đóng:
-     *
-     * phải dùng outAnimation.
-     *
-     * Khi mở:
-     *
-     * dùng inAnimation.
-     */
     const animation = show ? inAnimation : outAnimation;
 
     switch (animation) {
@@ -186,10 +161,6 @@ export default function ModalWrapper({
     }
   });
 
-  /**
-   * Native Modal không cần tồn tại sau khi
-   * exit animation hoàn tất.
-   */
   if (!mounted) {
     return null;
   }

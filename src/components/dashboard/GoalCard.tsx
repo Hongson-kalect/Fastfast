@@ -3,6 +3,7 @@ import { WeightTarget } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { fixed } from "@/util/numberLimit";
 import {
   Feather,
   MaterialCommunityIcons,
@@ -18,13 +19,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { fixed } from "@/util/numberLimit";
 
 export const GoalCard = () => {
   const dbService = useDBService();
   const { weight, settings, theme, updateSetting, updateWeight } =
     useAppStore();
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const [activeTarget, setActiveTarget] = useState<WeightTarget | null>(null);
 
   const [startWeight, targetWeight] = useMemo(() => {
@@ -67,7 +67,7 @@ export const GoalCard = () => {
   const { present, close } = useBottomSheet();
 
   const openSetWeightModal = () => {
-    setGlobalModal({
+    addModal({
       type: "input",
       keyboardType: "numeric",
       title: "Current Weight",
@@ -83,7 +83,7 @@ export const GoalCard = () => {
   };
 
   const openWeightTargetModal = () => {
-    setGlobalModal({
+    addModal({
       type: "input",
       keyboardType: "numeric",
       title: "Target",

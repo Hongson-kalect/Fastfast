@@ -138,12 +138,21 @@ export const finishLastSession = async (
       [time, duration, id],
     );
 
-    newHabitLog = await addHabitLogs(db, {
+     const {newHabitLog : habit, wastedShield} = await addHabitLogs(db, {
       fast_id: id,
       log_date: getLocalTodayStr(),
       habit_detla: fixed(habitDelta),
       shield_detla: shieldGain,
     });
+
+    newHabitLog = habit;
+
+    if(shieldGain || wastedShield) {
+      // Update profile
+      // await profileShieldIncrease(db, shieldGain, wastedShield);
+
+      // update zustand state
+    }
   }
 
   const res = await db.getFirstAsync<FastSession>(
@@ -162,7 +171,7 @@ export const startNewSession = async (
   targetDuration: number | null = null,
 ) => {
   const id = uuidv7();
-  db.runAsync(
+  await db.runAsync(
     `INSERT INTO fast_sessions (id, start_time, target_duration) VALUES (?, ?, ?);`,
     [id, time, targetDuration],
   );

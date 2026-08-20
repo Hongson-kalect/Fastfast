@@ -113,10 +113,10 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
           width: size,
           height: size,
           borderColor: color + "88",
-          shadowColor: color + "66",
+          boxShadow: "0px 3px 6px " + color + "66",
           backgroundColor: isDarkMode ? "#121318" : "#fff",
         }}
-        className="rounded-full border-2 items-center justify-center relative overflow-hidden shadow-lg z-10"
+        className="rounded-full border-2 items-center justify-center relative overflow-hidden z-10"
       >
         {/* Khung chứa SVG Nước Sóng Sánh */}
         <View className="absolute inset-0">
@@ -141,7 +141,7 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
         <View className="items-center justify-center z-10">
           <Text
             style={{ fontSize: Math.floor(size / 3) }}
-            className="font-black text-white shadow-md"
+            className="font-black text-white"
           >
             {Math.round(clampedPercent)}
           </Text>

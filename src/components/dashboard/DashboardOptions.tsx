@@ -6,16 +6,15 @@ import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
-import { GoalCard } from "./GoalCard";
 
 const DashboardOptions = () => {
   const { theme, updateWeight, settings, weight } = useAppStore();
   const dbService = useDBService();
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const { present, close } = useBottomSheet();
 
   const openUpdateWeightModal = () => {
-    setGlobalModal({
+    addModal({
       type: "input",
       keyboardType: "numeric",
       title: "Update weight",

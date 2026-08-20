@@ -7,7 +7,7 @@ import { TouchableOpacity, View } from "react-native";
 type Props = ConfirmModalOptions & BasicModalOptions;
 
 const ConfirmModal = (modal: Props) => {
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const { theme } = useAppStore();
   return (
     <View>
@@ -25,7 +25,7 @@ const ConfirmModal = (modal: Props) => {
           className="bg-gray-300 rounded-lg py-3 px-4"
           onPress={() => {
             modal.onCancel?.();
-            setGlobalModal(null);
+            addModal(null);
           }}
         >
           <ThemedText color="white">{modal.cancelText || "Cancel"}</ThemedText>
@@ -35,7 +35,7 @@ const ConfirmModal = (modal: Props) => {
           className=" rounded-lg py-3 items-center justify-center min-w-28"
           onPress={() => {
             modal.onOk?.();
-            setGlobalModal(null);
+            addModal(null);
           }}
         >
           <ThemedText color="white">{modal.okText || "OK"}</ThemedText>

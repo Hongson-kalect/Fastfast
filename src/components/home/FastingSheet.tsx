@@ -2,12 +2,12 @@ import { FastingTargetItem, getFastingStatus } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { fixed } from "@/util/numberLimit";
 import { getRelativeTime, timeString } from "@/util/timer";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
-import { fixed } from "@/util/numberLimit";
 
 interface FastingSheetProps {
   fastTarget: FastingTargetItem;
@@ -27,7 +27,7 @@ const FastingSheet = ({
   onChangeTarget,
 }: FastingSheetProps) => {
   const { theme } = useAppStore();
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   // Giả lập dữ liệu demo
   const finishTime = useMemo(() => {
     return currentFast?.start_time + fastTarget.hours * 3600_000;
@@ -85,7 +85,7 @@ const FastingSheet = ({
   }, []);
 
   const changeTargetConfirm = () => {
-    setGlobalModal({
+    addModal({
       type: "confirm",
       title: "Change Target",
       message: "Are you sure to change target?",

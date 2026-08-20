@@ -2,10 +2,10 @@ import { StreakCheckResult } from "@/interfaces/home.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import {
-  AntDesign,
   Feather,
   FontAwesome5,
   Foundation,
+  Ionicons
 } from "@expo/vector-icons";
 import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -46,9 +46,9 @@ const MODAL_THEME = {
 export const StreakCheckModal = ({ data }: Props) => {
   if (!data) return null;
   const { theme } = useAppStore();
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
 
-  const onClose = () => setGlobalModal(null);
+  const onClose = () => addModal(null);
 
   // 1. Xác định Status chính xác
   const status = useMemo<keyof typeof MODAL_THEME>(() => {
@@ -61,9 +61,12 @@ export const StreakCheckModal = ({ data }: Props) => {
     return "STREAK_MILESTONE";
   }, [data]);
 
-  const milestone = useMemo(()=>{
-    return MILESTONES.find((milestone) => data.streak.previous<milestone && milestone<=data.streak.current);
-  },[data])
+  const milestone = useMemo(() => {
+    return MILESTONES.find(
+      (milestone) =>
+        data.streak.previous < milestone && milestone <= data.streak.current,
+    );
+  }, [data]);
 
   // 2. Check phá kỷ lục
   const isBestRecord = useMemo(() => {
@@ -173,7 +176,7 @@ export const StreakCheckModal = ({ data }: Props) => {
         <View className="mt-5 flex-row items-center justify-center">
           <Text className="text-base">{config.icon}</Text>
           <Text className="mx-2 text-center text-lg font-black text-white">
-            {milestone ?"Streak over "+milestone+" Hits!":config.title}
+            {milestone ? "Streak over " + milestone + " Hits!" : config.title}
           </Text>
           <Text className="text-base" style={{ transform: [{ scaleX: -1 }] }}>
             {config.icon}
@@ -230,7 +233,7 @@ export const StreakCheckModal = ({ data }: Props) => {
         {/* RETAIN PANEL */}
         <View className="flex-1 items-center justify-between rounded-2xl border border-white/5 bg-zinc-800/50 px-3 py-3">
           <View className="mb-1.5 flex-row items-center self-start">
-            <AntDesign name="redo" size={14} color={theme.warning} />
+            <Ionicons name="water" size={20} color={theme.primary} />
             <Text className="ml-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
               Retain
             </Text>

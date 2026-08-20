@@ -18,6 +18,7 @@ export interface FastResultData {
     current: number;
     max: number;
     gained: number; // VD: 1 hoặc 0
+    detail: number[] | null;
   };
   retainCount: number;
   retainDiff: number;
@@ -34,6 +35,7 @@ const testData: FastResultData = {
     current: 1,
     max: 2,
     gained: 1,
+    detail: null,
   },
   retainCount: 1,
 };
@@ -71,8 +73,9 @@ const STATUS_CONFIG = {
 
 export const ResultModal = ({ data = testData }: Props) => {
   //   if (!data) return null;
+  console.log("vào đc đây");
 
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
 
   const { fastingTime, status } = useMemo<{
     fastingTime: string;
@@ -94,6 +97,7 @@ export const ResultModal = ({ data = testData }: Props) => {
     ? Math.min(1, data.fastingTime / 3600 / data.targetHours)
     : 1;
   const { theme } = useAppStore();
+  console.log("vào đc đây");
 
   return (
     <View>
@@ -191,6 +195,34 @@ export const ResultModal = ({ data = testData }: Props) => {
       </Animated.View>
 
       {/* Note / Reward Banner */}
+      {!!data.shields.detail && (
+        <View className="mt-4 rounded-xl items-center bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 gap-2">
+          {!!data.shields.detail[0] && (
+            <View className="flex-row items-center gap-1">
+              <Text className="text-xs text-success font-bold">
+                +{data.shields.detail[0]}
+              </Text>
+              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
+              <Text className="ml-2 text-xs text-text-base/60">
+                For long fast. Use it for rest correctly 🎉
+              </Text>
+            </View>
+          )}
+          {!!data.shields.detail[1] && (
+            <View className="flex-row items-center gap-1">
+              <Text className="text-xs text-success font-bold">
+                +{data.shields.detail[1]}
+              </Text>
+              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
+              <Text className="ml-2 text-xs  text-text-base/60">
+                For retain habit. Keep it amazing 🎉
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Note / Reward Banner */}
       {data.note && (
         <Animated.View
           entering={FadeInUp.delay(400)}
@@ -206,7 +238,7 @@ export const ResultModal = ({ data = testData }: Props) => {
       {/* Confirm Button */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => setGlobalModal(null)}
+        onPress={() => addModal(null)}
         className="mt-6 rounded-2xl bg-primary py-3.5 items-center justify-center"
       >
         <Text className="font-bold text-white">OK</Text>

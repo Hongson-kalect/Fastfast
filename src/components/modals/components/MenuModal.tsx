@@ -7,7 +7,7 @@ import { ScrollView, TouchableOpacity, View } from "react-native";
 type Props = MenuModalOptions & BasicModalOptions;
 
 const MenuModal = (modal: Props) => {
-  const { globalModal, setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const menuType = modal.menuOptions.some((item) => item.rightContent)
     ? "space-between"
     : "center";
@@ -33,7 +33,7 @@ const MenuModal = (modal: Props) => {
             }
             onPress={() => {
               menu.onPress?.();
-              if (menu.isCloseAfterPress !== false) setGlobalModal(null);
+              if (menu.isCloseAfterPress !== false) addModal(null);
             }}
             icon={menu.icon}
             label={menu.label}
@@ -45,7 +45,7 @@ const MenuModal = (modal: Props) => {
         <TouchableOpacity
           className="mt-4 py-2"
           onPress={() => {
-            setGlobalModal(null);
+            addModal(null);
           }}
         >
           <ThemedText className="text-center text-gray-500 text-base">

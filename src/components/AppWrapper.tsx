@@ -12,7 +12,7 @@ import { MILESTONES, StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings, isDarkMode } = useAppStore();
-  const { setGlobalModal } = useModalStore();
+  const { addModal } = useModalStore();
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
   SplashScreen.preventAutoHideAsync();
@@ -72,7 +72,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       if (hitMilestone || usedShield || lostStreak) {
         setTimeout(
           () =>
-            setGlobalModal({
+            addModal({
               type: "custom",
               render: (
                 <StreakCheckModal

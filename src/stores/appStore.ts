@@ -36,7 +36,7 @@ interface AppState {
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
   init: (db: SQLiteDatabase) => Promise<StreakCheckResult|null>;
   updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
-  updateHabit: (val: { habit_percent: number; shield: number }) => void;
+  updateHabit: (val: { habit_percent: number; shield: number, habit_retain: number }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -148,7 +148,7 @@ export const useAppStore = create<AppState>((set, get) => {
       }
     },
 
-    updateHabit: (val: { habit_percent: number; shield: number }) => {
+    updateHabit: (val: { habit_percent: number; shield: number,habit_retain:number }) => {
       const profile = get().userProfile;
       if (profile) {
         set({ userProfile: { ...profile, ...val } });

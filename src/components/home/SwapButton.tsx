@@ -4,6 +4,7 @@ import { EMOTIONS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
@@ -19,10 +20,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import DelayModal from "./DelayModal";
 import { PhotoPickerModal } from "./ImageModal";
 import NoteModal from "./NoteModal";
-import DelayModal from "./DelayModal";
-import useModalStore from "@/stores/modalStore";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
@@ -140,26 +140,26 @@ export const SwapButton = ({
     setTempImage(uri);
   };
 
-  const {setGlobalModal} = useModalStore();
-  const handleDelaySubmit = (startTime:number) => {
-    setGlobalModal(null);
-    toggleCounting(startTime);  
-  }
+  const { addModal } = useModalStore();
+  const handleDelaySubmit = (startTime: number) => {
+    addModal(null);
+    toggleCounting(startTime);
+  };
 
   const showDelayModal = () => {
-    setGlobalModal({type: "custom",
-      render: <DelayModal
-        isCounting={isCounting}
-        onSubmit={handleDelaySubmit}
-        />
+    addModal({
+      type: "custom",
+      render: (
+        <DelayModal isCounting={isCounting} onSubmit={handleDelaySubmit} />
+      ),
     });
-  }
+  };
   useEffect(() => {
     if (!dbService) return;
     detectTodayNote();
     getCurrrentWeight();
   }, [dbService]);
-  
+
   useEffect(() => {
     if (!todayNote) return;
     setTodayData({
@@ -209,8 +209,8 @@ export const SwapButton = ({
         </TouchableOpacity>
 
         <Pressable
-        onLongPress={showDelayModal}
-          onPress={()=>toggleCounting()}
+          onLongPress={showDelayModal}
+          onPress={() => toggleCounting()}
           activeOpacity={0.7}
           disabled={loading}
           className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
