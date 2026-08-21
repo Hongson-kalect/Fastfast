@@ -110,15 +110,17 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   let retainDelta = 0;
 
   const lastLog = await getLastHabitLog(db);
+  if (!data.habit_snap || !data.shield_snap) {
+    habit_data.habit_snap =lastLog?.habit_snap || 0;
+    habit_data.shield_snap =lastLog?.shield_snap || 0
+  }
 
   if (lastLog?.habit_snap === 100) {
-    console.log("retain 1", retain);
     // habit giảm
     if (habit_data.habit_detla) {
       if (habit_data.habit_detla < 0) retain = 0;
       else {
         retain = (lastLog?.habit_retain || 0) + (habit_data.habit_detla || 0);
-        console.log("retain 2", retain);
 
         habitDetla = 0;
         retainDelta = habit_data.habit_detla;
@@ -128,19 +130,13 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
         retain = 1; // Khi đủ 1 vòng thì retain sẽ về 1 thay vì về 0
         bonusShield = 1;
       }
-      console.log("retain 3", retain);
     }
   }
-  console.log("retain 4", retain);
 
-  if (!data.habit_snap || !data.shield_snap) {
-    habit_data.habit_snap =
-      (lastLog?.habit_snap || 0) + (habit_data.habit_detla || 0);
-    habit_data.shield_snap =
-      (lastLog?.shield_snap || 0) +
-      (habit_data.shield_detla || 0) +
-      bonusShield;
-  }
+  habit_data.habit_snap=(habit_data?.habit_snap ||0) + (habit_data?.habit_detla || 0);
+  habit_data.shield_snap=(habit_data?.shield_snap ||0) + (habit_data?.shield_detla || 0)+bonusShield;
+  habit_data.shield_detla = habitDetla + bonusShield;
+
 
   let shield_detail = null;
 

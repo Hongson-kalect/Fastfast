@@ -227,7 +227,7 @@ const HomeScreen = () => {
     });
   };
 
-  const startFast = async (now: number = Date.now() - 50 * 60 * 60 * 1000) => {
+  const startFast = async (now: number = Date.now()) => {
     // if (currentFastSession?.end_time && now <= currentFastSession?.end_time) {
     //   return addModal({
     //     type: "alert",

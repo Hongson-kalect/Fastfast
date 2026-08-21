@@ -3,6 +3,7 @@ import PixelInYear from "@/components/pixel/PixelInYear";
 import PixelStatistic from "@/components/pixel/Statistic";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useDBService } from "@/hooks/useDBService";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -87,6 +88,7 @@ const generateMockYearData = () => {
 };
 
 const PixelScreen = () => {
+  const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("fasting");
   const { width, height } = useWindowDimensions();
@@ -112,6 +114,10 @@ const PixelScreen = () => {
       animated: animated,
     });
   };
+
+  const getYearData = async ()=>{
+    // const res = await dbService.();
+  }
 
   useEffect(() => {
     setTimeout(() => {
