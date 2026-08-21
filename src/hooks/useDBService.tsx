@@ -5,5 +5,7 @@ import { useMemo } from "react";
 export function useDBService() {
   const db = useSQLiteContext();
 
-  return useMemo(() => createDBService(db), [db]);
+  return useMemo(() => {
+    return createDBService(db);
+  }, [db]);
 }

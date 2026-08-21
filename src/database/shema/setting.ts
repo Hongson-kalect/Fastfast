@@ -13,11 +13,13 @@ CREATE TABLE IF NOT EXISTS app_settings (
 export const getUserSettings = async (
   db: SQLiteDatabase,
 ): Promise<AppSettings | null> => {
-  const rows = await db.getAllAsync<{ key: keyof AppSettings; value: string }>(
-    `SELECT * FROM app_settings;`,
-  );
-  const settingsObj: AppSettings = {};
+  try{
 
+    const rows = await db.getAllAsync<{ key: keyof AppSettings; value: string }>(
+      `SELECT * FROM app_settings;`,
+    );
+  const settingsObj: AppSettings = {};
+  
   rows.forEach((row) => {
     try {
       settingsObj[row.key] = JSON.parse(row.value);
@@ -26,6 +28,9 @@ export const getUserSettings = async (
     }
   });
   return settingsObj;
+}catch(e){
+  console.log('error on getUserSettings', e);
+  return null;}
 };
 
 export const toggleTheme = async (
@@ -35,7 +40,6 @@ export const toggleTheme = async (
   try {
     const stringValue = String(val); // Chuyển boolean thành 'true' hoặc 'false' để lưu vào SQLite TEXT
     const key = "is_dark_mode";
-
     // Sử dụng db.runAsync để thực thi lệnh INSERT/UPDATE/DELETE
     await db.runAsync(
       `UPDATE app_settings SET value = ?, updated_at = (strftime('%s', 'now')) WHERE key = ?`,

@@ -157,26 +157,31 @@ ${userSeedData}
 `;
 
 export const initDatabase = async (db: SQLiteDatabase) => {
-  const DATABASE_VERSION = 1; // get from server
-  // let version = 0;
-  // await clearDatabase(db);
-  const version = await getDatabaseVersion(db);
-  if (version >= 1) {
-    return;
-  }
+  try{
+
+    const DATABASE_VERSION = 1; // get from server
+    // let version = 0;
+    // await clearDatabase(db);
+    const version = await getDatabaseVersion(db);
+    if (version >= 1) {
+      return;
+    }
 
   if (version >= DATABASE_VERSION) {
     return;
   }
-
+  
   if (version === 0) {
     await db.execAsync(generateSchema);
-
+    
     console.log("generateSchema completed");
     await db.execAsync(generateSeedData);
   }
-
+  
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+}catch (error) {
+  console.error("Lỗi khi tạo DB:", error);
+}
 };
 
 export const getDatabaseVersion = async (
@@ -366,15 +371,15 @@ export const handleLogin = async ({
 
   let returnLastFast = lastFast || null;
   let returnHabitLog = habitLog || null;
-  let returnProfile = profile;
+  let returnProfile: UserProfile|null = profile;
 
   if (increaseStreakNumber) {
     streakStat.streak.current =
       streakStat.streak.previous + increaseStreakNumber;
 
     returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
-    streakStat.streak.max = returnProfile.max_streak;
-    streakStat.streak.current = returnProfile.current_streak;
+    streakStat.streak.max = returnProfile?.max_streak||0;
+    streakStat.streak.current = returnProfile?.current_streak||0;
     if (habitLog && reduceShieldNumber)
       returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
 

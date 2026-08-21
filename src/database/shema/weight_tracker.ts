@@ -43,6 +43,7 @@ export const getCurrentWeight = async (
 export const updateWeight = async (db: SQLiteDatabase, weight: number) => {
   const today = getLocalTodayStr();
   const id = uuidv7();
+try{
 
   await db.runAsync(
     `INSERT INTO weight_logs (id, weight, log_date) VALUES (?,?,?)`,
@@ -53,4 +54,7 @@ export const updateWeight = async (db: SQLiteDatabase, weight: number) => {
     [id],
   );
   return row;
+}catch(e){
+  console.log('error on updateWeight', e);
+}
 };

@@ -133,16 +133,14 @@ export type ListModalOptions = {
   outAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
 };
 const GlobalModalComponent = () => {
-  const {
+  const { currentModal, modalQueue, closeCurrentModal } = useModalStore();
+  const backDropVisible = useMemo(
+    () => currentModal || modalQueue.length,
+    [currentModal],
+  );
+  const [placeholder, setPlaceholder] = useState<GlobalModalOptions | null>(
     currentModal,
-    modalQueue,
-    closeCurrentModal,
-  } = useModalStore();
-
-  const [placeholder, setPlaceholder] =
-    useState<GlobalModalOptions | null>(currentModal);
-
-  const [isClosing, setIsClosing] = useState(false);
+  );
 
   useEffect(() => {
     if (currentModal) {
@@ -153,27 +151,10 @@ const GlobalModalComponent = () => {
   const showValue = currentModal ?? placeholder;
 
   const closeModal = () => {
-    showValue?.onDismiss?.();
-
-    setIsClosing(true);
+    if (!currentModal) return;
+    currentModal?.onDismiss?.();
     closeCurrentModal();
   };
-
-  const handleExitComplete = () => {
-  setTimeout(() => {
-    const nextModal = useModalStore.getState().modalQueue[0];
-
-    if (!nextModal) {
-      setPlaceholder(null);
-      return;
-    }
-
-    useModalStore.setState((state) => ({
-      currentModal: nextModal,
-      modalQueue: state.modalQueue.slice(1),
-    }));
-  }, 300);
-};
 
   return (
     <ModalWrapper
@@ -184,7 +165,6 @@ const GlobalModalComponent = () => {
       outAnimation={showValue?.outAnimation}
       type={showValue?.type}
       bottom={showValue?.footer}
-      onExitComplete={handleExitComplete}
     >
       <View className="px-3 rounded-lg">
         {showValue?.header}

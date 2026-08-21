@@ -7,10 +7,10 @@ import {
 // src/store/appStore.ts
 import { createDBService, handleLogin } from "@/database";
 import { AppSettings, FastSession, UserProfile } from "@/interfaces/db.type";
+import { StreakCheckResult } from "@/interfaces/home.type";
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 import { create } from "zustand";
-import { StreakCheckResult } from "@/interfaces/home.type";
 
 type ColorPalette = typeof darkTheme;
 
@@ -34,9 +34,13 @@ interface AppState {
   isHydrated: boolean;
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
-  init: (db: SQLiteDatabase) => Promise<StreakCheckResult|null>;
+  init: (db: SQLiteDatabase) => Promise<StreakCheckResult | null>;
   updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
-  updateHabit: (val: { habit_percent: number; shield: number, habit_retain: number }) => void;
+  updateHabit: (val: {
+    habit_percent: number;
+    shield: number;
+    habit_retain: number;
+  }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -70,22 +74,12 @@ export const useAppStore = create<AppState>((set, get) => {
         // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
 
         // Chạy song song cả 3 truy vấn để tối ưu hóa tốc độ khởi động
-        let [
-          currentFast,
-          weightObj,
-          currentProfile,
-          dbSettings,
-          themes,
-          currentHabitLog,
-        ] = await Promise.all([
-          dbService.getLastFastSession(),
-          dbService.getCurrentWeight(),
-          dbService.getUserProfile(),
-          dbService.getUserSettings(),
-          dbService.getThemes(),
-          dbService.getLastHabitLog(),
-        ]);
-
+        const currentFast = await dbService.getLastFastSession();
+        const weightObj = await dbService.getCurrentWeight();
+        const currentProfile = await dbService.getUserProfile();
+        const dbSettings = await dbService.getUserSettings();
+        const themes = await dbService.getThemes();
+        const currentHabitLog = await dbService.getLastHabitLog();
         const { lastFast, profile, habitLog, streak } = await handleLogin({
           db,
           lastFast: currentFast,
@@ -148,7 +142,11 @@ export const useAppStore = create<AppState>((set, get) => {
       }
     },
 
-    updateHabit: (val: { habit_percent: number; shield: number,habit_retain:number }) => {
+    updateHabit: (val: {
+      habit_percent: number;
+      shield: number;
+      habit_retain: number;
+    }) => {
       const profile = get().userProfile;
       if (profile) {
         set({ userProfile: { ...profile, ...val } });

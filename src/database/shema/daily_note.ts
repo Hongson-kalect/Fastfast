@@ -17,19 +17,31 @@ CREATE TABLE IF NOT EXISTS daily_notes (
 export const getDailyNotes = async (
   db: SQLiteDatabase,
 ): Promise<DailyNote[] | null> => {
-  const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes;`);
-  return rows;
+  try{
+
+    const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes;`);
+    return rows;
+  }catch(e){
+    console.log('error on getDailyNotes', e);
+    return null;
+  }
 };
 
 export const getDailyNote = async (
   db: SQLiteDatabase,
   day: string = getLocalTodayStr(),
 ): Promise<DailyNote | null> => {
-  const row = await db.getFirstAsync<DailyNote>(
-    `SELECT * FROM daily_notes WHERE log_date = ?;`,
-    [day],
-  );
-  return row;
+  try{
+
+    const row = await db.getFirstAsync<DailyNote>(
+      `SELECT * FROM daily_notes WHERE log_date = ?;`,
+      [day],
+    );
+    return row;
+  }catch(e){
+    console.log('error on getDailyNote', e);
+    return null;
+  }
 };
 
 // Hàm lưu hoặc cập nhật Note của ngày hôm nay
@@ -44,6 +56,10 @@ export const setDailyNote = async (
     INSERT OR REPLACE INTO daily_notes (log_date, mood_level, note, image_uri, updated_at)
     VALUES (?, ?, ?, ?, strftime('%s', 'now'));
   `;
+try{
 
   await db.runAsync(query, [dateStr, mood||null, note || null, image || null]);
+}catch(e){
+  console.log('error on setDailyNote', e);
+}
 };

@@ -1,9 +1,10 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { fixed } from "@/util/numberLimit";
 import { hourFormat } from "@/util/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 
@@ -99,6 +100,11 @@ export const ResultModal = ({ data = testData }: Props) => {
   const { theme } = useAppStore();
   console.log("vào đc đây");
 
+  useEffect(() => {
+    console.log("mở ra");
+    return () => console.log("bị kill");
+  }, []);
+
   return (
     <View>
       {/* Header Icon */}
@@ -159,11 +165,11 @@ export const ResultModal = ({ data = testData }: Props) => {
         <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
           <Text className="text-[11px] text-zinc-400">Habit</Text>
           <Text className="mt-1 text-base font-bold text-white">
-            {data.habitPercent.toFixed(1)}%
+            {fixed(data.habitPercent)}%
           </Text>
           {data.habitDiff > 0 && (
             <Text className="text-[10px] text-success font-semibold">
-              +{data.habitDiff.toFixed(1)}%
+              +{fixed(data.habitDiff)}%
             </Text>
           )}
         </View>
@@ -185,7 +191,9 @@ export const ResultModal = ({ data = testData }: Props) => {
         {/* Retain */}
         <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
           <Text className="text-[11px] text-zinc-400">Retain</Text>
-          <Text className="mt-1 text-base font-bold text-white">0</Text>
+          <Text className="mt-1 text-base font-bold text-white">
+            {data.retainCount}/25
+          </Text>
           {data.retainDiff > 0 && (
             <Text className="text-[10px] text-success font-semibold">
               +{data.retainDiff}%

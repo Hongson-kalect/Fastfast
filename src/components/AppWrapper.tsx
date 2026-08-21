@@ -30,25 +30,6 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
     const load = async () => {
       const streakObj = await init(db);
-      const testData = {
-        streak: {
-          previous: 57,
-          max: 60,
-          current: 61,
-        },
-        habit: {
-          previousPercent: 90,
-          currentPercent: 90,
-        },
-        retain: {
-          previous: 0,
-          current: 0,
-        },
-        shield: {
-          previous: 3,
-          current: 3,
-        },
-      };
       setDBReady(true);
 
       console.log("streak", streakObj);

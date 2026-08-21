@@ -77,9 +77,9 @@ export const getFastStatsSummary = async (
         AND duration IS NOT NULL
     ) AS completed_sessions;
   `;
+try{
 
   const res = await db.getFirstAsync<FastStatsSummary>(query);
-
   return (
     res || {
       total_hours: 0,
@@ -94,25 +94,55 @@ export const getFastStatsSummary = async (
       above_72: 0,
     }
   );
+}catch(e){
+  console.log('error on getFastStatsSummary', e);
+  return ({
+      total_hours: 0,
+      avg_hours: 0,
+      max_hours: 0,
+      total_sessions: 0,
+      above_16: 0,
+      above_20: 0,
+      above_24: 0,
+      above_36: 0,
+      above_48: 0,
+      above_72: 0,
+    }
+  );
+}
+
+  
 };
 
 export const getLastFastSession = async (
   db: SQLiteDatabase,
 ): Promise<FastSession | null> => {
-  const row = await db.getFirstAsync<FastSession>(
-    `SELECT * FROM fast_sessions where status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
-  );
-  return row;
+  try{
+
+    const row = await db.getFirstAsync<FastSession>(
+      `SELECT * FROM fast_sessions where status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
+    );
+    return row;
+  }catch(e){
+    console.log('error on getLastFastSession', e);
+    return null;
+  }
 };
 
 export const getYearFastSession = async (
   db: SQLiteDatabase,
   year: number,
 ): Promise<FastSession | null> => {
-  const row = await db.getFirstAsync<FastSession>(
-    `SELECT * FROM fast_sessions WHERE strftime('%Y', start_time) = ${year} ORDER BY updated_at DESC LIMIT 1;`,
-  );
-  return row;
+  try{
+
+    const row = await db.getFirstAsync<FastSession>(
+      `SELECT * FROM fast_sessions WHERE strftime('%Y', start_time) = ${year} ORDER BY updated_at DESC LIMIT 1;`,
+    );
+    return row;
+  }catch(e){
+    console.log('error on getYearFastSession', e);
+    return null;
+  }
 };
 
 export const finishLastSession = async (
@@ -123,46 +153,55 @@ export const finishLastSession = async (
   isValid: boolean = true,
 ) => {
   let newHabitLog = null;
-  if (!isValid) {
-    await db.runAsync(
-      `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'failed' WHERE id = ?;`,
-      [time, duration, id],
-    );
-  } else {
-    const hours = duration / 3600;
-    const habitDelta = 3.0 + (hours - 16) * 0.2;
-    const shieldGain = Math.max(0, Math.floor(hours / 24) - 1);
+  try{
 
-    await db.runAsync(
-      `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'completed' WHERE id = ?;`,
-      [time, duration, id],
-    );
-
-     const {newHabitLog : habit, wastedShield} = await addHabitLogs(db, {
-      fast_id: id,
-      log_date: getLocalTodayStr(),
-      habit_detla: fixed(habitDelta),
-      shield_detla: shieldGain,
-    });
-
-    newHabitLog = habit;
-
-    if(shieldGain || wastedShield) {
-      // Update profile
-      // await profileShieldIncrease(db, shieldGain, wastedShield);
-
-      // update zustand state
+    if (!isValid) {
+      await db.runAsync(
+        `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'failed' WHERE id = ?;`,
+        [time, duration, id],
+      );
+    } else {
+      const hours = duration / 3600;
+      const habitDelta = 3.0 + (hours - 16) * 0.2;
+      const shieldGain = Math.max(0, Math.floor(hours / 24) - 1);
+  
+      await db.runAsync(
+        `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'completed' WHERE id = ?;`,
+        [time, duration, id],
+      );
+  
+       const {newHabitLog : habit, wastedShield} = await addHabitLogs(db, {
+        fast_id: id,
+        log_date: getLocalTodayStr(),
+        habit_detla: fixed(habitDelta),
+        shield_detla: shieldGain,
+      });
+  
+      newHabitLog = habit;
+  
+      if(shieldGain || wastedShield) {
+        // Update profile
+        // await profileShieldIncrease(db, shieldGain, wastedShield);
+  
+        // update zustand state
+      }
     }
+  
+    const res = await db.getFirstAsync<FastSession>(
+      `SELECT * FROM fast_sessions WHERE id = ?;`,
+      [id],
+    );
+    return {
+      lastSession: res,
+      habitLog: newHabitLog,
+    };
+  }catch{
+    console.log('error on finishLastSession');
+    return {
+      lastSession: null,
+      habitLog: null,
+    };
   }
-
-  const res = await db.getFirstAsync<FastSession>(
-    `SELECT * FROM fast_sessions WHERE id = ?;`,
-    [id],
-  );
-  return {
-    lastSession: res,
-    habitLog: newHabitLog,
-  };
 };
 
 export const startNewSession = async (
@@ -171,13 +210,19 @@ export const startNewSession = async (
   targetDuration: number | null = null,
 ) => {
   const id = uuidv7();
-  await db.runAsync(
-    `INSERT INTO fast_sessions (id, start_time, target_duration) VALUES (?, ?, ?);`,
-    [id, time, targetDuration],
-  );
+  try{
 
-  const res = await getLastFastSession(db);
-  return res;
+    await db.runAsync(
+      `INSERT INTO fast_sessions (id, start_time, target_duration) VALUES (?, ?, ?);`,
+      [id, time, targetDuration],
+    );
+    
+    const res = await getLastFastSession(db);
+    return res;
+  }catch(e){
+    console.log('error on startNewSession', e);
+    return null;
+  }
 };
 
 export const updateSessionTarget = async (
@@ -185,28 +230,45 @@ export const updateSessionTarget = async (
   id: string,
   targetDuration: number | null,
 ) => {
-  await db.runAsync(
-    `UPDATE fast_sessions SET target_duration = ? WHERE id = ?;`,
-    [targetDuration, id],
+  try{
+
+    await db.runAsync(
+      `UPDATE fast_sessions SET target_duration = ? WHERE id = ?;`,
+      [targetDuration, id],
   );
 
   const res = await getLastFastSession(db);
   return res;
+}catch(e){
+  console.log('error on updateSessionTarget', e);
+  return null;
+}
 };
 
 export const deleteSession = async (db: SQLiteDatabase, id: string) => {
+try{
+
   await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
     id,
   ]);
+}catch(e){
+  console.log('error on deleteSession', e);
+}
 };
 
 export const fastFail = async (
   db: SQLiteDatabase,
   fastSession: FastSession,
 ) => {
-  await db.runAsync(
-    `Update fast_sessions SET status = 'failed', shield_point_clamable = 0 WHERE id = ?;`,
-    [fastSession.id],
-  );
-  return await getLastFastSession(db);
+  try{
+
+    await db.runAsync(
+      `Update fast_sessions SET status = 'failed', shield_point_clamable = 0 WHERE id = ?;`,
+      [fastSession.id],
+    );
+    return await getLastFastSession(db);
+  }catch(e){
+    console.log('error on fastFail', e);
+    return null;
+  }
 };

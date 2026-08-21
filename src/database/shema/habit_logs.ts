@@ -2,7 +2,7 @@ import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
-import { fixed, numberLimit } from "./../../util/numberLimit";
+import { numberLimit } from "./../../util/numberLimit";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Habit Logs) để vẽ Chart và Grid
 export const generateString = /*sql*/ `
@@ -112,28 +112,26 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   const lastLog = await getLastHabitLog(db);
 
   if (lastLog?.habit_snap === 100) {
-    console.log('retain 1', retain)
+    console.log("retain 1", retain);
     // habit giảm
     if (habit_data.habit_detla) {
       if (habit_data.habit_detla < 0) retain = 0;
       else {
         retain = (lastLog?.habit_retain || 0) + (habit_data.habit_detla || 0);
-    console.log('retain 2', retain)
+        console.log("retain 2", retain);
 
         habitDetla = 0;
         retainDelta = habit_data.habit_detla;
       }
 
       if (retain >= RETAIN_LIMIT) {
-        retain = 0;
+        retain = 1; // Khi đủ 1 vòng thì retain sẽ về 1 thay vì về 0
         bonusShield = 1;
       }
-    console.log('retain 3', retain)
-
+      console.log("retain 3", retain);
     }
   }
-    console.log('retain 4', retain)
-
+  console.log("retain 4", retain);
 
   if (!data.habit_snap || !data.shield_snap) {
     habit_data.habit_snap =
@@ -153,7 +151,9 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     ]);
   }
 
-  const wastedShield = habit_data.shield_snap? habit_data.shield_snap - SHIELD_LIMIT : 0;
+  const wastedShield = habit_data.shield_snap
+    ? habit_data.shield_snap - SHIELD_LIMIT
+    : 0;
 
   // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
   // const currentLog = await db.getFirstAsync<HabitLog>(`SELECT * FROM habit_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);
@@ -163,26 +163,32 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   // }else{
   //   await db.runAsync(`INSERT INTO habit_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
   // }
-    console.log('retain 5', retain, numberLimit(retain, 0, RETAIN_LIMIT))
+  console.log("retain 5", retain, numberLimit(retain, 0, RETAIN_LIMIT));
 
-  await db.runAsync(
-    `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, retain_delta, shield_delta, shield_snap, habit_retain, shield_detail) VALUES (?, ?, ?, ?, ?,?,?,?,?,?)`,
-    [
-      id,
-      log_date,
-      data.fast_id || null,
-      numberLimit(habitDetla || 0, 0, 100),
-      numberLimit(habit_data.habit_snap || 0,0,100),
-      retainDelta,
-      habit_data.shield_detla || 0,
-      numberLimit(habit_data.shield_snap || 0, 0, SHIELD_LIMIT),
-      numberLimit(retain, 0, RETAIN_LIMIT),
-      shield_detail,
-    ],
-  );
+  try {
+    await db.runAsync(
+      `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, retain_delta, shield_delta, shield_snap, habit_retain, shield_detail) VALUES (?, ?, ?, ?, ?,?,?,?,?,?)`,
+      [
+        id,
+        log_date,
+        data.fast_id || null,
+        numberLimit(habitDetla || 0, 0, 100),
+        numberLimit(habit_data.habit_snap || 0, 0, 100),
+        retainDelta,
+        habit_data.shield_detla || 0,
+        numberLimit(habit_data.shield_snap || 0, 0, SHIELD_LIMIT),
+        numberLimit(retain, 0, RETAIN_LIMIT),
+        shield_detail,
+      ],
+    );
 
-  const res = await getLastHabitLog(db);
-  return {newHabitLog:res, wastedShield:wastedShield};
+    const res = await getLastHabitLog(db);
+    console.log("res", res);
+    return { newHabitLog: res, wastedShield: wastedShield };
+  } catch (e) {
+    console.log("e", e);
+    return { newHabitLog: null, wastedShield: wastedShield };
+  }
 };
 
 export const reduceShield = async (
@@ -192,25 +198,29 @@ export const reduceShield = async (
 ) => {
   const today = getLocalTodayStr();
   const id = uuidv7();
-
-  await db.runAsync(
-    `INSERT INTO habit_logs 
+  try {
+    await db.runAsync(
+      `INSERT INTO habit_logs 
     (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) 
     VALUES (?, ?, ?, ?, ?,?,?)`,
-    [
-      id,
-      today,
-      null,
-      0,
-      lastHabitLog.habit_snap,
-      -reduce,
-      lastHabitLog.shield_snap - reduce,
-      lastHabitLog.habit_retain || 0,
-    ],
-  );
+      [
+        id,
+        today,
+        null,
+        0,
+        lastHabitLog.habit_snap,
+        -reduce,
+        lastHabitLog.shield_snap - reduce,
+        lastHabitLog.habit_retain || 0,
+      ],
+    );
 
-  const lastHabit = await getLastHabitLog(db);
-  return lastHabit;
+    const lastHabit = await getLastHabitLog(db);
+    return lastHabit;
+  } catch (e) {
+    console.log("error on reduceShield", e);
+    return null;
+  }
 };
 
 export const reduceHabit = async (
@@ -221,24 +231,28 @@ export const reduceHabit = async (
 ) => {
   const today = getLocalTodayStr();
   const id = uuidv7();
+  try {
+    await db.runAsync(
+      `INSERT INTO habit_logs 
+      (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, overest) 
+      VALUES (?, ?, ?, ?, ?,?,?,?)`,
+      [
+        id,
+        today,
+        null,
+        -reduce,
+        Math.max(lastHabitLog.habit_snap - reduce, 0),
+        0,
+        lastHabitLog.shield_snap,
+        0,
+        days,
+      ],
+    );
 
-  await db.runAsync(
-    `INSERT INTO habit_logs 
-    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, overest) 
-    VALUES (?, ?, ?, ?, ?,?,?,?)`,
-    [
-      id,
-      today,
-      null,
-      -reduce,
-      Math.max(lastHabitLog.habit_snap - reduce, 0),
-      0,
-      lastHabitLog.shield_snap,
-      0,
-      days,
-    ],
-  );
-
-  const lastHabit = await getLastHabitLog(db);
-  return lastHabit;
+    const lastHabit = await getLastHabitLog(db);
+    return lastHabit;
+  } catch (e) {
+    console.log("error on reduceHabit", e);
+    return null;
+  }
 };

@@ -1,4 +1,5 @@
 import { FASTING_TARGETS } from "@/constants/data";
+import { RETAIN_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
@@ -250,8 +251,12 @@ interface HabitBottomSheetProps {
 }
 
 const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
+  useEffect(() => {
+    console.log("show");
+  }, []);
   const [showAllHistory, setShowAllHistory] = useState(false);
   const { theme, userProfile } = useAppStore();
+  console.log("profile", userProfile);
   const dbService = useDBService();
 
   const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
@@ -317,7 +322,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
           percent={habitPercent}
           size={120}
           color={theme.primary}
-          retainPercent={habitRetain} // Ví dụ: 45% (Đang tích được 45% cho Shield tiếp theo)
+          retainPercent={(habitRetain / RETAIN_LIMIT) * 100} // Ví dụ: 45% (Đang tích được 45% cho Shield tiếp theo)
           retainColor="#3B82F6" // Viền Retain màu Xanh Shield
         />
 
@@ -440,7 +445,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
     if (!log?.target_duration) {
       if (log.duration) {
         const dynamicTarget = FASTING_TARGETS.findIndex(
-          (item) => item.hours >= log.duration,
+          (item) => item.hours >= log.duration / 3600,
         );
 
         if (dynamicTarget === -1) return FASTING_TARGETS.at(-1); //Quá last target
@@ -456,9 +461,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   }, [log?.target_duration]);
 
   const isFastSuccess = useMemo(() => {
-    if (!log.habit_delta) return null;
-    if (log.habit_delta > 0) return true;
-    if (log.habit_delta < 0) return false;
+    const delta = log.habit_delta || log.retain_delta;
+    if (!delta) return null;
+    if (delta > 0) return true;
+    if (delta < 0) return false;
     return null;
   }, [log]);
 
@@ -478,8 +484,9 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
 
   const state = useMemo(() => {
     // 1. Fasting, 2. Shield, 3. Rest, 4. Over Rest
-    if (log?.habit_delta && log.habit_delta > 0) return 1;
-    if (log?.habit_delta && log.habit_delta < 0) return 4;
+    const delta = log.habit_delta || log.retain_delta;
+    if (delta && delta > 0) return 1;
+    if (delta && delta < 0) return 4;
     if (log?.shield_delta && log.shield_delta > 0) return 2;
     if (log?.shield_delta && log.shield_delta < 0) return 3;
     return 0;
@@ -519,11 +526,13 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
               ? log?.description || "⬆️ Shield increase"
               : `🌱 Rest ${Math.abs(log?.shield_delta || 0)} days`}
         </Text>
-        {log.target_duration && isTargetSuccess ? (
-          <Feather name="check-circle" color={theme.success} size={12} />
-        ) : (
-          <Feather name="x-circle" color={theme.error} size={12} />
-        )}
+        {log.target_duration ? (
+          isTargetSuccess ? (
+            <Feather name="check-circle" color={theme.success} size={12} />
+          ) : (
+            <Feather name="x-circle" color={theme.error} size={12} />
+          )
+        ) : null}
       </View>
     );
   };
@@ -707,7 +716,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
                     size={13}
                     color={theme.primary}
                   />
-                  <Text className="text-sm text-amber-400 font-bold">
+                  <Text className="text-sm text-primary font-bold">
                     {log.shield_snap ?? 0}
                   </Text>
                 </View>

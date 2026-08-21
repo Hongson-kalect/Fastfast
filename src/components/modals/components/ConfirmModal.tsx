@@ -33,8 +33,8 @@ const ConfirmModal = (modal: Props) => {
         <TouchableOpacity
           style={{ backgroundColor: theme.primary }}
           className=" rounded-lg py-3 items-center justify-center min-w-28"
-          onPress={() => {
-            modal.onOk?.();
+          onPress={async () => {
+            await modal.onOk?.();
             addModal(null);
           }}
         >

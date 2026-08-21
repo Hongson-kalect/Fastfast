@@ -32,28 +32,34 @@ ON theme(is_deleted);
 `;
 
 export const getThemes = async (db: SQLiteDatabase): Promise<ThemeType[]> => {
-  const rows = await db.getAllAsync<Theme & { color_palette: string }>(
-    `SELECT * FROM theme WHERE is_deleted = 0 ORDER BY priority DESC;`,
-  );
+  try{
+
+    const rows = await db.getAllAsync<Theme & { color_palette: string }>(
+      `SELECT * FROM theme WHERE is_deleted = 0 ORDER BY priority DESC;`,
+    );
   return rows.map((row) => ({
     ...row,
     color_palette: JSON.parse(row.color_palette || "{}"),
   }));
+}catch(e){console.log('error on getThemes', e); return [];}
 };
 
 export const getActiveTheme = async (
   db: SQLiteDatabase,
 ): Promise<ThemeType | null> => {
-  const now = new Date().toISOString();
-  const row = await db.getFirstAsync<Theme & { color_palette: string }>(
-    `SELECT * FROM theme WHERE (expired_at IS NULL OR expired_at > "${now}") AND is_deleted = 0 ORDER BY priority DESC LIMIT 1;`,
-  );
-  if (!row) return null;
+  try{
 
-  return {
-    ...row,
-    color_palette: JSON.parse(row.color_palette || "{}"),
-  };
+    const now = new Date().toISOString();
+    const row = await db.getFirstAsync<Theme & { color_palette: string }>(
+      `SELECT * FROM theme WHERE (expired_at IS NULL OR expired_at > "${now}") AND is_deleted = 0 ORDER BY priority DESC LIMIT 1;`,
+    );
+    if (!row) return null;
+  
+    return {
+      ...row,
+      color_palette: JSON.parse(row.color_palette || "{}"),
+    };
+  }catch(e){console.log('error on getActiveTheme', e); return null;}
 };
 
 const lightTheme = {

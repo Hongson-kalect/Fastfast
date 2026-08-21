@@ -33,10 +33,20 @@ const useModalStore = create<ModalProps>((set, get) => ({
     });
   },
 
-  closeCurrentModal: () =>
+  closeCurrentModal: () => {
+    const nextModal = get().modalQueue[0];
     set({
       currentModal: null,
-    }),
+    });
+    if (nextModal) {
+      setTimeout(() => {
+        set({
+          currentModal: nextModal,
+          modalQueue: get().modalQueue.slice(1),
+        });
+      }, 500);
+    }
+  },
 
   clearModalQueue: () =>
     set({

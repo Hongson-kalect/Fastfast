@@ -59,11 +59,6 @@ export default function ModalWrapper({
   const [mounted, setMounted] = useState(show);
   const progress = useSharedValue(show ? 1 : 0);
 
-  const handleExitComplete = () => {
-  setMounted(false);
-  onExitComplete?.();
-};
-
   /**
    * ================================
    * OPEN / CLOSE LIFECYCLE
@@ -91,7 +86,7 @@ export default function ModalWrapper({
         (finished) => {
           if (finished) {
             // ⚠️ BẮT BUỘC dùng runOnJS để chuyển call về JS Thread an toàn
-            runOnJS(handleExitComplete)();
+            runOnJS(setMounted)(false);
           }
         },
       );

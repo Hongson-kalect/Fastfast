@@ -19,7 +19,6 @@ const HomeHeader = () => {
     present({
       render: () => <HabitBottomSheet />,
       title: "",
-      onClose: () => close(),
       size: "long",
     });
   };

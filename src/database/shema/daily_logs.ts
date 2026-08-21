@@ -31,23 +31,35 @@ export const getDailyLogs = async (
   const startDay = new Date(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
-  const rows = await db.getAllAsync<DailyLog>(
-    `SELECT * FROM daily_logs WHERE log_date >= ?;`,
-    [startDate],
-  );
-  // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
-  return rows;
+  try{
+
+    const rows = await db.getAllAsync<DailyLog>(
+      `SELECT * FROM daily_logs WHERE log_date >= ?;`,
+      [startDate],
+    );
+    // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
+    return rows;
+  }catch(e){
+    console.log('error on getDailyLogs', e);
+    return [];
+  }
 };
 
 export const getTodayLog = async (
   db: SQLiteDatabase,
 ): Promise<DailyLog | null> => {
   const today = getLocalTodayStr();
-  const rows = await db.getFirstAsync<DailyLog>(
-    `SELECT * FROM daily_logs WHERE log_date = ?`,
-    [today],
-  );
-  return rows;
+  try{
+
+    const rows = await db.getFirstAsync<DailyLog>(
+      `SELECT * FROM daily_logs WHERE log_date = ?`,
+      [today],
+    );
+    return rows;
+  }catch(e){
+    console.log('error on getTodayLog', e);
+    return null;
+  }
 };
 
 export const addDailyLogs = async (
@@ -60,14 +72,24 @@ export const addDailyLogs = async (
     hour_in_fast: number;
   },
 ) => {
-  await db.runAsync(
-    `INSERT INTO daily_logs (log_date, fast_id, hours_in_day, elapsed_hours, hours_in_fast) VALUES (?, ?, ?, ?, ?)`,
-    [
-      data.log_date,
-      data.fast_id,
-      data.hours_in_day,
-      data.elapsed_times,
-      data.hour_in_fast,
-    ],
-  );
+  try{
+
+    await db.runAsync(
+      `INSERT INTO daily_logs (log_date, fast_id, hours_in_day, elapsed_hours, hours_in_fast) VALUES (?, ?, ?, ?, ?)`,
+      [
+        data.log_date,
+        data.fast_id,
+        data.hours_in_day,
+        data.elapsed_times,
+        data.hour_in_fast,
+      ],
+    );
+
+    const res = await db.runAsync(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?;`, [data.log_date, data.fast_id]);
+    return res;
+  }catch(e){
+    console.log('error on addDailyLogs', e);
+
+    return null
+  }
 };

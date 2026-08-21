@@ -95,16 +95,23 @@ export const getUserProfile = async (
   db: SQLiteDatabase,
 ): Promise<UserProfile | null> => {
   // Vì local thường chỉ có 1 user active, ta lấy bản ghi mới nhất hoặc duy nhất
-  const row = await db.getFirstAsync<UserProfile>(
-    `SELECT * FROM user_profile ORDER BY updated_at DESC LIMIT 1;`,
-  );
-  if (!row) return null;
+  try{
 
-  return {
-    ...row,
-    // learning_languages: JSON.parse(row.learning_languages || '[]'),
-    // learning_languages: JSON.parse(row.learning_languages || '[]'),
-  };
+    const row = await db.getFirstAsync<UserProfile>(
+      `SELECT * FROM user_profile ORDER BY updated_at DESC LIMIT 1;`,
+    );
+    if (!row) return null;
+    
+    return {
+      ...row,
+      // learning_languages: JSON.parse(row.learning_languages || '[]'),
+      // learning_languages: JSON.parse(row.learning_languages || '[]'),
+    };
+  }
+  catch (e){
+    console.log('get user profile error', e);
+    return null;
+  }
 };
 
 // Kiểm trả streak và trả về profile mới
@@ -113,20 +120,34 @@ export const increaseStreak = async (
   profile: UserProfile,
   streakNumber: number,
 ) => {
-  const today = getLocalTodayStr();
-  const newStreak = profile.current_streak + streakNumber;
-  await db.runAsync(
-    `UPDATE user_profile SET current_streak = ${newStreak}, active_days = ${profile.active_days + streakNumber}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
-  );
-  const newProfile = await getUserProfile(db);
-  return newProfile!;
+  try{
+
+    const today = getLocalTodayStr();
+    const newStreak = profile.current_streak + streakNumber;
+    await db.runAsync(
+      `UPDATE user_profile SET current_streak = ${newStreak}, active_days = ${profile.active_days + streakNumber}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+    );
+    const newProfile = await getUserProfile(db);
+    return newProfile!;
+  }
+  catch (e){
+    console.log('increaseStreak error', e);
+    return null;
+  }
 };
 
 export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile) => {
-  const today = getLocalTodayStr();
-  await db.runAsync(
-    `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
-  );
-  const newProfile = await getUserProfile(db);
-  return newProfile!;
+  try{
+
+    const today = getLocalTodayStr();
+    await db.runAsync(
+      `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+    );
+    const newProfile = await getUserProfile(db);
+    return newProfile!;
+  }
+  catch (e){
+    console.log('clearStreak error', e);
+    return null;
+  }
 };

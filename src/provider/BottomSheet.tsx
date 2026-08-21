@@ -126,6 +126,7 @@ export const BottomSheetProvider = ({
   }, []);
 
   const close = useCallback(() => {
+    if (!isOpen.current) return;
     isOpen.current = false;
     setIsPresent(false);
     console.log(activeSheet);
