@@ -1,4 +1,4 @@
-import { FastSession, HabitLog } from "@/interfaces/db.type";
+import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -147,10 +147,6 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     ]);
   }
 
-  const wastedShield = habit_data.shield_snap
-    ? habit_data.shield_snap - SHIELD_LIMIT
-    : 0;
-
   // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
   // const currentLog = await db.getFirstAsync<HabitLog>(`SELECT * FROM habit_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);
 
@@ -180,10 +176,10 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
 
     const res = await getLastHabitLog(db);
     console.log("res", res);
-    return { newHabitLog: res, wastedShield: wastedShield };
+    return res
   } catch (e) {
     console.log("e", e);
-    return { newHabitLog: null, wastedShield: wastedShield };
+    return null
   }
 };
 

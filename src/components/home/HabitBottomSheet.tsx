@@ -470,8 +470,9 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
 
   const isTargetSuccess = useMemo(() => {
     if (!log.target_duration) return null;
-    if (log.duration >= log.target_duration) return true;
-    if (log.duration < log.target_duration) return false;
+    const hours = log.duration / 3600;
+    if (hours >= log.target_duration) return true;
+    if (hours < log.target_duration) return false;
     return null;
   }, [log]);
 
@@ -664,7 +665,9 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
 
               <View className="items-end">
                 <Text className="text-[10px] text-zinc-400">
-                  Thực tế / Mục tiêu
+                  {!log.target_duration
+                    ? "Thời gian nhịn"
+                    : "Thực tế / Mục tiêu"}
                 </Text>
                 <View className="flex-row items-center gap-1.5 mt-1">
                   <Text

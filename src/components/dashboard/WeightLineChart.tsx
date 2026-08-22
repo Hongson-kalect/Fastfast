@@ -473,10 +473,10 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
 
       {/* Panel Tooltip hiển thị đồng thời cả 2 thông số */}
       <RoundedRect
-        x={10}
-        y={0}
-        width={120}
-        height={56}
+        x={4}
+        y={4}
+        width={170}
+        height={75}
         r={10}
         color={theme.background + "CC"}
       />

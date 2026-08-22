@@ -14,14 +14,16 @@ import { create } from "zustand";
 
 type ColorPalette = typeof darkTheme;
 
-interface AppState {
-  userProfile:
-    | (UserProfile & {
+type UserAppProfile = | (UserProfile & {
         habit_percent: number;
         shield: number;
         habit_retain: number;
       })
     | null;
+
+interface AppState {
+  userProfile: UserAppProfile
+    
   settings: AppSettings | null;
   weight: number | null;
   currentFastSession: FastSession | null;
@@ -35,12 +37,7 @@ interface AppState {
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
   init: (db: SQLiteDatabase) => Promise<StreakCheckResult | null>;
-  updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
-  updateHabit: (val: {
-    habit_percent: number;
-    shield: number;
-    habit_retain: number;
-  }) => void;
+  updateProfile: (val: { [K in keyof UserAppProfile]: any }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -65,6 +62,9 @@ export const useAppStore = create<AppState>((set, get) => {
     language: "en",
     isHydrated: false, // Kiểm tra đã nạp xong data từ SecureStore chưa
     init: async (db: SQLiteDatabase) => {
+      const id = Math.random().toString(36).slice(2);
+
+  console.log('[INIT START]', id, db);
       const start = Date.now();
       set({ isLoadingData: true });
       try {
@@ -73,7 +73,6 @@ export const useAppStore = create<AppState>((set, get) => {
         // streak cal: Nếu ngày lấy streak < now => streak + = 1 max_streak = Math.max(streak, max_streak)
         // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
 
-        // Chạy song song cả 3 truy vấn để tối ưu hóa tốc độ khởi động
         const currentFast = await dbService.getLastFastSession();
         const weightObj = await dbService.getCurrentWeight();
         const currentProfile = await dbService.getUserProfile();
@@ -122,37 +121,26 @@ export const useAppStore = create<AppState>((set, get) => {
           isLoadingData: false,
           language: locale.toString(),
         });
-
+console.log('[INIT SUCCESS]', id, db);
         console.log(
           "=> [Zustand] Khởi tạo dữ liệu Local DB thành công!",
           Date.now() - start,
         );
         return streak;
       } catch (error) {
+        console.error('[INIT FAILED]', id, db, error);
         console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
         set({ isLoadingData: false });
         return null;
       }
     },
 
-    updateProfile: (val: { [K in keyof UserProfile]: any }) => {
+    updateProfile: (val: { [K in keyof UserAppProfile]: any }) => {
       const profile = get().userProfile;
       if (profile) {
         set({ userProfile: { ...profile, ...val } });
       }
     },
-
-    updateHabit: (val: {
-      habit_percent: number;
-      shield: number;
-      habit_retain: number;
-    }) => {
-      const profile = get().userProfile;
-      if (profile) {
-        set({ userProfile: { ...profile, ...val } });
-      }
-    },
-
     updateSetting: (obj: object) =>
       set((state) => ({
         settings: {

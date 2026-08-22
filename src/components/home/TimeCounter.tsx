@@ -40,6 +40,7 @@ const colorRange = {
 };
 
 const padding = 12;
+const MIN_ANGLE = 3;
 const HomeTimeCounter = ({
   isCounting,
   counter,
@@ -100,12 +101,12 @@ const HomeTimeCounter = ({
 
   // 2. Xử lý triệt để bài toán Cleanup khi Unmount / Hot Reload
   useEffect(() => {
-    const angle = Math.min(2 * Math.PI * progress + 3, 2 * Math.PI);
+    const angle = Math.min(2 * Math.PI * progress + MIN_ANGLE, 2 * Math.PI);
     rotation.value = 0; // Reset về 0 trước khi chạy
     rotation.value = withRepeat(
       withTiming(angle, {
-        duration: 5000,
-        // duration: 7000 - 4000 * (1 - progress),
+        // duration: 5000,
+        duration: 7000 - 4000 * (1 - progress),
         easing: Easing.linear,
       }), // Càng thấp thì lặp càng nhanh
       -1,

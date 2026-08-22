@@ -119,13 +119,14 @@ export const increaseStreak = async (
   db: SQLiteDatabase,
   profile: UserProfile,
   streakNumber: number,
+  reduceShieldNumber?:number
 ) => {
   try{
 
     const today = getLocalTodayStr();
     const newStreak = profile.current_streak + streakNumber;
     await db.runAsync(
-      `UPDATE user_profile SET current_streak = ${newStreak}, active_days = ${profile.active_days + streakNumber}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+      `UPDATE user_profile SET current_streak = ${newStreak}, active_days = ${profile.active_days + streakNumber}, max_streak = ${Math.max(profile.max_streak, newStreak)}, streak_date = '${today}', total_shield_used = ${profile.total_shield_used + (reduceShieldNumber||0)} , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
     );
     const newProfile = await getUserProfile(db);
     return newProfile!;
@@ -136,12 +137,26 @@ export const increaseStreak = async (
   }
 };
 
-export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile) => {
+export const gainShield = async (db: SQLiteDatabase, num:number, userProfile?: UserProfile) => {
+  let profile = userProfile || await getUserProfile(db);
+
+  if(!profile) return null;
+
+  try{
+    db.runAsync(`UPDATE user_profile SET total_shield_used = ${profile.total_shield_used + num}, updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`)
+  }
+
+  catch (e){
+    console.log('gainShield error', e);
+    return null;
+  }}
+
+export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile, reduceHabitNumber?: number) => {
   try{
 
     const today = getLocalTodayStr();
     await db.runAsync(
-      `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}' , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+      `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}', total_shield_used = ${profile.total_shield_used + (reduceHabitNumber||0)} , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
     );
     const newProfile = await getUserProfile(db);
     return newProfile!;

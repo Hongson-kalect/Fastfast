@@ -5,7 +5,7 @@ import {
   Feather,
   FontAwesome5,
   Foundation,
-  Ionicons
+  Ionicons,
 } from "@expo/vector-icons";
 import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -98,7 +98,7 @@ export const StreakCheckModal = ({ data }: Props) => {
     <View className="relative py-2">
       {/* 🛡️ TOP RIGHT: SHIELD STATUS */}
       <View className="absolute top-0 right-0 z-10">
-        <View className="flex-row items-center rounded-full border border-indigo-400/15 bg-indigo-500/10 px-2.5 py-1">
+        <View className="flex-row items-center rounded-full border border-indigo-400/15 bg-indigo-500/10 px-2.5 py-1 gap-1">
           <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
           <View className="flex-row">
             <Text className="font-bold text-[10px] text-primary">
@@ -240,7 +240,7 @@ export const StreakCheckModal = ({ data }: Props) => {
           </View>
 
           <View className="my-1 items-center">
-            <Text className="text-2xl font-black text-warning">
+            <Text className="text-2xl font-black text-primary">
               {data.retain.current}
             </Text>
           </View>

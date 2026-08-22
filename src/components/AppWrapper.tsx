@@ -27,6 +27,9 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!db) return;
+    const id = Math.random().toString(36).slice(2);
+
+  console.log('[DB EFFECT MOUNT]', id, db)
 
     const load = async () => {
       const streakObj = await init(db);
@@ -114,6 +117,8 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     load();
+
+    return ()=> {console.log('[DB EFFECT CLEANUP]', id, db);}
   }, [db]);
 
   useEffect(() => {

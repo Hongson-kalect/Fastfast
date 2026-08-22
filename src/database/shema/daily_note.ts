@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS daily_notes (
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_daily_notes_date ON daily_notes(log_date);
 `;
 
 export const getDailyNotes = async (
@@ -63,3 +65,13 @@ try{
   console.log('error on setDailyNote', e);
 }
 };
+
+export const  getPixelNoteData = async (db: SQLiteDatabase, year: number): Promise<DailyNote[] | []> =>{
+  try{
+    const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes WHERE strftime('%Y', log_date) = ?;`, [year]);
+    return rows;
+  }catch(e){
+    console.log('error on getPixelYearData', e);
+    return [];
+  }
+}

@@ -13,11 +13,11 @@ type Props = {
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000; // 6 tiếng tính bằng milliseconds
 
 const START_PRESETS = [
-  { label: "-30p", minutes: 30 },
-  { label: "-1h", minutes: 60 },
-  { label: "-2h", minutes: 120 },
-  { label: "-4h", minutes: 240 },
-  { label: "-6h", minutes: 360 },
+  { label: "30p", minutes: 30 },
+  { label: "1h", minutes: 60 },
+  { label: "2h", minutes: 120 },
+  { label: "4h", minutes: 240 },
+  { label: "6h", minutes: 360 },
 ];
 
 const DelayModal = ({ onSubmit, isCounting }: Props) => {
@@ -123,7 +123,7 @@ const DelayModal = ({ onSubmit, isCounting }: Props) => {
             className="flex-1 items-center justify-center rounded-xl border border-white/10 bg-zinc-800/80 py-2.5 active:border-sky-500/50 active:bg-sky-500/20"
           >
             <Text className="text-xs font-bold text-sky-400">
-              {!isCounting ? `-${chip.label}` : chip.label}
+              {`-${chip.label}`}
             </Text>
           </TouchableOpacity>
         ))}

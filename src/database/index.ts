@@ -10,12 +10,14 @@ import {
   addDailyLogs,
   generateString as daily_logsGenerateString,
   getDailyLogs,
+  getPixelLogData,
   getTodayLog,
 } from "./shema/daily_logs";
 import {
   generateString as daily_noteGenerateString,
   getDailyNote,
   getDailyNotes,
+  getPixelNoteData,
   setDailyNote,
 } from "./shema/daily_note";
 import {
@@ -138,6 +140,9 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getHabitLogs: () => getHabitLogs(db),
   addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
+
+  getPixelNoteData: (year: number) => getPixelNoteData(db, year),
+  getPixelLogData: (year: number) => getPixelLogData(db, year),
 });
 
 export const generateSchema = `
@@ -157,8 +162,7 @@ ${userSeedData}
 `;
 
 export const initDatabase = async (db: SQLiteDatabase) => {
-  try{
-
+  try {
     const DATABASE_VERSION = 1; // get from server
     // let version = 0;
     // await clearDatabase(db);
@@ -167,21 +171,21 @@ export const initDatabase = async (db: SQLiteDatabase) => {
       return;
     }
 
-  if (version >= DATABASE_VERSION) {
-    return;
+    if (version >= DATABASE_VERSION) {
+      return;
+    }
+
+    if (version === 0) {
+      await db.execAsync(generateSchema);
+
+      console.log("generateSchema completed");
+      await db.execAsync(generateSeedData);
+    }
+
+    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+  } catch (error) {
+    console.error("Lỗi khi tạo DB:", error);
   }
-  
-  if (version === 0) {
-    await db.execAsync(generateSchema);
-    
-    console.log("generateSchema completed");
-    await db.execAsync(generateSeedData);
-  }
-  
-  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
-}catch (error) {
-  console.error("Lỗi khi tạo DB:", error);
-}
 };
 
 export const getDatabaseVersion = async (
@@ -284,7 +288,7 @@ export const handleLogin = async ({
     },
     habit: {
       currentPercent: habitLog?.habit_snap || 0,
-      previousPercent: habitLog?.habit_retain || 0,
+      previousPercent: habitLog?.habit_snap || 0,
     },
     shield: {
       previous: habitLog?.shield_snap || 0,
@@ -371,15 +375,15 @@ export const handleLogin = async ({
 
   let returnLastFast = lastFast || null;
   let returnHabitLog = habitLog || null;
-  let returnProfile: UserProfile|null = profile;
+  let returnProfile: UserProfile | null = profile;
 
   if (increaseStreakNumber) {
     streakStat.streak.current =
       streakStat.streak.previous + increaseStreakNumber;
 
-    returnProfile = await increaseStreak(db, profile, increaseStreakNumber);
-    streakStat.streak.max = returnProfile?.max_streak||0;
-    streakStat.streak.current = returnProfile?.current_streak||0;
+    returnProfile = await increaseStreak(db, profile, increaseStreakNumber, reduceShieldNumber);
+    streakStat.streak.max = returnProfile?.max_streak || 0;
+    streakStat.streak.current = returnProfile?.current_streak || 0;
     if (habitLog && reduceShieldNumber)
       returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
 
@@ -388,7 +392,7 @@ export const handleLogin = async ({
     streakStat.streak.current = 1;
     // thêm shield bị trừ ở profile
 
-    returnProfile = await clearStreak(db, profile);
+    returnProfile = await clearStreak(db, profile, reduceHabitNumber);
     if (habitLog && reduceHabitNumber) {
       returnHabitLog = await reduceHabit(
         db,

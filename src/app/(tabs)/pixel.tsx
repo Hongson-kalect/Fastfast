@@ -4,6 +4,7 @@ import PixelStatistic from "@/components/pixel/Statistic";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
+import { DailyLog, DailyNote } from "@/interfaces/db.type";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -115,9 +116,43 @@ const PixelScreen = () => {
     });
   };
 
-  const getYearData = async ()=>{
-    // const res = await dbService.();
-  }
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [isLoading, setIsLoading] = useState(true); // Để hiển thị skeleton
+
+  const [pixelNotes, setPixelNotes] = useState<{ [date: string]: DailyNote }>(
+    {},
+  );
+  const [pixelLogs, setPixelLogs] = useState<{ [date: string]: DailyLog[] }>(
+    {},
+  );
+
+  const getYearData = async (year: number) => {
+    setIsLoading(true);
+    const notes = await dbService.getPixelNoteData(year);
+    const logs = await dbService.getPixelLogData(year);
+
+    const newNotes: typeof pixelNotes = {};
+    notes.forEach((note) => {
+      newNotes[note.log_date] = note;
+    });
+
+    const newLogs: typeof pixelLogs = {};
+    logs.forEach((log) => {
+      if (newLogs[log.log_date]) {
+        newLogs[log.log_date].push(log);
+      } else {
+        newLogs[log.log_date] = [log];
+      }
+    });
+
+    setPixelNotes(newNotes);
+    setPixelLogs(newLogs);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    getYearData(year);
+  }, [year]);
 
   useEffect(() => {
     setTimeout(() => {

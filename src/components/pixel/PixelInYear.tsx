@@ -216,7 +216,7 @@ const PixelGridManager = () => {
   return (
     <View>
       {/* KHU VỰC CONTROLLER */}
-      <View className="bg-white/5 rounded-lg pr-1 pb-1 overflow-hidden">
+      <View className="bg-background/5 rounded-lg pr-1 py-1 overflow-hidden">
         {/* Header Thứ (T2 -> CN) */}
 
         {/* Danh sách các tuần */}

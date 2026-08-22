@@ -4,6 +4,7 @@ import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import { addHabitLogs } from "./habit_logs";
 import { fixed } from "@/util/numberLimit";
+import { gainShield } from "./user";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -153,6 +154,7 @@ export const finishLastSession = async (
   isValid: boolean = true,
 ) => {
   let newHabitLog = null;
+  let shieldGain = 0;
   try{
 
     if (!isValid) {
@@ -170,20 +172,15 @@ export const finishLastSession = async (
         [time, duration, id],
       );
   
-       const {newHabitLog : habit, wastedShield} = await addHabitLogs(db, {
+       newHabitLog = await addHabitLogs(db, {
         fast_id: id,
         log_date: getLocalTodayStr(),
         habit_detla: fixed(habitDelta),
         shield_detla: shieldGain,
       });
   
-      newHabitLog = habit;
-  
-      if(shieldGain || wastedShield) {
-        // Update profile
-        // await profileShieldIncrease(db, shieldGain, wastedShield);
-  
-        // update zustand state
+      if(shieldGain) {
+        await gainShield(db, shieldGain);
       }
     }
   
@@ -194,12 +191,14 @@ export const finishLastSession = async (
     return {
       lastSession: res,
       habitLog: newHabitLog,
+      shieldGain: shieldGain,
     };
   }catch{
     console.log('error on finishLastSession');
     return {
       lastSession: null,
       habitLog: null,
+      shieldGain: 0,
     };
   }
 };
