@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS daily_logs (
     -- FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE,
   );
 
-CREATE INDEX IF NOT EXISTS idx_daily_logs_user_date ON daily_logs(user_id, log_date);
+CREATE INDEX IF NOT EXISTS idx_daily_logs_date ON daily_logs(log_date);
 `;
 
 export const getDailyLogs = async (
@@ -94,12 +94,26 @@ export const addDailyLogs = async (
   }
 };
 
-export const getPixelLogData=async (db: SQLiteDatabase, year: number): Promise<DailyLog[] | []> => {
-  try{
-    const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs WHERE strftime('%Y', log_date) = ?;`, [year]);
+export const getPixelLogData = async (
+  db: SQLiteDatabase,
+  year: number,
+): Promise<DailyLog[]> => {
+  try {
+    // Tạo 2 mốc đầu năm và cuối năm theo chuẩn YYYY-MM-DD
+    const startOfYear = `${year}-01-01`;
+    const endOfYear = `${year}-12-31`;
+
+    const rows = await db.getAllAsync<DailyLog>(
+      `SELECT * FROM daily_logs 
+       WHERE log_date BETWEEN ? AND ? 
+         AND is_deleted = 0 
+       ORDER BY log_date ASC;`,
+      [startOfYear, endOfYear],
+    );
+
     return rows;
-  }catch(e){
-    console.log('error on getPixelLogData', e);
+  } catch (e) {
+    console.log("error on getPixelLogData", e);
     return [];
   }
-}
+};

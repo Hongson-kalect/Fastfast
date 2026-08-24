@@ -19,12 +19,11 @@ CREATE INDEX IF NOT EXISTS idx_daily_notes_date ON daily_notes(log_date);
 export const getDailyNotes = async (
   db: SQLiteDatabase,
 ): Promise<DailyNote[] | null> => {
-  try{
-
+  try {
     const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes;`);
     return rows;
-  }catch(e){
-    console.log('error on getDailyNotes', e);
+  } catch (e) {
+    console.log("error on getDailyNotes", e);
     return null;
   }
 };
@@ -33,15 +32,14 @@ export const getDailyNote = async (
   db: SQLiteDatabase,
   day: string = getLocalTodayStr(),
 ): Promise<DailyNote | null> => {
-  try{
-
+  try {
     const row = await db.getFirstAsync<DailyNote>(
       `SELECT * FROM daily_notes WHERE log_date = ?;`,
       [day],
     );
     return row;
-  }catch(e){
-    console.log('error on getDailyNote', e);
+  } catch (e) {
+    console.log("error on getDailyNote", e);
     return null;
   }
 };
@@ -58,20 +56,37 @@ export const setDailyNote = async (
     INSERT OR REPLACE INTO daily_notes (log_date, mood_level, note, image_uri, updated_at)
     VALUES (?, ?, ?, ?, strftime('%s', 'now'));
   `;
-try{
-
-  await db.runAsync(query, [dateStr, mood||null, note || null, image || null]);
-}catch(e){
-  console.log('error on setDailyNote', e);
-}
+  try {
+    await db.runAsync(query, [
+      dateStr,
+      mood || null,
+      note || null,
+      image || null,
+    ]);
+  } catch (e) {
+    console.log("error on setDailyNote", e);
+  }
 };
 
-export const  getPixelNoteData = async (db: SQLiteDatabase, year: number): Promise<DailyNote[] | []> =>{
-  try{
-    const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes WHERE strftime('%Y', log_date) = ?;`, [year]);
+export const getPixelNoteData = async (
+  db: SQLiteDatabase,
+  year: number,
+): Promise<DailyNote[]> => {
+  try {
+    // Tạo 2 mốc đầu năm và cuối năm theo chuẩn YYYY-MM-DD
+    const startOfYear = `${year}-01-01`;
+    const endOfYear = `${year}-12-31`;
+
+    const rows = await db.getAllAsync<DailyNote>(
+      `SELECT * FROM daily_notes 
+       WHERE log_date BETWEEN ? AND ? 
+       ORDER BY log_date ASC;`,
+      [startOfYear, endOfYear],
+    );
+
     return rows;
-  }catch(e){
-    console.log('error on getPixelYearData', e);
+  } catch (e) {
+    console.log("error on getPixelNoteData", e);
     return [];
   }
-}
+};

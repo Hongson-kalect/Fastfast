@@ -21,7 +21,7 @@ const rating = [
 ];
 
 const HomeScreen = () => {
-  const { currentFastSession, setCurrentFastSession, settings, userProfile, updateProfile } =
+  const { currentFastSession, setCurrentFastSession, settings, userProfile, habit, updateProfile } =
     useAppStore();
   const [startTime, setStartTime] = useState<number | null>(
     currentFastSession?.start_time || null,
@@ -89,21 +89,24 @@ const HomeScreen = () => {
 
         console.log("current ", currentFastSession.id);
 
-        const { lastSession, habitLog,shieldGain } = await dbService?.finishLastSession(
-          currentFastSession?.id,
-          now,
+        const { lastSession, habitLog, profile } = await dbService?.finishLastSession({
+
+          id:currentFastSession?.id,
+          endTime:now,
           duration,
           isValid,
+          profile:userProfile||undefined,
+          habitLog:habit ||undefined
+        }
         );
 
         // update zustand
         if (habitLog && userProfile) {
           updateProfile({
-            habit_percent: habitLog?.habit_snap,
-            habit_retain: habitLog?.habit_retain || 0,
-            shield: habitLog?.shield_snap,
-            total_shield_clamable: userProfile?.total_shield_clamable + (shieldGain || 0),
-          });
+            ...userProfile,
+            ...profile
+          }
+          );
         }
 
         setCurrentFastSession(null);
@@ -189,19 +192,21 @@ const HomeScreen = () => {
         setIsCounting(!isCounting);
         // Lấy thời gian, nếu nhỏ hơn x thì cho thành false nếu thời gian > 2 tiếng hoặc xóa luôn nếu dưới
 
-        const { lastSession, habitLog, shieldGain } = await dbService?.finishLastSession(
-          currentFastSession?.id,
-          now,
+        const { lastSession, habitLog, profile } = await dbService?.finishLastSession({
+
+          id:currentFastSession?.id,
+          endTime:now,
           duration,
           isValid,
+          profile:userProfile||undefined,
+          habitLog:habit ||undefined
+        }
         );
         close();
          if (habitLog && userProfile) {
           updateProfile({
-            habit_percent: habitLog?.habit_snap,
-            habit_retain: habitLog?.habit_retain || 0,
-            shield: habitLog?.shield_snap,
-            total_shield_clamable: userProfile?.total_shield_clamable + (shieldGain || 0),
+            ...userProfile,
+            ...profile
           });
         }
 

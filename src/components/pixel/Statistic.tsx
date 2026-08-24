@@ -1,9 +1,16 @@
 import { Text, View } from "react-native";
 import { ThemedText } from "../themed-text";
-import { moodArr } from "./PixelInYear";
+import { moodArr, targetArr } from "./PixelInYear";
+import { FASTING_TARGETS } from "@/constants/data";
 
-const moodCount = [102, 25, 5, 2, 0];
-const PixelStatistic = () => {
+const moodCount = [102, 25, 5, 2, 0, 10, 10];
+
+type Props= {
+  trackingType: "mood" | "fasting";
+  setTrackingType: (mode: "mood" | "fasting") => void
+}
+const PixelStatistic = ({setTrackingType,trackingType}:Props) => {
+
   return (
     <View className="gap-4">
       <View className="flex-row gap-1 items-end">
@@ -24,12 +31,12 @@ const PixelStatistic = () => {
         </View> */}
 
         <View className="flex-row items-center gap-1 justify-between">
-          <View className=" items-center px-3 py-1 bg-primary rounded-lg">
+          <View className={`items-center px-3 py-1 ${trackingType==='mood' ?'bg-primary':'bg-background/60'} rounded-lg`}>
             <ThemedText className="text-[11px]! text-white! font-bold">
               Emotion
             </ThemedText>
           </View>
-          <View className=" items-center px-3 py-1 bg-gray-600 rounded-lg">
+          <View className={`items-center px-3 py-1 ${trackingType==='fasting' ?'bg-primary':'bg-background/60'} rounded-lg`}>
             <ThemedText className="text-[11px]! text-white/60! font-bold">
               Fast process
             </ThemedText>
@@ -38,16 +45,33 @@ const PixelStatistic = () => {
       </View>
 
       <View className="flex-row gap-2 mt-2">
-        {moodArr.map((item, index) => (
+        {trackingType==='mood' && moodArr.map((item, index) => (
           <View
             key={item.label}
             style={{ backgroundColor: item.color }}
             className="flex-1 px-2 py-1 rounded"
           >
-            <View className="flex-row items-center justify-between">
+            <View className="items-center justify-between">
               <ThemedText className="text-base!">{item.emoji}</ThemedText>
               <ThemedText className="text-[13px]! text-text-base/800!">
-                {moodCount[index]}
+                {moodCount[index || 0]}
+              </ThemedText>
+            </View>
+            {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">
+              {moodCount[index]}
+            </ThemedText> */}
+          </View>
+        ))}
+        {trackingType==='fasting' && FASTING_TARGETS.map((item, index) => (
+          <View
+            key={item.label}
+            style={{ backgroundColor: item.colors.badgeBg }}
+            className="flex-1 px-2 py-1 rounded"
+          >
+            <View className="items-center justify-between">
+              <ThemedText className="text-base!">{item.emoji}</ThemedText>
+              <ThemedText className="text-[13px]! text-text-base/800!">
+                {moodCount[index || 0]}
               </ThemedText>
             </View>
             {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">

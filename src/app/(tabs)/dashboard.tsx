@@ -15,7 +15,8 @@ import { useAppStore } from "@/stores/appStore";
 import { getBucketKey, initChartData } from "@/util/dashboard/utils";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
-import { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StatusBar, useWindowDimensions, View } from "react-native";
 
 const DashboardScreen = () => {
@@ -130,9 +131,11 @@ const DashboardScreen = () => {
     setFastStatistics(fastStatisticsDB);
   };
 
-  useEffect(() => {
-    refreshData();
-  }, [chartRange, currentFastSession, weight]);
+  useFocusEffect(
+    useCallback(() => {
+      refreshData();
+    }, [chartRange, currentFastSession, weight]),
+  );
 
   return (
     <ThemedView className="flex-1 bg-main">

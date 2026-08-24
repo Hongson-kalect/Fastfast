@@ -29,8 +29,6 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!db) return;
     const id = Math.random().toString(36).slice(2);
 
-  console.log('[DB EFFECT MOUNT]', id, db)
-
     const load = async () => {
       const streakObj = await init(db);
       setDBReady(true);
@@ -102,23 +100,9 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
           onHide: () => console.log("Toast hidden"),
         });
       }
-
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Main message",
-      //   text2: "Secondary message",
-      //   position: "bottom",
-      //   visibilityTime: 4000,
-      //   autoHide: true,
-      //   onPress: () => console.log("Toast pressed"),
-      //   onShow: () => console.log("Toast shown"),
-      //   onHide: () => console.log("Toast hidden"),
-      // });
     };
 
     load();
-
-    return ()=> {console.log('[DB EFFECT CLEANUP]', id, db);}
   }, [db]);
 
   useEffect(() => {

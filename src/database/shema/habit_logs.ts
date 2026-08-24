@@ -1,4 +1,4 @@
-import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
+import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -94,10 +94,12 @@ export type AddHabitType = {
   log_date?: string;
   fast_id?: string;
   habit_detla?: number;
-  shield_detla?: number;
+  shield_delta?: number;
+  shield_milestone?: number;
 
   habit_snap?: number;
   shield_snap?: number;
+  lastLog?: HabitLog|null;
 };
 export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   const id = uuidv7();
@@ -109,10 +111,10 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
   let habitDetla = data.habit_detla || 0;
   let retainDelta = 0;
 
-  const lastLog = await getLastHabitLog(db);
+  const lastLog = data.lastLog || await getLastHabitLog(db);
   if (!data.habit_snap || !data.shield_snap) {
-    habit_data.habit_snap =lastLog?.habit_snap || 0;
-    habit_data.shield_snap =lastLog?.shield_snap || 0
+    habit_data.habit_snap = lastLog?.habit_snap || 0;
+    habit_data.shield_snap = lastLog?.shield_snap || 0;
   }
 
   if (lastLog?.habit_snap === 100) {
@@ -133,17 +135,22 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     }
   }
 
-  habit_data.habit_snap=(habit_data?.habit_snap ||0) + (habit_data?.habit_detla || 0);
-  habit_data.shield_snap=(habit_data?.shield_snap ||0) + (habit_data?.shield_detla || 0)+bonusShield;
-  habit_data.shield_detla = habitDetla + bonusShield;
-
+  habit_data.habit_snap =
+    (habit_data?.habit_snap || 0) + (habit_data?.habit_detla || 0);
+  habit_data.shield_snap =
+    (habit_data?.shield_snap || 0) +
+    (habit_data?.shield_delta || 0) +
+    (habit_data?.shield_milestone || 0) +
+    bonusShield;
+  habit_data.shield_delta = habitDetla + bonusShield;
 
   let shield_detail = null;
 
-  if (habit_data.shield_detla || bonusShield) {
+  if (habit_data.shield_delta || bonusShield|| habit_data.shield_milestone) {
     shield_detail = JSON.stringify([
-      habit_data.shield_detla || 0,
+      habit_data.shield_delta || 0,
       bonusShield || 0,
+      habit_data.shield_milestone || 0
     ]);
   }
 
@@ -167,7 +174,7 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
         numberLimit(habitDetla || 0, 0, 100),
         numberLimit(habit_data.habit_snap || 0, 0, 100),
         retainDelta,
-        habit_data.shield_detla || 0,
+        habit_data.shield_delta || 0,
         numberLimit(habit_data.shield_snap || 0, 0, SHIELD_LIMIT),
         numberLimit(retain, 0, RETAIN_LIMIT),
         shield_detail,
@@ -176,10 +183,10 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
 
     const res = await getLastHabitLog(db);
     console.log("res", res);
-    return res
+    return res;
   } catch (e) {
     console.log("e", e);
-    return null
+    return null;
   }
 };
 
@@ -194,7 +201,7 @@ export const reduceShield = async (
     await db.runAsync(
       `INSERT INTO habit_logs 
     (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) 
-    VALUES (?, ?, ?, ?, ?,?,?)`,
+    VALUES (?, ?, ?, ?, ?,?,?,?)`,
       [
         id,
         today,
@@ -214,7 +221,6 @@ export const reduceShield = async (
     return null;
   }
 };
-
 export const reduceHabit = async (
   db: SQLiteDatabase,
   lastHabitLog: HabitLog,
@@ -227,7 +233,7 @@ export const reduceHabit = async (
     await db.runAsync(
       `INSERT INTO habit_logs 
       (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, overest) 
-      VALUES (?, ?, ?, ?, ?,?,?,?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         today,

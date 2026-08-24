@@ -428,6 +428,7 @@ export const EMOTIONS: { level: MoodLevel; emoji: string; label: string }[] = [
 
 export interface FastingTargetItem {
   id: string;
+  emoji: string;
   hours: number;
   label: string;
   title: string;
@@ -446,6 +447,7 @@ export interface FastingTargetItem {
 export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "16h",
+    emoji:'🌱',
     hours: 16,
     label: "Intermittent",
     title: "Phổ biến & Dễ bắt đầu",
@@ -464,6 +466,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   },
   {
     id: "18h",
+    emoji:'🌳',
     hours: 18,
     label: "Fat Burner",
     title: "Đốt mỡ tăng cường",
@@ -482,6 +485,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   },
   {
     id: "20h",
+    emoji:'⚡',
     hours: 20,
     label: "Warrior",
     title: "Chế độ Chiến binh",
@@ -500,6 +504,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   },
   {
     id: "23h",
+    emoji:'🔥',
     hours: 23,
     label: "OMAD",
     title: "Một bữa mỗi ngày",
@@ -519,6 +524,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   {
     id: "36h",
     hours: 36,
+    emoji:'💪',
     label: "Monk",
     title: "Thử thách nhịn xuyên ngày",
     level: "Expert",
@@ -536,6 +542,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   },
   {
     id: "48h",
+    emoji:'🏆',
     hours: 48,
     label: "Extended",
     title: "Nhịn sâu nâng cao",
@@ -554,6 +561,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
   },
   {
     id: "72h",
+    emoji:'👑',
     hours: 72,
     label: "Prolonged",
     title: "Thử thách cực hạn",

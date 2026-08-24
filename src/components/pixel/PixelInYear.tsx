@@ -47,6 +47,10 @@ export const moodArr = [
   { index: 5, emoji: "🥰", label: "Happy", color: "#2E6930" }, // Xanh lá Emerald trầm - Trạng thái tốt nhất
 ];
 
+export const targetArr = [
+  {index:1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc
+]
+
 export const generateMockDataObj = (targetYear: number): DayItemObj => {
   const mockData: DayItemObj = {};
 

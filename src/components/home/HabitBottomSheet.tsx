@@ -255,22 +255,21 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
     console.log("show");
   }, []);
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const { theme, userProfile } = useAppStore();
-  console.log("profile", userProfile);
+  const { theme, userProfile, habit } = useAppStore();
   const dbService = useDBService();
 
   const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
     return [
-      userProfile?.habit_percent || 0,
-      userProfile?.shield || 0,
-      userProfile?.habit_retain || 0,
+      habit?.habit_snap || 0,
+      habit?.shield_snap || 0,
+      habit?.habit_retain || 0,
     ];
-  }, [userProfile]);
+  }, [habit]);
 
   // Trạng thái mốc (Đã đạt hay chưa)
-  const isMilestone35Reached = habitPercent < 35;
-  const isMilestone70Reached = habitPercent < 70;
-  const isMilestone100Reached = habitPercent < 100;
+  const isMilestone35Reached = !!userProfile?.low_shield_clamable;
+  const isMilestone70Reached = !!userProfile?.mid_shield_clamable;
+  const isMilestone100Reached = !!userProfile?.full_shield_clamable;
 
   // Đánh giá động dựa trên % Habit
   const getMotivationalText = (percent: number) => {

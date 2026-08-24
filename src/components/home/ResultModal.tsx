@@ -227,6 +227,17 @@ export const ResultModal = ({ data = testData }: Props) => {
               </Text>
             </View>
           )}
+          {!!data.shields.detail[2] && (
+            <View className="flex-row items-center gap-1">
+              <Text className="text-xs text-success font-bold">
+                +{data.shields.detail[2]}
+              </Text>
+              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
+              <Text className="ml-2 text-xs  text-text-base/60">
+                For for milestone reached 🎉
+              </Text>
+            </View>
+          )}
         </View>
       )}
 

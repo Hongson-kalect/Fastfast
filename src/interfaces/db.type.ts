@@ -30,8 +30,12 @@ export interface UserProfile {
   streak_date: string|null;
 
   total_shield_used :number,
-total_shield_clamable :number,
-total_shield_wasted :number,
+  total_shield_clamable :number,
+  total_shield_wasted :number,
+
+  low_shield_clamable:number,
+  mid_shield_clamable:number,
+  full_shield_clamable:number,
 
   last_fast_completed_at: number;
   rest_point: number;

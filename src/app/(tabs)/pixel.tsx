@@ -5,9 +5,11 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -90,6 +92,8 @@ const generateMockYearData = () => {
 
 const PixelScreen = () => {
   const dbService = useDBService();
+  const { userProfile } = useAppStore();
+  const [trackingType, setTrackingType] = useState<"mood" | "fasting">("fasting")
   const [enableScroll, setEnableScroll] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("fasting");
   const { width, height } = useWindowDimensions();
@@ -130,6 +134,7 @@ const PixelScreen = () => {
     setIsLoading(true);
     const notes = await dbService.getPixelNoteData(year);
     const logs = await dbService.getPixelLogData(year);
+    const stats = await dbService.getFastStatsSummary()
 
     const newNotes: typeof pixelNotes = {};
     notes.forEach((note) => {
@@ -150,9 +155,12 @@ const PixelScreen = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    getYearData(year);
-  }, [year]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log("focused");
+      getYearData(year);
+    }, [year]),
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -202,7 +210,7 @@ const PixelScreen = () => {
         >
           <PixelHeader />
           <View className="mt-4 mb-6">
-            <PixelStatistic />
+            <PixelStatistic trackingType={trackingType} setTrackingType={setTrackingType}/>
           </View>
           {/* <View className="py-4">
               <PixelOptions

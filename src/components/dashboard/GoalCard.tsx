@@ -134,7 +134,7 @@ export const GoalCard = () => {
     );
 
   return (
-    <View className="mb-4 rounded-2xl border border-zinc-800 bg-primary/40 p-4">
+    <View className="mb-4 rounded-2xl border border-zinc-800 bg-primary/40 p-4 h-36">
       {/* Header Goal */}
       <View className="flex-row items-center justify-between">
         {!!weight ? (

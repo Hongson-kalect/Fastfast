@@ -137,32 +137,97 @@ export const increaseStreak = async (
   }
 };
 
-export const gainShield = async (db: SQLiteDatabase, num:number, userProfile?: UserProfile) => {
+export const gainShield = async (db: SQLiteDatabase, num:number,  habit:number, userProfile?: UserProfile) => {
   let profile = userProfile || await getUserProfile(db);
 
   if(!profile) return null;
 
-  try{
-    db.runAsync(`UPDATE user_profile SET total_shield_used = ${profile.total_shield_used + num}, updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`)
-  }
+  let shield_mileStone_gain = 0
+  let low_shield_clamable = profile.low_shield_clamable;
+  let mid_shield_clamable = profile.mid_shield_clamable;
+  let full_shield_clamable = profile.full_shield_clamable;
 
+  if(habit >= shield_rewards[0] && !!profile.low_shield_clamable) {
+    shield_mileStone_gain+=1
+    low_shield_clamable = 0
+  }
+  if(habit >= shield_rewards[1] && !!profile.mid_shield_clamable) {shield_mileStone_gain+=1; mid_shield_clamable = 0}
+  if(habit >= shield_rewards[2] && !!profile.full_shield_clamable) {shield_mileStone_gain+=1; full_shield_clamable = 0}
+
+  try{
+    db.runAsync(`UPDATE user_profile SET total_shield_used = ${profile.total_shield_used + num+shield_mileStone_gain},
+      low_shield_clamable = ${low_shield_clamable},
+      mid_shield_clamable = ${mid_shield_clamable},
+      full_shield_clamable = ${full_shield_clamable},
+      updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`)
+      const newProfile = await getUserProfile(db);
+      return {
+        profile: newProfile!,
+        habitShield: num,
+        mileStoneShield: shield_mileStone_gain  ,
+        lowShieldClamable: low_shield_clamable,
+        midShieldClamable: mid_shield_clamable,
+        fullShieldClamable: full_shield_clamable
+      }
+  }
   catch (e){
     console.log('gainShield error', e);
-    return null;
+    return {
+      profile: null,
+      habitShield: 0,
+      mileStoneShield: 0,
+      lowShieldClamable: 1,
+midShieldClamable: 1,
+fullShieldClamable: 1,
+    };
   }}
 
-export const clearStreak = async (db: SQLiteDatabase, profile: UserProfile, reduceHabitNumber?: number) => {
-  try{
-
+export const clearStreak = async (
+  db: SQLiteDatabase,
+  profile: UserProfile,
+  reduceHabitNumber: number = 0,
+  reduceShieldNumber:number = 0,
+  currentHabitSnap: number = 0,
+) => {
+  try {
     const today = getLocalTodayStr();
+    // Tính habit score mới sau khi giảm
+    const newHabit = Math.max(0, currentHabitSnap - reduceHabitNumber);
+
+    // Mốc shield_rewards = [35, 70, 100]
+    // Nếu newHabit rớt xuống dưới mốc nào -> bật lại claimable = 1 (true)
+    const lowClaimable = newHabit < shield_rewards[0] ? 1 : profile.low_shield_clamable;
+    const midClaimable = newHabit < shield_rewards[1] ? 1 : profile.mid_shield_clamable;
+    const fullClaimable = newHabit < shield_rewards[2] ? 1 : profile.full_shield_clamable;
+
     await db.runAsync(
-      `UPDATE user_profile SET current_streak = 1, active_days = ${profile.active_days+1},  streak_date = '${today}', total_shield_used = ${profile.total_shield_used + (reduceHabitNumber||0)} , updated_at = strftime('%s', 'now') WHERE id = '${profile.id}'`,
+      `UPDATE user_profile 
+       SET current_streak = 1, 
+           active_days = ?, 
+           streak_date = ?, 
+           total_shield_used = ?, 
+           current_habit_snap = ?,
+           low_shield_clamable = ?,
+           mid_shield_clamable = ?,
+           full_shield_clamable = ?,
+           updated_at = strftime('%s', 'now') 
+       WHERE id = ?`,
+      [
+        profile.active_days + 1,
+        today,
+        profile.total_shield_used + reduceShieldNumber,
+        newHabit,
+        lowClaimable,
+        midClaimable,
+        fullClaimable,
+        profile.id,
+      ],
     );
+
     const newProfile = await getUserProfile(db);
-    return newProfile!;
-  }
-  catch (e){
-    console.log('clearStreak error', e);
+    return newProfile;
+  } catch (e) {
+    console.log("clearStreak error", e);
     return null;
   }
 };

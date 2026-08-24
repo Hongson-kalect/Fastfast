@@ -6,7 +6,7 @@ import {
 } from "@/database/shema/theme";
 // src/store/appStore.ts
 import { createDBService, handleLogin } from "@/database";
-import { AppSettings, FastSession, UserProfile } from "@/interfaces/db.type";
+import { AppSettings, FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -14,15 +14,9 @@ import { create } from "zustand";
 
 type ColorPalette = typeof darkTheme;
 
-type UserAppProfile = | (UserProfile & {
-        habit_percent: number;
-        shield: number;
-        habit_retain: number;
-      })
-    | null;
-
 interface AppState {
-  userProfile: UserAppProfile
+  userProfile: UserProfile|null
+  habit: HabitLog | null
     
   settings: AppSettings | null;
   weight: number | null;
@@ -37,7 +31,8 @@ interface AppState {
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
   init: (db: SQLiteDatabase) => Promise<StreakCheckResult | null>;
-  updateProfile: (val: { [K in keyof UserAppProfile]: any }) => void;
+  updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
+  updateHabit: (val: { [K in keyof HabitLog]: any }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -50,6 +45,7 @@ const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
 export const useAppStore = create<AppState>((set, get) => {
   return {
     userProfile: null,
+    habit:null,
     settings: {},
     currentFastSession: null,
     weight: null,
@@ -62,9 +58,6 @@ export const useAppStore = create<AppState>((set, get) => {
     language: "en",
     isHydrated: false, // Kiểm tra đã nạp xong data từ SecureStore chưa
     init: async (db: SQLiteDatabase) => {
-      const id = Math.random().toString(36).slice(2);
-
-  console.log('[INIT START]', id, db);
       const start = Date.now();
       set({ isLoadingData: true });
       try {
@@ -108,12 +101,8 @@ export const useAppStore = create<AppState>((set, get) => {
         set({
           currentFastSession: lastFast || null,
           weight: weightObj?.weight,
-          userProfile: profile && {
-            ...profile,
-            habit_percent: habitLog?.habit_snap || 0,
-            habit_retain: habitLog?.habit_retain || 0,
-            shield: habitLog?.shield_snap || 0,
-          },
+          userProfile: profile,
+          habit: habitLog,
           settings: dbSettings,
           theme: theme,
           themeObj: themeObj,
@@ -121,24 +110,28 @@ export const useAppStore = create<AppState>((set, get) => {
           isLoadingData: false,
           language: locale.toString(),
         });
-console.log('[INIT SUCCESS]', id, db);
         console.log(
           "=> [Zustand] Khởi tạo dữ liệu Local DB thành công!",
           Date.now() - start,
         );
         return streak;
       } catch (error) {
-        console.error('[INIT FAILED]', id, db, error);
         console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
         set({ isLoadingData: false });
         return null;
       }
     },
 
-    updateProfile: (val: { [K in keyof UserAppProfile]: any }) => {
+    updateProfile: (val: { [K in keyof UserProfile]: any }) => {
       const profile = get().userProfile;
       if (profile) {
         set({ userProfile: { ...profile, ...val } });
+      }
+    },
+    updateHabit: (val: { [K in keyof HabitLog]: any }) => {
+      const habit = get().habit;
+      if (habit) {
+        set({ habit: { ...habit, ...val } });
       }
     },
     updateSetting: (obj: object) =>
