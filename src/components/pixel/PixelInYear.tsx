@@ -1,4 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
+import { FASTING_TARGETS } from "@/constants/data";
+import { DailyLog, DailyNote } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
+import { DissectedDay } from "@/util/home/timespliter";
+import { getLocalTodayStr } from "@/util/timer";
 import { useMemo, useRef, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
@@ -47,67 +52,35 @@ export const moodArr = [
   { index: 5, emoji: "🥰", label: "Happy", color: "#2E6930" }, // Xanh lá Emerald trầm - Trạng thái tốt nhất
 ];
 
-export const targetArr = [
-  {index:1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc
-]
+export const fastArr = [
+  { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc
+];
 
-export const generateMockDataObj = (targetYear: number): DayItemObj => {
-  const mockData: DayItemObj = {};
-
-  // Tạo mốc thời gian bắt đầu từ 1/1 và kết thúc ở 31/12
-  const startDate = new Date(targetYear, 0, 1);
-  const endDate = new Date(targetYear, 11, 31);
-
-  const currentPointer = new Date(startDate);
-
-  while (currentPointer <= endDate) {
-    const currentYear = currentPointer.getFullYear();
-    const currentMonth = currentPointer.getMonth();
-    const currentDate = currentPointer.getDate();
-
-    // Format chuẩn key YYYY-MM-DD
-    const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDate).padStart(2, "0")}`;
-
-    // Giả lập: Không phải ngày nào người dùng cũng điền log (tỷ lệ 85% có data)
-    if (Math.random() > 0.15) {
-      // Random ngẫu nhiên số giờ nhịn từ 14h đến 22h
-      const fastingHours = Math.floor(Math.random() * 9) + 14;
-      // Random target mục tiêu (ví dụ: 16h, 18h, 20h)
-      const targetOptions = [16, 18, 20];
-      const targetRange =
-        targetOptions[Math.floor(Math.random() * targetOptions.length)];
-
-      mockData[dateString] = {
-        dateString,
-        moodIndex: Math.floor(Math.random() * 5) + 1, // Random từ 1 -> 5
-        fastingHours,
-        fastingRange: targetRange, // Giờ mục tiêu nhịn đặt ra ngày đó
-        isCurrentYear: true,
-      };
-    }
-
-    // Tịnh tiến lên 1 ngày
-    currentPointer.setDate(currentPointer.getDate() + 1);
-  }
-
-  return mockData;
-};
-
-const generateYearGrid = (
+export const generateYearGrid = (
   targetYear: number,
-  dataObj?: DayItemObj,
+  sundayFirst: boolean = false,
 ): WeekItem[] => {
   const weeks: WeekItem[] = [];
   const firstDayOfYear = new Date(targetYear, 0, 1);
 
-  // Tìm Thứ 2 đầu tiên của chuỗi
-  let dayOfWeek = firstDayOfYear.getDay();
-  let daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  // Tìm ngày bắt đầu tuần đầu tiên
+  const dayOfWeek = firstDayOfYear.getDay(); // 0: Sun, 1: Mon, ...
+  let daysToSubtract = 0;
+
+  if (sundayFirst) {
+    // Nếu Chủ Nhật là ngày đầu tuần -> Chủ Nhật lùi 0 ngày
+    daysToSubtract = dayOfWeek;
+  } else {
+    // Nếu Thứ 2 là ngày đầu tuần -> Chủ Nhật lùi 6 ngày, Thứ 2 lùi 0 ngày
+    daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  }
 
   const currentPointer = new Date(firstDayOfYear);
   currentPointer.setDate(currentPointer.getDate() - daysToSubtract);
 
   const lastDayOfYear = new Date(targetYear, 11, 31);
+  const targetStartDay = sundayFirst ? 0 : 1; // 0: Sun, 1: Mon
+
   const shortMonths = [
     "JAN",
     "FEB",
@@ -122,12 +95,18 @@ const generateYearGrid = (
     "NOV",
     "DEC",
   ];
-  const trackedMonths = new Set<number>(); // Đảm bảo mỗi tháng chỉ kích hoạt nhãn Tháng đúng 1 lần
+  const trackedMonths = new Set<number>();
 
   let currentWeekNum: number = 1;
 
-  while (currentPointer <= lastDayOfYear || currentPointer.getDay() !== 1) {
-    if (currentPointer > lastDayOfYear && currentPointer.getDay() === 1) {
+  while (
+    currentPointer <= lastDayOfYear ||
+    currentPointer.getDay() !== targetStartDay
+  ) {
+    if (
+      currentPointer > lastDayOfYear &&
+      currentPointer.getDay() === targetStartDay
+    ) {
       break;
     }
 
@@ -135,16 +114,13 @@ const generateYearGrid = (
     let monthLabelToUse = "";
     let shouldBeMonthHeader = false;
 
-    // Lưu lại trạng thái của 7 ngày trong tuần này trước khi tịnh tiến pointer
+    // Quét trước 7 ngày của tuần này để đặt Label Tháng
     const tempPointer = new Date(currentPointer);
-
-    // Quét trước 7 ngày của tuần này để tìm xem có ngày mùng 1 đầu tháng nào thuộc năm target không
     for (let i = 0; i < 7; i++) {
       const m = tempPointer.getMonth();
       const d = tempPointer.getDate();
       const y = tempPointer.getFullYear();
 
-      // Nếu tìm thấy ngày mùng 1 đầu tháng (hoặc ngày đầu tiên của năm trong Grid)
       if (
         y === targetYear &&
         (d === 1 || (m === 0 && d === firstDayOfYear.getDate() && i === 0))
@@ -158,28 +134,21 @@ const generateYearGrid = (
       tempPointer.setDate(tempPointer.getDate() + 1);
     }
 
-    // Build dữ liệu thực tế cho 7 ngày
+    // Build 7 ngày thực tế
     for (let i = 0; i < 7; i++) {
       const currentYear = currentPointer.getFullYear();
       const currentMonth = currentPointer.getMonth();
       const currentDate = currentPointer.getDate();
       const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDate).padStart(2, "0")}`;
 
-      const data = dataObj?.[dateString];
-
       days.push({
         dateString,
         dayOfMonth: currentDate,
         isCurrentYear: currentYear === targetYear,
-        data,
       });
 
       currentPointer.setDate(currentPointer.getDate() + 1);
     }
-
-    // Xác định text hiển thị cho rìa trái
-    const currentWeekStr = currentWeekNum.toString().padStart(2, "0");
-    let finalLabel = currentWeekStr;
 
     weeks.push({
       weekIndex: currentWeekNum - 1,
@@ -196,7 +165,14 @@ const generateYearGrid = (
   return weeks;
 };
 
-const PixelGridManager = () => {
+type Props = {
+  displayType: "mood" | "fasting";
+  year: number;
+  noteData: { [key: string]: DailyNote };
+  logData: { [key: string]: (DailyLog | DissectedDay)[] };
+};
+
+const PixelGridManager = (props: Props) => {
   const [inputYear, setInputYear] = useState<string>(
     new Date().getFullYear().toString(),
   );
@@ -206,9 +182,12 @@ const PixelGridManager = () => {
   const flatListRef = useRef(FlatList);
 
   const gridData = useMemo(() => {
-    const dataObj = generateMockDataObj(renderedYear);
-    return generateYearGrid(renderedYear, dataObj);
+    return generateYearGrid(renderedYear);
   }, [renderedYear]);
+
+  const todayStr = useMemo(() => {
+    return getLocalTodayStr();
+  }, []);
 
   const handleRender = () => {
     const yearNum = parseInt(inputYear, 10);
@@ -252,39 +231,144 @@ const PixelGridManager = () => {
 
                 {/* Hàng 7 ô pixel ngày */}
                 <View className="flex-1 flex-row justify-between gap-x-1">
-                  {week.days.map((day, dIdx) => (
-                    <View
-                      style={{
-                        backgroundColor: day?.data?.moodIndex
-                          ? moodArr[day?.data?.moodIndex - 1].color + "dd"
-                          : "transparent",
-                      }}
-                      key={dIdx}
-                      className={`flex-1 aspect-square justify-center items-center rounded-md border 
-                      ${
-                        day.isCurrentYear
-                          ? "bg-white/10 border-white/10"
-                          : "bg-white/2 border-dashed border-white/5"
-                      }`}
-                    >
-                      <Text
-                        className={`text-[16px]! font-medium ${
-                          day.isCurrentYear ? "text-white" : "text-white/20"
-                        }`}
-                      >
-                        {/* {day.dayOfMonth} */}
-                        {day?.data?.moodIndex
-                          ? moodArr[day?.data?.moodIndex - 1].emoji
-                          : ""}
-                      </Text>
-                    </View>
-                  ))}
+                  {week.days.map((day, dIdx) => {
+                    const isToday = day.dateString === todayStr;
+                    if (props.displayType === "mood") {
+                      const pixelData = props.noteData[day.dateString];
+                      if (!pixelData)
+                        return <EmptyPixel isToday={isToday} key={dIdx} />;
+                      return (
+                        <MoodPixel
+                          isToday={isToday}
+                          key={dIdx}
+                          data={pixelData}
+                          isCurrentYear={day.isCurrentYear}
+                        />
+                      );
+                    } else {
+                      const pixelData = props.logData[day.dateString];
+                      if (!pixelData)
+                        return <EmptyPixel isToday={isToday} key={dIdx} />;
+                      return (
+                        <FastPixel
+                          isToday={isToday}
+                          key={dIdx}
+                          data={pixelData}
+                          isCurrentYear={day.isCurrentYear}
+                        />
+                      );
+                    }
+                  })}
                 </View>
               </View>
             )}
           />
         </View>
       </View>
+    </View>
+  );
+};
+
+const EmptyPixel = ({ isToday }: { isToday: boolean }) => {
+  const { theme } = useAppStore();
+  return (
+    <View
+      style={{
+        backgroundColor: "transparent",
+        boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
+      }}
+      className={`flex-1 aspect-square justify-center items-center rounded-md border 
+                      `}
+    ></View>
+  );
+};
+
+const MoodPixel = ({
+  data,
+  isCurrentYear,
+  isToday,
+}: {
+  data: DailyNote;
+  isCurrentYear: boolean;
+  isToday: boolean;
+}) => {
+  const pixel = moodArr[data?.mood_level || 0];
+  const { theme } = useAppStore();
+  return (
+    <View
+      style={{
+        backgroundColor: pixel.color + "88",
+        boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
+      }}
+      className={`flex-1 aspect-square justify-center items-center rounded-md border 
+                      ${
+                        isCurrentYear
+                          ? "border-white/10"
+                          : "border-dashed border-white/5"
+                      }`}
+    >
+      <Text
+        className={`text-[14px]! font-medium ${
+          isCurrentYear ? "text-white" : "text-white/20"
+        }`}
+      >
+        {pixel.emoji}
+      </Text>
+    </View>
+  );
+};
+
+const FastPixel = ({
+  data,
+  isCurrentYear,
+  isToday,
+}: {
+  data: (DailyLog | DissectedDay)[];
+  isCurrentYear: boolean;
+  isToday: boolean;
+}) => {
+  const fast = useMemo(() => {
+    let maxFast = data[0];
+    data.forEach((fast) => {
+      if (fast.hours_in_fast > maxFast.hours_in_fast) maxFast = fast;
+    });
+    return maxFast;
+  }, [data]);
+
+  const pixel = FASTING_TARGETS.find(
+    (target) =>
+      target.hours <= fast.hours_in_fast &&
+      (!target.toHours || target.toHours >= fast.hours_in_fast),
+  );
+  const progress = fast.elapsed_hours / fast.hours_in_fast;
+  const baseOpacity = 0.5;
+  const opacity = baseOpacity + (1 - baseOpacity) * progress;
+  const { theme } = useAppStore();
+
+  if (!pixel) return <EmptyPixel isToday={isToday} />;
+
+  return (
+    <View
+      style={{
+        opacity,
+        backgroundColor: pixel.colors.accent + "88",
+        boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
+      }}
+      className={`flex-1 aspect-square justify-center items-center rounded-md border 
+                      ${
+                        isCurrentYear
+                          ? "bg-white/10 border-white/10"
+                          : "bg-white/2 border-dashed border-white/5"
+                      }`}
+    >
+      <Text
+        // style={{ opacity }}
+        className={`text-[14px]! font-medium ${
+          isCurrentYear ? "text-white" : "text-white/20"
+        }`}
+      >
+        {pixel.emoji}
+      </Text>
     </View>
   );
 };
