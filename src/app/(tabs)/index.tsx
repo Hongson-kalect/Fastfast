@@ -21,8 +21,14 @@ const rating = [
 ];
 
 const HomeScreen = () => {
-  const { currentFastSession, setCurrentFastSession, settings, userProfile, habit, updateProfile } =
-    useAppStore();
+  const {
+    currentFastSession,
+    setCurrentFastSession,
+    settings,
+    userProfile,
+    habit,
+    updateProfile,
+  } = useAppStore();
   const [startTime, setStartTime] = useState<number | null>(
     currentFastSession?.start_time || null,
   );
@@ -89,24 +95,22 @@ const HomeScreen = () => {
 
         console.log("current ", currentFastSession.id);
 
-        const { lastSession, habitLog, profile } = await dbService?.finishLastSession({
-
-          id:currentFastSession?.id,
-          endTime:now,
-          duration,
-          isValid,
-          profile:userProfile||undefined,
-          habitLog:habit ||undefined
-        }
-        );
+        const { lastSession, habitLog, profile } =
+          await dbService?.finishLastSession({
+            id: currentFastSession?.id,
+            endTime: now,
+            duration,
+            isValid,
+            profile: userProfile || undefined,
+            habitLog: habit || undefined,
+          });
 
         // update zustand
         if (habitLog && userProfile) {
           updateProfile({
             ...userProfile,
-            ...profile
-          }
-          );
+            ...profile,
+          });
         }
 
         setCurrentFastSession(null);
@@ -155,7 +159,11 @@ const HomeScreen = () => {
         // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
         // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
         if (isValid) {
-          const parsedDays = splitSessionIntoDays(startTime, now);
+          const parsedDays = splitSessionIntoDays(
+            startTime,
+            now,
+            currentFastSession.id,
+          );
           console.log(parsedDays.map((x) => x.log_date));
 
           for (const dayData of parsedDays) {
@@ -192,21 +200,20 @@ const HomeScreen = () => {
         setIsCounting(!isCounting);
         // Lấy thời gian, nếu nhỏ hơn x thì cho thành false nếu thời gian > 2 tiếng hoặc xóa luôn nếu dưới
 
-        const { lastSession, habitLog, profile } = await dbService?.finishLastSession({
-
-          id:currentFastSession?.id,
-          endTime:now,
-          duration,
-          isValid,
-          profile:userProfile||undefined,
-          habitLog:habit ||undefined
-        }
-        );
+        const { lastSession, habitLog, profile } =
+          await dbService?.finishLastSession({
+            id: currentFastSession?.id,
+            endTime: now,
+            duration,
+            isValid,
+            profile: userProfile || undefined,
+            habitLog: habit || undefined,
+          });
         close();
-         if (habitLog && userProfile) {
+        if (habitLog && userProfile) {
           updateProfile({
             ...userProfile,
-            ...profile
+            ...profile,
           });
         }
 
@@ -216,7 +223,11 @@ const HomeScreen = () => {
         // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
         // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
         if (isValid) {
-          const parsedDays = splitSessionIntoDays(startTime, now);
+          const parsedDays = splitSessionIntoDays(
+            startTime,
+            now,
+            currentFastSession.id,
+          );
 
           for (const dayData of parsedDays) {
             await dbService?.addDailyLogs({

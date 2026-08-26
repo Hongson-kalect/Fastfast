@@ -25,6 +25,7 @@ import {
   generateString as fast_sessionsGenerateString,
   fastFail,
   finishLastSession,
+  getFastSessionByIds,
   getFastSessions,
   getFastStatsSummary,
   getLastFastSession,
@@ -71,6 +72,7 @@ import {
   AddHabitType,
   getHabitLogs,
   getLastHabitLog,
+  getShieldUsedLog,
   generateString as habit_logsGenerateString,
   reduceHabit,
   reduceShield,
@@ -144,9 +146,11 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getHabitLogs: () => getHabitLogs(db),
   addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
+  getShieldUsedLog:(year:number)=>getShieldUsedLog(db, year),
 
   getPixelNoteData: (year: number) => getPixelNoteData(db, year),
   getPixelLogData: (year: number) => getPixelLogData(db, year),
+  getFastSessionByIds: (ids: string[]) => getFastSessionByIds(db, ids),
 });
 
 export const generateSchema = `

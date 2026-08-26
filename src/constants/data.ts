@@ -418,12 +418,12 @@ export function getProcessLevelTitle(
 }
 
 // data/emotions.ts
-export const EMOTIONS: { level: MoodLevel; emoji: string; label: string }[] = [
-  { level: 1, emoji: "😫", label: "Exhausted" },
-  { level: 2, emoji: "😮‍💨", label: "Neutral" },
-  { level: 3, emoji: "🙂", label: "Good" },
-  { level: 4, emoji: "😃", label: "Focused" },
-  { level: 5, emoji: "🥰", label: "Peak" },
+export const EMOTIONS: { level: MoodLevel; emoji: string; label: string, color: string }[] = [
+  { level: 0, emoji: "😫", label: "Exhausted",color: "#6E2020" },
+  { level: 1, emoji: "😮‍💨", label: "Neutral",color: "#874D14" },
+  { level: 2, emoji: "🙂", label: "Good",color: "#3A3F47" },
+  { level: 3, emoji: "😃", label: "Focused",color: "#1A5C70" },
+  { level: 4, emoji: "🥰", label: "Peak",color: "#2E6930" },
 ];
 
 export interface FastingTargetItem {

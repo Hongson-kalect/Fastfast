@@ -1,5 +1,6 @@
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { EMOTIONS } from "@/constants/data";
 
 type Props = {
   viewMode: "fasting" | "mood";
@@ -7,20 +8,12 @@ type Props = {
   currentGuides: { emoji: string; label: string }[];
 };
 
-export const moodArr = [
-  { index: 1, emoji: "😫", label: "Tired", color: "#C62828" }, // Đỏ rượu rất trầm (Deep Muted Red)
-  { index: 2, emoji: "😮‍💨", label: "Bad", color: "#EF6C00" }, // Nâu cam đất (Muted Terracotta)
-  { index: 3, emoji: "😐", label: "Normal", color: "#6D4D41" }, // Nâu gỗ ấm (Warm Muted Brown)
-  { index: 4, emoji: "🙂", label: "Good", color: "#1565C0" }, // Xanh biển đêm (Deep Navy/Slate)
-  { index: 5, emoji: "🥰", label: "Happy", color: "#2E7D32" }, // Xanh lá rừng sâu (Deep Forest Green)
-];
-
 const PixelOptions = ({ viewMode, setViewMode, currentGuides }: Props) => {
   return (
     <View className="w-full flex-row items-center gap-2">
-      {moodArr.map((item) => (
+      {EMOTIONS.map((item) => (
         <View
-          key={item.index}
+          key={item.level}
           className="flex-1 items-center justify-evenly gap-1.5"
         >
           <View className="items-center justify-center">

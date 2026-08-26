@@ -4,7 +4,13 @@ import PixelStatistic from "@/components/pixel/Statistic";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyLog, DailyNote } from "@/interfaces/db.type";
+import {
+  DailyLog,
+  DailyNote,
+  FastSession,
+  HabitLog,
+  SyncStatus,
+} from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { DissectedDay, splitSessionIntoDays } from "@/util/home/timespliter";
 import { Feather } from "@expo/vector-icons";
@@ -28,213 +34,247 @@ interface EmojiGuide {
   label: string;
 }
 
-export const generateMockYearData = (targetYear: number = 2026) => {
+export const generateRealisticYearData = (targetYear: number = 2026) => {
   const notes: DailyNote[] = [];
   const logs: DailyLog[] = [];
+  const habitLogs: HabitLog[] = [];
+  const fastSessions: FastSession[] = [];
 
-  // Danh sách các mốc Fasting thực tế (giờ)
-  const fastMilestones = [16, 18, 20, 23, 36, 48, 72];
-
-  // Mood levels (0: Rất tồi, 1: Tồi, 2: Bình thường, 3: Tốt, 4: Tuyệt vời)
-  const moodLevels = [0, 1, 2, 3, 4] as const;
-
-  // Giả lập dữ liệu từ đầu năm (01/01/2026) đến ngày hiện tại (25/08/2026)
-  const startDate = new Date(targetYear, 0, 1);
-  const endDate = new Date(targetYear, 7, 25); // Đến ngày 25/08/2026
-
-  let currentDate = new Date(startDate);
-  let fastSessionIdCounter = 1000;
-
-  while (currentDate <= endDate) {
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const dateString = `${year}-${month}-${day}`;
-
-    const timeStamp = currentDate.getTime();
-
-    // Giả lập tần suất user dùng app: ~70% số ngày sẽ có Fasting/Mood
-    const shouldLogToday = Math.random() < 0.7;
-
-    if (shouldLogToday) {
-      // 1. Random Mood & Note
-      const randomMood =
-        moodLevels[Math.floor(Math.random() * moodLevels.length)];
-      notes.push({
-        log_date: dateString,
-        mood_level: randomMood,
-        note: `Ghi chú cho ngày ${dateString} - Cảm giác ${randomMood >= 3 ? "tốt" : "bình thường"}.`,
-        sync_status: "synced" as SyncStatus,
-        created_at: timeStamp,
-        updated_at: timeStamp,
-      });
-
-      // 2. Random Fasting Session
-      // Tỷ lệ: 80% chọn mốc ngắn (16-23h), 20% chọn mốc dài (36-72h)
-      const isProlonged = Math.random() < 0.2;
-      const targetHours = isProlonged
-        ? fastMilestones[Math.floor(Math.random() * 3) + 4] // 36, 48, 72
-        : fastMilestones[Math.floor(Math.random() * 4)]; // 16, 18, 20, 23
-
-      // Thực tế đạt được (có thể đủ target hoặc chênh lệch nhẹ)
-      const actualHours = Math.min(24, targetHours);
-      fastSessionIdCounter++;
-
-      logs.push({
-        log_date: dateString,
-        user_id: "user_alex_01",
-        fast_id: `fast_${fastSessionIdCounter}`,
-        hours_in_day: actualHours,
-        elapsed_hours: targetHours,
-        hours_in_fast: targetHours,
-        is_deleted: 0,
-        sync_status: "synced" as SyncStatus,
-        created_at: timeStamp,
-        updated_at: timeStamp,
-      });
-    }
-
-    // Tịnh tiến sang ngày tiếp theo
-    currentDate.setDate(currentDate.getDate() + 1);
+  const createFast = ({
+    id,
+    dateStr,
+    target,
+    duration,
+  }:{id:string, dateStr: string, target: number, duration: number})=>{
+    const timestamp = new Date(dateStr).getTime();
+    fastSessions.push({
+      id: id,
+      start_time: timestamp,
+      end_time: timestamp+duration*1000,
+      duration,
+      target_duration: target,
+      is_deleted: 0,
+      sync_status: "synced" as SyncStatus,
+      created_at: timestamp,
+      updated_at: timestamp,
+      user_id:'qq',
+      status:'completed',
+      rating:null,
+      home_data_snapshot:null
+    });
   }
 
-  return { notes, logs };
+  const createLog = (
+    dateStr: string,
+    hoursInDay: number,
+    elapsed: number,
+    totalFast: number,
+  ) => {
+    const timestamp = new Date(dateStr).getTime();
+    logs.push({
+      log_date: dateStr,
+      user_id: "user_alex_01",
+      fast_id: `fast_session_${dateStr}`,
+      hours_in_day: hoursInDay,
+      elapsed_hours: elapsed,
+      hours_in_fast: totalFast,
+      is_deleted: 0,
+      sync_status: "synced" as SyncStatus,
+      created_at: timestamp,
+      updated_at: timestamp,
+    });
+  };
+
+  const createNote = (
+    dateStr: string,
+    mood: 0 | 1 | 2 | 3 | 4,
+    text: string,
+  ) => {
+    const timestamp = new Date(dateStr).getTime();
+    notes.push({
+      log_date: dateStr,
+      mood_level: mood,
+      note: text,
+      sync_status: "synced" as SyncStatus,
+      created_at: timestamp,
+      updated_at: timestamp,
+    });
+  };
+
+  // Hàm tạo log dùng Khiên bảo vệ (Shield)
+  const createShieldLog = (
+    dateStr: string,
+    shieldDelta: number, // -1, -2, -3
+    currentShieldSnap: number,
+    description: string,
+  ) => {
+    const timestamp = new Date(dateStr).getTime();
+    habitLogs.push({
+      id: `habit_shield_${dateStr}`,
+      log_date: dateStr,
+      fast_id: `fast_session_${dateStr}`,
+      type: "shield",
+      shield_delta: shieldDelta,
+      shield_snap: currentShieldSnap,
+      habit_retain: 0,
+      habit_snap: 100,
+      description: description,
+      is_deleted: 0,
+      sync_status: "synced" as SyncStatus,
+      created_at: timestamp,
+      updated_at: timestamp,
+    });
+  };
+
+  const runMultiDayFast = (
+    startDateStr: string,
+    daysCount: number,
+    totalFastHours: 16 | 18 | 20 | 23 | 36 | 48 | 72,
+  ) => {
+    const [y, m, d] = startDateStr.split("-").map(Number);
+    let start = new Date(Date.UTC(y, m - 1, d));
+
+    for (let i = 0; i < daysCount; i++) {
+      const d1 = start.toISOString().split("T")[0];
+      start.setUTCDate(start.getUTCDate() + 1);
+      const d2 = start.toISOString().split("T")[0];
+      start.setUTCDate(start.getUTCDate() + 1);
+      const d3 = start.toISOString().split("T")[0];
+      if (totalFastHours < 24) {
+        createLog(d1, 4, 4, totalFastHours);
+        createNote(d1, Math.floor(Math.random() * 4), "Bắt đầu nhịn tối");
+
+        createLog(d2, totalFastHours - 4, totalFastHours, totalFastHours);
+        createNote(
+          d2,
+          Math.floor(Math.random() * 3),
+          "Ngày thứ 2 mệt, cồn cào",
+        );
+      }
+
+      if (totalFastHours === 36) {
+        createLog(d1, 4.0, 4.0, 36);
+        createNote(d1, 2, "Bắt đầu nhịn tối");
+
+        createLog(d2, 24.0, 28.0, 36);
+        createNote(d2, 1, "Ngày thứ 2 mệt, cồn cào");
+
+        createLog(d3, 8.0, 36.0, 36);
+        createNote(d3, 4, "Hoàn thành 36h Titan Fast!");
+      } else if (totalFastHours === 48) {
+        createLog(d1, 4.0, 4.0, 48);
+        createNote(d1, 2, "Khởi động 48h Master Fast");
+
+        createLog(d2, 24.0, 28.0, 48);
+        createNote(d2, 1, "Đốt mỡ sâu ngày 2");
+
+        createLog(d3, 20.0, 48.0, 48);
+        createNote(d3, 4, "Cúp vô địch 48h!");
+      } else if (totalFastHours === 72) {
+        start.setUTCDate(start.getUTCDate() + 1);
+        const d4 = start.toISOString().split("T")[0];
+
+        createLog(d1, 4.0, 4.0, 72);
+        createLog(d2, 24.0, 28.0, 72);
+        createLog(d3, 24.0, 52.0, 72);
+        createLog(d4, 20.0, 72.0, 72);
+        createNote(d4, 4, "Đỉnh cao 72h Extended Fast!");
+      }
+
+      start.setUTCDate(start.getUTCDate() + 1);
+    }
+  };
+
+  // ===========================================================================
+  // TẠO DỮ LIỆU KÍN NĂM 2026 (THÁNG 1 -> THÁNG 8)
+  // ===========================================================================
+
+  // ----- THÁNG 1 -----
+  runMultiDayFast("2026-01-02", 6, 16);
+  runMultiDayFast("2026-01-09", 5, 16);
+  runMultiDayFast("2026-01-15", 7, 18);
+  runMultiDayFast("2026-01-23", 6, 16);
+  // Dùng 1 khiên gánh ngày 2026-01-30 bị cúp
+  createShieldLog(
+    "2026-01-30",
+    -1,
+    4,
+    "Tự động kích hoạt 1 khiên gánh ngày 29/01",
+  );
+
+  // ----- THÁNG 2 -----
+  runMultiDayFast("2026-02-01", 6, 18);
+  runMultiDayFast("2026-02-08", 5, 20);
+  runMultiDayFast("2026-02-14", 6, 18);
+  runMultiDayFast("2026-02-21", 5, 16);
+
+  // ----- THÁNG 3 -----
+  runMultiDayFast("2026-03-01", 5, 16);
+  runMultiDayFast("2026-03-08", 1, 36);
+  runMultiDayFast("2026-03-13", 6, 18);
+  runMultiDayFast("2026-03-20", 7, 20);
+  // Dùng 2 khiên gánh liền 2 ngày đi du lịch (2026-03-28 và 2026-03-29)
+  createShieldLog(
+    "2026-03-29",
+    -2,
+    2,
+    "Dùng 2 khiên bảo vệ chuỗi trong chuyến đi du lịch",
+  );
+
+  // ----- THÁNG 4 -----
+  runMultiDayFast("2026-04-01", 5, 18);
+  runMultiDayFast("2026-04-07", 6, 18);
+  createNote("2026-04-13", 0, "Tiệc sinh nhật, xả giàn không fast");
+  runMultiDayFast("2026-04-15", 6, 16);
+  runMultiDayFast("2026-04-22", 6, 18);
+
+  // ----- THÁNG 5 -----
+  runMultiDayFast("2026-05-01", 5, 20);
+  runMultiDayFast("2026-05-08", 1, 48);
+  runMultiDayFast("2026-05-14", 6, 18);
+  runMultiDayFast("2026-05-21", 5, 20);
+  // Dùng 3 khiên gánh chuỗi 3 ngày bị ốm (2026-05-27 -> 2026-05-29)
+  createShieldLog(
+    "2026-05-29",
+    -3,
+    1,
+    "Bật 3 khiên bảo vệ chuỗi do sốt nghỉ ngơi",
+  );
+
+  // ----- THÁNG 6 -----
+  runMultiDayFast("2026-06-01", 6, 18);
+  runMultiDayFast("2026-06-08", 5, 23); // OMAD
+  runMultiDayFast("2026-06-14", 6, 18);
+  runMultiDayFast("2026-06-22", 1, 36);
+  runMultiDayFast("2026-06-26", 4, 16);
+
+  // ----- THÁNG 7 -----
+  runMultiDayFast("2026-07-01", 5, 20);
+  runMultiDayFast("2026-07-07", 6, 18);
+  runMultiDayFast("2026-07-14", 1, 72); // Lần đầu chạm mốc 72h
+  runMultiDayFast("2026-07-19", 6, 20);
+  runMultiDayFast("2026-07-26", 5, 18);
+
+  // ----- THÁNG 8 (Gần hiện tại) -----
+  runMultiDayFast("2026-08-01", 6, 18);
+  runMultiDayFast("2026-08-08", 5, 20);
+  runMultiDayFast("2026-08-14", 5, 18);
+
+  // Tuần 34 & 35
+  createLog("2026-08-20", 23.0, 23.0, 23);
+  createNote("2026-08-20", 3, "OMAD 23h xuất sắc");
+  createLog("2026-08-21", 23.0, 23.0, 23);
+  createNote("2026-08-21", 2, "Duy trì OMAD ngày 2");
+  createLog("2026-08-22", 16.0, 16.0, 16);
+  createNote("2026-08-22", 4, "Chuyển sang 16h nhẹ nhàng");
+  createLog("2026-08-23", 16.0, 16.0, 16);
+  createNote("2026-08-23", 1, "Hơi oải nhưng vẫn đạt 16h");
+
+  // Đang chạy 36h từ ngày 24/08
+  runMultiDayFast("2026-08-24", 1, 36);
+
+  return { notes, logs, habitLogs };
 };
-
-const testNotes: DailyNote[] = [
-  {
-    log_date: "2026-08-20",
-    mood_level: 3, // Mood Tốt
-    note: "Hôm nay chạy bộ nhẹ 3km vào cuối phiên fast, người rất tỉnh táo.",
-    image_uri: "file:///storage/emulated/0/Pictures/fast_20260820.jpg",
-    sync_status: "synced",
-    created_at: 1787184000000,
-    updated_at: 1787184000000,
-  },
-  {
-    log_date: "2026-08-21",
-    mood_level: 2, // Mood Bình thường
-    note: "Hơi thèm đồ ngọt vào khoảng tiếng thứ 14, nhưng uống thêm nước lọc là qua.",
-    sync_status: "synced",
-    created_at: 1787270400000,
-    updated_at: 1787270400000,
-  },
-  {
-    log_date: "2026-08-22",
-    mood_level: 4, // Mood Tuyệt vời
-    note: "Chinh phục mốc Monk Fast 23h! Cảm giác bụng nhẹ nhàng.",
-    image_uri: "file:///storage/emulated/0/Pictures/meal_20260822.jpg",
-    sync_status: "pending",
-    created_at: 1787356800000,
-    updated_at: 1787356800000,
-  },
-  {
-    log_date: "2026-08-23",
-    mood_level: 1, // Mood Tồi (do ăn đồ ngọt nhiều)
-    note: "Xả giàn hơi quá tay buổi tối, bị đầy bụng.",
-    sync_status: "synced",
-    created_at: 1787443200000,
-    updated_at: 1787443200000,
-  },
-  {
-    log_date: "2026-08-24",
-    mood_level: 3, // Mood Tốt
-    note: "Bắt đầu lại phiên fast 18h dũng cảm.",
-    sync_status: "synced",
-    created_at: 1787529600000,
-    updated_at: 1787529600000,
-  },
-  {
-    log_date: "2026-08-25",
-    mood_level: 2,
-    note: "Đang duy trì phiên fast trong ngày.",
-    sync_status: "synced",
-    created_at: 1787616000000,
-    updated_at: 1787616000000,
-  },
-];
-
-const testLogs: DailyLog[] = [
-  // --- PHIÊN 1: Fast 36h kéo dài vắt qua 2 ngày (20/08 đến 21/08) ---
-  {
-    log_date: "2026-08-20",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_101",
-    hours_in_day: 12.0, // 12 giờ rơi vào ngày 20
-    elapsed_hours: 12.0, // Tính đến cuối ngày 20 đã nhịn được 12h
-    hours_in_fast: 36.0, // Tổng thời lượng của cả phiên gốc là 36h
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787184000000,
-    updated_at: 1787184000000,
-  },
-  {
-    log_date: "2026-08-21",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_101",
-    hours_in_day: 24.0, // 24 giờ còn lại rơi vào ngày 21
-    elapsed_hours: 36.0, // Cột mốc hoàn tất phiên 36h
-    hours_in_fast: 36.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787270400000,
-    updated_at: 1787270400000,
-  },
-
-  // --- PHIÊN 2 & 3: Hai phiên ngắn diễn ra trong cùng ngày 22/08 ---
-  {
-    log_date: "2026-08-22",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_102",
-    hours_in_day: 16.0,
-    elapsed_hours: 16.0,
-    hours_in_fast: 16.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787356800000,
-    updated_at: 1787356800000,
-  },
-  {
-    log_date: "2026-08-22",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_103",
-    hours_in_day: 4.5, // Phiên nhịn thêm buổi tối trong cùng ngày
-    elapsed_hours: 4.5,
-    hours_in_fast: 4.5,
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787380000000,
-    updated_at: 1787380000000,
-  },
-
-  // --- PHIÊN 4: Nhịn gián đoạn 18h ngày 23/08 ---
-  {
-    log_date: "2026-08-23",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_104",
-    hours_in_day: 18.0,
-    elapsed_hours: 18.0,
-    hours_in_fast: 18.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787443200000,
-    updated_at: 1787443200000,
-  },
-
-  // --- PHIÊN 5: Nhịn gián đoạn 16h ngày 24/08 ---
-  {
-    log_date: "2026-08-24",
-    user_id: "user_alex_01",
-    fast_id: "fast_session_105",
-    hours_in_day: 16.0,
-    elapsed_hours: 16.0,
-    hours_in_fast: 16.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    created_at: 1787529600000,
-    updated_at: 1787529600000,
-  },
-];
 
 const PixelScreen = () => {
   const dbService = useDBService();
@@ -247,7 +287,7 @@ const PixelScreen = () => {
   const { width, height } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const currentWeekY = useMemo(() => {
-    const extraScroll = 100;
+    const extraScroll = 60;
     const currentWeek = getWeek(new Date());
     const weekHeight = (width - 21 - (14 * 15) / 4) / 7;
     return Math.max(0, weekHeight * currentWeek - extraScroll);
@@ -266,6 +306,9 @@ const PixelScreen = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true); // Để hiển thị skeleton
 
+  const [shieldLogs, setShieldLogs] = useState<{ [date: string]: HabitLog }>(
+    {},
+  );
   const [pixelNotes, setPixelNotes] = useState<{ [date: string]: DailyNote }>(
     {},
   );
@@ -275,10 +318,15 @@ const PixelScreen = () => {
   const [stats, setStats] = useState({ fastDays: 0, fastHour: 0, logDays: 0 });
 
   const getYearData = async (year: number) => {
-    const { logs, notes } = generateMockYearData(year);
+    const {
+      logs,
+      notes,
+      habitLogs: shieldUsed,
+    } = generateRealisticYearData(year);
     setIsLoading(true);
-    // const notes = (await dbService.getPixelNoteData(year));
-    // const logs =(await dbService.getPixelLogData(year));
+    // const notes = await dbService.getPixelNoteData(year);
+    // const logs = await dbService.getPixelLogData(year);
+    // const shieldUsed = await dbService.getShieldUsedLog(year);
     const newStats = { fastDays: 0, fastHour: 0, logDays: 0 };
     // const stats = await dbService.getFastStatsSummary()
 
@@ -291,7 +339,7 @@ const PixelScreen = () => {
     const newLogs: typeof pixelLogs = {};
     logs.forEach((log) => {
       newStats.fastHour += log.hours_in_day;
-      if (newLogs[log.log_date]) {
+      if (newLogs[log.log_date] && Array.isArray(newLogs[log.log_date])) {
         newLogs[log.log_date].push(log);
       } else {
         newStats.fastDays += 1;
@@ -309,7 +357,7 @@ const PixelScreen = () => {
 
       for (const log of parsedDays) {
         newStats.fastHour += log.hours_in_day;
-        if (newLogs[log.log_date]) {
+        if (newLogs[log.log_date] && Array.isArray(newLogs[log.log_date])) {
           newLogs[log.log_date].push(log);
         } else {
           newStats.fastDays += 1;
@@ -318,8 +366,32 @@ const PixelScreen = () => {
       }
     }
 
+    const newShieldLog: typeof shieldLogs = {};
+    // Bổ sung khiên vào logs
+    for (const log of shieldUsed) {
+      let shields = Math.abs(log.shield_delta || 0);
+
+      // Parse YYYY-MM-DD thành [year, month, day]
+      const [year, month, day] = log.log_date.split("-").map(Number);
+
+      // Dùng Date.UTC để cố định múi giờ UTC tuyệt đối
+      const pointerDate = new Date(Date.UTC(year, month - 1, day));
+
+      while (shields > 0) {
+        // Trừ 1 ngày trên UTC
+        pointerDate.setUTCDate(pointerDate.getUTCDate() - 1);
+
+        // Format lại chuỗi YYYY-MM-DD từ UTC
+        const dateStr = pointerDate.toISOString().split("T")[0];
+
+        newShieldLog[dateStr] = log;
+        shields -= 1;
+      }
+    }
+
     setPixelNotes(newNotes);
     setPixelLogs(newLogs);
+    setShieldLogs(newShieldLog);
     setStats(newStats);
     setIsLoading(false);
   };
@@ -430,6 +502,7 @@ const PixelScreen = () => {
             year={year}
             noteData={pixelNotes}
             logData={pixelLogs}
+            shieldLogs={shieldLogs}
           />
         </ScrollView>
       </View>

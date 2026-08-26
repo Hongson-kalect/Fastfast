@@ -254,3 +254,27 @@ export const reduceHabit = async (
     return null;
   }
 };
+
+export const getShieldUsedLog = async (db: SQLiteDatabase, year: number): Promise<HabitLog[]> => {
+  try {
+    // Ngày bắt đầu: '2026-01-01'
+    const startDate = `${year}-01-01`;
+
+    // Ngày kết thúc: Ngày 1/1 năm sau + thêm 7 ngày (tức ngày 2027-01-08)
+    // Dùng date() của SQLite để tự động tính toán chính xác tuyệt đối
+    const query = `
+      SELECT * FROM habit_logs 
+      WHERE shield_delta < 0 
+        AND log_date >= ? 
+        AND log_date <= date(?, '+1 year', '+7 days')
+      ORDER BY log_date ASC
+    `;
+
+    // Dùng Parameterized Query (?) để chống SQL Injection & tối ưu performance
+    const rows = await db.getAllAsync<HabitLog>(query, [startDate, startDate]);
+    return rows;
+  } catch (e) {
+    console.log("error on getShieldUsed", e);
+    return [];
+  }
+};

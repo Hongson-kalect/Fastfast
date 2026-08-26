@@ -125,6 +125,18 @@ export const getLastFastSession = async (
   }
 };
 
+export const getFastSessionByIds = async(db: SQLiteDatabase, fast_ids: string[])=>{
+  try {
+    const rows = await db.getAllAsync<FastSession>(
+      `SELECT * FROM fast_sessions WHERE id IN (${fast_ids.join(",")});`,
+    );
+    return rows;
+  } catch (e) {
+    console.log("error on getFastSessionByIds", e);
+    return null;
+  }
+}
+
 export const getYearFastSession = async (
   db: SQLiteDatabase,
   year: number,

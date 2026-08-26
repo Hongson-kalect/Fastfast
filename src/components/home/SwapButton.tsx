@@ -248,7 +248,7 @@ export const SwapButton = ({
               >
                 {todayData?.mood ? (
                   <ThemedText type="subtitle" className="">
-                    {EMOTIONS[todayData.mood - 1].emoji}
+                    {EMOTIONS[todayData.mood].emoji}
                   </ThemedText>
                 ) : (
                   <Feather name="edit-2" size={28} color="white" />

@@ -5,7 +5,7 @@ import { ColorPalette } from "@/database/shema/theme";
 
 export type SyncStatus = "synced" | "pending" | "failed";
 export type AccountType = "free" | "premium";
-export type MoodLevel = 1 | 2 | 3 | 4 | 5; // 1: Tired -> 5: Happy
+export type MoodLevel = 0 | 1 | 2 | 3 | 4; // 1: Tired -> 5: Happy
 
 // 1. Interface cho bảng app_settings
 export interface AppSettings {

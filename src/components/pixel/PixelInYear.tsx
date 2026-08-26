@@ -1,11 +1,14 @@
 import { ThemedText } from "@/components/themed-text";
-import { FASTING_TARGETS } from "@/constants/data";
-import { DailyLog, DailyNote } from "@/interfaces/db.type";
+import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
+import { DailyLog, DailyNote, HabitLog } from "@/interfaces/db.type";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { DissectedDay } from "@/util/home/timespliter";
 import { getLocalTodayStr } from "@/util/timer";
-import { useMemo, useRef, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FlatList, Pressable, Text, View } from "react-native";
+import PixelDetailSheet from "./PixelDetailSheet";
 
 interface DayItem {
   dateString: string;
@@ -35,22 +38,6 @@ type DayItemType = {
 type DayItemObj = {
   [key: string]: DayItemType;
 };
-
-// export const moodArr = [
-//   { index: 1, emoji: "😫", label: "Tired", color: "#541A1A" }, // Đỏ bã trầu đậm sâu (Deep Wine)
-//   { index: 2, emoji: "😮‍💨", label: "Bad", color: "#5C3A15" }, // Nâu cam đất trầm (Dark Amber)
-//   { index: 3, emoji: "🙂", label: "Fine", color: "#544D17" }, // Vàng rêu/Úa tối (Muted Olive) - Đủ phân biệt nhưng không bị chói như vàng chanh
-//   { index: 4, emoji: "😃", label: "Good", color: "#164454" }, // Xanh slate/Cyan tối (Deep Ocean Blue)
-//   { index: 5, emoji: "🥰", label: "Happy", color: "#2B4C15" }, // Xanh lá cây sẫm (Deep Forest Green)
-// ];
-
-export const moodArr = [
-  { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ trầm nhưng có sắc hồng (Crimson Dark) - Rõ ràng là tiêu cực
-  { index: 2, emoji: "😮‍💨", label: "Bad", color: "#874D14" }, // Cam cháy/Hổ phách (Amber Earth) - Tách biệt hẳn với đỏ
-  { index: 3, emoji: "🙂", label: "Fine", color: "#3A3F47" }, // Xám Slate trung tính - Đúng nghĩa "Bình thường", giúp các ngày vui/buồn khác nổi bật lên
-  { index: 4, emoji: "😃", label: "Good", color: "#1A5C70" }, // Xanh ngọc biển (Deep Teal) - Bắt đầu có năng lượng tích cực
-  { index: 5, emoji: "🥰", label: "Happy", color: "#2E6930" }, // Xanh lá Emerald trầm - Trạng thái tốt nhất
-];
 
 export const fastArr = [
   { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc
@@ -170,6 +157,7 @@ type Props = {
   year: number;
   noteData: { [key: string]: DailyNote };
   logData: { [key: string]: (DailyLog | DissectedDay)[] };
+  shieldLogs: { [key: string]: HabitLog };
 };
 
 const PixelGridManager = (props: Props) => {
@@ -180,6 +168,7 @@ const PixelGridManager = (props: Props) => {
     new Date().getFullYear(),
   );
   const flatListRef = useRef(FlatList);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const gridData = useMemo(() => {
     return generateYearGrid(renderedYear);
@@ -195,6 +184,39 @@ const PixelGridManager = (props: Props) => {
       setRenderedYear(yearNum);
     }
   };
+
+  const { present, close } = useBottomSheet();
+  useEffect(() => {
+    if (selectedDate) {
+      // show sheet
+      const logData = props.logData[selectedDate];
+      const noteData = props.noteData[selectedDate];
+
+      if (logData || noteData) {
+        present({
+          render: () => (
+            <PixelDetailSheet
+              dateString={selectedDate}
+              note={noteData}
+              log={logData}
+            />
+          ),
+          title: "",
+          size: "long",
+          onClose: () => {
+            setSelectedDate(null);
+            close();
+          },
+        });
+      } else {
+        const shieldLogs = props.shieldLogs[selectedDate];
+
+        if (shieldLogs) {
+          //show shield log
+        }
+      }
+    }
+  }, [selectedDate]);
 
   return (
     <View>
@@ -232,6 +254,9 @@ const PixelGridManager = (props: Props) => {
                 {/* Hàng 7 ô pixel ngày */}
                 <View className="flex-1 flex-row justify-between gap-x-1">
                   {week.days.map((day, dIdx) => {
+                    if (day.dateString > todayStr)
+                      return <EmptyPixel isToday={false} key={dIdx} />;
+
                     const isToday = day.dateString === todayStr;
                     if (props.displayType === "mood") {
                       const pixelData = props.noteData[day.dateString];
@@ -239,6 +264,7 @@ const PixelGridManager = (props: Props) => {
                         return <EmptyPixel isToday={isToday} key={dIdx} />;
                       return (
                         <MoodPixel
+                          onPress={() => setSelectedDate(day.dateString)}
                           isToday={isToday}
                           key={dIdx}
                           data={pixelData}
@@ -247,13 +273,30 @@ const PixelGridManager = (props: Props) => {
                       );
                     } else {
                       const pixelData = props.logData[day.dateString];
-                      if (!pixelData)
+                      if (!pixelData) {
+                        const logs = props.shieldLogs[day.dateString];
+                        if (logs)
+                          return (
+                            <ShieldPixel
+                              onPress={() => setSelectedDate(day.dateString)}
+                              key={dIdx}
+                              shieldLogs={logs}
+                            />
+                          );
                         return <EmptyPixel isToday={isToday} key={dIdx} />;
+                      }
+
+                      let fast = pixelData[0];
+                      pixelData.forEach((fast) => {
+                        if (fast.hours_in_fast > fast.hours_in_fast)
+                          fast = fast;
+                      });
                       return (
                         <FastPixel
+                          onPress={() => setSelectedDate(day.dateString)}
                           isToday={isToday}
                           key={dIdx}
-                          data={pixelData}
+                          data={fast}
                           isCurrentYear={day.isCurrentYear}
                         />
                       );
@@ -276,6 +319,7 @@ const EmptyPixel = ({ isToday }: { isToday: boolean }) => {
       style={{
         backgroundColor: "transparent",
         boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
+        borderColor: isToday ? theme.primary + "80" : theme.text + "20",
       }}
       className={`flex-1 aspect-square justify-center items-center rounded-md border 
                       `}
@@ -283,21 +327,47 @@ const EmptyPixel = ({ isToday }: { isToday: boolean }) => {
   );
 };
 
+const ShieldPixel = ({
+  shieldLogs,
+  onPress,
+}: {
+  shieldLogs: HabitLog;
+  onPress: () => void;
+}) => {
+  const { theme } = useAppStore();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        backgroundColor: "transparent",
+      }}
+      className={`flex-1 aspect-square justify-center items-center rounded-md border 
+                      border-dashed border-white/5`}
+    >
+      <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
+    </Pressable>
+  );
+};
+
 const MoodPixel = ({
   data,
   isCurrentYear,
   isToday,
+  onPress,
 }: {
   data: DailyNote;
   isCurrentYear: boolean;
   isToday: boolean;
+  onPress: () => void;
 }) => {
-  const pixel = moodArr[data?.mood_level || 0];
+  const pixel = EMOTIONS[data?.mood_level || 0];
   const { theme } = useAppStore();
+
   return (
-    <View
+    <Pressable
+      onPress={onPress}
       style={{
-        backgroundColor: pixel.color + "88",
+        backgroundColor: pixel.color,
         boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
       }}
       className={`flex-1 aspect-square justify-center items-center rounded-md border 
@@ -314,7 +384,7 @@ const MoodPixel = ({
       >
         {pixel.emoji}
       </Text>
-    </View>
+    </Pressable>
   );
 };
 
@@ -322,25 +392,19 @@ const FastPixel = ({
   data,
   isCurrentYear,
   isToday,
+  onPress,
 }: {
-  data: (DailyLog | DissectedDay)[];
+  data: DailyLog | DissectedDay;
   isCurrentYear: boolean;
   isToday: boolean;
+  onPress: () => void;
 }) => {
-  const fast = useMemo(() => {
-    let maxFast = data[0];
-    data.forEach((fast) => {
-      if (fast.hours_in_fast > maxFast.hours_in_fast) maxFast = fast;
-    });
-    return maxFast;
-  }, [data]);
-
   const pixel = FASTING_TARGETS.find(
     (target) =>
-      target.hours <= fast.hours_in_fast &&
-      (!target.toHours || target.toHours >= fast.hours_in_fast),
+      target.hours <= data.hours_in_fast &&
+      (!target.toHours || target.toHours >= data.hours_in_fast),
   );
-  const progress = fast.elapsed_hours / fast.hours_in_fast;
+  const progress = data.elapsed_hours / data.hours_in_fast;
   const baseOpacity = 0.5;
   const opacity = baseOpacity + (1 - baseOpacity) * progress;
   const { theme } = useAppStore();
@@ -348,7 +412,8 @@ const FastPixel = ({
   if (!pixel) return <EmptyPixel isToday={isToday} />;
 
   return (
-    <View
+    <Pressable
+      onPress={onPress}
       style={{
         opacity,
         backgroundColor: pixel.colors.accent + "88",
@@ -369,6 +434,30 @@ const FastPixel = ({
       >
         {pixel.emoji}
       </Text>
+    </Pressable>
+  );
+};
+
+type PixelType =
+  | {
+      type: "note";
+      data: DailyNote;
+    }
+  | {
+      type: "log";
+      data: DailyLog | DissectedDay;
+    }
+  | {
+      type: "shield";
+      data: HabitLog;
+    };
+
+const NoteContent = ({ note }: { note: DailyNote }) => {};
+
+const ShieldContent = ({ shieldLogs }: { shieldLogs: HabitLog }) => {
+  return (
+    <View>
+      <Text className="text-white!">{JSON.stringify(shieldLogs)}</Text>
     </View>
   );
 };

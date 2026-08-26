@@ -5,11 +5,13 @@ export interface DissectedDay {
   hours_in_day: number; // Số giờ nhịn thuộc về ngày đó (Ví dụ: 4.5, 24, 12)
   elapsed_hours: number; // số giờ đã nhịn kể từ đầu phiên
   hours_in_fast: number;
+  fast_id: string;
 }
 
 export const splitSessionIntoDays = (
   startTimeMs: number,
   endTimeMs: number,
+  fast_id: string
 ): DissectedDay[] => {
   const result: DissectedDay[] = [];
   const hoursInFast = (endTimeMs - startTimeMs)/3600_000;
@@ -48,6 +50,7 @@ export const splitSessionIntoDays = (
 
     // Đẩy kết quả của ngày này vào mảng
     result.push({
+      fast_id,
       log_date: dateStr,
       hours_in_day: fixed(hoursInDay), // Làm tròn 2 chữ số thập phân cho đẹp DB
       elapsed_hours: fixed(timeleap),

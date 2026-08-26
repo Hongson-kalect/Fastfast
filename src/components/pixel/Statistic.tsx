@@ -1,10 +1,9 @@
-import { FASTING_TARGETS } from "@/constants/data";
+import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
 import { fixed } from "@/util/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import { ThemedText } from "../themed-text";
-import { moodArr } from "./PixelInYear";
 
 const moodCount = [102, 25, 5, 2, 0, 10, 10];
 
@@ -86,7 +85,7 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
 
       <View className="flex-row gap-2 mt-2">
         {trackingType === "mood" &&
-          moodArr.map((item, index) => (
+          EMOTIONS.map((item, index) => (
             <View
               key={item.label}
               style={{ backgroundColor: item.color }}
