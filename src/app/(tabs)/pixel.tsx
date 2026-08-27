@@ -45,27 +45,33 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
     dateStr,
     target,
     duration,
-  }:{id:string, dateStr: string, target: number, duration: number})=>{
+  }: {
+    id: string;
+    dateStr: string;
+    target: number;
+    duration: number;
+  }) => {
     const timestamp = new Date(dateStr).getTime();
     fastSessions.push({
       id: id,
       start_time: timestamp,
-      end_time: timestamp+duration*1000,
+      end_time: timestamp + duration * 1000,
       duration,
       target_duration: target,
       is_deleted: 0,
       sync_status: "synced" as SyncStatus,
       created_at: timestamp,
       updated_at: timestamp,
-      user_id:'qq',
-      status:'completed',
-      rating:null,
-      home_data_snapshot:null
+      user_id: "qq",
+      status: "completed",
+      rating: null,
+      home_data_snapshot: null,
     });
-  }
+  };
 
   const createLog = (
     dateStr: string,
+    startStr: string,
     hoursInDay: number,
     elapsed: number,
     totalFast: number,
@@ -74,7 +80,7 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
     logs.push({
       log_date: dateStr,
       user_id: "user_alex_01",
-      fast_id: `fast_session_${dateStr}`,
+      fast_id: `fast_session_${startStr}`,
       hours_in_day: hoursInDay,
       elapsed_hours: elapsed,
       hours_in_fast: totalFast,
@@ -95,6 +101,8 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
       log_date: dateStr,
       mood_level: mood,
       note: text,
+      image_uri:
+        "https://wallpapers.com/images/hd/professional-portrait-background-raqacmglp56xscr1.jpg",
       sync_status: "synced" as SyncStatus,
       created_at: timestamp,
       updated_at: timestamp,
@@ -132,19 +140,19 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
     totalFastHours: 16 | 18 | 20 | 23 | 36 | 48 | 72,
   ) => {
     const [y, m, d] = startDateStr.split("-").map(Number);
-    let start = new Date(Date.UTC(y, m - 1, d));
 
     for (let i = 0; i < daysCount; i++) {
+      let start = new Date(Date.UTC(y, m - 1, d + i));
       const d1 = start.toISOString().split("T")[0];
       start.setUTCDate(start.getUTCDate() + 1);
       const d2 = start.toISOString().split("T")[0];
       start.setUTCDate(start.getUTCDate() + 1);
       const d3 = start.toISOString().split("T")[0];
       if (totalFastHours < 24) {
-        createLog(d1, 4, 4, totalFastHours);
+        createLog(d1, d1, 4, 4, totalFastHours);
         createNote(d1, Math.floor(Math.random() * 4), "Bắt đầu nhịn tối");
 
-        createLog(d2, totalFastHours - 4, totalFastHours, totalFastHours);
+        createLog(d2, d1, totalFastHours - 4, totalFastHours, totalFastHours);
         createNote(
           d2,
           Math.floor(Math.random() * 3),
@@ -153,31 +161,31 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
       }
 
       if (totalFastHours === 36) {
-        createLog(d1, 4.0, 4.0, 36);
+        createLog(d1, d1, 4.0, 4.0, 36);
         createNote(d1, 2, "Bắt đầu nhịn tối");
 
-        createLog(d2, 24.0, 28.0, 36);
+        createLog(d2, d1, 24.0, 28.0, 36);
         createNote(d2, 1, "Ngày thứ 2 mệt, cồn cào");
 
-        createLog(d3, 8.0, 36.0, 36);
+        createLog(d3, d1, 8.0, 36.0, 36);
         createNote(d3, 4, "Hoàn thành 36h Titan Fast!");
       } else if (totalFastHours === 48) {
-        createLog(d1, 4.0, 4.0, 48);
+        createLog(d1, d1, 4.0, 4.0, 48);
         createNote(d1, 2, "Khởi động 48h Master Fast");
 
-        createLog(d2, 24.0, 28.0, 48);
+        createLog(d2, d1, 24.0, 28.0, 48);
         createNote(d2, 1, "Đốt mỡ sâu ngày 2");
 
-        createLog(d3, 20.0, 48.0, 48);
+        createLog(d3, d1, 20.0, 48.0, 48);
         createNote(d3, 4, "Cúp vô địch 48h!");
       } else if (totalFastHours === 72) {
         start.setUTCDate(start.getUTCDate() + 1);
         const d4 = start.toISOString().split("T")[0];
 
-        createLog(d1, 4.0, 4.0, 72);
-        createLog(d2, 24.0, 28.0, 72);
-        createLog(d3, 24.0, 52.0, 72);
-        createLog(d4, 20.0, 72.0, 72);
+        createLog(d1, d1, 4.0, 4.0, 72);
+        createLog(d2, d1, 24.0, 28.0, 72);
+        createLog(d3, d1, 24.0, 52.0, 72);
+        createLog(d4, d1, 20.0, 72.0, 72);
         createNote(d4, 4, "Đỉnh cao 72h Extended Fast!");
       }
 
@@ -261,13 +269,13 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
   runMultiDayFast("2026-08-14", 5, 18);
 
   // Tuần 34 & 35
-  createLog("2026-08-20", 23.0, 23.0, 23);
+  createLog("2026-08-20", "2026-08-20", 23.0, 23.0, 23);
   createNote("2026-08-20", 3, "OMAD 23h xuất sắc");
-  createLog("2026-08-21", 23.0, 23.0, 23);
+  createLog("2026-08-21", "2026-08-21", 23.0, 23.0, 23);
   createNote("2026-08-21", 2, "Duy trì OMAD ngày 2");
-  createLog("2026-08-22", 16.0, 16.0, 16);
+  createLog("2026-08-22", "2026-08-22", 16.0, 16.0, 16);
   createNote("2026-08-22", 4, "Chuyển sang 16h nhẹ nhàng");
-  createLog("2026-08-23", 16.0, 16.0, 16);
+  createLog("2026-08-23", "2026-08-23", 16.0, 16.0, 16);
   createNote("2026-08-23", 1, "Hơi oải nhưng vẫn đạt 16h");
 
   // Đang chạy 36h từ ngày 24/08
@@ -287,7 +295,7 @@ const PixelScreen = () => {
   const { width, height } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const currentWeekY = useMemo(() => {
-    const extraScroll = 60;
+    const extraScroll = 100;
     const currentWeek = getWeek(new Date());
     const weekHeight = (width - 21 - (14 * 15) / 4) / 7;
     return Math.max(0, weekHeight * currentWeek - extraScroll);
@@ -352,6 +360,7 @@ const PixelScreen = () => {
       const parsedDays = splitSessionIntoDays(
         currentFastSession.start_time,
         Math.floor(Date.now()),
+        currentFastSession.id,
       );
       console.log(parsedDays.map((x) => x.log_date));
 

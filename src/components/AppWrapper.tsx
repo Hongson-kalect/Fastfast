@@ -82,7 +82,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
             }),
           1000,
         );
-      } else if (streak.current < 1 && streak.current > streak.previous) {
+      } else if (streak.current > 1 && streak.current > streak.previous) {
         Toast.show({
           type: "success",
           text2: "Sreak increased!",

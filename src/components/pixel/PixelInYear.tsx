@@ -192,6 +192,8 @@ const PixelGridManager = (props: Props) => {
       const logData = props.logData[selectedDate];
       const noteData = props.noteData[selectedDate];
 
+      console.log("props", logData, noteData);
+
       if (logData || noteData) {
         present({
           render: () => (
@@ -287,9 +289,9 @@ const PixelGridManager = (props: Props) => {
                       }
 
                       let fast = pixelData[0];
-                      pixelData.forEach((fast) => {
-                        if (fast.hours_in_fast > fast.hours_in_fast)
-                          fast = fast;
+                      pixelData.forEach((data) => {
+                        if (data.hours_in_fast > fast.hours_in_fast)
+                          fast = data;
                       });
                       return (
                         <FastPixel

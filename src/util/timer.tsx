@@ -77,26 +77,26 @@ export const getWeek = (date: Date) => {
   return week;
 };
 
-export const getRelativeTime = (targetDate: Date): string => {
+export const getRelativeTime = (targetDate: Date, showHour = true): string => {
   const timeStr = format(targetDate, "HH:mm");
   const diffDays = differenceInCalendarDays(targetDate, new Date());
   if (isToday(targetDate)) {
-    return `${timeStr} Hôm nay`;
+    return `${showHour ? timeStr + " " : ""}Hôm nay`;
   }
   if (isTomorrow(targetDate)) {
-    return `${timeStr} Ngày mai`;
+    return `${showHour ? timeStr + " " : ""}Ngày mai`;
   }
   if (isYesterday(targetDate)) {
-    return `${timeStr} Hôm qua`;
+    return `${showHour ? timeStr + " " : ""}Hôm qua`;
   }
   if (diffDays > 0 && diffDays === 2) {
-    return `${timeStr} Ngày kia`;
+    return `${showHour ? timeStr + " " : ""}Ngày kia`;
   }
   if (diffDays < 0 && diffDays === -2) {
-    return `${timeStr} 2 ngày trước`;
+    return `${showHour ? timeStr + " " : ""}2 ngày trước`;
   }
   if (diffDays > 0) {
-    return `${timeStr} ${diffDays} ngày sau`;
+    return `${showHour ? timeStr + " " : ""}${diffDays} ngày sau`;
   }
-  return `${timeStr} ${Math.abs(diffDays)} ngày trước`;
+  return `${showHour ? timeStr + " " : ""}${Math.abs(diffDays)} ngày trước`;
 };

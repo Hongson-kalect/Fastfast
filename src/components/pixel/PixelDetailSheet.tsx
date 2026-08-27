@@ -2,14 +2,9 @@ import { EMOTIONS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
 import { DissectedDay } from "@/util/home/timespliter";
+import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  Text,
-  View
-} from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -151,31 +146,56 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
 
-  
-
-  /**
-   * Những fast thực sự liên quan tới ngày này.
-   *
-   * Set giúp tránh query trùng ID.
-   */
   const fastIds = useMemo(() => {
     return [...new Set(log.map((item) => item.fast_id).filter(Boolean))];
   }, [log]);
 
-  /**
-   * Tổng số giờ fasting trong ngày.
-   */
   const totalFastHoursInDay = useMemo(() => {
     return log.reduce((acc, item) => acc + (item.hours_in_day || 0), 0);
   }, [log]);
 
-  /**
-   * Lấy FastSession sau khi sheet mở.
-   */
   const getFasts = useCallback(async () => {
     if (fastIds.length === 0) {
       setFastObj({});
       return;
+    }
+
+    if (3 === 3) {
+      const id = "fast_session_" + dateString;
+
+      const fast: FastMap = {
+        "fast_session_2026-08-08": {
+          start_time: new Date("2026-08-08T13:00:00.000Z").getTime(),
+          end_time: new Date("2026-08-09T09:00:00.000Z").getTime(),
+          duration: 20 * 3600,
+          target_duration: 20,
+          created_at: new Date("2026-08-08T13:00:00.000Z").getTime() / 1000,
+          updated_at: new Date("2026-08-08T13:00:00.000Z").getTime() / 1000,
+          home_data_snapshot: null,
+          id: id,
+          is_deleted: 0,
+          sync_status: "synced",
+          user_id: "qq",
+          status: "completed",
+          rating: null,
+        },
+        "fast_session_2026-08-09": {
+          start_time: new Date("2026-08-09T13:00:00.000Z").getTime(),
+          end_time: new Date("2026-08-10T09:00:00.000Z").getTime(),
+          duration: 20 * 3600,
+          target_duration: 20,
+          created_at: new Date("2026-08-09T13:00:00.000Z").getTime() / 1000,
+          updated_at: new Date("2026-08-09T13:00:00.000Z").getTime() / 1000,
+          home_data_snapshot: null,
+          id: id,
+          is_deleted: 0,
+          sync_status: "synced",
+          user_id: "qq",
+          status: "completed",
+          rating: null,
+        },
+      };
+      return setFastObj(fast);
     }
 
     try {
@@ -202,16 +222,11 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     getFasts();
   }, [getFasts]);
 
-  /**
-   * Timeline.
-   *
-   * Mỗi DailyLog có fast_id.
-   * Sau khi FastSession được load thì lấy start/end thực tế.
-   */
   const timelineSegments = useMemo(() => {
     const segments: TimelineSegment[] = [];
 
     for (const item of log) {
+      console.log("timelineSegments", log, fastObj);
       if (!item.fast_id) continue;
 
       const fast = fastObj[item.fast_id];
@@ -223,10 +238,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       segments.push(...fastSegments);
     }
 
-    /**
-     * Một fast_id có thể xuất hiện nhiều row,
-     * tránh duplicate segment.
-     */
     const unique = new Map<string, TimelineSegment>();
 
     for (const segment of segments) {
@@ -240,17 +251,8 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     return [...unique.values()].sort((a, b) => a.startHour - b.startHour);
   }, [log, fastObj, dateString]);
 
-  /**
-   * Mood.
-   */
   const currentMood = note?.mood_level ? EMOTIONS[note.mood_level] : null;
 
-  /**
-   * Tìm log tương ứng với fast.
-   *
-   * Dùng để hiển thị hours_in_day / elapsed_hours /
-   * hours_in_fast trong card.
-   */
   const getLogForFast = (fastId: string) => {
     return log.find((item) => item.fast_id === fastId);
   };
@@ -271,17 +273,18 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
       <View className="flex-row items-center justify-between pb-5 border-b border-white/10">
         <View className="flex-1">
-          <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px]">
-            Nhật ký ngày
-          </Text>
+          <Text className="text-zinc-500 text-[11px]">Nhật ký ngày</Text>
 
-          <Text className="text-white text-2xl font-bold mt-1">
+          <Text className="text-white text-2xl font-bold mt-0.5">
             {dateString}
           </Text>
         </View>
 
         {currentMood ? (
-          <View className="flex-row items-center gap-x-2 bg-white/5 px-3 py-2 rounded-full border border-white/10">
+          <View
+            style={{ backgroundColor: currentMood.color }}
+            className="flex-row items-center gap-x-2 bg-white/5 px-3 py-2 rounded-full border border-white/10"
+          >
             <Text className="text-2xl">{currentMood.emoji}</Text>
 
             <Text className="text-zinc-300 text-xs font-semibold">
@@ -302,30 +305,26 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       <View className="mt-5">
         <View className="flex-row items-end justify-between mb-3">
           <View>
-            <Text className="text-zinc-500 text-xs font-medium uppercase tracking-wider">
+            <Text className="text-text-base/60 text-xs font-medium uppercase tracking-wider">
               Fasting
             </Text>
-
-            <View className="flex-row items-baseline mt-0.5">
-              <Text className="text-white text-3xl font-bold">
-                {totalFastHoursInDay.toFixed(1)}
-              </Text>
-
-              <Text className="text-zinc-500 text-sm ml-1">giờ</Text>
-            </View>
           </View>
 
-          <Text className="text-zinc-600 text-xs">
-            {((totalFastHoursInDay / 24) * 100).toFixed(0)}% ngày
-          </Text>
+          <View className="flex-row items-baseline mt-0.5">
+            <Text className="text-success text-3xl font-bold">
+              {totalFastHoursInDay.toFixed(1)}
+            </Text>
+
+            <Text className="text-zinc-500 text-sm ml-1">Hours</Text>
+          </View>
         </View>
 
         {/* ======================================================= */}
         {/* 24H TIMELINE                                             */}
         {/* ======================================================= */}
 
-        <View className="bg-zinc-900 rounded-2xl border border-white/10 p-4">
-          <View className="relative h-10 rounded-xl overflow-hidden bg-zinc-800 border border-white/5">
+        <View className="bg-zinc-900 rounded border border-white/10 p-4">
+          <View className="relative h-6 rounded-full overflow-hidden bg-primary/30 shadow shadow-primary">
             {/* Grid 6h */}
             <View
               pointerEvents="none"
@@ -355,12 +354,12 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
                     left: `${clamp(leftPercent, 0, 100)}%`,
                     width: `${clamp(widthPercent, 0, 100)}%`,
                   }}
-                  className="absolute top-0 bottom-0 bg-emerald-500 justify-center overflow-hidden"
+                  className="absolute top-0 bottom-0 bg-primary justify-center overflow-hidden rounded-full"
                 >
                   {widthPercent > 10 && (
                     <Text
                       numberOfLines={1}
-                      className="text-[10px] font-bold text-zinc-950 text-center"
+                      className="text-[9px] text-white/80 italic text-center"
                     >
                       {formatDuration(segment.duration)}
                     </Text>
@@ -457,7 +456,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
                         </Text>
 
                         <Text className="text-zinc-600 text-[10px] mt-0.5">
-                          {fastId}
+                          {`${getLocalTodayStr(start)} - ${end ? getLocalTodayStr(end) : "Now"}`}
                         </Text>
                       </View>
                     </View>
@@ -468,7 +467,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
                       </Text>
 
                       <Text className="text-zinc-600 text-[10px]">
-                        trong ngày
+                        {getRelativeTime(start, false)}
                       </Text>
                     </View>
                   </View>
@@ -504,15 +503,15 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       {/* ========================================================= */}
 
       {note?.image_uri && (
-        <View className="mt-4">
+        <View className="mt-4 h-screen">
           <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-3">
             Hình ảnh
           </Text>
 
-          <View className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+          <View className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 px-3">
             <Image
               source={{ uri: note.image_uri }}
-              className="w-full h-64"
+              className="w-full aspect-9/16"
               resizeMode="cover"
             />
           </View>
