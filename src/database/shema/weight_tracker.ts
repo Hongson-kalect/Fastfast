@@ -34,27 +34,28 @@ export const getWeightLogs = async (
 
 export const getCurrentWeight = async (
   db: SQLiteDatabase,
+  date?: string,
 ): Promise<WeightLog | null> => {
   const row = await db.getFirstAsync<WeightLog>(
-    `SELECT * FROM weight_logs Order by created_at DESC LIMIT 1`,
+    `SELECT * FROM weight_logs WHERE log_date <= ? Order by created_at DESC LIMIT 1`,
+    [date || getLocalTodayStr()],
   );
   return row;
 };
 export const updateWeight = async (db: SQLiteDatabase, weight: number) => {
   const today = getLocalTodayStr();
   const id = uuidv7();
-try{
-
-  await db.runAsync(
-    `INSERT INTO weight_logs (id, weight, log_date) VALUES (?,?,?)`,
-    [id, weight, today],
-  );
-  const row = await db.getFirstAsync<WeightLog>(
-    `SELECT * FROM weight_logs WHERE id = ?`,
-    [id],
-  );
-  return row;
-}catch(e){
-  console.log('error on updateWeight', e);
-}
+  try {
+    await db.runAsync(
+      `INSERT INTO weight_logs (id, weight, log_date) VALUES (?,?,?)`,
+      [id, weight, today],
+    );
+    const row = await db.getFirstAsync<WeightLog>(
+      `SELECT * FROM weight_logs WHERE id = ?`,
+      [id],
+    );
+    return row;
+  } catch (e) {
+    console.log("error on updateWeight", e);
+  }
 };

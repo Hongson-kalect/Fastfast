@@ -100,3 +100,16 @@ export const getRelativeTime = (targetDate: Date, showHour = true): string => {
   }
   return `${showHour ? timeStr + " " : ""}${Math.abs(diffDays)} ngày trước`;
 };
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+export const formatHour = (hour: number) => {
+  const h = Math.floor(hour);
+  const m = Math.round((hour - h) * 60);
+
+  if (m === 60) {
+    return `${pad((h + 1) % 24)}:00`;
+  }
+
+  return `${pad(h % 24)}:${pad(m)}`;
+};

@@ -286,12 +286,9 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
 
 const PixelScreen = () => {
   const dbService = useDBService();
-  const { userProfile, currentFastSession } = useAppStore();
-  const [trackingType, setTrackingType] = useState<"mood" | "fasting">(
-    "fasting",
-  );
+  const { userProfile, currentFastSession, settings, updateSetting } = useAppStore();
   const [enableScroll, setEnableScroll] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("fasting");
+  const [viewMode, setViewMode] = useState<ViewMode>(settings?.pixel_view_mode || "fasting");
   const { width, height } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const currentWeekY = useMemo(() => {
@@ -310,6 +307,11 @@ const PixelScreen = () => {
       animated: animated,
     });
   };
+
+  useEffect(()=>{
+    dbService.setting("pixel_view_mode", viewMode || "fasting")
+    updateSetting({ pixel_view_mode: viewMode });
+  },[viewMode])
 
   const [year, setYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true); // Để hiển thị skeleton
@@ -462,8 +464,8 @@ const PixelScreen = () => {
           <View className="mt-4 mb-6">
             <PixelStatistic
               stats={stats}
-              trackingType={trackingType}
-              setTrackingType={setTrackingType}
+              trackingType={viewMode}
+              setTrackingType={setViewMode}
             />
           </View>
           {/* <View className="py-4">
@@ -507,7 +509,7 @@ const PixelScreen = () => {
 
           {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
           <PixelInYear
-            displayType={trackingType}
+            displayType={viewMode}
             year={year}
             noteData={pixelNotes}
             logData={pixelLogs}

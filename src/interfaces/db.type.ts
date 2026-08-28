@@ -13,6 +13,7 @@ export interface AppSettings {
   weight_target?: number;
   chart_range?: ChartRangeKey;
   is_dark_mode?: boolean;
+  pixel_view_mode?:'fasting'|'mood';
   theme?: string;
   language?: string;
 }
@@ -50,7 +51,7 @@ export interface UserProfile {
 export interface FastSession {
   id: string; // UUID v7
   user_id: string;
-  start_time: number; // Epoch timestamp (giây)
+  start_time: number; // mili
   end_time: number | null; // NULL nếu phiên đang chạy real-time
   duration: number; // Mục tiêu nhịn (16, 18, 20, 48...)
   target_duration: number; // Mục tiêu nhịn (16, 18, 20, 48...)

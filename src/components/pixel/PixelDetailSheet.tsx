@@ -2,9 +2,10 @@ import { EMOTIONS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
 import { DissectedDay } from "@/util/home/timespliter";
-import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Circular24hTimeline from "./Circular24hTimeline";
+import { DailyFastSessionCard } from "./DailySessionFast";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -22,30 +23,6 @@ type TimelineSegment = {
 };
 
 const HOURS_IN_DAY = 24;
-
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-
-const pad = (value: number) => String(value).padStart(2, "0");
-
-const formatHour = (hour: number) => {
-  const h = Math.floor(hour);
-  const m = Math.round((hour - h) * 60);
-
-  if (m === 60) {
-    return `${pad((h + 1) % 24)}:00`;
-  }
-
-  return `${pad(h % 24)}:${pad(m)}`;
-};
-
-const getDateKey = (date: Date) => {
-  return [
-    date.getFullYear(),
-    pad(date.getMonth() + 1),
-    pad(date.getDate()),
-  ].join("-");
-};
 
 const getHourInLocalDay = (date: Date) => {
   return (
@@ -218,8 +195,17 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     }
   }, [dbService, fastIds]);
 
+  const [weight, setWeight] = useState(0);
+  const getWeight = useCallback(async () => {
+    const weight = await dbService?.getCurrentWeight(dateString);
+    if (weight) {
+      setWeight(weight.weight);
+    }
+  }, [dbService]);
+
   useEffect(() => {
     getFasts();
+    getWeight();
   }, [getFasts]);
 
   const timelineSegments = useMemo(() => {
@@ -257,267 +243,202 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     return log.find((item) => item.fast_id === fastId);
   };
 
-  return (
-    <ScrollView
-      className="flex-1 bg-zinc-950"
-      contentContainerStyle={{
-        paddingHorizontal: 16,
-        paddingTop: 10,
-        paddingBottom: 40,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* ========================================================= */}
-      {/* HEADER                                                     */}
-      {/* ========================================================= */}
+  const circularSegments = useMemo(() => {
+    return timelineSegments.map((segment) => ({
+      id: `${segment.fastId}-${segment.startHour}`,
+      startHour: segment.startHour,
+      duration: segment.duration,
+      // Muốn chỉnh màu riêng hoặc dùng mặc định #34D399:
+      color: "#34d399",
+    }));
+  }, [timelineSegments]);
 
-      <View className="flex-row items-center justify-between pb-5 border-b border-white/10">
+  // Tính tổng số giờ nhịn trong ngày để hiển thị ở tâm đồng hồ
+  const totalDuration = useMemo(() => {
+    return timelineSegments.reduce((acc, curr) => acc + curr.duration, 0);
+  }, [timelineSegments]);
+
+  const [activeTab, setActiveTab] = useState<"fasting" | "journal">("fasting");
+
+  return (
+    <View className="flex-1 bg-zinc-950">
+      {/* 1. HEADER CHÍNH (Cố định ở trên) */}
+      <View className="px-4 pt-3 pb-3 border-b border-white/10 flex-row items-center justify-between">
         <View className="flex-1">
           <Text className="text-zinc-500 text-[11px]">Nhật ký ngày</Text>
-
-          <Text className="text-white text-2xl font-bold mt-0.5">
+          <Text className="text-white text-xl font-bold mt-0.5">
             {dateString}
           </Text>
         </View>
 
+        {/* Mood Badge thu gọn */}
         {currentMood ? (
           <View
             style={{ backgroundColor: currentMood.color }}
-            className="flex-row items-center gap-x-2 bg-white/5 px-3 py-2 rounded-full border border-white/10"
+            className="flex-row items-center gap-x-1.5 px-5 py-1.5 rounded-full border border-white/10"
           >
-            <Text className="text-2xl">{currentMood.emoji}</Text>
-
-            <Text className="text-zinc-300 text-xs font-semibold">
+            <Text className="text-zinc-200 text-xs font-semibold">
               {currentMood.label}
             </Text>
+            <Text className="text-lg font-medium">{currentMood.emoji}</Text>
           </View>
         ) : (
-          <View className="bg-white/5 px-3 py-2 rounded-full border border-white/5">
-            <Text className="text-zinc-500 text-xs">Chưa có mood</Text>
+          <View className="bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
+            <Text className="text-zinc-500 text-[11px]">Chưa có mood</Text>
           </View>
         )}
       </View>
 
-      {/* ========================================================= */}
-      {/* FASTING SUMMARY                                            */}
-      {/* ========================================================= */}
-
-      <View className="mt-5">
-        <View className="flex-row items-end justify-between mb-3">
-          <View>
-            <Text className="text-text-base/60 text-xs font-medium uppercase tracking-wider">
-              Fasting
+      {/* 2. TAB SWITCHER (Nút chuyển Tab) */}
+      <View className="px-4 mt-3">
+        <View className="flex-row bg-zinc-900 p-1 rounded-xl border border-white/5">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setActiveTab("fasting")}
+            className={`flex-1 py-4 items-center justify-center ${
+              activeTab === "fasting"
+                ? "bg-zinc-800  border rounded-2xl border-emerald-400"
+                : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-xs font-semibold ${
+                activeTab === "fasting" ? "text-emerald-400" : "text-zinc-400"
+              }`}
+            >
+              ⏱️ Daily Fast
             </Text>
-          </View>
+          </TouchableOpacity>
 
-          <View className="flex-row items-baseline mt-0.5">
-            <Text className="text-success text-3xl font-bold">
-              {totalFastHoursInDay.toFixed(1)}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setActiveTab("journal")}
+            className={`flex-1 py-4 items-center justify-center ${
+              activeTab === "journal"
+                ? "bg-zinc-800 border rounded-2xl border-emerald-400"
+                : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-xs font-semibold ${
+                activeTab === "journal" ? "text-emerald-400" : "text-zinc-400"
+              }`}
+            >
+              📝 Daily Note
             </Text>
-
-            <Text className="text-zinc-500 text-sm ml-1">Hours</Text>
-          </View>
+          </TouchableOpacity>
         </View>
+      </View>
 
-        {/* ======================================================= */}
-        {/* 24H TIMELINE                                             */}
-        {/* ======================================================= */}
+      {/* 3. NỘI DUNG SCROLLVIEW TƯƠNG ỨNG THEO TAB */}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 40,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ================= TAB 1: FASTING ================= */}
+        {activeTab === "fasting" && (
+          <View className="gap-y-5">
+            {/* 24H CIRCULAR TIMELINE */}
+            <View className="bg-zinc-900 rounded-2xl border border-white/10 p-5 items-center justify-center">
+              <Circular24hTimeline
+                segments={circularSegments}
+                totalDuration={totalDuration}
+                size={220}
+                strokeWidth={14}
+                isLoading={isLoadingFasts}
+                animated={true}
+              />
+            </View>
 
-        <View className="bg-zinc-900 rounded border border-white/10 p-4">
-          <View className="relative h-6 rounded-full overflow-hidden bg-primary/30 shadow shadow-primary">
-            {/* Grid 6h */}
-            <View
-              pointerEvents="none"
-              className="absolute top-0 bottom-0 left-1/4 w-px bg-white/5"
-            />
-
-            <View
-              pointerEvents="none"
-              className="absolute top-0 bottom-0 left-1/2 w-px bg-white/10"
-            />
-
-            <View
-              pointerEvents="none"
-              className="absolute top-0 bottom-0 left-3/4 w-px bg-white/5"
-            />
-
-            {/* Fasting segments */}
-            {timelineSegments.map((segment) => {
-              const leftPercent = (segment.startHour / 24) * 100;
-
-              const widthPercent = (segment.duration / 24) * 100;
-
-              return (
-                <View
-                  key={`${segment.fastId}-${segment.startHour}`}
-                  style={{
-                    left: `${clamp(leftPercent, 0, 100)}%`,
-                    width: `${clamp(widthPercent, 0, 100)}%`,
-                  }}
-                  className="absolute top-0 bottom-0 bg-primary justify-center overflow-hidden rounded-full"
-                >
-                  {widthPercent > 10 && (
-                    <Text
-                      numberOfLines={1}
-                      className="text-[9px] text-white/80 italic text-center"
-                    >
-                      {formatDuration(segment.duration)}
-                    </Text>
-                  )}
+            {/* DANH SÁCH PHIÊN LIÊN QUAN */}
+            {fastIds.length > 0 && (
+              <View>
+                <View className="flex-row items-center justify-between mb-2.5 px-1">
+                  <Text className="text-white text-xs font-semibold uppercase tracking-wider">
+                    Các phiên liên quan
+                  </Text>
+                  <Text className="text-zinc-500 text-xs">
+                    {fastIds.length} phiên
+                  </Text>
                 </View>
-              );
-            })}
 
-            {/* Loading overlay */}
-            {isLoadingFasts && (
-              <View className="absolute inset-0 bg-zinc-900/70 items-center justify-center">
-                <ActivityIndicator size="small" color="#34d399" />
+                <View className="gap-y-2">
+                  {log.map((item) => (
+                    <DailyFastSessionCard
+                      key={item.fast_id}
+                      fast={fastObj[item.fast_id] ?? null}
+                      dailyLog={item}
+                      // item={item}
+                    />
+                  ))}
+                </View>
               </View>
             )}
           </View>
+        )}
 
-          {/* Time labels */}
-          <View className="flex-row justify-between mt-2">
-            <Text className="text-zinc-600 text-[10px] font-mono">00:00</Text>
-
-            <Text className="text-zinc-600 text-[10px] font-mono">06:00</Text>
-
-            <Text className="text-zinc-600 text-[10px] font-mono">12:00</Text>
-
-            <Text className="text-zinc-600 text-[10px] font-mono">18:00</Text>
-
-            <Text className="text-zinc-600 text-[10px] font-mono">24:00</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* ========================================================= */}
-      {/* RELATED FASTS                                              */}
-      {/* ========================================================= */}
-
-      {fastIds.length > 0 && (
-        <View className="mt-5">
-          <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-white text-sm font-semibold">
-              Các phiên liên quan
-            </Text>
-
-            <Text className="text-zinc-600 text-xs">
-              {fastIds.length} phiên
-            </Text>
-          </View>
-
-          <View className="gap-y-2">
-            {fastIds.map((fastId) => {
-              const fast = fastObj[fastId];
-              const dailyLog = getLogForFast(fastId);
-
-              if (!fast) {
-                return (
-                  <View
-                    key={fastId}
-                    className="bg-zinc-900 rounded-xl border border-white/5 p-3"
-                  >
-                    <View className="flex-row items-center">
-                      <ActivityIndicator size="small" color="#71717a" />
-
-                      <Text className="text-zinc-500 text-xs ml-3">
-                        Đang tải phiên nhịn...
-                      </Text>
-                    </View>
-                  </View>
-                );
-              }
-
-              const start = new Date(fast.start_time);
-
-              const end = fast.end_time ? new Date(fast.end_time) : null;
-
-              const duration = dailyLog?.hours_in_fast ?? 0;
-
-              return (
-                <View
-                  key={fastId}
-                  className="bg-zinc-900 rounded-xl border border-white/5 p-3"
-                >
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center flex-1">
-                      <View className="w-2 h-2 rounded-full bg-emerald-400 mr-3" />
-
-                      <View>
-                        <Text className="text-white text-sm font-semibold">
-                          {formatHour(getHourInLocalDay(start))}
-
-                          {"  →  "}
-
-                          {end
-                            ? formatHour(getHourInLocalDay(end))
-                            : "Đang nhịn"}
-                        </Text>
-
-                        <Text className="text-zinc-600 text-[10px] mt-0.5">
-                          {`${getLocalTodayStr(start)} - ${end ? getLocalTodayStr(end) : "Now"}`}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View className="items-end ml-3">
-                      <Text className="text-emerald-400 text-sm font-bold">
-                        {formatDuration(duration)}
-                      </Text>
-
-                      <Text className="text-zinc-600 text-[10px]">
-                        {getRelativeTime(start, false)}
-                      </Text>
-                    </View>
-                  </View>
+        {/* ================= TAB 2: JOURNAL & METRICS ================= */}
+        {activeTab === "journal" && (
+          <View className="gap-y-4">
+            {/* CARD THÔNG SỐ SỨC KHỎE (CÂN NẶNG & MOOD) */}
+            <View className="flex-row items-center gap-x-3">
+              <View className="flex-1 bg-zinc-900 p-3.5 rounded-2xl border border-white/10 flex-row items-center justify-between">
+                <Text className="text-zinc-400 text-xs font-medium">
+                  Cân nặng
+                </Text>
+                <View className="flex-row items-baseline">
+                  <Text className="text-amber-400 text-lg font-bold">
+                    {weight ?? "--"}
+                  </Text>
+                  <Text className="text-zinc-500 text-xs ml-0.5">kg</Text>
                 </View>
-              );
-            })}
-          </View>
-        </View>
-      )}
+              </View>
+            </View>
 
-      {/* ========================================================= */}
-      {/* NOTE                                                        */}
-      {/* ========================================================= */}
+            {/* GHI CHÚ (NOTE) */}
+            <View className="bg-zinc-900 rounded-2xl border border-white/10 p-4">
+              <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-2.5">
+                Ghi chú trong ngày
+              </Text>
 
-      <View className="mt-5 bg-zinc-900 rounded-2xl border border-white/10 p-4">
-        <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-3">
-          Ghi chú
-        </Text>
+              {note?.note ? (
+                <Text className="text-zinc-200 text-sm leading-6">
+                  {note.note}
+                </Text>
+              ) : (
+                <View className="py-2">
+                  <Text className="text-zinc-600 text-sm italic">
+                    Chưa có ghi chú nào được thêm.
+                  </Text>
+                </View>
+              )}
+            </View>
 
-        {note?.note ? (
-          <Text className="text-zinc-200 text-sm leading-6">{note.note}</Text>
-        ) : (
-          <View className="py-2">
-            <Text className="text-zinc-600 text-sm italic">
-              Không có ghi chú nào cho ngày này.
-            </Text>
+            {/* HÌNH ẢNH (IMAGE) - Đã sửa lỗi h-screen */}
+            {note?.image_uri && (
+              <View className="bg-zinc-900 rounded-2xl border border-white/10 p-3">
+                <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-2.5 ml-1">
+                  Hình ảnh
+                </Text>
+
+                <View className="overflow-hidden rounded-xl bg-zinc-950">
+                  <Image
+                    source={{ uri: note.image_uri }}
+                    className="w-full aspect-9/16 rounded-xl"
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+            )}
           </View>
         )}
-      </View>
-
-      {/* ========================================================= */}
-      {/* IMAGE                                                       */}
-      {/* ========================================================= */}
-
-      {note?.image_uri && (
-        <View className="mt-4 h-screen">
-          <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-3">
-            Hình ảnh
-          </Text>
-
-          <View className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 px-3">
-            <Image
-              source={{ uri: note.image_uri }}
-              className="w-full aspect-9/16"
-              resizeMode="cover"
-            />
-          </View>
-        </View>
-      )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

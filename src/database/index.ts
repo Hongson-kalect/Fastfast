@@ -127,7 +127,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getThemes: () => getThemes(db),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
-  getCurrentWeight: () => getCurrentWeight(db),
+  getCurrentWeight: (date?: string) => getCurrentWeight(db,date),
   getWeightLogs: (days?: number) => getWeightLogs(db, days),
   updateWeight: (weight: number) => updateWeight(db, weight),
 
