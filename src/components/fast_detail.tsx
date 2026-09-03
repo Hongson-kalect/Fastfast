@@ -85,20 +85,20 @@ function Timeline({
   return (
     <View className="mt-5 bg-zinc-900 rounded-2xl border border-white/5 px-4 py-5">
       <View className="flex-row items-center">
-        <View className="absolute bottom-2 -left-4">
+        <View className="absolute bottom-3 -left-3">
           <Text
             style={{ color: color }}
-            className=" opaciry-70 text-sm font-bold"
+            className=" opaciry-70 text-xs font-semibold"
           >
-            {startDate.getHours().toString().padStart(2, "0")}
+            {startDate.getHours().toString()}h
           </Text>
         </View>
-        <View className="absolute bottom-2 -right-4">
+        <View className="absolute bottom-3 -right-3">
           <Text
             style={{ color: color }}
-            className=" opaciry-70 text-sm font-bold"
+            className=" opaciry-70 text-xs font-semibold"
           >
-            {endDate ? endDate.getHours().toString().padStart(2, "0") : "Now"}
+            {endDate ? endDate.getHours().toString() + "h" : "Now"}
           </Text>
         </View>
         <View className="flex-1 flex-row items-center h-[58px]">
@@ -124,7 +124,7 @@ function Timeline({
                   </Text>
                 </View>
                 <View
-                  className={`h-2.5 ${isStart ? "rounded-l-full" : isLast ? "rounded-r-full" : ""}`}
+                  className={`h-2.5 ${isStart && "rounded-l-full"} ${isLast && "rounded-r-full"}`}
                   style={{
                     backgroundColor: color,
                     opacity: index % 2 === 0 ? 1 : 0.68,
@@ -134,7 +134,7 @@ function Timeline({
                 />
                 <View className="absolute left-0 right-0 bottom-2 items-center">
                   <Text
-                    className="text-white/60 text-[10px] "
+                    className="text-text-base/40 text-[9px] font-light"
                     numberOfLines={1}
                   >
                     {formatDayDuration(part.hours_in_day)}

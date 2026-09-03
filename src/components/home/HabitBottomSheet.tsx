@@ -3,18 +3,13 @@ import { RETAIN_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeOutUp,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { HabitDetailModal } from "./HabitDetailModal";
 import Waterball from "./Waterball";
 
 export interface HabitLogItem {
@@ -437,8 +432,6 @@ type HabitLogComProps = {
 };
 const HabitLogComponent = ({ log }: HabitLogComProps) => {
   const { theme } = useAppStore();
-  const [expanded, setExpanded] = useState(false);
-  const rotateValue = useSharedValue(0);
   // Sửa dependency array cho useMemo
   const target = useMemo(() => {
     if (!log?.target_duration) {
@@ -537,14 +530,14 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
     );
   };
 
-  const toggleExpand = () => {
-    setExpanded((prev) => !prev);
-    rotateValue.value = withTiming(expanded ? 0 : 180, { duration: 250 });
-  };
+  const { addModal } = useModalStore();
 
-  const arrowStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotateValue.value}deg` }],
-  }));
+  const openHabitModal = () => {
+    addModal({
+      type: "custom",
+      render: <HabitDetailModal log={log} targetInfo={target} />,
+    });
+  };
 
   if (!log) return null;
 
@@ -559,7 +552,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
       {/* 1. HEADER (CLICK ĐỂ ĐÓNG/MỞ) */}
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={toggleExpand}
+        onPress={openHabitModal}
         className="p-3.5 flex-row justify-between items-center"
       >
         <View className="flex-row items-center gap-3 flex-1 pr-2">
@@ -633,100 +626,11 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
           </View>
 
           {/* Mũi tên xoay */}
-          <Animated.View style={arrowStyle} className="ml-1">
-            <Ionicons name="chevron-down" size={14} color="#71717A" />
-          </Animated.View>
+          <View className="ml-1">
+            <Ionicons name="chevron-forward" size={14} color="#71717A" />
+          </View>
         </View>
       </TouchableOpacity>
-
-      {/* 2. DETAIL EXPANDED PANEL (MỞ RA KHI BẤM) */}
-      {expanded && (
-        <Animated.View
-          entering={FadeInDown.duration(200)}
-          exiting={FadeOutUp.duration(150)}
-          className="px-3.5 pb-3.5 pt-2 border-t border-white/5 bg-black/20"
-        >
-          {/* Lưới thông số chi tiết (2 hàng 2 cột) */}
-          <View className="gap-3">
-            {/* Hàng 1: Thời gian Nhịn & Mục tiêu */}
-            <View className="flex-row justify-between items-center bg-zinc-800/40 p-2.5 rounded-lg">
-              <View>
-                <Text className="text-[10px] text-text-base/60">
-                  Thời gian nhịn
-                </Text>
-                <Text className="text-xs text-text-base/90 font-semibold mt-1">
-                  {getLocalTodayStr(log.start_time)} ➔{" "}
-                  {log.end_time
-                    ? getLocalTodayStr(log.end_time).slice(5)
-                    : "#####"}
-                </Text>
-              </View>
-
-              <View className="items-end">
-                <Text className="text-[10px] text-zinc-400">
-                  {!log.target_duration
-                    ? "Thời gian nhịn"
-                    : "Thực tế / Mục tiêu"}
-                </Text>
-                <View className="flex-row items-center gap-1.5 mt-1">
-                  <Text
-                    style={{
-                      color:
-                        isTargetSuccess !== null
-                          ? isTargetSuccess
-                            ? theme.success
-                            : theme.error
-                          : theme.primary,
-                    }}
-                    className="text-xs font-semibold"
-                  >
-                    {fixed(log.duration ? log.duration / 3600 : 0)}h
-                  </Text>
-                  {log.target_duration && (
-                    <Text
-                      style={{ color: target?.colors.accent }}
-                      className="text-xs font-semibold"
-                    >
-                      {`/ ${log.target_duration ?? 0}h`}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            {/* Hàng 2: Trạng thái Tích lũy (Habit Snap & Shield Retain) */}
-            <View className="flex-row justify-between items-center bg-zinc-800/40 p-2.5 rounded-lg">
-              <View className="item-center">
-                <Text className="text-[10px] text-zinc-400">Điểm Habit</Text>
-                <Text className="text-sm text-emerald-400 font-bold mt-1">
-                  {fixed(log.habit_snap ?? 0)}%
-                </Text>
-              </View>
-
-              <View className="items-center">
-                <Text className="text-[10px] text-zinc-400">Retain</Text>
-                <Text className="text-sm text-blue-400 font-bold mt-1">
-                  {fixed(log.habit_retain ?? 0)}%
-                </Text>
-              </View>
-
-              <View className="item-center">
-                <Text className="text-[10px] text-zinc-400">Số Khiên</Text>
-                <View className="items-center justify-center flex-row gap-1 mt-1">
-                  <FontAwesome5
-                    name="shield-alt"
-                    size={13}
-                    color={theme.primary}
-                  />
-                  <Text className="text-sm text-primary font-bold">
-                    {log.shield_snap ?? 0}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-      )}
     </View>
   );
 };
