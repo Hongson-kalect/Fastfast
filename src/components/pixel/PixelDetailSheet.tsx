@@ -291,7 +291,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
       {/* 2. TAB SWITCHER (Nút chuyển Tab) */}
       <View className="px-4 mt-3">
-        <View className="flex-row bg-zinc-900 p-1 rounded-xl border border-white/5">
+        <View className="flex-row gap-3 bg-zinc-900 p-1 rounded-xl border border-white/5">
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setActiveTab("fasting")}
@@ -368,8 +368,9 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
                 </View>
 
                 <View className="gap-y-2">
-                  {log.map((item) => (
+                  {log.map((item, index) => (
                     <DailyFastSessionCard
+                      index={index}
                       key={item.fast_id}
                       fast={fastObj[item.fast_id] ?? null}
                       dailyLog={item}

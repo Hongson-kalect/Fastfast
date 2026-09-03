@@ -4,13 +4,16 @@ import { DissectedDay } from "@/util/home/timespliter";
 import { formatHour, getLocalTodayStr } from "@/util/timer";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { FastDetail } from "../fast_detail";
+import { DEBUG_COLORS } from "./Circular24hTimeline";
 
 type DailyFastSessionCardProps = {
+  index?: number;
   fast: FastSession | null;
   dailyLog?: DailyLog | DissectedDay | null;
 };
 
 export function DailyFastSessionCard({
+  index,
   fast,
   dailyLog,
 }: DailyFastSessionCardProps) {
@@ -61,7 +64,11 @@ export function DailyFastSessionCard({
 
   const dateLabel = crossesDay ? `${startDate} → ${endDate}` : "Hôm nay";
 
-  const accentColor = isActive ? "#34D399" : isFailed ? "#FB7185" : "#71717A";
+  const accentColor = isActive
+    ? "#34D399"
+    : isFailed
+      ? "#FB7185"
+      : (DEBUG_COLORS[index ?? 0] ?? "#71717A");
 
   const progress =
     targetDurationHours > 0
@@ -125,19 +132,18 @@ export function DailyFastSessionCard({
 
         <View className="flex-row items-baseline mt-0.5">
           <Text
-            className={[
-              "text-2xl font-bold tracking-tight",
-              contributionHours > 0 ? "text-emerald-400" : "text-zinc-500",
-            ].join(" ")}
+            style={{ color: contributionHours > 0 ? accentColor : "#71717A" }}
+            className="text-2xl font-bold tracking-tight"
           >
             {contributionHours > 0 ? `+${contributionHours.toFixed(1)}` : "0"}
           </Text>
 
           <Text
-            className={[
-              "text-xs font-medium ml-1",
-              contributionHours > 0 ? "text-emerald-400/60" : "text-zinc-600",
-            ].join(" ")}
+            style={{
+              color: contributionHours > 0 ? accentColor : "#71717A",
+              opacity: 0.6,
+            }}
+            className="text-xs font-medium ml-1"
           >
             hours
           </Text>
@@ -148,12 +154,10 @@ export function DailyFastSessionCard({
           <View className="mt-3">
             <View className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <View
-                className={[
-                  "h-full rounded-full",
-                  isFailed ? "bg-rose-400/60" : "bg-emerald-400",
-                ].join(" ")}
+                className="h-full rounded-full"
                 style={{
                   width: `${progress * 100}%`,
+                  backgroundColor: isFailed ? "#FB7185" : accentColor,
                 }}
               />
             </View>

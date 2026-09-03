@@ -88,16 +88,14 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
-  finishLastSession: (
-    data: {
-      id: string,
-      endTime: number,
-      duration: number,
-      isValid: boolean,
-      profile?: UserProfile;
-      habitLog?: HabitLog;
-    }
-  ) => finishLastSession(db, data),
+  finishLastSession: (data: {
+    id: string;
+    endTime: number;
+    duration: number;
+    isValid: boolean;
+    profile?: UserProfile;
+    habitLog?: HabitLog;
+  }) => finishLastSession(db, data),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number, targetDuration?: number) =>
     startNewSession(db, startTime, targetDuration),
@@ -127,7 +125,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getThemes: () => getThemes(db),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
-  getCurrentWeight: (date?: string) => getCurrentWeight(db,date),
+  getCurrentWeight: (date?: string) => getCurrentWeight(db, date),
   getWeightLogs: (days?: number) => getWeightLogs(db, days),
   updateWeight: (weight: number) => updateWeight(db, weight),
 
@@ -146,7 +144,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getHabitLogs: () => getHabitLogs(db),
   addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
-  getShieldUsedLog:(year:number)=>getShieldUsedLog(db, year),
+  getShieldUsedLog: (year: number) => getShieldUsedLog(db, year),
 
   getPixelNoteData: (year: number) => getPixelNoteData(db, year),
   getPixelLogData: (year: number) => getPixelLogData(db, year),
@@ -262,7 +260,12 @@ export const handleLogin = async ({
 
   // Lần đầu vào app, khởi tạo streak_date
   if (!profile.streak_date) {
-    const returnProfile = await clearStreak(db, profile, 0, habitLog?.habit_snap || 0);
+    const returnProfile = await clearStreak(
+      db,
+      profile,
+      0,
+      habitLog?.habit_snap || 0,
+    );
     return { lastFast, profile: returnProfile, habitLog, streak: null };
   }
 
@@ -302,9 +305,12 @@ export const handleLogin = async ({
   // -------------------------------------------------------------
   let effectiveLastDate = profile.streak_date;
 
+  console.log(todayStr, profile.streak_date, lastFast);
+
   // Nếu đang có phiên Fast chưa kết thúc
   if (lastFast && !lastFast.end_time) {
-    const targetEndTime = lastFast.start_time + (lastFast.target_duration || 24) * 60 * 60 * 1000;
+    const targetEndTime =
+      lastFast.start_time + (lastFast.target_duration || 24) * 60 * 60 * 1000;
     const targetDayStr = getLocalTodayStr(new Date(targetEndTime));
 
     // Lấy mốc LỚN NHẤT giữa streak_date và targetDayStr
@@ -323,7 +329,7 @@ export const handleLogin = async ({
   // -------------------------------------------------------------
   // Khoảng cách từ Mốc Cuối Cùng Hợp Lệ -> Hôm Nay
   const diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
-  
+
   // Khoảng cách thực tế từ Streak Date cũ -> Hôm Nay (Dùng để cộng dồn Streak)
   const totalDaysFromStreakDate = getDaysDiff(profile.streak_date, todayStr);
 
@@ -336,7 +342,8 @@ export const handleLogin = async ({
 
     if (overRestDays > 0) {
       // Shield không đủ gánh -> Reset Streak
-      reduceHabitNumber = 5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
+      reduceHabitNumber =
+        5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
     } else {
       // Shield gánh thành công! Giữ Streak và cộng bù số ngày
       reduceShieldNumber = shieldNeed;
@@ -360,7 +367,7 @@ export const handleLogin = async ({
         db,
         profile,
         increaseStreakNumber,
-        reduceShieldNumber
+        reduceShieldNumber,
       );
       streakStat.streak.max = returnProfile?.max_streak || 0;
       streakStat.streak.current = returnProfile?.current_streak || 0;
@@ -377,7 +384,7 @@ export const handleLogin = async ({
         profile,
         reduceHabitNumber,
         habitLog?.shield_snap || 0,
-        habitLog?.habit_snap || 0
+        habitLog?.habit_snap || 0,
       );
 
       if (habitLog && reduceHabitNumber > 0) {
@@ -385,7 +392,7 @@ export const handleLogin = async ({
           db,
           habitLog,
           reduceHabitNumber,
-          overRestDays
+          overRestDays,
         );
         streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
         streakStat.shield.current = returnHabitLog?.shield_snap || 0;

@@ -58,6 +58,7 @@ function formatTimelineDate(date: string) {
   const [year, month, day] = date.split("-");
   return `${month}/${day}`;
 }
+
 function Timeline({
   start,
   end,
@@ -84,6 +85,22 @@ function Timeline({
   return (
     <View className="mt-5 bg-zinc-900 rounded-2xl border border-white/5 px-4 py-5">
       <View className="flex-row items-center">
+        <View className="absolute bottom-2 -left-4">
+          <Text
+            style={{ color: color }}
+            className=" opaciry-70 text-sm font-bold"
+          >
+            {startDate.getHours().toString().padStart(2, "0")}
+          </Text>
+        </View>
+        <View className="absolute bottom-2 -right-4">
+          <Text
+            style={{ color: color }}
+            className=" opaciry-70 text-sm font-bold"
+          >
+            {endDate ? endDate.getHours().toString().padStart(2, "0") : "Now"}
+          </Text>
+        </View>
         <View className="flex-1 flex-row items-center h-[58px]">
           {validParts.map((part, index) => {
             const ratio =
@@ -107,7 +124,7 @@ function Timeline({
                   </Text>
                 </View>
                 <View
-                  className={`h-2.5 ${isStart?"rounded-l-full":isLast?"rounded-r-full":""}`}
+                  className={`h-2.5 ${isStart ? "rounded-l-full" : isLast ? "rounded-r-full" : ""}`}
                   style={{
                     backgroundColor: color,
                     opacity: index % 2 === 0 ? 1 : 0.68,
@@ -115,9 +132,9 @@ function Timeline({
                     marginRight: isLast ? 0 : 3,
                   }}
                 />
-                <View className="absolute left-0 right-0 bottom-0 items-center">
+                <View className="absolute left-0 right-0 bottom-2 items-center">
                   <Text
-                    className="text-white text-[10px] font-bold"
+                    className="text-white/60 text-[10px] "
                     numberOfLines={1}
                   >
                     {formatDayDuration(part.hours_in_day)}
@@ -137,11 +154,6 @@ function Timeline({
             );
           })}
         </View>
-        {/* End node */}
-        <View
-          className="w-3 h-3 rounded-full border-[2px] bg-zinc-950 z-10"
-          style={{ borderColor: color }}
-        />
       </View>
     </View>
   );
@@ -316,39 +328,7 @@ export function FastDetail({ fast }: FastDetailProps) {
           </Text>
         </View>
       )}
-      <View className="mt-5">
-        <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-3">
-          Session
-        </Text>
 
-        <View className="bg-zinc-900 rounded-2xl border border-white/5 overflow-hidden">
-          <InfoRow
-            label="Started"
-            value={`${formatDate(start)} · ${formatTime(start)}`}
-          />
-
-          <InfoRow
-            label="Ended"
-            value={
-              end ? `${formatDate(end)} · ${formatTime(end)}` : "Đang nhịn"
-            }
-            accent={end ? undefined : "#34D399"}
-          />
-
-          <InfoRow
-            label="Duration"
-            value={formatDuration(durationHours)}
-            accent={targetColor}
-          />
-
-          <InfoRow
-            label="Target"
-            value={targetHours > 0 ? formatDuration(targetHours) : "—"}
-          />
-
-          <InfoRow label="Status" value={status} accent={statusColor} />
-        </View>
-      </View>
       {fast.rating && (
         <View className="mt-5">
           <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-3">

@@ -1,6 +1,7 @@
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { fixed } from "@/util/numberLimit";
 import {
   Feather,
   FontAwesome5,
@@ -205,7 +206,7 @@ export const StreakCheckModal = ({ data }: Props) => {
 
           <View className="my-1 items-center">
             <Text className="text-2xl font-black text-success">
-              {data.habit.currentPercent}%
+              {fixed(data.habit.currentPercent)}%
             </Text>
           </View>
 
@@ -220,7 +221,7 @@ export const StreakCheckModal = ({ data }: Props) => {
               {data.habit.currentPercent >= data.habit.previousPercent
                 ? "▲"
                 : "▼"}{" "}
-              {Math.abs(data.habit.currentPercent - data.habit.previousPercent)}
+              {fixed(Math.abs(data.habit.currentPercent - data.habit.previousPercent))}
               %
             </Text>
           ) : (
@@ -254,7 +255,7 @@ export const StreakCheckModal = ({ data }: Props) => {
               }`}
             >
               {data.retain.current >= data.retain.previous ? "+" : "-"}
-              {Math.abs(data.retain.current - data.retain.previous)} pts
+              {fixed(Math.abs(data.retain.current - data.retain.previous))} pts
             </Text>
           ) : (
             <Text className="mt-0.5 text-[8px] uppercase tracking-wide text-zinc-600">

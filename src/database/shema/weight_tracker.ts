@@ -28,6 +28,11 @@ export const getWeightLogs = async (
     `SELECT * FROM weight_logs WHERE log_date >= ?;`,
     [startDate],
   );
+
+  if (rows.length === 0) {
+    const lastWeight = await getCurrentWeight(db, startDate);
+    return lastWeight ? [lastWeight] : []; // Lấy last weight
+  }
   // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
   return rows;
 };

@@ -82,7 +82,7 @@ const DEFAULT_STROKE_WIDTH = 12;
 * Sau khi geometry ổn định có thể bỏ và dùng
 * một màu duy nhất.
   */
-const DEBUG_COLORS = [
+export const DEBUG_COLORS = [
   "#34D399", // emerald
   "#60A5FA", // blue
   "#F59E0B", // amber
@@ -124,43 +124,6 @@ UTILS
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
-/**
-
-* Chuyển polar coordinate sang SVG coordinate.
-*
-* Quy ước:
-*
-* 
-          0h
-  
-* 
-           │
-  
-* 
-           ▼
-  
-*
-* 
-   18h ─── ● ─── 6h
-  
-*
-* 
-           ▲
-  
-* 
-           │
-  
-* 
-          12h
-  
-*
-* Tức:
-*
-* 0deg   = 0h
-* 90deg  = 6h
-* 180deg = 12h
-* 270deg = 18h
-  */
 const polarToCartesian = (
   cx: number,
   cy: number,
@@ -384,13 +347,13 @@ const TimelineSegmentItem = React.memo(
       };
     });
 
-    const color = colors[index % colors.length];
+    const color = DEBUG_COLORS[index % colors.length];
 
     return (
       <AnimatedPath
         d={path}
         fill="none"
-        stroke={segment.color ?? "#34D399"}
+        stroke={color ?? segment.color ?? "#34D399"}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -501,7 +464,7 @@ export default function Circular24hTimeline({
   const anchors = [
     {
       hour: 0,
-      label: "00",
+      label: "24 | 00",
     },
     {
       hour: 6,

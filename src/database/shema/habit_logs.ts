@@ -2,7 +2,7 @@ import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
-import { numberLimit } from "./../../util/numberLimit";
+import { fixed, numberLimit } from "./../../util/numberLimit";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Habit Logs) để vẽ Chart và Grid
 export const generateString = /*sql*/ `
@@ -239,9 +239,9 @@ export const reduceHabit = async (
         today,
         null,
         -reduce,
-        Math.max(lastHabitLog.habit_snap - reduce, 0),
+        Math.max(fixed(lastHabitLog.habit_snap - reduce) , 0),
+        -lastHabitLog.shield_snap,
         0,
-        lastHabitLog.shield_snap,
         0,
         days,
       ],

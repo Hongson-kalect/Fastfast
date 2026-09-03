@@ -46,7 +46,6 @@ const DashboardScreen = () => {
   >(initChartData(chartType));
 
   const getWeightData = async () => {
-    console.log(chartDayRange);
     return dbService?.getWeightLogs(chartDayRange);
   };
 
@@ -97,6 +96,7 @@ const DashboardScreen = () => {
       const fasts = splitSessionIntoDays(
         currentFastSession.start_time,
         currentFastSession.end_time ?? Date.now(),
+        "fast_id",
       );
 
       fasts.forEach((fast) => {
@@ -115,7 +115,10 @@ const DashboardScreen = () => {
       weightsArr.push({
         key: item.key,
         x: item.x,
-        weight: (weightMap[item.key] ?? weightsArr[index - 1]?.weight) || null,
+        weight:
+          (weightMap[item.key] ?? weightsArr[index - 1]?.weight) ||
+          weights?.[0].weight ||
+          null, // case ngày có data nằm ngoài range => ngày đầu sẽ lấy last weight
         fast: Math.round(fastMap[item.key] ?? 0),
       }),
     );
