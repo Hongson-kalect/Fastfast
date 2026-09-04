@@ -30,6 +30,8 @@ const DelayModal = ({ onSubmit, isCounting }: Props) => {
     };
   });
 
+  console.log('nhảy modal ', Date.now());
+
   const [selectingTime, setSelectingTime] = useState(now.getTime());
   const [showPicker, setShowPicker] = useState(false);
 

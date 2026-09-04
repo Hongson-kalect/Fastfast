@@ -6,7 +6,7 @@ import { ListModal } from "@/components/modals/OptionModal";
 import { Portal, Provider } from "react-native-paper";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { GestureHandlerRootView, ScrollView, FlatList } from "react-native-gesture-handler";
 
 import { AppWrapper } from "@/components/AppWrapper";
 import { DATABASE_NAME, initDatabase } from "@/database";
@@ -22,6 +22,7 @@ import {
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 import ToastManager, { Toast } from 'toastify-react-native'
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ export default function TabLayout() {
               <Provider>
                 <LanguageProvider>
                   <BottomSheetProvider>
+                    <BottomSheetModalProvider>
                     <Suspense>
                       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
                         <AppWrapper>
@@ -49,6 +51,8 @@ export default function TabLayout() {
                         <ToastManager />
                       </SafeAreaProvider>
                     </Suspense>
+
+                    </BottomSheetModalProvider>
                   </BottomSheetProvider>
                   <Portal>
                     <ListModal />

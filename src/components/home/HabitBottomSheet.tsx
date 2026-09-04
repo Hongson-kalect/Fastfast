@@ -8,236 +8,18 @@ import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { HabitDetailModal } from "./HabitDetailModal";
 import Waterball from "./Waterball";
-
-export interface HabitLogItem {
-  id: string;
-  log_date: string; // 'YYYY-MM-DD'
-  fast_id: string | null;
-  type: "habit+" | "habit-" | "shield+" | "shield-";
-  habit_delta: number;
-  habit_snap: number;
-  habit_retain: number;
-  shield_delta: number;
-  shield_snap: number;
-
-  // Các trường thời gian bổ sung
-  start_time: number | null; // Unix Timestamp (seconds)
-  end_time: number | null; // Unix Timestamp (seconds)
-  target_duration: number | null; // Mục tiêu nhịn (Giờ, VD: 16.0)
-  duration: number | null; // Thời gian nhịn thực tế (Giờ, VD: 16.5)
-
-  is_deleted: number;
-  sync_status: "synced" | "pending";
-  description: string;
-  created_at: number;
-  updated_at: number;
-}
-
-export const MOCK_HABIT_LOGS: HabitLogItem[] = [
-  {
-    id: "log_001",
-    log_date: "2026-08-01",
-    fast_id: "fast_101",
-    type: "habit+",
-    habit_delta: 3.0,
-    habit_snap: 3.0,
-    habit_retain: 15.0,
-    shield_delta: 0,
-    shield_snap: 0,
-    start_time: 1785523200000, // 2026-07-31 18:00000
-    end_time: 1785582600000, // 2026-08-01 10:30000
-    target_duration: 16.0, // Mục tiêu 16h
-    duration: 16.5, // Thực tế 16.5h
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Hoàn thành 16:8 Fasting",
-    created_at: 1785580800,
-    updated_at: 1785580800,
-  },
-  {
-    id: "log_002",
-    log_date: "2026-08-02",
-    fast_id: "fast_102",
-    type: "habit+",
-    habit_delta: 3.5,
-    habit_snap: 6.5,
-    habit_retain: 50.0,
-    shield_delta: 0,
-    shield_snap: 0,
-    start_time: 1785602400000,
-    end_time: 1785667200000,
-    target_duration: 18.0,
-    duration: 18.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Hoàn thành 18:6 Fasting",
-    created_at: 1785667200,
-    updated_at: 1785667200,
-  },
-  {
-    id: "log_003",
-    log_date: "2026-08-03",
-    fast_id: "fast_103",
-    type: "shield+",
-    habit_delta: 4.0,
-    habit_snap: 10.5,
-    habit_retain: 0.0,
-    shield_delta: 1.0,
-    shield_snap: 1.0,
-    start_time: 1785680000000,
-    end_time: 1785753800000,
-    target_duration: 20.0,
-    duration: 20.5,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Đạt mốc 100% Retain -> Nhận Khiên bảo vệ",
-    created_at: 1785753600,
-    updated_at: 1785753600,
-  },
-  {
-    id: "log_004",
-    log_date: "2026-08-04",
-    fast_id: null,
-    type: "shield-",
-    habit_delta: 0.0,
-    habit_snap: 10.5,
-    habit_retain: 0.0,
-    shield_delta: -1.0,
-    shield_snap: 0.0,
-    start_time: null, // Dùng Shield do bỏ lỡ phiên nhị000n
-    end_time: null,
-    target_duration: null,
-    duration: null,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Nghỉ 1 ngày",
-    created_at: 1785840000,
-    updated_at: 1785840000,
-  },
-  {
-    id: "log_005",
-    log_date: "2026-08-05",
-    fast_id: "fast_104",
-    type: "habit+",
-    habit_delta: 3.2,
-    habit_snap: 13.7,
-    habit_retain: 30.0,
-    shield_delta: 0,
-    shield_snap: 0,
-    start_time: 1785868800000,
-    end_time: 1785927120000,
-    target_duration: 16.0,
-    duration: 16.2,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Hoàn thành 16:8 Fasting",
-    created_at: 1785926400,
-    updated_at: 1785926400,
-  },
-  {
-    id: "log_006",
-    log_date: "2026-08-06",
-    fast_id: "fast_105",
-    type: "habit+",
-    habit_delta: 5.0,
-    habit_snap: 18.7,
-    habit_retain: 85.0,
-    shield_delta: 0,
-    shield_snap: 0,
-    start_time: 1785926400000,
-    end_time: 1786012800000,
-    target_duration: 23.0,
-    duration: 24.1,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Hoàn thành OMAD 24H",
-    created_at: 1786012800,
-    updated_at: 1786012800,
-  },
-  {
-    id: "log_007",
-    log_date: "2026-08-07",
-    fast_id: "fast_106",
-    type: "shield+",
-    habit_delta: 3.0,
-    habit_snap: 21.7,
-    habit_retain: 10.0,
-    shield_delta: 1.0,
-    shield_snap: 1.0,
-    start_time: 1786041600000,
-    end_time: 1786099200000,
-    target_duration: 16.0,
-    duration: 16.0,
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "Đạt mốc phần thưởng -> Nhận Khiên",
-    created_at: 1786099200,
-    updated_at: 1786099200,
-  },
-  {
-    id: "log_008",
-    log_date: "2026-08-08",
-    fast_id: "fast_107",
-    type: "habit-",
-    habit_delta: -2.0,
-    habit_snap: 19.7,
-    habit_retain: 10.0,
-    shield_delta: 0,
-    shield_snap: 1.0,
-    start_time: 1786128000000,
-    end_time: 1786169400000,
-    target_duration: 16.0,
-    duration: 11.5, // Hủy sớm hơn mục tiêu
-    is_deleted: 0,
-    sync_status: "synced",
-    description: "1",
-    created_at: 1786185600,
-    updated_at: 1786185600,
-  },
-  {
-    id: "log_009",
-    log_date: "2026-08-09",
-    fast_id: "fast_108",
-    type: "habit+",
-    habit_delta: 4.5,
-    habit_snap: 24.2,
-    habit_retain: 55.0,
-    shield_delta: 0,
-    shield_snap: 1.0,
-    start_time: 1786200000000,
-    end_time: 1786272000000,
-    target_duration: 20.0,
-    duration: 20.0,
-    is_deleted: 0,
-    sync_status: "pending",
-    description: "Hoàn thành Warrior 20H",
-    created_at: 1786272000,
-    updated_at: 1786272000,
-  },
-  {
-    id: "log_010",
-    log_date: "2026-08-10",
-    fast_id: "fast_109",
-    type: "habit+",
-    habit_delta: 3.0,
-    habit_snap: 27.2,
-    habit_retain: 85.0,
-    shield_delta: 0,
-    shield_snap: 1.0,
-    start_time: 1786300800000,
-    end_time: 1786358400000,
-    target_duration: 16.0,
-    duration: 16.0,
-    is_deleted: 0,
-    sync_status: "pending",
-    description: "Hoàn thành 16:8 Fasting",
-    created_at: 1786358400,
-    updated_at: 1786358400,
-  },
-];
 
 interface HabitBottomSheetProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -245,10 +27,8 @@ interface HabitBottomSheetProps {
   onClose?: () => void;
 }
 
-const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
-  useEffect(() => {
-    console.log("show");
-  }, []);
+const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
+  const { addModal } = useModalStore();
   const [showAllHistory, setShowAllHistory] = useState(false);
   const { theme, userProfile, habit } = useAppStore();
   const dbService = useDBService();
@@ -287,8 +67,56 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
     getHabitLogs();
   }, []);
 
+  const [selectedLog, setSelectedLog] = useState<HabitLog & FastSession>();
+  const [logTarget, setLogTarget] = useState<(typeof FASTING_TARGETS)[0]>();
+
+  const handleSelectHabit = (
+    log: HabitLog & FastSession,
+    target?: (typeof FASTING_TARGETS)[0],
+  ) => {
+    addModal(<HabitDetailModal log={log} targetInfo={target} />);
+    // setSelectedLog(log);
+    // setLogTarget(target);
+  };
+
+  const { width, height } = useWindowDimensions();
+
   return (
     <View className="bg-[#121318] px-5 pt-4 pb-20 rounded-t-4xl w-full border-t border-white/10">
+      <Modal
+        visible={!!selectedLog}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedLog(undefined)}
+      >
+        <View className="flex-1 justify-center">
+          <Pressable
+            className="absolute inset-0 bg-gray-900/60"
+            onPress={() => setSelectedLog(undefined)}
+          />
+
+          <View className="px-5 max-h-[80%]">
+            <Animated.View
+              entering={FadeInDown}
+              exiting={FadeOutUp}
+              className="
+                overflow-hidden
+                rounded-2xl
+                py-1
+                border
+                border-text-base/60
+                shadow-lg
+                shadow-text-base/40
+                bg-gray-800
+              "
+            >
+              <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+                <HabitDetailModal log={selectedLog} targetInfo={logTarget} />
+              </ScrollView>
+            </Animated.View>
+          </View>
+        </View>
+      </Modal>
       {/* Handle bar */}
       {/* <View className="w-12 h-1.5 bg-zinc-700 rounded-full self-center mb-4 opacity-60" /> */}
 
@@ -311,7 +139,12 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
       </View>
 
       {/* 2. HERO: VÒNG TRÒN % Ở CHÍNH GIỮA */}
-      <View className="items-center my-3">
+      <TouchableOpacity
+        onPress={() => {
+          addModal({ type: "custom", render: <HabitDetailModal /> });
+        }}
+        className="items-center my-3"
+      >
         <Waterball
           percent={habitPercent}
           size={120}
@@ -324,7 +157,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
         <Text className="text-xs text-zinc-300 font-medium text-center mt-6 px-6">
           {getMotivationalText(habitPercent)}
         </Text>
-      </View>
+      </TouchableOpacity>
 
       {/* 3. THANH MILESTONE & SHIELD TRACK (Ở DƯỚI) */}
       <View className="bg-zinc-900/80 p-4 rounded-2xl border border-white/5 my-4">
@@ -409,10 +242,14 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
           <Text className="text-xs text-zinc-500">7 phiên</Text>
         </View>
 
-        <ScrollView className="">
+        <View className="">
           {habitLogs?.length ? (
             habitLogs.map((item) => (
-              <HabitLogComponent key={item.id} log={item} />
+              <HabitLogComponent
+                onPress={handleSelectHabit}
+                key={item.id}
+                log={item}
+              />
             ))
           ) : (
             <View className="mt-8 gap-3 items-center">
@@ -421,7 +258,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
               </Text>
             </View>
           )}
-        </ScrollView>
+        </View>
       </View>
     </View>
   );
@@ -429,8 +266,12 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = ({ onClose }) => {
 
 type HabitLogComProps = {
   log: HabitLog & FastSession;
+  onPress: (
+    log: HabitLog & FastSession,
+    target?: (typeof FASTING_TARGETS)[0],
+  ) => void;
 };
-const HabitLogComponent = ({ log }: HabitLogComProps) => {
+export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
   const { theme } = useAppStore();
   // Sửa dependency array cho useMemo
   const target = useMemo(() => {
@@ -445,7 +286,7 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
         return FASTING_TARGETS[dynamicTarget - 1];
       }
 
-      return null;
+      return undefined;
     }
     return FASTING_TARGETS.find(
       (item) => item.hours === Math.floor(log.target_duration),
@@ -531,11 +372,10 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
   };
 
   const { addModal } = useModalStore();
-
-  const openHabitModal = () => {
+  const showDetail = () => {
     addModal({
       type: "custom",
-      render: <HabitDetailModal log={log} targetInfo={target} />,
+      render: <HabitDetailModal />,
     });
   };
 
@@ -552,7 +392,8 @@ const HabitLogComponent = ({ log }: HabitLogComProps) => {
       {/* 1. HEADER (CLICK ĐỂ ĐÓNG/MỞ) */}
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={openHabitModal}
+        onPress={() => onPress(log, target)}
+        // onPress={showDetail}
         className="p-3.5 flex-row justify-between items-center"
       >
         <View className="flex-row items-center gap-3 flex-1 pr-2">

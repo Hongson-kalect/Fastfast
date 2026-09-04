@@ -18,6 +18,7 @@ const useModalStore = create<ModalProps>((set, get) => ({
   modalQueue: [],
 
   addModal: (modal) => {
+    console.log("add modal ", Date.now());
     if (!modal) return get().closeCurrentModal();
 
     set((state) => {
@@ -31,6 +32,10 @@ const useModalStore = create<ModalProps>((set, get) => ({
         currentModal: modal,
       };
     });
+
+    
+
+    console.log("add completed", Date.now());
   },
 
   closeCurrentModal: () => {
@@ -59,3 +64,5 @@ const useModalStore = create<ModalProps>((set, get) => ({
 }));
 
 export default useModalStore;
+
+

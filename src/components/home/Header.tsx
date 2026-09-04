@@ -1,26 +1,70 @@
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { Pressable, View } from "react-native";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { useMemo } from "react";
+import { Button, Dimensions, Pressable, View } from "react-native";
 import CircularProgress from "../circleProgress";
 import { ThemedText } from "../themed-text";
-import HabitBottomSheet from "./HabitBottomSheet";
 
 const radius = 50;
 const strokeWidth = 10;
 const circumference = 2 * Math.PI * radius;
-
+const NINETY_PERCENT_SCREEN_HEIGHT = 0.9;
 const progress = 0.75;
 
 const HomeHeader = () => {
   const { theme, settings, userProfile, habit } = useAppStore();
-  const { isPresent, present, close } = useBottomSheet();
+  const { show } = useBottomSheet();
+
+  const maxHeight = useMemo(
+    () => Dimensions.get("window").height * 0.5,
+    [0.3, 0.8],
+  );
 
   const openHabitModal = () => {
-    present({
-      render: () => <HabitBottomSheet />,
-      title: "",
-      size: "long",
-    });
+    console.log("Vừng mở ra");
+    show(
+      <BottomSheetScrollView style={{ padding: 20, maxHeight }}>
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+        <Button title="Hello" onPress={() => {}} />
+      </BottomSheetScrollView>,
+      {
+        snapPoints: ["40%", "80%"],
+      },
+    );
+    // present({
+    //   render: () => <HabitBottomFlatList />,
+    //   title: "",
+    //   scrollable: true,
+    //   size: "long",
+    // });
   };
   return (
     <View className="flex-row justify-between items-center">
