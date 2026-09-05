@@ -17,13 +17,13 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
-  currentFast: FastSession | null
+  currentFast: FastSession | null;
 }
 
 const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
-  const { close } = useBottomSheet();
   const dbService = useDBService();
   const { settings, updateSetting, theme } = useAppStore();
+  const { hide } = useBottomSheet();
   const { width } = useWindowDimensions();
   const [selectIndex, setSelectIndex] = useState(() => {
     const index = FASTING_TARGETS.findIndex(
@@ -48,21 +48,21 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
     if (onSelectTarget) onSelectTarget(selected);
 
     // Nếu đang có phiên hiện tại thì cập nhật target vào phiên
-    if(currentFast){
+    if (currentFast) {
       dbService.updateSessionTarget(currentFast.id, selected.hours);
     }
-    close();
+    hide();
   };
 
   const handleClearTarget = () => {
     updateSetting({ [settingKey.target]: null });
     dbService.setting(settingKey.target, null);
 
-    if(currentFast){
+    if (currentFast) {
       dbService.updateSessionTarget(currentFast.id, null);
     }
 
-    close();
+    hide();
   };
 
   const [isScrolling, setIsScrolling] = useState(false);
@@ -248,7 +248,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                     </Text>
 
                     <Pressable
-                      onPress={isCurrent ? close : handleSelect}
+                      onPress={isCurrent ? hide : handleSelect}
                       style={{
                         marginTop: 20,
                         backgroundColor: item.colors.accent,

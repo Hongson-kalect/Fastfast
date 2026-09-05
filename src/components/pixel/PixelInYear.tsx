@@ -185,7 +185,7 @@ const PixelGridManager = (props: Props) => {
     }
   };
 
-  const { present, close } = useBottomSheet();
+  const { present, hide } = useBottomSheet();
   useEffect(() => {
     if (selectedDate) {
       // show sheet
@@ -195,21 +195,19 @@ const PixelGridManager = (props: Props) => {
       console.log("props", logData, noteData);
 
       if (logData || noteData) {
-        present({
-          render: () => (
-            <PixelDetailSheet
-              dateString={selectedDate}
-              note={noteData}
-              log={logData}
-            />
-          ),
-          title: "",
-          size: "long",
-          onClose: () => {
-            setSelectedDate(null);
-            close();
+        present(
+          <PixelDetailSheet
+            dateString={selectedDate}
+            note={noteData}
+            log={logData}
+          />,
+          {
+            onClose: () => {
+              setSelectedDate(null);
+              hide();
+            },
           },
-        });
+        );
       } else {
         const shieldLogs = props.shieldLogs[selectedDate];
 

@@ -129,11 +129,7 @@ const WeightLineChart = ({
   }, [data, settings]);
 
   const openTimeRangeSheet = () => {
-    present({
-      title: "Time range",
-      size: "long",
-      render: () => <ChartRangeSheet />,
-    });
+    present(<ChartRangeSheet />);
   };
 
   const xPosition = useDerivedValue(() => {

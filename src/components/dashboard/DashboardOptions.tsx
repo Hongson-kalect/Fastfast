@@ -11,7 +11,7 @@ const DashboardOptions = () => {
   const { theme, updateWeight, settings, weight } = useAppStore();
   const dbService = useDBService();
   const { addModal } = useModalStore();
-  const { present, close } = useBottomSheet();
+  const { present, hide } = useBottomSheet();
 
   const openUpdateWeightModal = () => {
     addModal({
@@ -30,11 +30,7 @@ const DashboardOptions = () => {
   };
 
   const openTimeRangeSheet = () => {
-    present({
-      title: "Time range",
-      size: "long",
-      render: () => <ChartRangeSheet />,
-    });
+    present(<ChartRangeSheet />);
   };
 
   return (

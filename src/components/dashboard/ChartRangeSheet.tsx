@@ -13,7 +13,7 @@ interface Props {
 
 
 const ChartRangeSheet = ({ onSelectTarget }: Props) => {
-  const { close } = useBottomSheet();
+  const { hide } = useBottomSheet();
   const dbService = useDBService();
   const { theme, settings, updateSetting } = useAppStore();
   const [selectedRange, setSelectedRange] = useState<ChartRangeKey>(
@@ -26,7 +26,7 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
     dbService.setting("chart_range", key);
 
     if (onSelectTarget) onSelectTarget(key);
-    close();
+    hide();
   };
 
   return (

@@ -4,7 +4,7 @@ import { getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import { addHabitLogs, getLastHabitLog } from "./habit_logs";
-import { gainShield, getUserProfile, shield_rewards } from "./user";
+import { getUserProfile, shield_rewards } from "./user";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS fast_sessions (
 
 export const getFastSessions = async (
   db: SQLiteDatabase,
-): Promise<FastSession[] | null> => {
+): Promise<FastSession[]> => {
   const rows = await db.getAllAsync<FastSession>(
-    `SELECT * FROM fast_sessions;`,
+    `SELECT * FROM fast_sessions order by updated_at desc;`,
   );
   return rows;
 };
@@ -125,7 +125,10 @@ export const getLastFastSession = async (
   }
 };
 
-export const getFastSessionByIds = async(db: SQLiteDatabase, fast_ids: string[])=>{
+export const getFastSessionByIds = async (
+  db: SQLiteDatabase,
+  fast_ids: string[],
+) => {
   try {
     const rows = await db.getAllAsync<FastSession>(
       `SELECT * FROM fast_sessions WHERE id IN (${fast_ids.join(",")});`,
@@ -135,7 +138,7 @@ export const getFastSessionByIds = async(db: SQLiteDatabase, fast_ids: string[])
     console.log("error on getFastSessionByIds", e);
     return null;
   }
-}
+};
 
 export const getYearFastSession = async (
   db: SQLiteDatabase,
@@ -154,22 +157,22 @@ export const getYearFastSession = async (
 
 export const finishLastSession = async (
   db: SQLiteDatabase,
-  data:{
-    id: string,
-    endTime: number,
-    duration: number,
-    isValid: boolean,
+  data: {
+    id: string;
+    endTime: number;
+    duration: number;
+    isValid: boolean;
     profile?: UserProfile;
     habitLog?: HabitLog;
-  }
+  },
 ) => {
   try {
     const { id, endTime, duration, isValid, profile, habitLog } = data;
     let result = {
-    lastSession: null as FastSession | null,
-    habitLog: null as HabitLog | null,
-    profile: null as UserProfile | null,
-  };
+      lastSession: null as FastSession | null,
+      habitLog: null as HabitLog | null,
+      profile: null as UserProfile | null,
+    };
     await db.withTransactionAsync(async () => {
       // 1. Nếu Session INVALID -> Update Failed & Return ngay
       if (!isValid) {
@@ -181,37 +184,35 @@ export const finishLastSession = async (
           `SELECT * FROM fast_sessions WHERE id = ?;`,
           [id],
         );
-        const currentProfile = profile || await getUserProfile(db);
-        const currentHabit = habitLog || await getLastHabitLog(db); // Hàm helper lấy habit mới nhất của bạn
+        const currentProfile = profile || (await getUserProfile(db));
+        const currentHabit = habitLog || (await getLastHabitLog(db)); // Hàm helper lấy habit mới nhất của bạn
 
         result = {
           lastSession: failedSession,
           habitLog: currentHabit,
           profile: currentProfile,
         };
-      }
-      else{
-
+      } else {
         // 2. Lấy Old Habit & Old Profile
         const oldProfile = await getUserProfile(db);
         const oldHabitLog = await getLastHabitLog(db);
         if (!oldProfile) throw new Error("UserProfile not found");
-  
+
         // 3. Tính toán Habit Delta & Shield từ Session
         const hours = duration / 3600;
         const habitDelta = fixed(3.0 + (hours - 16) * 0.2);
         const sessionShieldGain = Math.max(0, Math.floor(hours / 24) - 1);
-  
+
         // Dự tính Habit Score mới để check Milestone
         const oldHabitScore = oldHabitLog?.habit_snap || 0; // Hoặc lấy từ habit log cũ
         const newHabitScore = fixed(oldHabitScore + habitDelta);
-  
+
         // 4. Check Shield Milestone từ Habit Score mới
         let milestoneShieldGain = 0;
         let lowClaimable = oldProfile.low_shield_clamable;
         let midClaimable = oldProfile.mid_shield_clamable;
         let fullClaimable = oldProfile.full_shield_clamable;
-  
+
         if (newHabitScore >= shield_rewards[0] && lowClaimable) {
           milestoneShieldGain += 1;
           lowClaimable = 0;
@@ -224,15 +225,15 @@ export const finishLastSession = async (
           milestoneShieldGain += 1;
           fullClaimable = 0;
         }
-  
+
         const totalShieldGain = sessionShieldGain + milestoneShieldGain;
-  
+
         // 5. UPDATE FAST SESSION
         await db.runAsync(
           `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'completed' WHERE id = ?;`,
           [endTime, duration, id],
         );
-  
+
         // 6. ADD NEW HABIT LOG (Chỉ Insert 1 lần duy nhất chứa tổng Delta & Milestone)
         const newHabitLog = await addHabitLogs(db, {
           fast_id: id,
@@ -242,7 +243,7 @@ export const finishLastSession = async (
           shield_milestone: milestoneShieldGain,
           habit_snap: newHabitScore,
         });
-  
+
         // 7. UPDATE USER PROFILE
         await db.runAsync(
           `UPDATE user_profile 
@@ -260,24 +261,23 @@ export const finishLastSession = async (
             oldProfile.id,
           ],
         );
-  
+
         // 8. Lấy dữ liệu mới nhất trả về
         const updatedSession = await db.getFirstAsync<FastSession>(
           `SELECT * FROM fast_sessions WHERE id = ?;`,
           [id],
         );
         const updatedProfile = await getUserProfile(db);
-  
+
         result = {
           lastSession: updatedSession,
           habitLog: newHabitLog,
           profile: updatedProfile,
         };
       }
-
     });
 
-    return result
+    return result;
   } catch (error) {
     console.error("error on finishLastSession:", error);
     return {

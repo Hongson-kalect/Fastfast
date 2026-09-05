@@ -418,12 +418,17 @@ export function getProcessLevelTitle(
 }
 
 // data/emotions.ts
-export const EMOTIONS: { level: MoodLevel; emoji: string; label: string, color: string }[] = [
-  { level: 0, emoji: "😫", label: "Exhausted",color: "#6E2020" },
-  { level: 1, emoji: "😮‍💨", label: "Neutral",color: "#874D14" },
-  { level: 2, emoji: "🙂", label: "Good",color: "#3A3F47" },
-  { level: 3, emoji: "😃", label: "Focused",color: "#1A5C70" },
-  { level: 4, emoji: "🥰", label: "Peak",color: "#2E6930" },
+export const EMOTIONS: {
+  level: MoodLevel;
+  emoji: string;
+  label: string;
+  color: string;
+}[] = [
+  { level: 0, emoji: "😫", label: "Exhausted", color: "#6E2020" },
+  { level: 1, emoji: "😮‍💨", label: "Neutral", color: "#874D14" },
+  { level: 2, emoji: "🙂", label: "Good", color: "#3A3F47" },
+  { level: 3, emoji: "😃", label: "Focused", color: "#1A5C70" },
+  { level: 4, emoji: "🥰", label: "Peak", color: "#2E6930" },
 ];
 
 export interface FastingTargetItem {
@@ -586,6 +591,14 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     },
   },
 ];
+
+export const getTarget = (fastHour: number) => {
+  return FASTING_TARGETS.find(
+    (item) =>
+      fastHour >= item.hours &&
+      (item.toHours == null || fastHour < item.toHours),
+  );
+};
 
 export interface FastingStatusInfo {
   minHours: number;

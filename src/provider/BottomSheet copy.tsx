@@ -152,7 +152,6 @@ export const BottomSheetProvider = ({
     if (!isPresent) {
       return;
     }
-
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
@@ -160,7 +159,6 @@ export const BottomSheetProvider = ({
         return true;
       },
     );
-
     return () => {
       subscription.remove();
     };

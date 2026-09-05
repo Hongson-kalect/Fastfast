@@ -6,6 +6,7 @@ import { SwapButton } from "@/components/home/SwapButton";
 import HomeTimeCounter from "@/components/home/TimeCounter";
 import { SHIELD_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
+import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
@@ -34,7 +35,7 @@ const HomeScreen = () => {
   );
 
   const { addModal, modalQueue } = useModalStore();
-  const { close } = useBottomSheet();
+  const { hide } = useBottomSheet();
   const dbService = useDBService();
 
   const [isCounting, setIsCounting] = useState(
@@ -79,8 +80,6 @@ const HomeScreen = () => {
       message = "You not reach the target, are you sure to finish?";
     }
 
-    console.log("modalQueue", modalQueue);
-
     addModal({
       type: "confirm",
       title: "Finish",
@@ -91,7 +90,7 @@ const HomeScreen = () => {
         setIsCounting(!isCounting);
         setCounter(0);
         // Lấy thời gian, nếu nhỏ hơn x thì cho thành false nếu thời gian > 2 tiếng hoặc xóa luôn nếu dưới
-        close();
+        hide();
 
         console.log("current ", currentFastSession.id);
 
@@ -209,7 +208,7 @@ const HomeScreen = () => {
             profile: userProfile || undefined,
             habitLog: habit || undefined,
           });
-        close();
+        hide();
         if (habitLog && userProfile) {
           updateProfile({
             ...userProfile,
@@ -280,6 +279,16 @@ const HomeScreen = () => {
     setCounter(Math.abs(now - startTime));
   };
 
+  const [fastHistory, setFastHistory] = useState<FastSession[]>([]);
+  const getHabitLogs = async () => {
+    const res = await dbService?.getFastSessions();
+    setFastHistory(res);
+  };
+
+  useEffect(() => {
+    getHabitLogs();
+  }, []);
+
   useEffect(() => {
     let interval = undefined;
     if (!isCounting) {
@@ -303,10 +312,11 @@ const HomeScreen = () => {
         <ScrollView keyboardShouldPersistTaps="handled">
           <View className="px-3">
             <HomeHeader />
-            <View className="py-4 mt-4">
+            <View className="pt-4 pb-2 mt-4">
               <HomeTimeCounter
                 cancelFasting={cancelFasting}
                 finishFasting={finishFast}
+                fastHistory={fastHistory}
                 isCounting={isCounting}
                 counter={counter}
                 currentFast={currentFastSession}

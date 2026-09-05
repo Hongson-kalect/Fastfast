@@ -319,7 +319,7 @@ export const handleLogin = async ({
     }
 
     // Nếu thời gian hiện tại đã vượt quá targetDayStr ít nhất 1 ngày -> Cần chốt phiên Fast cũ
-    if (todayStr > targetDayStr) {
+    if (todayStr > effectiveLastDate) {
       isFastFail = true;
     }
   }

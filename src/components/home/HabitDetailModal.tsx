@@ -45,8 +45,8 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
   }, [currentModal]);
 
   return (
-    <View className="w-full p-4 pb-8 rounded-t-3xl">
-      <Pressable onPress={(e) => e.stopPropagation()} className="bg-gray-800">
+    <View className="w-full">
+      <Pressable onPress={(e) => e.stopPropagation()}>
         {/* ---------------------------------------------------- */}
         {/* PHẦN 1: THÔNG SỐ HABIT (LUÔN HIỂN THỊ Ở ĐẦU)          */}
         {/* ---------------------------------------------------- */}

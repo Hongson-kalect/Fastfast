@@ -1,4 +1,4 @@
-import { FASTING_TARGETS } from "@/constants/data";
+import { FASTING_TARGETS, getTarget } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { useMemo } from "react";
@@ -43,14 +43,6 @@ const formatSignedDuration = (hours: number) => {
   return `+${formatDuration(hours)}`;
 };
 
-const getTarget = (targetHours: number) => {
-  return FASTING_TARGETS.find(
-    (item) =>
-      targetHours >= item.hours &&
-      (item.toHours == null || targetHours < item.toHours),
-  );
-};
-
 function formatDayDuration(hours: number) {
   return `${Number(hours.toFixed(1))}h`;
 }
@@ -83,7 +75,7 @@ function Timeline({
   const startDate = new Date(start);
   const endDate = end ? new Date(end) : null;
   return (
-    <View className="mt-5 bg-zinc-900 rounded-2xl border border-white/5 px-4 py-5">
+    <View className="m3-5 bg-zinc-900 rounded-2xl border border-white/5 px-4 py-2">
       <View className="flex-row items-center">
         <View className="absolute bottom-3 -left-3">
           <Text
@@ -184,15 +176,7 @@ function InfoRow({
 }
 
 export function FastDetail({ fast }: FastDetailProps) {
-  const start = useMemo(() => new Date(fast.start_time), [fast.start_time]);
-
-  const end = useMemo(
-    () => (fast.end_time ? new Date(fast.end_time) : null),
-    [fast.end_time],
-  );
-
   const durationHours = fast.duration / S_PER_HOUR;
-
   const targetHours = fast.target_duration;
 
   const target = useMemo(() => getTarget(targetHours), [targetHours]);
@@ -202,101 +186,104 @@ export function FastDetail({ fast }: FastDetailProps) {
   const progress = targetHours > 0 ? durationHours / targetHours : 0;
 
   const percent = Math.round(progress * 100);
-
   const reached = durationHours >= targetHours;
 
+  
   const status =
-    fast.status === "active"
-      ? "Đang nhịn"
-      : reached
-        ? "Đã đạt mục tiêu"
-        : "Chưa đạt mục tiêu";
-
+  fast?.status==='failed'?'Bị Hủy':
+  !fast?.end_time
+  ? "Đang nhịn"
+  : reached
+  ? "Đã đạt mục tiêu"
+  : "Chưa đạt mục tiêu";
+  
   const statusColor =
     fast.status === "active" ? "#34D399" : reached ? targetColor : "#FB7185";
 
   const difference = Math.abs(durationHours - targetHours);
 
-  const parts = splitSessionIntoDays(
-    fast.start_time,
-    fast.end_time || Date.now(),
-    fast.id,
-  );
-
   return (
-    <View>
-      <View className="items-center pt-2">
-        {target && (
-          <View
-            className="flex-row items-center px-3 py-1.5 rounded-full"
-            style={{
-              backgroundColor: target.colors.badgeBg,
-            }}
-          >
-            <Text className="text-base mr-1.5">{target.emoji} </Text>
-            <Text
-              className="text-[10px] font-bold uppercase tracking-wider"
+    <View className="pb-2">
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-1 pt-1">
+        {/* Left */}
+        <View className="flex-1 mr-4">
+          {target && (
+            <View
+              className="self-start flex-row items-center px-2.5 py-1 rounded-full"
               style={{
-                color: target.colors.badgeText,
+                backgroundColor: target.colors.badgeBg,
               }}
             >
-              {target.label}
-            </Text>
-          </View>
-        )}
+              <Text className="text-sm mr-1">{target.emoji}</Text>
 
-        <Text className="text-white text-4xl font-bold tracking-tight mt-3">
+              <Text
+                className="text-[9px] font-bold uppercase tracking-wider"
+                style={{
+                  color: target.colors.badgeText,
+                }}
+              >
+                {target.label}
+              </Text>
+            </View>
+          )}
+
+          <Text
+            className="text-xs font-semibold mt-2"
+            style={{ color: statusColor }}
+          >
+            {status}
+          </Text>
+        </View>
+
+        {/* Duration */}
+        <Text className="text-white text-4xl font-bold tracking-tight">
           {formatDuration(durationHours)}
         </Text>
-
-        <Text
-          className="text-xs font-semibold mt-1"
-          style={{ color: statusColor }}
-        >
-          {status}
-        </Text>
       </View>
-      <Timeline
-        start={fast.start_time}
-        end={fast.end_time}
-        durationHours={durationHours}
-        color={targetColor}
-      />
+
+      {/* Timeline */}
+      <View className="mt-3">
+        <Timeline
+          start={fast.start_time}
+          end={fast.end_time}
+          durationHours={durationHours}
+          color={targetColor}
+        />
+      </View>
+
+      {/* Target */}
       {target && (
         <View
-          className="mt-4 rounded-2xl border p-4"
+          className="mt-3 rounded-2xl border px-4 py-3"
           style={{
             borderColor: `${targetColor}25`,
             backgroundColor: `${targetColor}08`,
           }}
         >
+          {/* Target header */}
           <View className="flex-row items-center justify-between">
-            <View className="flex-1">
+            <View className="flex-1 mr-3">
               <Text
                 className="text-sm font-bold"
-                style={{
-                  color: targetColor,
-                }}
+                style={{ color: targetColor }}
+                numberOfLines={1}
               >
                 {target.title}
               </Text>
 
-              <Text className="text-zinc-500 text-[10px] mt-1">
+              <Text className="text-zinc-600 text-[10px] mt-0.5">
                 {target.hours}h target
               </Text>
             </View>
 
-            <Text
-              className="text-xl font-bold"
-              style={{
-                color: targetColor,
-              }}
-            >
+            <Text className="text-lg font-bold" style={{ color: targetColor }}>
               {percent}%
             </Text>
           </View>
 
-          <View className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
+          {/* Progress */}
+          <View className="h-1.5 bg-zinc-900 rounded-full overflow-hidden mt-3">
             <View
               className="h-full rounded-full"
               style={{
@@ -306,16 +293,15 @@ export function FastDetail({ fast }: FastDetailProps) {
             />
           </View>
 
-          <View className="flex-row justify-between mt-2">
+          {/* Progress labels */}
+          <View className="flex-row justify-between mt-1.5">
             <Text className="text-zinc-600 text-[10px]">
               {formatDuration(durationHours)}
             </Text>
 
             <Text
               className="text-[10px] font-medium"
-              style={{
-                color: targetColor,
-              }}
+              style={{ color: targetColor }}
             >
               {reached
                 ? `Vượt ${formatSignedDuration(difference)}`
@@ -323,21 +309,22 @@ export function FastDetail({ fast }: FastDetailProps) {
             </Text>
           </View>
 
-          <Text className="text-zinc-500 text-xs leading-5 mt-4">
+          <Text className="text-zinc-500 text-[11px] leading-4 mt-3">
             {target.description}
           </Text>
         </View>
       )}
 
+      {/* Rating */}
       {fast.rating && (
-        <View className="mt-5">
-          <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-3">
+        <View className="mt-4">
+          <Text className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[1.5px] mb-2">
             Rating
           </Text>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-4">
+          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-3">
             <View className="flex-row items-center">
-              <Text className="text-2xl mr-3">
+              <Text className="text-xl mr-3">
                 {fast.rating === "Excellent"
                   ? "🏆"
                   : fast.rating === "Good"
@@ -358,31 +345,38 @@ export function FastDetail({ fast }: FastDetailProps) {
           </View>
         </View>
       )}
+
+      {/* About target */}
       {target && (
-        <View className="mt-5">
-          <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-3">
+        <View className="mt-4">
+          <Text className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[1.5px] mb-2">
             About this target
           </Text>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-4">
+          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-3">
             <Text className="text-white text-sm font-semibold">
               {target.title}
             </Text>
 
-            <Text className="text-zinc-500 text-xs leading-5 mt-2">
+            <Text className="text-zinc-500 text-[11px] leading-4 mt-1.5">
               {target.adviceLong}
             </Text>
           </View>
         </View>
       )}
+
+      {/* Home data */}
       {fast.home_data_snapshot && (
-        <View className="mt-5">
-          <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-[1.5px] mb-3">
+        <View className="mt-4">
+          <Text className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[1.5px] mb-2">
             Home data
           </Text>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-4">
-            <Text className="text-zinc-500 text-xs leading-5" numberOfLines={8}>
+          <View className="bg-zinc-900 rounded-2xl border border-white/5 px-4 py-3">
+            <Text
+              className="text-zinc-500 text-[11px] leading-4"
+              numberOfLines={6}
+            >
               {fast.home_data_snapshot}
             </Text>
           </View>

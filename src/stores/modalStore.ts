@@ -32,9 +32,6 @@ const useModalStore = create<ModalProps>((set, get) => ({
         currentModal: modal,
       };
     });
-
-    
-
     console.log("add completed", Date.now());
   },
 

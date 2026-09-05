@@ -2,6 +2,7 @@ import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import {
   BlurMask,
   Canvas,
@@ -12,7 +13,7 @@ import {
   vec,
 } from "@shopify/react-native-skia";
 import { useEffect, useMemo, useState } from "react";
-import { LayoutChangeEvent, Pressable, View } from "react-native";
+import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 import {
   cancelAnimation,
   Easing,
@@ -21,8 +22,10 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { FastDetail } from "../fast_detail";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
+import FastHistoryHeader, { FastHistoryItem } from "./FastHistorySheet";
 import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
 
@@ -30,6 +33,7 @@ type Props = {
   isCounting: boolean;
   counter: number;
   currentFast: FastSession | null;
+  fastHistory: FastSession[];
   finishFasting: () => void;
   cancelFasting: () => void;
 };
@@ -45,6 +49,7 @@ const HomeTimeCounter = ({
   isCounting,
   counter,
   currentFast,
+  fastHistory,
   finishFasting,
   cancelFasting,
 }: Props) => {
@@ -128,7 +133,7 @@ const HomeTimeCounter = ({
     return matrix;
   }); // KHÔNG truyền mảng [rotation] ở đây nữa!
 
-  const { isPresent, present, close } = useBottomSheet();
+  const { present, hide } = useBottomSheet();
 
   const currentTarget = useMemo(() => {
     return settings?.target
@@ -141,16 +146,11 @@ const HomeTimeCounter = ({
   }, [currentTarget]);
 
   const openTargetSheet = () => {
-    present({
-      render: () => <TargetSheet currentFast={currentFast} />,
-      title: "",
-      onClose: () => close(),
-      size: "long",
-    });
+    present(<TargetSheet currentFast={currentFast} />);
   };
 
   const changeTarget = () => {
-    close();
+    hide();
 
     setTimeout(() => {
       openTargetSheet();
@@ -159,23 +159,51 @@ const HomeTimeCounter = ({
 
   const openFastingSheet = () => {
     if (currentTarget && currentFast)
-      present({
-        render: () => (
-          <FastingSheet
-            counter={counter}
-            fastTarget={currentTarget}
-            currentFast={currentFast}
-            onStopFasting={finishFasting}
-            onCancelFasting={cancelFasting}
-            onChangeTarget={changeTarget}
-          />
-        ),
-        title: "Fasting",
-        onClose: () => close(),
-        size: "long",
-      });
+      present(
+        <FastingSheet
+          counter={counter}
+          fastTarget={currentTarget}
+          currentFast={currentFast}
+          onStopFasting={finishFasting}
+          onCancelFasting={cancelFasting}
+          onChangeTarget={changeTarget}
+        />,
+      );
     else openTargetSheet();
   };
+
+  const [selectedHistory, setSelectedHistory] = useState<FastSession | null>(
+    null,
+  );
+
+  const showHistory = () => {
+    present(<FastHistoryHeader data={fastHistory} />, {
+      list: {
+        data: fastHistory,
+        renderItem: ({ item }) => (
+          <View className="px-2">
+            <FastHistoryItem
+              item={item}
+              onPress={() => setSelectedHistory(item)}
+            />
+          </View>
+        ),
+        keyExtractor: (item) => item.id,
+        contentContainerStyle: {
+          gap: 2,
+        },
+      },
+    });
+  };
+
+  const { addModal } = useModalStore();
+  useEffect(() => {
+    if (selectedHistory)
+      addModal({
+        type: "custom",
+        render: <FastDetail fast={selectedHistory} />,
+      });
+  }, [selectedHistory]);
 
   return (
     <View className="items-center justify-center">
@@ -330,9 +358,17 @@ const HomeTimeCounter = ({
         </View>
       )}
 
-      <ThemedText type="small" className="mt-4">
-        {/* You're doing great, keep it up */}
-      </ThemedText>
+      <View className="w-full pt-3 items-center justify-center">
+        <Pressable onPress={showHistory} hitSlop={10}>
+          <Text className="text-text-base/60 text-sm underline">
+            Fast History
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* <ThemedText type="small" className="mt-4"> */}
+      {/* You're doing great, keep it up */}
+      {/* </ThemedText> */}
     </View>
   );
 };

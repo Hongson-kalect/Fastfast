@@ -63,8 +63,7 @@ export const GoalCard = () => {
   const remaining = useMemo(() => {
     if (!activeTarget || !weight) return 0;
     return (weight - activeTarget.target_weight).toFixed(1);
-  }, []);
-  const { present, close } = useBottomSheet();
+  }, []);;
 
   const openSetWeightModal = () => {
     addModal({

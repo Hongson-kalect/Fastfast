@@ -7,17 +7,13 @@ import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  Modal,
-  Pressable,
-  ScrollView,
   Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { HabitDetailModal } from "./HabitDetailModal";
 import Waterball from "./Waterball";
 
@@ -56,17 +52,6 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
     return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
   };
 
-  const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
-
-  const getHabitLogs = async () => {
-    const res = await dbService?.getHabitLogs();
-    setHabitLogs(res);
-  };
-
-  useEffect(() => {
-    getHabitLogs();
-  }, []);
-
   const [selectedLog, setSelectedLog] = useState<HabitLog & FastSession>();
   const [logTarget, setLogTarget] = useState<(typeof FASTING_TARGETS)[0]>();
 
@@ -74,7 +59,6 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
     log: HabitLog & FastSession,
     target?: (typeof FASTING_TARGETS)[0],
   ) => {
-    addModal(<HabitDetailModal log={log} targetInfo={target} />);
     // setSelectedLog(log);
     // setLogTarget(target);
   };
@@ -82,44 +66,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
   const { width, height } = useWindowDimensions();
 
   return (
-    <View className="bg-[#121318] px-5 pt-4 pb-20 rounded-t-4xl w-full border-t border-white/10">
-      <Modal
-        visible={!!selectedLog}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setSelectedLog(undefined)}
-      >
-        <View className="flex-1 justify-center">
-          <Pressable
-            className="absolute inset-0 bg-gray-900/60"
-            onPress={() => setSelectedLog(undefined)}
-          />
-
-          <View className="px-5 max-h-[80%]">
-            <Animated.View
-              entering={FadeInDown}
-              exiting={FadeOutUp}
-              className="
-                overflow-hidden
-                rounded-2xl
-                py-1
-                border
-                border-text-base/60
-                shadow-lg
-                shadow-text-base/40
-                bg-gray-800
-              "
-            >
-              <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-                <HabitDetailModal log={selectedLog} targetInfo={logTarget} />
-              </ScrollView>
-            </Animated.View>
-          </View>
-        </View>
-      </Modal>
-      {/* Handle bar */}
-      {/* <View className="w-12 h-1.5 bg-zinc-700 rounded-full self-center mb-4 opacity-60" /> */}
-
+    <View className="bg-[#121318] px-5 py-4 rounded-t-4xl w-full border-t border-white/10">
       {/* 1. HEADER SHEET */}
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-row items-center gap-2">
@@ -239,25 +186,6 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
           <Text className="text-sm font-bold text-zinc-300">
             Lịch sử phiên gần đây
           </Text>
-          <Text className="text-xs text-zinc-500">7 phiên</Text>
-        </View>
-
-        <View className="">
-          {habitLogs?.length ? (
-            habitLogs.map((item) => (
-              <HabitLogComponent
-                onPress={handleSelectHabit}
-                key={item.id}
-                log={item}
-              />
-            ))
-          ) : (
-            <View className="mt-8 gap-3 items-center">
-              <Text className="italic text-text-base/40">
-                Chưa có lịch sử phiên gần đây
-              </Text>
-            </View>
-          )}
         </View>
       </View>
     </View>
@@ -273,148 +201,164 @@ type HabitLogComProps = {
 };
 export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
   const { theme } = useAppStore();
-  // Sửa dependency array cho useMemo
-  const target = useMemo(() => {
-    if (!log?.target_duration) {
-      if (log.duration) {
-        const dynamicTarget = FASTING_TARGETS.findIndex(
-          (item) => item.hours >= log.duration / 3600,
-        );
-
-        if (dynamicTarget === -1) return FASTING_TARGETS.at(-1); //Quá last target
-        if (dynamicTarget === 0) return FASTING_TARGETS[0]; // Thấp hơn first Target
-        return FASTING_TARGETS[dynamicTarget - 1];
-      }
-
-      return undefined;
-    }
-    return FASTING_TARGETS.find(
-      (item) => item.hours === Math.floor(log.target_duration),
-    );
-  }, [log?.target_duration]);
-
-  const isFastSuccess = useMemo(() => {
-    const delta = log.habit_delta || log.retain_delta;
-    if (!delta) return null;
-    if (delta > 0) return true;
-    if (delta < 0) return false;
-    return null;
-  }, [log]);
-
-  const isTargetSuccess = useMemo(() => {
-    if (!log.target_duration) return null;
-    const hours = log.duration / 3600;
-    if (hours >= log.target_duration) return true;
-    if (hours < log.target_duration) return false;
-    return null;
-  }, [log]);
-
-  const isShieldIncrease = useMemo(() => {
-    if (!log.shield_delta) return null;
-    if (log.shield_delta > 0) return true;
-    if (log.shield_delta < 0) return false;
-    return null;
-  }, [log]);
-
-  const state = useMemo(() => {
-    // 1. Fasting, 2. Shield, 3. Rest, 4. Over Rest
-    const delta = log.habit_delta || log.retain_delta;
-    if (delta && delta > 0) return 1;
-    if (delta && delta < 0) return 4;
-    if (log?.shield_delta && log.shield_delta > 0) return 2;
-    if (log?.shield_delta && log.shield_delta < 0) return 3;
-    return 0;
-  }, [log]);
-
-  const [labelColor, backgroundColor, borderColor] = useMemo(() => {
-    let labelColor = theme.primary;
-    if (state === 1) labelColor = target?.colors.accent || "theme.primary";
-    if (state === 2) labelColor = theme.primary;
-    if (state === 3) labelColor = theme.success;
-    if (state === 4) labelColor = theme.error;
-
-    let backgroundColor = theme.background;
-    if (state === 3) backgroundColor = theme.success + "20";
-    if (state === 4) backgroundColor = theme.error + "20";
-
-    let borderColor = theme.text + "20";
-    if (state === 3) borderColor = theme.success + "40";
-    if (state === 4) borderColor = theme.error + "40";
-
-    return [labelColor, backgroundColor, borderColor];
-  }, [state]);
-
-  const getTitle = () => {
-    return (
-      <View className="flex-row items-center gap-1">
-        <Text
-          style={{ color: labelColor }}
-          numberOfLines={1}
-          className="text-xs font-semibold text-zinc-100"
-        >
-          {isFastSuccess !== null
-            ? isFastSuccess
-              ? target?.label || log?.description || "Fasting session"
-              : `😞 You over rest ${log?.overest} day(s)`
-            : isShieldIncrease
-              ? log?.description || "⬆️ Shield increase"
-              : `🌱 Rest ${Math.abs(log?.shield_delta || 0)} days`}
-        </Text>
-        {log.target_duration ? (
-          isTargetSuccess ? (
-            <Feather name="check-circle" color={theme.success} size={12} />
-          ) : (
-            <Feather name="x-circle" color={theme.error} size={12} />
-          )
-        ) : null}
-      </View>
-    );
-  };
-
-  const { addModal } = useModalStore();
-  const showDetail = () => {
-    addModal({
-      type: "custom",
-      render: <HabitDetailModal />,
-    });
-  };
 
   if (!log) return null;
 
-  const isShieldEvent = Boolean(log.shield_delta);
-  const isPositiveHabit = log.habit_delta && log.habit_delta > 0;
+  // ------------------------------------------------------------
+  // Target
+  // ------------------------------------------------------------
+
+  const target = useMemo(() => {
+    if (log.target_duration) {
+      return FASTING_TARGETS.find(
+        (item) => item.hours === Math.floor(log.target_duration),
+      );
+    }
+
+    if (!log.duration) {
+      return undefined;
+    }
+
+    const durationHours = log.duration / 3600;
+
+    const index = FASTING_TARGETS.findIndex(
+      (item) => item.hours >= durationHours,
+    );
+
+    if (index === -1) {
+      return FASTING_TARGETS.at(-1);
+    }
+
+    if (index === 0) {
+      return FASTING_TARGETS[0];
+    }
+
+    return FASTING_TARGETS[index - 1];
+  }, [log.target_duration, log.duration]);
+
+  // ------------------------------------------------------------
+  // Events / state
+  // ------------------------------------------------------------
+
+  const habitDelta = Number(log.habit_delta ?? log.retain_delta ?? 0);
+  const shieldDelta = Number(log.shield_delta ?? 0);
+
+  const isFastSuccess = habitDelta > 0 ? true : habitDelta < 0 ? false : null;
+
+  const isShieldIncrease =
+    shieldDelta > 0 ? true : shieldDelta < 0 ? false : null;
+
+  const isTargetSuccess = log.target_duration
+    ? log.duration / 3600 >= log.target_duration
+    : null;
+
+  /**
+   * 1 = Fasting success
+   * 2 = Shield increase
+   * 3 = Rest
+   * 4 = Over rest
+   * 0 = Unknown
+   */
+  const state =
+    habitDelta > 0
+      ? 1
+      : habitDelta < 0
+        ? 4
+        : shieldDelta > 0
+          ? 2
+          : shieldDelta < 0
+            ? 3
+            : 0;
+
+  // ------------------------------------------------------------
+  // Colors
+  // ------------------------------------------------------------
+
+  let labelColor = theme.primary;
+
+  switch (state) {
+    case 1:
+      labelColor = target?.colors.accent ?? theme.primary;
+      break;
+
+    case 2:
+      labelColor = theme.primary;
+      break;
+
+    case 3:
+      labelColor = theme.success;
+      break;
+
+    case 4:
+      labelColor = theme.error;
+      break;
+  }
+
+  const backgroundColor =
+    state === 3
+      ? `${theme.success}20`
+      : state === 4
+        ? `${theme.error}20`
+        : theme.background;
+
+  const borderColor =
+    state === 3
+      ? `${theme.success}40`
+      : state === 4
+        ? `${theme.error}40`
+        : `${theme.text}20`;
+
+  // ------------------------------------------------------------
+  // Display
+  // ------------------------------------------------------------
+
+  const isShieldEvent = shieldDelta !== 0;
+  const isPositiveHabit = habitDelta > 0;
+
+  const title =
+    isFastSuccess !== null
+      ? isFastSuccess
+        ? (target?.label ?? log.description ?? "Fasting session")
+        : `😞 You over rest ${log.overest} day(s)`
+      : isShieldIncrease
+        ? (log.description ?? "⬆️ Shield increase")
+        : `🌱 Rest ${Math.abs(shieldDelta)} days`;
+
+  const dateLabel = log.end_time
+    ? getLocalTodayStr(new Date(log.end_time))
+    : "########";
 
   return (
     <View
-      style={{ backgroundColor, borderColor }}
+      style={{
+        backgroundColor,
+        borderColor,
+      }}
       className="rounded-xl mb-2.5 border overflow-hidden"
     >
-      {/* 1. HEADER (CLICK ĐỂ ĐÓNG/MỞ) */}
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={() => onPress(log, target)}
-        // onPress={showDetail}
         className="p-3.5 flex-row justify-between items-center"
       >
+        {/* Left */}
         <View className="flex-row items-center gap-3 flex-1 pr-2">
-          {/* Icon Badge */}
+          {/* Icon */}
           <View
             style={{
               backgroundColor: isShieldEvent
                 ? borderColor
                 : isPositiveHabit
-                  ? theme.primary + "40"
+                  ? `${theme.primary}40`
                   : borderColor,
             }}
-            className={`w-9 h-9 rounded-full items-center justify-center`}
+            className="w-9 h-9 rounded-full items-center justify-center"
           >
             {isShieldEvent ? (
               <FontAwesome5
                 name="shield-alt"
                 size={13}
-                color={
-                  Number(log?.shield_delta) > 0 ? theme.primary : labelColor
-                }
+                color={shieldDelta > 0 ? theme.primary : labelColor}
               />
             ) : (
               <Ionicons
@@ -425,48 +369,63 @@ export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
             )}
           </View>
 
-          {/* Tiêu đề & Thời gian ngắn gọn */}
+          {/* Title / date */}
           <View className="flex-1">
-            {getTitle()}
+            <View className="flex-row items-center gap-1">
+              <Text
+                style={{ color: labelColor }}
+                numberOfLines={1}
+                className="text-xs font-semibold"
+              >
+                {title}
+              </Text>
+
+              {log.target_duration ? (
+                isTargetSuccess ? (
+                  <Feather
+                    name="check-circle"
+                    color={theme.success}
+                    size={12}
+                  />
+                ) : (
+                  <Feather name="x-circle" color={theme.error} size={12} />
+                )
+              ) : null}
+            </View>
 
             <Text className="text-[10px] text-zinc-400 mt-0.5">
-              {log.end_time
-                ? getLocalTodayStr(new Date(log.end_time))
-                : "########"}
+              {dateLabel}
               {log.duration ? ` • Fasted ${fixed(log.duration / 3600)}h` : ""}
             </Text>
           </View>
         </View>
 
-        {/* Cột phải: Delta + Mũi tên indicator */}
+        {/* Right */}
         <View className="flex-row items-center gap-2">
           <View className="items-end">
-            {/* Điểm Habit */}
-            {log.habit_delta ? (
+            {habitDelta !== 0 ? (
               <Text
                 className={`text-xs font-bold ${
                   isPositiveHabit ? "text-emerald-400" : "text-rose-400"
                 }`}
               >
                 {isPositiveHabit ? "+" : ""}
-                {fixed(log.habit_delta)}%
+                {fixed(habitDelta)}%
               </Text>
             ) : null}
 
-            {/* Shield Badge nhỏ gọn ở Header nếu có biến động khiên */}
-            {log.shield_delta !== 0 ? (
+            {shieldDelta !== 0 ? (
               <View className="flex-row items-center gap-1 mt-0.5 bg-blue-500/10 px-1.5 py-0.5 rounded">
                 <FontAwesome5 name="shield-alt" size={8} color="#60A5FA" />
+
                 <Text className="text-[9px] font-semibold text-blue-400">
-                  {Number(log.shield_delta) > 0
-                    ? `+${log.shield_delta}`
-                    : log.shield_delta}
+                  {shieldDelta > 0 ? "+" : ""}
+                  {shieldDelta}
                 </Text>
               </View>
             ) : null}
           </View>
 
-          {/* Mũi tên xoay */}
           <View className="ml-1">
             <Ionicons name="chevron-forward" size={14} color="#71717A" />
           </View>
