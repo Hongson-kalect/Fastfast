@@ -28,7 +28,7 @@ export const getFastSessions = async (
   db: SQLiteDatabase,
 ): Promise<FastSession[]> => {
   const rows = await db.getAllAsync<FastSession>(
-    `SELECT * FROM fast_sessions order by updated_at desc;`,
+    `SELECT * FROM fast_sessions where is_deleted = 0 order by updated_at desc;`,
   );
   return rows;
 };
@@ -116,7 +116,7 @@ export const getLastFastSession = async (
 ): Promise<FastSession | null> => {
   try {
     const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions where status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
+      `SELECT * FROM fast_sessions where is_deleted = 0 AND status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
     );
     return row;
   } catch (e) {
@@ -146,7 +146,7 @@ export const getYearFastSession = async (
 ): Promise<FastSession | null> => {
   try {
     const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions WHERE strftime('%Y', start_time) = ${year} ORDER BY updated_at DESC LIMIT 1;`,
+      `SELECT * FROM fast_sessions WHERE is_deleted = 0 AND strftime('%Y', start_time) = ${year} ORDER BY updated_at DESC;`,
     );
     return row;
   } catch (e) {
@@ -161,13 +161,15 @@ export const finishLastSession = async (
     id: string;
     endTime: number;
     duration: number;
+    isTooFast: boolean;
     isValid: boolean;
     profile?: UserProfile;
     habitLog?: HabitLog;
   },
 ) => {
   try {
-    const { id, endTime, duration, isValid, profile, habitLog } = data;
+    const { id, endTime, duration, isTooFast, isValid, profile, habitLog } =
+      data;
     let result = {
       lastSession: null as FastSession | null,
       habitLog: null as HabitLog | null,
@@ -175,7 +177,25 @@ export const finishLastSession = async (
     };
     await db.withTransactionAsync(async () => {
       // 1. Nếu Session INVALID -> Update Failed & Return ngay
-      if (!isValid) {
+      if (isTooFast) {
+        await db.runAsync(
+          `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'failed', is_deleted = 1 WHERE id = ?;`,
+          [endTime, duration, id],
+        );
+
+        const failedSession = await db.getFirstAsync<FastSession>(
+          `SELECT * FROM fast_sessions WHERE id = ?;`,
+          [id],
+        );
+        const currentProfile = profile || (await getUserProfile(db));
+        const currentHabit = habitLog || (await getLastHabitLog(db)); // Hàm helper lấy habit mới nhất của bạn
+
+        result = {
+          lastSession: failedSession,
+          habitLog: currentHabit,
+          profile: currentProfile,
+        };
+      } else if (!isValid) {
         await db.runAsync(
           `UPDATE fast_sessions SET end_time = ?, duration = ?, status = 'failed' WHERE id = ?;`,
           [endTime, duration, id],
@@ -328,6 +348,7 @@ export const updateSessionTarget = async (
 };
 
 export const deleteSession = async (db: SQLiteDatabase, id: string) => {
+  console.log("xóa chít mợ m, ", id);
   try {
     await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
       id,
@@ -350,5 +371,15 @@ export const fastFail = async (
   } catch (e) {
     console.log("error on fastFail", e);
     return null;
+  }
+};
+
+export const deleteFast = async (db: SQLiteDatabase, id: string) => {
+  try {
+    await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
+      id,
+    ]);
+  } catch (e) {
+    console.log("error on deleteFast", e);
   }
 };

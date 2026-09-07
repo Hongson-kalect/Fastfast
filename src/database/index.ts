@@ -93,6 +93,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
     endTime: number;
     duration: number;
     isValid: boolean;
+    isTooFast:boolean,
     profile?: UserProfile;
     habitLog?: HabitLog;
   }) => finishLastSession(db, data),
@@ -304,6 +305,10 @@ export const handleLogin = async ({
   // 1. TÌM MỐC HOẠT ĐỘNG HỢP LỆ CUỐI CÙNG (effectiveLastDate)
   // -------------------------------------------------------------
   let effectiveLastDate = profile.streak_date;
+  // -------------------------------------------------------------
+  // 2. TÍNH KHOẢNG CÁCH NGÀY & KIỂM TRA STREAK / SHIELD
+  // -------------------------------------------------------------
+  let diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
 
   console.log(todayStr, profile.streak_date, lastFast);
 
@@ -316,19 +321,14 @@ export const handleLogin = async ({
     // Lấy mốc LỚN NHẤT giữa streak_date và targetDayStr
     if (targetDayStr > effectiveLastDate) {
       effectiveLastDate = targetDayStr;
+      diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
     }
 
     // Nếu thời gian hiện tại đã vượt quá targetDayStr ít nhất 1 ngày -> Cần chốt phiên Fast cũ
-    if (todayStr > effectiveLastDate) {
+    if (diffInDaysFromLastActive > 1) {
       isFastFail = true;
     }
   }
-
-  // -------------------------------------------------------------
-  // 2. TÍNH KHOẢNG CÁCH NGÀY & KIỂM TRA STREAK / SHIELD
-  // -------------------------------------------------------------
-  // Khoảng cách từ Mốc Cuối Cùng Hợp Lệ -> Hôm Nay
-  const diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
 
   // Khoảng cách thực tế từ Streak Date cũ -> Hôm Nay (Dùng để cộng dồn Streak)
   const totalDaysFromStreakDate = getDaysDiff(profile.streak_date, todayStr);

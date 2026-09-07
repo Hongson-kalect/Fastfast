@@ -4,7 +4,6 @@ import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
@@ -204,231 +203,205 @@ export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
 
   if (!log) return null;
 
-  // ------------------------------------------------------------
-  // Target
-  // ------------------------------------------------------------
-
+  // 1. Tính toán Target mục tiêu (Chỉ recalculate khi log.target_duration hoặc log.duration đổi)
   const target = useMemo(() => {
-    if (log.target_duration) {
-      return FASTING_TARGETS.find(
-        (item) => item.hours === Math.floor(log.target_duration),
-      );
+    if (log.target_duration && log.target_duration > 0) {
+      const targetHours = Math.round(log.target_duration);
+      return FASTING_TARGETS.find((item) => item.hours === targetHours);
     }
 
-    if (!log.duration) {
-      return undefined;
-    }
+    if (!log.duration) return undefined;
 
     const durationHours = log.duration / 3600;
-
     const index = FASTING_TARGETS.findIndex(
       (item) => item.hours >= durationHours,
     );
 
-    if (index === -1) {
-      return FASTING_TARGETS.at(-1);
-    }
-
-    if (index === 0) {
-      return FASTING_TARGETS[0];
-    }
+    if (index === -1) return FASTING_TARGETS.at(-1);
+    if (index === 0) return FASTING_TARGETS[0];
 
     return FASTING_TARGETS[index - 1];
   }, [log.target_duration, log.duration]);
 
-  // ------------------------------------------------------------
-  // Events / state
-  // ------------------------------------------------------------
+  // 2. Bọc toàn bộ logic trạng thái & hiển thị vào useMemo để tối ưu FlatList scroll
+  const {
+    dateLabel,
+    habitDelta,
+    isPositiveHabit,
+    isShieldEvent,
+    isTargetSuccess,
+    labelColor,
+    shieldDelta,
+    title,
+  } = useMemo(() => {
+    const habitDelta = Number(log.habit_delta ?? log.retain_delta ?? 0);
+    const shieldDelta = Number(log.shield_delta ?? 0);
 
-  const habitDelta = Number(log.habit_delta ?? log.retain_delta ?? 0);
-  const shieldDelta = Number(log.shield_delta ?? 0);
+    const isFastSuccess = habitDelta > 0 ? true : habitDelta < 0 ? false : null;
+    const isShieldIncrease =
+      shieldDelta > 0 ? true : shieldDelta < 0 ? false : null;
 
-  const isFastSuccess = habitDelta > 0 ? true : habitDelta < 0 ? false : null;
+    const isTargetSuccess =
+      log.target_duration && log.target_duration > 0
+        ? log.duration / 3600 >= log.target_duration
+        : false;
 
-  const isShieldIncrease =
-    shieldDelta > 0 ? true : shieldDelta < 0 ? false : null;
+    /**
+     * 1 = Fasting success
+     * 2 = Shield increase
+     * 3 = Rest
+     * 4 = Over rest
+     * 0 = Unknown
+     */
+    const state =
+      habitDelta > 0
+        ? 1
+        : habitDelta < 0
+          ? 4
+          : shieldDelta > 0
+            ? 2
+            : shieldDelta < 0
+              ? 3
+              : 0;
 
-  const isTargetSuccess = log.target_duration
-    ? log.duration / 3600 >= log.target_duration
-    : null;
+    // Label Text Color
+    let labelColor = "#F4F4F5"; // Mã kẽm sáng chuẩn dark mode
+    switch (state) {
+      case 1:
+        labelColor = target?.colors.accent ?? theme.primary;
+        break;
+      case 2:
+        labelColor = theme.primary;
+        break;
+      case 3:
+        labelColor = theme.success;
+        break;
+      case 4:
+        labelColor = theme.error;
+        break;
+    }
 
-  /**
-   * 1 = Fasting success
-   * 2 = Shield increase
-   * 3 = Rest
-   * 4 = Over rest
-   * 0 = Unknown
-   */
-  const state =
-    habitDelta > 0
-      ? 1
-      : habitDelta < 0
-        ? 4
-        : shieldDelta > 0
-          ? 2
-          : shieldDelta < 0
-            ? 3
-            : 0;
+    const isShieldEvent = habitDelta === 0 && shieldDelta !== 0;
+    const isPositiveHabit = habitDelta > 0;
 
-  // ------------------------------------------------------------
-  // Colors
-  // ------------------------------------------------------------
+    // Title hiển thị
+    const overrestDays = log.overest ?? log.overest ?? 0;
+    const title =
+      isFastSuccess !== null
+        ? isFastSuccess
+          ? (target?.label ?? log.description ?? "Fasting session")
+          : `You over rest ${overrestDays} day(s)`
+        : isShieldIncrease
+          ? (log.description ?? "Shield increase")
+          : `Rest ${Math.abs(shieldDelta)} days`;
 
-  let labelColor = theme.primary;
+    // Date Label
+    const dateLabel = log.end_time
+      ? getLocalTodayStr(new Date(log.end_time))
+      : "--:--";
 
-  switch (state) {
-    case 1:
-      labelColor = target?.colors.accent ?? theme.primary;
-      break;
+    return {
+      target,
+      habitDelta,
+      shieldDelta,
+      isTargetSuccess,
+      isShieldEvent,
+      isPositiveHabit,
+      labelColor,
+      title,
+      dateLabel,
+    };
+  }, [log, target, theme]);
 
-    case 2:
-      labelColor = theme.primary;
-      break;
-
-    case 3:
-      labelColor = theme.success;
-      break;
-
-    case 4:
-      labelColor = theme.error;
-      break;
-  }
-
-  const backgroundColor =
-    state === 3
-      ? `${theme.success}20`
-      : state === 4
-        ? `${theme.error}20`
-        : theme.background;
-
-  const borderColor =
-    state === 3
-      ? `${theme.success}40`
-      : state === 4
-        ? `${theme.error}40`
-        : `${theme.text}20`;
-
-  // ------------------------------------------------------------
-  // Display
-  // ------------------------------------------------------------
-
-  const isShieldEvent = shieldDelta !== 0;
-  const isPositiveHabit = habitDelta > 0;
-
-  const title =
-    isFastSuccess !== null
-      ? isFastSuccess
-        ? (target?.label ?? log.description ?? "Fasting session")
-        : `😞 You over rest ${log.overest} day(s)`
-      : isShieldIncrease
-        ? (log.description ?? "⬆️ Shield increase")
-        : `🌱 Rest ${Math.abs(shieldDelta)} days`;
-
-  const dateLabel = log.end_time
-    ? getLocalTodayStr(new Date(log.end_time))
-    : "########";
-
+  // Format Helper
+  const fixed = (val: number) =>
+    val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
   return (
-    <View
-      style={{
-        backgroundColor,
-        borderColor,
-      }}
-      className="rounded-xl mb-2.5 border overflow-hidden"
-    >
+    <View className="mb-3 bg-zinc-800 border border-white/5 rounded-2xl overflow-hidden">
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={() => onPress(log, target)}
         className="p-3.5 flex-row justify-between items-center"
       >
-        {/* Left */}
+        {/* Left Section */}
         <View className="flex-row items-center gap-3 flex-1 pr-2">
-          {/* Icon */}
-          <View
-            style={{
-              backgroundColor: isShieldEvent
-                ? borderColor
-                : isPositiveHabit
-                  ? `${theme.primary}40`
-                  : borderColor,
-            }}
-            className="w-9 h-9 rounded-full items-center justify-center"
-          >
+          {/* Badge Icon (Tối giản background) */}
+          <View className="w-9 h-9 rounded-xl bg-zinc-800/80 items-center justify-center border border-white/5">
             {isShieldEvent ? (
               <FontAwesome5
                 name="shield-alt"
                 size={13}
-                color={shieldDelta > 0 ? theme.primary : labelColor}
+                color={shieldDelta > 0 ? theme.primary : "#A1A1AA"}
               />
             ) : (
               <Ionicons
                 name="flame"
                 size={15}
-                color={isPositiveHabit ? theme.primary : labelColor}
+                color={isPositiveHabit ? theme.primary : "#A1A1AA"}
               />
             )}
           </View>
 
-          {/* Title / date */}
+          {/* Title & Date Info */}
           <View className="flex-1">
-            <View className="flex-row items-center gap-1">
+            <View className="flex-row items-center gap-1.5">
               <Text
                 style={{ color: labelColor }}
                 numberOfLines={1}
-                className="text-xs font-semibold"
+                className="text-xs font-bold tracking-tight"
               >
                 {title}
               </Text>
 
-              {log.target_duration ? (
+              {/* Status Indicator */}
+              {log.target_duration && log.target_duration > 0 ? (
                 isTargetSuccess ? (
                   <Feather
                     name="check-circle"
                     color={theme.success}
-                    size={12}
+                    size={11}
                   />
                 ) : (
-                  <Feather name="x-circle" color={theme.error} size={12} />
+                  <Feather name="x-circle" color="#FB7185" size={11} />
                 )
               ) : null}
             </View>
 
-            <Text className="text-[10px] text-zinc-400 mt-0.5">
+            <Text className="text-[10px] font-medium text-zinc-500 mt-0.5">
               {dateLabel}
-              {log.duration ? ` • Fasted ${fixed(log.duration / 3600)}h` : ""}
+              {log.duration ? ` • ${fixed(log.duration / 3600)}h` : ""}
             </Text>
           </View>
         </View>
 
-        {/* Right */}
-        <View className="flex-row items-center gap-2">
-          <View className="items-end">
-            {habitDelta !== 0 ? (
+        {/* Right Section (Stats & Navigation) */}
+        <View className="flex-row items-center gap-2.5">
+          <View className="items-end gap-1">
+            {/* Habit Score Delta */}
+            {habitDelta !== 0 && (
               <Text
-                className={`text-xs font-bold ${
+                className={`text-xs font-extrabold ${
                   isPositiveHabit ? "text-emerald-400" : "text-rose-400"
                 }`}
               >
                 {isPositiveHabit ? "+" : ""}
                 {fixed(habitDelta)}%
               </Text>
-            ) : null}
+            )}
 
-            {shieldDelta !== 0 ? (
-              <View className="flex-row items-center gap-1 mt-0.5 bg-blue-500/10 px-1.5 py-0.5 rounded">
+            {/* Shield Delta (Style tinh gọn) */}
+            {shieldDelta !== 0 && (
+              <View className="flex-row items-center gap-1">
                 <FontAwesome5 name="shield-alt" size={8} color="#60A5FA" />
-
-                <Text className="text-[9px] font-semibold text-blue-400">
+                <Text className="text-[10px] font-bold text-blue-400">
                   {shieldDelta > 0 ? "+" : ""}
                   {shieldDelta}
                 </Text>
               </View>
-            ) : null}
+            )}
           </View>
 
-          <View className="ml-1">
-            <Ionicons name="chevron-forward" size={14} color="#71717A" />
-          </View>
+          <Ionicons name="chevron-forward" size={14} color="#52525B" />
         </View>
       </TouchableOpacity>
     </View>

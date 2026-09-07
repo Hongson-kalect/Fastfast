@@ -56,6 +56,7 @@ const HomeScreen = () => {
     let message = "Are you sure you want to finish your session?";
     let subMessage = "";
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
+    const isTooFast = duration < 2 * 3600;
     const isValid = duration > 16 * 3600;
     // const isValid = true;
     console.log(
@@ -67,7 +68,12 @@ const HomeScreen = () => {
     const isReachTarget = currentFastSession?.target_duration
       ? duration / 3600 > currentFastSession.target_duration
       : null;
-    if (!isValid) {
+
+      if(isTooFast) {
+        message = "This session too fast, it will be deleted, are you sure?";
+        subMessage = "The duration is less than 2 hours.";
+      }
+    else if (!isValid) {
       message = "This session will marked as FAILED, are you sure?";
       subMessage = "The duration is less than 16 hours.";
     }
@@ -100,6 +106,7 @@ const HomeScreen = () => {
             endTime: now,
             duration,
             isValid,
+            isTooFast,
             profile: userProfile || undefined,
             habitLog: habit || undefined,
           });
@@ -188,6 +195,12 @@ const HomeScreen = () => {
     const now = new Date().getTime();
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
     const isValid = false;
+    const isTooFast = duration < 2 * 60 * 60;
+
+    if(isTooFast) {
+        message = "This session too fast, it will be deleted, are you sure?";
+        subMessage = "The duration is less than 2 hours.";
+      }
 
     addModal({
       type: "confirm",
@@ -204,6 +217,7 @@ const HomeScreen = () => {
             id: currentFastSession?.id,
             endTime: now,
             duration,
+            isTooFast,
             isValid,
             profile: userProfile || undefined,
             habitLog: habit || undefined,
@@ -279,16 +293,6 @@ const HomeScreen = () => {
     setCounter(Math.abs(now - startTime));
   };
 
-  const [fastHistory, setFastHistory] = useState<FastSession[]>([]);
-  const getHabitLogs = async () => {
-    const res = await dbService?.getFastSessions();
-    setFastHistory(res);
-  };
-
-  useEffect(() => {
-    getHabitLogs();
-  }, []);
-
   useEffect(() => {
     let interval = undefined;
     if (!isCounting) {
@@ -316,7 +320,6 @@ const HomeScreen = () => {
               <HomeTimeCounter
                 cancelFasting={cancelFasting}
                 finishFasting={finishFast}
-                fastHistory={fastHistory}
                 isCounting={isCounting}
                 counter={counter}
                 currentFast={currentFastSession}

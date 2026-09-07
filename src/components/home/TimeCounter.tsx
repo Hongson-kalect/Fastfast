@@ -1,4 +1,5 @@
 import { FASTING_TARGETS } from "@/constants/data";
+import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
@@ -25,7 +26,7 @@ import {
 import { FastDetail } from "../fast_detail";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
-import FastHistoryHeader, { FastHistoryItem } from "./FastHistorySheet";
+import FastHistorySheet from "./FastHistorySheet";
 import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
 
@@ -33,7 +34,6 @@ type Props = {
   isCounting: boolean;
   counter: number;
   currentFast: FastSession | null;
-  fastHistory: FastSession[];
   finishFasting: () => void;
   cancelFasting: () => void;
 };
@@ -49,7 +49,6 @@ const HomeTimeCounter = ({
   isCounting,
   counter,
   currentFast,
-  fastHistory,
   finishFasting,
   cancelFasting,
 }: Props) => {
@@ -176,23 +175,26 @@ const HomeTimeCounter = ({
     null,
   );
 
+  const [fastHistory, setFastHistory] = useState<FastSession[]>([]);
+  const getHabitLogs = async () => {
+    const res = await dbService?.getFastSessions();
+    setFastHistory(res);
+  };
+
+  useEffect(() => {
+    getHabitLogs();
+  }, []);
+
+  const dbService = useDBService();
+  const deleteFast = async (id: string) => {
+    await dbService.deleteSession(id);
+    await getHabitLogs();
+  };
+
   const showHistory = () => {
-    present(<FastHistoryHeader data={fastHistory} />, {
-      list: {
-        data: fastHistory,
-        renderItem: ({ item }) => (
-          <View className="px-2">
-            <FastHistoryItem
-              item={item}
-              onPress={() => setSelectedHistory(item)}
-            />
-          </View>
-        ),
-        keyExtractor: (item) => item.id,
-        contentContainerStyle: {
-          gap: 2,
-        },
-      },
+    console.log("show");
+    present(<FastHistorySheet />, {
+      preventScroll: true,
     });
   };
 

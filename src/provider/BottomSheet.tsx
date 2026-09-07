@@ -6,6 +6,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import React, {
   createContext,
@@ -48,6 +49,7 @@ type ShowOptions<T = any> = {
   snapPoints?: string[];
   enablePanDownToClose?: boolean;
   onClose?: () => void;
+  isRaw?: boolean; // Dùng để khi mà giả sử dùng flatlist thi khóa scroll của provider
 
   list?: BottomSheetListOptions<T>;
 };
@@ -64,43 +66,46 @@ const BottomSheetContext = createContext<BottomSheetContextType | undefined>(
 
 export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   const { top } = useSafeAreaInsets();
+  const { theme } = useAppStore();
 
   const [isShowing, setIsShowing] = useState(false);
   const [content, setContent] = useState<React.ReactElement | null>(null);
   const [snapPoints, setSnapPoints] = useState<string[] | undefined>();
   const [enablePanDownToClose, setEnablePanDownToClose] = useState(true);
-
   const [onClose, setOnClose] = useState<(() => void) | null>(null);
+  const [isRaw, setIsRaw] = useState(false);
 
   const [listOptions, setListOptions] =
     useState<BottomSheetListOptions<any> | null>(null);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const { theme } = useAppStore();
-
   const present = useCallback(
     (node: React.ReactElement, options?: ShowOptions) => {
       setContent(node);
       setSnapPoints(options?.snapPoints);
       setListOptions(options?.list ?? null);
-      if (options?.onClose) setOnClose(options?.onClose);
-
       setEnablePanDownToClose(options?.enablePanDownToClose ?? true);
+      setOnClose(() => options?.onClose ?? null);
+      setIsShowing(true);
+      if (options?.isRaw) {
+        setIsRaw(true);
+      }
 
       requestAnimationFrame(() => {
         bottomSheetModalRef.current?.present();
       });
-      setIsShowing(true);
     },
     [],
   );
 
   const hide = useCallback(() => {
-    onClose?.();
-    setIsShowing(false);
-    bottomSheetModalRef.current?.dismiss();
-  }, []);
+    if (isShowing) {
+      setContent(null);
+      setIsShowing(false);
+      bottomSheetModalRef.current?.dismiss();
+    }
+  }, [isShowing]);
 
   useEffect(() => {
     if (!isShowing) {
@@ -110,12 +115,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        if (onClose) {
-          onClose();
-          // Cần cần hide sau khi onClose thì gọi hide trong đấy
-          return true;
-        }
-        hide();
+        bottomSheetModalRef.current?.dismiss();
         return true;
       },
     );
@@ -123,7 +123,23 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       subscription.remove();
     };
-  }, [isShowing, hide]);
+  }, [isShowing]);
+
+  const handleDismiss = useCallback(() => {
+    setIsShowing(false);
+    setContent(null);
+    setListOptions(null);
+    setSnapPoints(undefined);
+    setEnablePanDownToClose(true);
+    setIsRaw(false);
+
+    // Callback được gọi SAU khi sheet dismiss,
+    // không gọi trong render.
+    const callback = onClose;
+    setOnClose(null);
+
+    callback?.();
+  }, [onClose]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -138,6 +154,9 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const renderContent = () => {
+    if (isRaw) {
+      return <BottomSheetView>{content}</BottomSheetView>;
+    }
     if (listOptions) {
       return (
         <BottomSheetFlatList
@@ -176,11 +195,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           topInset={top + 64}
           enablePanDownToClose={enablePanDownToClose}
           backdropComponent={renderBackdrop}
-          onDismiss={() => {
-            setIsShowing(false);
-            setContent(null);
-            setListOptions(null);
-          }}
+          onDismiss={handleDismiss}
           enableContentPanningGesture={false}
           keyboardBehavior="fillParent"
           backgroundStyle={{
