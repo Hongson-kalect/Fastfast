@@ -58,17 +58,19 @@ function FastHistorySheet() {
     await loadHistory();
   };
 
-  const {addModal} = useModalStore();
-    useEffect(() => {
-      if (selectedHistory)
-        addModal({
-          type: "custom",
-          render: <FastDetail fast={selectedHistory} />,
-        });
-    }, [selectedHistory]);
+  const { addModal } = useModalStore();
+  useEffect(() => {
+    if (selectedHistory)
+      addModal({
+        type: "custom",
+        render: <FastDetail fast={selectedHistory} />,
+      });
+  }, [selectedHistory]);
 
-  return <BottomSheetFlatList
-  data={history}
+  if (3 === 3)
+    return (
+      <BottomSheetFlatList
+        data={history}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View className="px-2">
@@ -82,10 +84,14 @@ function FastHistorySheet() {
         contentContainerStyle={{
           gap: 2,
         }}
-
-            ListHeaderComponent={<FastHistoryHeader data={history} />}
-            ListEmptyComponent={<View><Text className="text-zinc-400 text-center">Không có dữ liệu</Text></View>}
-          />
+        ListHeaderComponent={<FastHistoryHeader data={history} />}
+        ListEmptyComponent={
+          <View>
+            <Text className="text-zinc-400 text-center">Không có dữ liệu</Text>
+          </View>
+        }
+      />
+    );
 
   return (
     <>
@@ -275,10 +281,20 @@ export const FastHistoryItem = ({ item, onPress, onDelete }: ItemProps) => {
   const reached =
     item.target_duration > 0 && durationHours >= item.target_duration;
 
+  if (isActive)
+    console.log(
+      Date.now(),
+      item.start_time,
+      item.target_duration,
+      (Date.now() / 1000 - item.start_time) / item.target_duration / 36,
+    );
+
   // Tính phần trăm tiến độ (giới hạn tối đa 100% cho thanh progress UI)
   const rawProgress =
     item.target_duration > 0
-      ? (durationHours / item.target_duration) * 100
+      ? isActive
+        ? (Date.now() / 1000 - item.start_time) / item.target_duration / 36
+        : (durationHours / item.target_duration) * 100
       : 100;
   const progressPercent = Math.min(Math.round(rawProgress), 100);
 

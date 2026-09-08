@@ -194,7 +194,8 @@ const HomeTimeCounter = ({
   const showHistory = () => {
     console.log("show");
     present(<FastHistorySheet />, {
-      preventScroll: true,
+      isRaw: true,
+      snapPoints: ['100%'],
     });
   };
 

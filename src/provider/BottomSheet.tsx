@@ -5,8 +5,7 @@ import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetScrollView,
-  BottomSheetView,
+  BottomSheetScrollView
 } from "@gorhom/bottom-sheet";
 import React, {
   createContext,
@@ -155,7 +154,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
 
   const renderContent = () => {
     if (isRaw) {
-      return <BottomSheetView>{content}</BottomSheetView>;
+      return content;
     }
     if (listOptions) {
       return (
