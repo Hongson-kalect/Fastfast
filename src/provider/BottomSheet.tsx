@@ -5,7 +5,7 @@ import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetScrollView
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import React, {
   createContext,
@@ -195,7 +195,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           enablePanDownToClose={enablePanDownToClose}
           backdropComponent={renderBackdrop}
           onDismiss={handleDismiss}
-          enableContentPanningGesture={false}
+          // enableContentPanningGesture={false}
           keyboardBehavior="fillParent"
           backgroundStyle={{
             backgroundColor: theme.background,

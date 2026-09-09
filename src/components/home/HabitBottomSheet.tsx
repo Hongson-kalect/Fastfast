@@ -6,7 +6,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Text,
   TouchableOpacity,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { HabitDetailModal } from "./HabitDetailModal";
 import Waterball from "./Waterball";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 interface HabitBottomSheetProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -22,11 +23,46 @@ interface HabitBottomSheetProps {
   onClose?: () => void;
 }
 
-const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
+const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
+  const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
+    const dbService = useDBService();
+  
+    const getHabitLogs = async () => {
+      const res = await dbService?.getHabitLogs();
+      setHabitLogs(res);
+    };
+  
+    useEffect(() => {
+      getHabitLogs();
+    }, []);
+
+  return (
+   <BottomSheetFlatList
+        data={habitLogs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View className="px-3">
+            <HabitLogComponent
+              log={item}
+            />
+          </View>
+        )}
+        contentContainerStyle={{
+          gap: 2,
+        }}
+        ListHeaderComponent={<HabitBottomSheetHeader/>}
+        ListEmptyComponent={
+          <View className="items-center justify-center px-3">
+            <Text className="text-zinc-400 text-center">Không có dữ liệu</Text>
+          </View>
+        }
+      />
+  );
+};
+
+const HabitBottomSheetHeader: React.FC<HabitBottomSheetProps> = () => {
   const { addModal } = useModalStore();
-  const [showAllHistory, setShowAllHistory] = useState(false);
   const { theme, userProfile, habit } = useAppStore();
-  const dbService = useDBService();
 
   const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
     return [
@@ -51,21 +87,8 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
     return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
   };
 
-  const [selectedLog, setSelectedLog] = useState<HabitLog & FastSession>();
-  const [logTarget, setLogTarget] = useState<(typeof FASTING_TARGETS)[0]>();
-
-  const handleSelectHabit = (
-    log: HabitLog & FastSession,
-    target?: (typeof FASTING_TARGETS)[0],
-  ) => {
-    // setSelectedLog(log);
-    // setLogTarget(target);
-  };
-
-  const { width, height } = useWindowDimensions();
-
   return (
-    <View className="bg-[#121318] px-5 py-4 rounded-t-4xl w-full border-t border-white/10">
+    <View className="px-5 py-4 rounded-t-4xl w-full">
       {/* 1. HEADER SHEET */}
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-row items-center gap-2">
@@ -86,9 +109,6 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
 
       {/* 2. HERO: VÒNG TRÒN % Ở CHÍNH GIỮA */}
       <TouchableOpacity
-        onPress={() => {
-          addModal({ type: "custom", render: <HabitDetailModal /> });
-        }}
         className="items-center my-3"
       >
         <Waterball
@@ -193,13 +213,21 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = () => {
 
 type HabitLogComProps = {
   log: HabitLog & FastSession;
-  onPress: (
+};
+export const HabitLogComponent = ({ log }: HabitLogComProps) => {
+  const { theme } = useAppStore();
+  const { addModal } = useModalStore();
+
+   const handleSelectHabit = (
     log: HabitLog & FastSession,
     target?: (typeof FASTING_TARGETS)[0],
-  ) => void;
-};
-export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
-  const { theme } = useAppStore();
+  ) => {
+    console.log("log", log, target);
+    addModal({
+      type: "custom",
+      render: <HabitDetailModal log={log} targetInfo={target} />,
+    });
+  };
 
   if (!log) return null;
 
@@ -320,7 +348,7 @@ export const HabitLogComponent = ({ log, onPress }: HabitLogComProps) => {
     <View className="mb-3 bg-zinc-800 border border-white/5 rounded-2xl overflow-hidden">
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => onPress(log, target)}
+        onPress={() => handleSelectHabit(log, target)}
         className="p-3.5 flex-row justify-between items-center"
       >
         {/* Left Section */}

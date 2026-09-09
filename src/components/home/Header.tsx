@@ -48,26 +48,32 @@ const HomeHeader = () => {
 
   const openHabitModal = () => {
     console.log("Vừng mở ra");
-    present(<HabitBottomSheet />, {
-      list: {
-        data: habitLogs,
-        renderItem: ({ item }) => (
-          <View className="px-4">
-            <HabitLogComponent onPress={handleSelectHabit} log={item} />
-          </View>
-        ),
-        keyExtractor(item, index) {
-          return String(index);
-        },
-        empty: (
-          <View className="mt-8 gap-3 items-center">
-            <Text className="italic text-text-base/40">
-              Chưa có lịch sử phiên gần đây
-            </Text>
-          </View>
-        ),
-      },
-    });
+    if(1===1){
+      return present(<HabitBottomSheet />,{
+        isRaw: true,
+        snapPoints: ['100%'],
+      });
+    }
+    // present(<HabitBottomSheet />, {
+    //   list: {
+    //     data: habitLogs,
+    //     renderItem: ({ item }) => (
+    //       <View className="px-4">
+    //         <HabitLogComponent onPress={handleSelectHabit} log={item} />
+    //       </View>
+    //     ),
+    //     keyExtractor(item, index) {
+    //       return String(index);
+    //     },
+    //     empty: (
+    //       <View className="mt-8 gap-3 items-center">
+    //         <Text className="italic text-text-base/40">
+    //           Chưa có lịch sử phiên gần đây
+    //         </Text>
+    //       </View>
+    //     ),
+    //   },
+    // });
   };
 
   return (

@@ -9,35 +9,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import PixelDetailSheet from "./PixelDetailSheet";
+import { DayItem, WeekItem } from "@/interfaces/pixel";
 
-interface DayItem {
-  dateString: string;
-  dayOfMonth: number;
-  isCurrentYear: boolean;
-  data?: DayItemType;
-}
-
-interface WeekItem {
-  weekIndex: number; // 0, 1, 2... tương ứng với hàng
-  weekNumberInYear: number; // Số tuần thực tế trong năm (1, 2, 3...)
-  month: string; // Nhãn hiển thị bên trái (W1 hoặc JAN - 1)
-  weekOfYear: string; // Nhãn hiển thị bên trái (W1 hoặc JAN - 1)
-  isMonthHeader: boolean; // Dùng để xác định xem có cần in đậm label không
-  days: DayItem[];
-}
-
-// ─── THUẬT TOÁN SINH LƯỚI PIXEL ĐÃ NÂNG CẤP NHÃN BIÊN ───
-type DayItemType = {
-  dateString: string;
-  moodIndex: number;
-  fastingHours: number;
-  fastingRange: number;
-  isCurrentYear: boolean;
-};
-
-type DayItemObj = {
-  [key: string]: DayItemType;
-};
 
 export const fastArr = [
   { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc

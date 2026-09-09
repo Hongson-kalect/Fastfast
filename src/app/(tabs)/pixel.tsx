@@ -1,6 +1,8 @@
 import PixelHeader from "@/components/pixel/Header";
-import PixelInYear from "@/components/pixel/PixelInYear";
+import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
+import PixelInYear, { generateYearGrid } from "@/components/pixel/PixelInYear";
 import PixelStatistic from "@/components/pixel/Statistic";
+import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
@@ -11,15 +13,27 @@ import {
   HabitLog,
   SyncStatus,
 } from "@/interfaces/db.type";
+import {
+  DailyPixelData,
+  PixelStats,
+  ViewMode,
+  YearPixelDataMap,
+} from "@/interfaces/pixel";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { DissectedDay, splitSessionIntoDays } from "@/util/home/timespliter";
+import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
+  SectionList,
   StatusBar,
   TouchableOpacity,
   useWindowDimensions,
@@ -27,7 +41,6 @@ import {
 } from "react-native";
 
 // 1. Định nghĩa các chế độ xem (View Options)
-type ViewMode = "fasting" | "mood";
 
 interface EmojiGuide {
   emoji: string;
@@ -285,140 +298,296 @@ export const generateRealisticYearData = (targetYear: number = 2026) => {
 };
 
 const PixelScreen = () => {
+  // ------------------------------------------------------------
+  // 1. Custom Hooks & Global Stores
+  // ------------------------------------------------------------
   const dbService = useDBService();
-  const { userProfile, currentFastSession, settings, updateSetting } = useAppStore();
-  const [enableScroll, setEnableScroll] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>(settings?.pixel_view_mode || "fasting");
+  const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
-  const scrollRef = useRef<ScrollView>(null);
-  const currentWeekY = useMemo(() => {
-    const extraScroll = 100;
-    const currentWeek = getWeek(new Date());
-    const weekHeight = (width - 21 - (14 * 15) / 4) / 7;
-    return Math.max(0, weekHeight * currentWeek - extraScroll);
-  }, [width]);
+  const { userProfile, currentFastSession, settings, updateSetting, theme } =
+    useAppStore();
 
+  // ------------------------------------------------------------
+  // 2. Refs
+  // ------------------------------------------------------------
+  const sectionListRef = useRef<SectionList>(null);
+  const flatListRef = useRef<FlatList>(null);
+  const yIndexRef = useRef(0);
+
+  // ------------------------------------------------------------
+  // 3. Local States
+  // ------------------------------------------------------------
+  const todayStr = getLocalTodayStr();
+  const currentYear = new Date().getFullYear();
+
+  const [year, setYear] = useState(currentYear);
+  const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    settings?.pixel_view_mode || "fasting",
+  );
+
+  // Scroll States
+  const [enableScroll, setEnableScroll] = useState(true);
   const [yIndex, setYIndex] = useState(0);
   const [isScrollUp, setIsScrollUp] = useState(false);
 
-  const scrollTo = (y: number, animated: boolean = true) => {
-    scrollRef.current?.scrollTo({
-      y: y,
-      animated: animated,
-    });
-  };
+  // Data States
+  const [isLoading, setIsLoading] = useState(true);
+  const [yearPixelData, setYearPixelData] = useState<YearPixelDataMap>({});
+  const [stats, setStats] = useState<PixelStats>({
+    fastDays: 0,
+    fastHour: 0,
+    logDays: 0,
+  });
 
-  useEffect(()=>{
-    dbService.setting("pixel_view_mode", viewMode || "fasting")
-    updateSetting({ pixel_view_mode: viewMode });
-  },[viewMode])
+  // ------------------------------------------------------------
+  // 4. Memos & Derived State
+  // ------------------------------------------------------------
+  const gridData = useMemo(() => {
+    return generateYearGrid(year);
+  }, [year]);
 
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [isLoading, setIsLoading] = useState(true); // Để hiển thị skeleton
+  const currentWeekY = useMemo(() => {
+    const currentWeek = getWeek(new Date());
+    return Math.max(0, currentWeek);
+  }, [width]);
 
-  const [shieldLogs, setShieldLogs] = useState<{ [date: string]: HabitLog }>(
-    {},
+  // ------------------------------------------------------------
+  // 5. Handlers & Callbacks
+  // ------------------------------------------------------------
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const newY = e.nativeEvent.contentOffset.y;
+      setIsScrollUp(newY < yIndexRef.current);
+      setYIndex(newY);
+      yIndexRef.current = newY;
+    },
+    [],
   );
-  const [pixelNotes, setPixelNotes] = useState<{ [date: string]: DailyNote }>(
-    {},
-  );
-  const [pixelLogs, setPixelLogs] = useState<{
-    [date: string]: (DailyLog | DissectedDay)[];
-  }>({});
-  const [stats, setStats] = useState({ fastDays: 0, fastHour: 0, logDays: 0 });
 
-  const getYearData = async (year: number) => {
-    const {
-      logs,
-      notes,
-      habitLogs: shieldUsed,
-    } = generateRealisticYearData(year);
-    setIsLoading(true);
-    // const notes = await dbService.getPixelNoteData(year);
-    // const logs = await dbService.getPixelLogData(year);
-    // const shieldUsed = await dbService.getShieldUsedLog(year);
-    const newStats = { fastDays: 0, fastHour: 0, logDays: 0 };
-    // const stats = await dbService.getFastStatsSummary()
-
-    const newNotes: typeof pixelNotes = {};
-    notes.forEach((note) => {
-      newNotes[note.log_date] = note;
-      newStats.logDays += 1;
+  const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
+    sectionListRef.current?.scrollToLocation({
+      sectionIndex,
+      itemIndex,
+      animated: true,
     });
+  }, []);
 
-    const newLogs: typeof pixelLogs = {};
-    logs.forEach((log) => {
-      newStats.fastHour += log.hours_in_day;
-      if (newLogs[log.log_date] && Array.isArray(newLogs[log.log_date])) {
-        newLogs[log.log_date].push(log);
-      } else {
-        newStats.fastDays += 1;
-        newLogs[log.log_date] = [log];
+  const handleSelectDate = useCallback(
+    (date: string) => () => {
+      setSelectedDate(date);
+      const data = yearPixelData[date];
+      if (!data) return;
+
+      if (data.note || data.logs.length > 0) {
+        present(
+          <PixelDetailSheet
+            dateString={date}
+            note={data.note}
+            log={data.logs}
+          />,
+          {
+            onClose: () => hide(),
+          },
+        );
+      } else if (data.shieldLog) {
+        // TODO: Show shield log detail
       }
-    });
+    },
+    [yearPixelData, present, hide],
+  );
 
-    // Đang có 1 phiên fast diễn ra
-    if (currentFastSession?.start_time && !currentFastSession?.end_time) {
-      const parsedDays = splitSessionIntoDays(
-        currentFastSession.start_time,
-        Math.floor(Date.now()),
-        currentFastSession.id,
-      );
-      console.log(parsedDays.map((x) => x.log_date));
+  // ------------------------------------------------------------
+  // 6. Data Fetching
+  // ------------------------------------------------------------
+  const getYearData = useCallback(
+    async (targetYear: number) => {
+      setIsLoading(true);
 
-      for (const log of parsedDays) {
-        newStats.fastHour += log.hours_in_day;
-        if (newLogs[log.log_date] && Array.isArray(newLogs[log.log_date])) {
-          newLogs[log.log_date].push(log);
-        } else {
-          newStats.fastDays += 1;
-          newLogs[log.log_date] = [log];
+      const {
+        logs,
+        notes,
+        habitLogs: shieldUsed,
+      } = generateRealisticYearData(targetYear);
+
+      const yearMap: YearPixelDataMap = {};
+      const newStats: PixelStats = { fastDays: 0, fastHour: 0, logDays: 0 };
+
+      const getOrCreateDayNode = (dateStr: string): DailyPixelData => {
+        if (!yearMap[dateStr]) {
+          yearMap[dateStr] = { logs: [], totalHours: 0 };
         }
+        return yearMap[dateStr];
+      };
+
+      // 1. Process Notes
+      notes.forEach((note) => {
+        const dayNode = getOrCreateDayNode(note.log_date);
+        dayNode.note = note;
+        newStats.logDays += 1;
+      });
+
+      // 2. Process Logs
+      const appendFastLog = (log: DailyLog | DissectedDay) => {
+        const dayNode = getOrCreateDayNode(log.log_date);
+        if (dayNode.logs.length === 0) {
+          newStats.fastDays += 1;
+        }
+        dayNode.logs.push(log);
+        dayNode.totalHours += log.hours_in_day;
+        newStats.fastHour += log.hours_in_day;
+      };
+
+      logs.forEach(appendFastLog);
+
+      // Process active session
+      if (currentFastSession?.start_time && !currentFastSession?.end_time) {
+        const parsedDays = splitSessionIntoDays(
+          currentFastSession.start_time,
+          Math.floor(Date.now()),
+          currentFastSession.id,
+        );
+        parsedDays.forEach(appendFastLog);
       }
-    }
 
-    const newShieldLog: typeof shieldLogs = {};
-    // Bổ sung khiên vào logs
-    for (const log of shieldUsed) {
-      let shields = Math.abs(log.shield_delta || 0);
+      // 3. Process Shields
+      shieldUsed.forEach((log) => {
+        let shields = Math.abs(log.shield_delta || 0);
+        const [y, m, d] = log.log_date.split("-").map(Number);
+        const pointerDate = new Date(Date.UTC(y, m - 1, d));
 
-      // Parse YYYY-MM-DD thành [year, month, day]
-      const [year, month, day] = log.log_date.split("-").map(Number);
+        while (shields > 0) {
+          pointerDate.setUTCDate(pointerDate.getUTCDate() - 1);
+          const dateStr = pointerDate.toISOString().split("T")[0];
 
-      // Dùng Date.UTC để cố định múi giờ UTC tuyệt đối
-      const pointerDate = new Date(Date.UTC(year, month - 1, day));
+          const dayNode = getOrCreateDayNode(dateStr);
+          dayNode.shieldLog = log;
+          shields -= 1;
+        }
+      });
 
-      while (shields > 0) {
-        // Trừ 1 ngày trên UTC
-        pointerDate.setUTCDate(pointerDate.getUTCDate() - 1);
+      setYearPixelData(yearMap);
+      setStats(newStats);
+      setIsLoading(false);
+    },
+    [currentFastSession],
+  );
 
-        // Format lại chuỗi YYYY-MM-DD từ UTC
-        const dateStr = pointerDate.toISOString().split("T")[0];
+  // ------------------------------------------------------------
+  // 7. Effects & Screen Lifecycle
+  // ------------------------------------------------------------
+  // Save View Mode setting
+  useEffect(() => {
+    dbService.setting("pixel_view_mode", viewMode || "fasting");
+    updateSetting({ pixel_view_mode: viewMode });
+  }, [viewMode]);
 
-        newShieldLog[dateStr] = log;
-        shields -= 1;
-      }
-    }
+  // Initial Auto Scroll to Current Week
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollToSection(0, currentWeekY);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [currentWeekY, scrollToSection]);
 
-    setPixelNotes(newNotes);
-    setPixelLogs(newLogs);
-    setShieldLogs(newShieldLog);
-    setStats(newStats);
-    setIsLoading(false);
-  };
-
+  // Refetch data on screen focus
   useFocusEffect(
     useCallback(() => {
-      console.log("focused");
       getYearData(year);
-    }, [year]),
+    }, [year, getYearData]),
   );
 
-  useEffect(() => {
-    setTimeout(() => {
-      scrollTo(currentWeekY);
-    }, 500);
-  }, []);
+  if (3 === 3) {
+    return (
+      <ThemedView className="flex-1 bg-main">
+        <View className="absolute bottom-12 right-2 z-10">
+          {isScrollUp && yIndex > height ? (
+            <Pressable
+              onPress={() => scrollToSection(0, currentWeekY)}
+              className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
+            >
+              <Feather name="arrow-up" size={20} color="white" />
+            </Pressable>
+          ) : (
+            currentWeekY > height &&
+            yIndex < currentWeekY - height && (
+              <Pressable
+                onPress={() => scrollToSection(0, currentWeekY)}
+                className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
+              >
+                <Feather name="arrow-down" size={20} color="white" />
+              </Pressable>
+            )
+          )}
+        </View>
+        <View
+          style={{ paddingTop: StatusBar.currentHeight || 0 }}
+          className="h-full w-full px-3"
+        >
+          <SectionList
+            ref={sectionListRef}
+            onScroll={(e) => {
+              const newY = e.nativeEvent.contentOffset.y;
+              setIsScrollUp(newY < yIndex);
+              setYIndex(e.nativeEvent.contentOffset.y);
+            }}
+            sections={[{ key: "calendar", data: gridData }]}
+            ListHeaderComponent={
+              <PixelHeader
+                stats={stats}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            }
+            renderSectionHeader={() => (
+              <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
+                {/* Header Thứ (T2 -> CN) */}
+                <View className="flex-row mb-2 items-center">
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    hitSlop={25}
+                    style={{ borderTopLeftRadius: 4 }}
+                    className="w-15 bg-primary justify-center items-center"
+                  >
+                    <ThemedText className="text-[12px]! py-1 text-white! font-bold">
+                      Week
+                    </ThemedText>
+                  </TouchableOpacity>
+
+                  <View className="flex-1 flex-row justify-between">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (day, idx) => (
+                        <View
+                          key={idx}
+                          className="flex-1 items-center justify-center pt-1"
+                        >
+                          <ThemedText className="text-[10px]! text-white! opacity-70">
+                            {day}
+                          </ThemedText>
+                        </View>
+                      ),
+                    )}
+                  </View>
+                </View>
+              </View>
+            )}
+            stickySectionHeadersEnabled
+            contentContainerClassName="gap-1"
+            keyExtractor={(week) => week.weekIndex.toString()}
+            renderItem={({ item }) => (
+              <WeekRow
+                week={item}
+                todayStr={todayStr}
+                viewMode={viewMode}
+                yearPixelData={yearPixelData}
+                onSelectDate={handleSelectDate}
+              />
+            )}
+          />
+        </View>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView className="flex-1 bg-main">
@@ -468,13 +637,6 @@ const PixelScreen = () => {
               setTrackingType={setViewMode}
             />
           </View>
-          {/* <View className="py-4">
-              <PixelOptions
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                currentGuides={currentGuides}
-              />
-            </View> */}
 
           <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
             {/* Header Thứ (T2 -> CN) */}

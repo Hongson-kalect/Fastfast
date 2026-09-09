@@ -336,7 +336,6 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
       return (
         <HabitLogComponent
           log={item}
-          onPress={handleSelectHabit}
         />
       );
     },

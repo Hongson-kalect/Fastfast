@@ -142,17 +142,21 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     (habit_data?.shield_delta || 0) +
     (habit_data?.shield_milestone || 0) +
     bonusShield;
-  habit_data.shield_delta = habitDetla + bonusShield;
+    
+    let shield_detail = null;
+    
+    if (habit_data.shield_delta || bonusShield|| habit_data.shield_milestone) {
+      shield_detail = JSON.stringify([
+        habit_data.shield_delta || 0,
+        bonusShield || 0,
+        habit_data.shield_milestone || 0
+      ]);
+    }
 
-  let shield_detail = null;
-
-  if (habit_data.shield_delta || bonusShield|| habit_data.shield_milestone) {
-    shield_detail = JSON.stringify([
-      habit_data.shield_delta || 0,
-      bonusShield || 0,
-      habit_data.shield_milestone || 0
-    ]);
-  }
+    // Total shield increase, no matter source
+    habit_data.shield_delta = (habit_data?.shield_delta || 0) +
+    (habit_data?.shield_milestone || 0) +
+    bonusShield;
 
   // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
   // const currentLog = await db.getFirstAsync<HabitLog>(`SELECT * FROM habit_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);

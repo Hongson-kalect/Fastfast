@@ -37,7 +37,7 @@ type Props = {
   onExitComplete?: () => void;
 };
 
-const ANIMATION_DURATION = 200;
+const ANIMATION_DURATION = 300;
 
 export default function ModalWrapper({
   show,

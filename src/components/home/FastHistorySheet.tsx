@@ -3,7 +3,7 @@ import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -15,7 +15,6 @@ type HeaderProps = {
 
 type ItemProps = {
   item: FastSession;
-  onPress: () => void;
   onDelete: (id: string) => void;
 };
 
@@ -40,9 +39,6 @@ function FastHistorySheet() {
   const dbService = useDBService();
 
   const [history, setHistory] = useState<FastSession[]>([]);
-  const [selectedHistory, setSelectedHistory] = useState<FastSession | null>(
-    null,
-  );
 
   const loadHistory = useCallback(async () => {
     const res = await dbService.getFastSessions();
@@ -58,27 +54,13 @@ function FastHistorySheet() {
     await loadHistory();
   };
 
-  const { addModal } = useModalStore();
-  useEffect(() => {
-    if (selectedHistory)
-      addModal({
-        type: "custom",
-        render: <FastDetail fast={selectedHistory} />,
-      });
-  }, [selectedHistory]);
-
-  if (3 === 3)
     return (
       <BottomSheetFlatList
         data={history}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View className="px-2">
-            <FastHistoryItem
-              item={item}
-              onDelete={deleteFast}
-              onPress={() => setSelectedHistory(item)}
-            />
+          <View className="px-3">
+            <FastHistoryItem item={item} onDelete={deleteFast} />
           </View>
         )}
         contentContainerStyle={{
@@ -86,35 +68,12 @@ function FastHistorySheet() {
         }}
         ListHeaderComponent={<FastHistoryHeader data={history} />}
         ListEmptyComponent={
-          <View>
+          <View className="items-center justify-center px-3">
             <Text className="text-zinc-400 text-center">Không có dữ liệu</Text>
           </View>
         }
       />
     );
-
-  return (
-    <>
-      <FastHistoryHeader data={history} />
-
-      <BottomSheetFlatList
-        data={history}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="px-2">
-            <FastHistoryItem
-              item={item}
-              onDelete={deleteFast}
-              onPress={() => setSelectedHistory(item)}
-            />
-          </View>
-        )}
-        contentContainerStyle={{
-          gap: 2,
-        }}
-      />
-    </>
-  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -167,24 +126,15 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
     };
   }, [data]);
 
-  if (stats.total === 0) {
-    return (
-      <View className="px-1 pt-1 pb-3">
-        <Text className="text-white text-base font-bold">Fasting history</Text>
-
-        <Text className="text-zinc-500 text-xs mt-1">
-          Chưa có phiên nhịn nào.
-        </Text>
-      </View>
-    );
-  }
-
   return (
-    <View className="px-1 pt-1 pb-3">
+    <View className="px-4 pt-1 pb-4">
       {/* Title */}
       <View className="flex-row items-end justify-between mb-3">
         <View>
-          <Text className="text-white text-lg font-bold">Fasting history</Text>
+          <View className="flex-row items-center gap-2">
+            <FontAwesome5 name="history" size={20} color={theme.primary} />
+            <Text className="text-xl font-bold text-white">Fasts history</Text>
+          </View>
 
           <Text className="text-zinc-500 text-xs mt-0.5">
             Tổng quan các phiên nhịn
@@ -192,7 +142,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
         </View>
 
         <View
-          className="flex-row items-center px-2 py-1 rounded-full"
+          className="flex-row items-center py-1 rounded-full"
           style={{
             backgroundColor: `${theme.success}15`,
           }}
@@ -209,7 +159,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
       </View>
 
       {/* Stats */}
-      <View className="flex-row gap-2">
+      <View className="flex-row items-center justify-between gap-2">
         <StatCard
           value={formatTime(stats.totalDuration)}
           label="Total"
@@ -229,8 +179,8 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
         />
       </View>
 
-      <View className="mt-3 px-2 items-end">
-        <Text className="text-xs font-medium text-text-base/50">
+      <View className="mt-5 px-2 items-end">
+        <Text className="text-xs font-medium text-text-base/40">
           Recent fasts
         </Text>
       </View>
@@ -251,18 +201,18 @@ type StatCardProps = {
 const StatCard = ({ value, label, color }: StatCardProps) => {
   return (
     <View
-      className="flex-1 rounded-xl px-3 py-2.5 items-center justify-center"
+      className="flex-1 rounded-xl py-2.5 items-center justify-center"
       style={{
-        backgroundColor: `${color}08`,
+        backgroundColor: `${color}11`,
         borderWidth: 1,
-        borderColor: `${color}15`,
+        borderColor: `${color}22`,
       }}
     >
-      <Text className="text-lg font-bold" style={{ color }}>
+      <Text className="text-base font-semibold" style={{ color }}>
         {value}
       </Text>
 
-      <Text className="text-zinc-600 text-xs mt-0.5">{label}</Text>
+      <Text className="text-zinc-600 text-xs mt-1">{label}</Text>
     </View>
   );
 };
@@ -271,7 +221,7 @@ const StatCard = ({ value, label, color }: StatCardProps) => {
 /* Item                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export const FastHistoryItem = ({ item, onPress, onDelete }: ItemProps) => {
+export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const { theme } = useAppStore();
 
   const durationHours = Number(item.duration ?? 0) / S_PER_HOUR;
@@ -286,14 +236,14 @@ export const FastHistoryItem = ({ item, onPress, onDelete }: ItemProps) => {
       Date.now(),
       item.start_time,
       item.target_duration,
-      (Date.now() / 1000 - item.start_time) / item.target_duration / 36,
+      (Date.now() - item.start_time) / item.target_duration / 36000,
     );
 
   // Tính phần trăm tiến độ (giới hạn tối đa 100% cho thanh progress UI)
   const rawProgress =
     item.target_duration > 0
       ? isActive
-        ? (Date.now() / 1000 - item.start_time) / item.target_duration / 36
+        ? (Date.now() - item.start_time) / item.target_duration / 36000
         : (durationHours / item.target_duration) * 100
       : 100;
   const progressPercent = Math.min(Math.round(rawProgress), 100);
@@ -365,11 +315,18 @@ export const FastHistoryItem = ({ item, onPress, onDelete }: ItemProps) => {
     ? `${formatTimeStr(startDate)} ${formatDate(startDate)} - ${formatTimeStr(endDate)} ${formatDate(endDate)}`
     : `${formatTimeStr(startDate)} ${formatDate(startDate)}`;
 
+  const showDetail = () => {
+    addModal({
+      type: "custom",
+      render: <FastDetail fast={item} />,
+    });
+  };
+
   return (
     <TouchableOpacity
       onLongPress={handleLongPress}
       activeOpacity={0.7}
-      onPress={onPress}
+      onPress={showDetail}
       className="mb-2.5 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden relative"
     >
       <View className="p-3.5 flex-row items-center justify-between">
