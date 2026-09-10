@@ -7,7 +7,6 @@ import useModalStore from "@/stores/modalStore";
 import {
   BlurMask,
   Canvas,
-  interpolateColors,
   Path,
   Skia,
   SweepGradient,
@@ -72,13 +71,6 @@ const HomeTimeCounter = ({
   const progress = useMemo(() => {
     return target ? Math.min(Math.max(counter / target, 0.05), 1) : 1;
   }, [target, counter]);
-  const progressColor = useMemo(() => {
-    return interpolateColors(
-      progress,
-      [0, 1], // Input range: tiến trình từ 0% đến 100%
-      [colorRange.start, colorRange.end], // Output range: màu tương ứng
-    );
-  }, [progress, colorRange.start, colorRange.end]);
 
   const strokeWidth = 20;
 
@@ -186,16 +178,12 @@ const HomeTimeCounter = ({
   }, []);
 
   const dbService = useDBService();
-  const deleteFast = async (id: string) => {
-    await dbService.deleteSession(id);
-    await getHabitLogs();
-  };
 
   const showHistory = () => {
     console.log("show");
     present(<FastHistorySheet />, {
       isRaw: true,
-      snapPoints: ['100%'],
+      snapPoints: ["100%"],
     });
   };
 
@@ -278,16 +266,16 @@ const HomeTimeCounter = ({
                         colors={[
                           color + "10",
                           color + "30",
-                          color + "80",
+                          color + "50",
                           color,
                           "#FFFFFF",
                           color,
-                          color + "80",
+                          color + "50",
                           color + "30",
                           color + "10",
                         ]}
                         positions={[
-                          0, 0.45, 0.7, 0.82, 0.9, 0.94, 0.97, 0.99, 1,
+                          0, 0.45, 0.75, 0.86, 0.9, 0.94, 0.97, 0.99, 1,
                         ]}
                       />
 
@@ -361,17 +349,13 @@ const HomeTimeCounter = ({
         </View>
       )}
 
-      <View className="w-full pt-3 items-center justify-center">
+      <View className="w-full pt-4 items-center justify-center">
         <Pressable onPress={showHistory} hitSlop={10}>
           <Text className="text-text-base/60 text-sm underline">
             Fast History
           </Text>
         </Pressable>
       </View>
-
-      {/* <ThemedText type="small" className="mt-4"> */}
-      {/* You're doing great, keep it up */}
-      {/* </ThemedText> */}
     </View>
   );
 };

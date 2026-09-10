@@ -464,7 +464,7 @@ export default function Circular24hTimeline({
   const anchors = [
     {
       hour: 0,
-      label: "24 | 00",
+      label: "24 - 00",
     },
     {
       hour: 6,

@@ -1,12 +1,11 @@
 import HomeBodyProgress from "@/components/home/BodyProgress";
+import CircleCounter from "@/components/home/CircleCounter";
 import FullHabitModal from "@/components/home/FullHabitModal";
 import HomeHeader from "@/components/home/Header";
 import { FastResultData, ResultModal } from "@/components/home/ResultModal";
 import { SwapButton } from "@/components/home/SwapButton";
-import HomeTimeCounter from "@/components/home/TimeCounter";
 import { SHIELD_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
-import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
@@ -69,11 +68,10 @@ const HomeScreen = () => {
       ? duration / 3600 > currentFastSession.target_duration
       : null;
 
-      if(isTooFast) {
-        message = "This session too fast, it will be deleted, are you sure?";
-        subMessage = "The duration is less than 2 hours.";
-      }
-    else if (!isValid) {
+    if (isTooFast) {
+      message = "This session too fast, it will be deleted, are you sure?";
+      subMessage = "The duration is less than 2 hours.";
+    } else if (!isValid) {
       message = "This session will marked as FAILED, are you sure?";
       subMessage = "The duration is less than 16 hours.";
     }
@@ -197,10 +195,10 @@ const HomeScreen = () => {
     const isValid = false;
     const isTooFast = duration < 2 * 60 * 60;
 
-    if(isTooFast) {
-        message = "This session too fast, it will be deleted, are you sure?";
-        subMessage = "The duration is less than 2 hours.";
-      }
+    if (isTooFast) {
+      message = "This session too fast, it will be deleted, are you sure?";
+      subMessage = "The duration is less than 2 hours.";
+    }
 
     addModal({
       type: "confirm",
@@ -316,8 +314,18 @@ const HomeScreen = () => {
         <ScrollView keyboardShouldPersistTaps="handled">
           <View className="px-3">
             <HomeHeader />
-            <View className="pt-4 pb-2 mt-4">
+            {/* <View className="pb-2 mt-4">
               <HomeTimeCounter
+                cancelFasting={cancelFasting}
+                finishFasting={finishFast}
+                isCounting={isCounting}
+                counter={counter}
+                currentFast={currentFastSession}
+              />
+            </View> */}
+
+            <View className="">
+              <CircleCounter
                 cancelFasting={cancelFasting}
                 finishFasting={finishFast}
                 isCounting={isCounting}
@@ -326,14 +334,14 @@ const HomeScreen = () => {
               />
             </View>
 
-            <View className="py-4 mt-4 items-center justify-center">
+            <View className="-mt-24 items-center justify-center">
               <SwapButton
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
                 variant="primary"
               />
             </View>
-            <View className="mt-12">
+            <View className="mt-4">
               {/* These indicators reflect general biological stages based on fasting duration. Always listen to your body and consult a healthcare professional before attempting prolonged fasts */}
               <HomeBodyProgress counter={counter} />
             </View>

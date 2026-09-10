@@ -11,17 +11,15 @@ type DailyFastSessionCardProps = {
   fast: FastSession | null;
   dailyLog?: DailyLog | DissectedDay | null;
 };
-
 export function DailyFastSessionCard({
   index,
   fast,
   dailyLog,
 }: DailyFastSessionCardProps) {
   const { addModal } = useModalStore();
-
   if (!fast) {
     return (
-      <View className="bg-zinc-900/80 rounded-2xl border border-white/5 px-4 py-4">
+      <View className="bg-zinc-900/80 rounded-2xl border border-white/5 px-4 py-3">
         <View className="flex-row items-center">
           <ActivityIndicator size="small" color="#71717a" />
           <Text className="text-zinc-500 text-xs ml-3">
@@ -34,52 +32,49 @@ export function DailyFastSessionCard({
 
   const start = new Date(fast.start_time);
   const end = fast.end_time ? new Date(fast.end_time) : null;
-
   const actualDurationHours = fast.duration / 3600;
-
   const contributionHours = dailyLog?.hours_in_day ?? 0;
-
   const targetDurationHours = fast.target_duration ?? 0;
-
   const isActive = fast.status === "active" || !fast.end_time;
-
   const isFailed = fast.status === "failed";
-
-  const startTime = `${new Date(start).getHours().toString().padStart(2, "0")}:${new Date(
-    start,
-  )
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
-
-  const endTime = end
-    ? `${new Date(end).getHours().toString().padStart(2, "0")}:${new Date(end).getMinutes().toString().padStart(2, "0")}`
-    : "Đang nhịn";
+  const formatTime = (date: Date) =>
+    `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  const formatShortDate = (date: Date, showYear = false) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    if (showYear) {
+      const year = date.getFullYear().toString().slice(-2);
+      return `${day}/${month}/${year}`;
+    }
+    return `${day}/${month}`;
+  };
+  const startTime = formatTime(start);
+  const endTime = end ? formatTime(end) : "Đang nhịn";
+  const crossesDay =
+    (!!end && start.getFullYear() !== end.getFullYear()) ||
+    (!!end && start.getMonth() !== end.getMonth()) ||
+    (!!end && start.getDate() !== end.getDate());
+  const crossesYear = !!end && start.getFullYear() !== end.getFullYear();
+  const dateRange = end
+    ? crossesDay
+      ? `${formatShortDate(start, crossesYear)} → ${formatShortDate(end, crossesYear)}`
+      : null
+    : null;
 
   const startDate = getLocalTodayStr(start);
-
   const endDate = end ? getLocalTodayStr(end) : null;
-
-  const crossesDay = !!endDate && startDate !== endDate;
-
   const dateLabel = crossesDay ? `${startDate} → ${endDate}` : "Hôm nay";
-
   const accentColor = isActive
     ? "#34D399"
     : isFailed
       ? "#FB7185"
       : (DEBUG_COLORS[index ?? 0] ?? "#71717A");
-
   const progress =
     targetDurationHours > 0
       ? Math.min(contributionHours / actualDurationHours, 1)
       : 0;
-
   const openFastModal = () => {
-    addModal({
-      type: "custom",
-      render: <FastDetail fast={fast} />,
-    });
+    addModal({ type: "custom", render: <FastDetail fast={fast} /> });
   };
   return (
     <Pressable
@@ -87,72 +82,72 @@ export function DailyFastSessionCard({
       className={[
         "bg-zinc-900 rounded-2xl",
         "border border-white/5",
-        "px-4 py-4",
+        "px-4 py-3",
         isActive ? "border-emerald-400/15" : "",
       ].join(" ")}
     >
-      {/* Session */}
+      {/* Session header */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
           <View
-            className="w-2.5 h-2.5 rounded-full mr-3"
-            style={{
-              backgroundColor: accentColor,
-            }}
+            className="w-2 h-2 rounded-full mr-2.5"
+            style={{ backgroundColor: accentColor }}
           />
-
           <View className="flex-1">
-            <Text
-              className="text-white text-[15px] font-semibold"
-              numberOfLines={1}
-            >
-              {startTime}
-              {"  →  "}
-              {endTime}
-            </Text>
-
-            <Text className="text-zinc-600 text-[10px] mt-1">{dateLabel}</Text>
+            <View className="flex-row items-center">
+              <Text
+                className="text-white text-sm font-semibold"
+                numberOfLines={1}
+              >
+                {startTime}
+                {end && (
+                  <>
+                    {" → "} {endTime}
+                  </>
+                )}
+              </Text>
+              {dateRange && (
+                <Text className="text-zinc-500 text-[10px] font-normal ml-2">
+                  {dateRange}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
-        <View className="items-end ml-4">
-          <Text className="text-zinc-300 text-sm font-semibold">
-            {formatHour(actualDurationHours)}
-          </Text>
-
-          <Text className="text-zinc-600 text-[9px] uppercase tracking-wider mt-0.5">
-            Session
-          </Text>
-        </View>
-      </View>
-      {/* Daily contribution */}
-      <View className="mt-4 pt-3 border-t border-white/5">
-        <Text className="text-zinc-600 text-[9px] font-semibold uppercase tracking-[1.5px]">
-          Fasted today
+        <Text className="text-zinc-400 text-xs font-medium ml-3">
+          {formatHour(actualDurationHours)}
         </Text>
-
-        <View className="flex-row items-baseline mt-0.5">
-          <Text
-            style={{ color: contributionHours > 0 ? accentColor : "#71717A" }}
-            className="text-2xl font-bold tracking-tight"
-          >
-            {contributionHours > 0 ? `+${contributionHours.toFixed(1)}` : "0"}
-          </Text>
-
-          <Text
-            style={{
-              color: contributionHours > 0 ? accentColor : "#71717A",
-              opacity: 0.6,
-            }}
-            className="text-xs font-medium ml-1"
-          >
-            hours
-          </Text>
+      </View>
+      {/* Today's contribution — hero */}
+      <View className="mt-2.5 pt-2.5 border-t border-white/5">
+        <View className="flex-row items-end justify-between">
+          <View className="flex-row items-baseline">
+            <Text
+              style={{ color: contributionHours > 0 ? accentColor : "#71717A" }}
+              className="text-2xl font-bold tracking-tight"
+            >
+              {contributionHours > 0 ? `+${contributionHours.toFixed(1)}` : "0"}
+            </Text>
+            <Text
+              style={{
+                color: contributionHours > 0 ? accentColor : "#71717A",
+                opacity: 0.55,
+              }}
+              className="text-[10px] font-medium ml-1"
+            >
+              hours today
+            </Text>
+          </View>
+          {targetDurationHours > 0 && (
+            <Text className="text-zinc-600 text-[9px]">
+              mục tiêu {targetDurationHours}h
+            </Text>
+          )}
         </View>
-
-        {/* Target */}
+        {/* Progress */}
         {targetDurationHours > 0 && (
-          <View className="mt-3">
-            <View className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+          <View className="mt-2">
+            <View className="h-1 bg-zinc-800 rounded-full overflow-hidden">
               <View
                 className="h-full rounded-full"
                 style={{
@@ -160,16 +155,6 @@ export function DailyFastSessionCard({
                   backgroundColor: isFailed ? "#FB7185" : accentColor,
                 }}
               />
-            </View>
-
-            <View className="flex-row justify-between mt-1.5">
-              <Text className="text-zinc-700 text-[9px]">
-                {formatHour(actualDurationHours)}
-              </Text>
-
-              <Text className="text-zinc-700 text-[9px]">
-                mục tiêu {targetDurationHours}
-              </Text>
             </View>
           </View>
         )}

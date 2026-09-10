@@ -2,8 +2,8 @@ import { Platform, StyleSheet, Text, type TextProps } from "react-native";
 
 import { Fonts } from "@/constants/theme";
 import { ThemeColors } from "@/store/useAppSettingStore";
-import { useMemo } from "react";
 import { useAppStore } from "@/stores/appStore";
+import { useMemo } from "react";
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     fontWeight: 500,
   },
   title: {
-    fontSize: 48,
+    fontSize: 44,
     fontWeight: 600,
     lineHeight: 52,
   },

@@ -1,7 +1,6 @@
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
-import PixelInYear, { generateYearGrid } from "@/components/pixel/PixelInYear";
-import PixelStatistic from "@/components/pixel/Statistic";
+import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -29,15 +28,12 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
-  ScrollView,
   SectionList,
   StatusBar,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 
 // 1. Định nghĩa các chế độ xem (View Options)
@@ -46,6 +42,9 @@ interface EmojiGuide {
   emoji: string;
   label: string;
 }
+
+const ITEM_HEIGHT = 40;
+const HEADER_HEIGHT = 60;
 
 export const generateRealisticYearData = (targetYear: number = 2026) => {
   const notes: DailyNote[] = [];
@@ -352,19 +351,6 @@ const PixelScreen = () => {
     return Math.max(0, currentWeek);
   }, [width]);
 
-  // ------------------------------------------------------------
-  // 5. Handlers & Callbacks
-  // ------------------------------------------------------------
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const newY = e.nativeEvent.contentOffset.y;
-      setIsScrollUp(newY < yIndexRef.current);
-      setYIndex(newY);
-      yIndexRef.current = newY;
-    },
-    [],
-  );
-
   const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
     sectionListRef.current?.scrollToLocation({
       sectionIndex,
@@ -374,9 +360,11 @@ const PixelScreen = () => {
   }, []);
 
   const handleSelectDate = useCallback(
-    (date: string) => () => {
+    (date: string) => {
+      console.log("handleSelectDate", Date.now());
       setSelectedDate(date);
       const data = yearPixelData[date];
+      console.log("selected Date ", date, data);
       if (!data) return;
 
       if (data.note || data.logs.length > 0) {
@@ -387,14 +375,15 @@ const PixelScreen = () => {
             log={data.logs}
           />,
           {
-            onClose: () => hide(),
+            snapPoints: ["100%"],
           },
         );
+        console.log("present ", Date.now());
       } else if (data.shieldLog) {
         // TODO: Show shield log detail
       }
     },
-    [yearPixelData, present, hide],
+    [yearPixelData, present],
   );
 
   // ------------------------------------------------------------
@@ -493,117 +482,36 @@ const PixelScreen = () => {
   // Refetch data on screen focus
   useFocusEffect(
     useCallback(() => {
-      getYearData(year);
+      const task = requestIdleCallback(() => {
+        getYearData(year);
+      });
+
+      // return () => {
+      //   task.cancel();
+      // };
     }, [year, getYearData]),
   );
 
-  if (3 === 3) {
-    return (
-      <ThemedView className="flex-1 bg-main">
-        <View className="absolute bottom-12 right-2 z-10">
-          {isScrollUp && yIndex > height ? (
-            <Pressable
-              onPress={() => scrollToSection(0, currentWeekY)}
-              className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
-            >
-              <Feather name="arrow-up" size={20} color="white" />
-            </Pressable>
-          ) : (
-            currentWeekY > height &&
-            yIndex < currentWeekY - height && (
-              <Pressable
-                onPress={() => scrollToSection(0, currentWeekY)}
-                className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
-              >
-                <Feather name="arrow-down" size={20} color="white" />
-              </Pressable>
-            )
-          )}
-        </View>
-        <View
-          style={{ paddingTop: StatusBar.currentHeight || 0 }}
-          className="h-full w-full px-3"
-        >
-          <SectionList
-            ref={sectionListRef}
-            onScroll={(e) => {
-              const newY = e.nativeEvent.contentOffset.y;
-              setIsScrollUp(newY < yIndex);
-              setYIndex(e.nativeEvent.contentOffset.y);
-            }}
-            sections={[{ key: "calendar", data: gridData }]}
-            ListHeaderComponent={
-              <PixelHeader
-                stats={stats}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-            }
-            renderSectionHeader={() => (
-              <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
-                {/* Header Thứ (T2 -> CN) */}
-                <View className="flex-row mb-2 items-center">
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    hitSlop={25}
-                    style={{ borderTopLeftRadius: 4 }}
-                    className="w-15 bg-primary justify-center items-center"
-                  >
-                    <ThemedText className="text-[12px]! py-1 text-white! font-bold">
-                      Week
-                    </ThemedText>
-                  </TouchableOpacity>
-
-                  <View className="flex-1 flex-row justify-between">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                      (day, idx) => (
-                        <View
-                          key={idx}
-                          className="flex-1 items-center justify-center pt-1"
-                        >
-                          <ThemedText className="text-[10px]! text-white! opacity-70">
-                            {day}
-                          </ThemedText>
-                        </View>
-                      ),
-                    )}
-                  </View>
-                </View>
-              </View>
-            )}
-            stickySectionHeadersEnabled
-            contentContainerClassName="gap-1"
-            keyExtractor={(week) => week.weekIndex.toString()}
-            renderItem={({ item }) => (
-              <WeekRow
-                week={item}
-                todayStr={todayStr}
-                viewMode={viewMode}
-                yearPixelData={yearPixelData}
-                onSelectDate={handleSelectDate}
-              />
-            )}
-          />
-        </View>
-      </ThemedView>
-    );
-  }
+  useEffect(() => {
+    console.log("yIndex", yIndex);
+  }, [yIndex]);
 
   return (
     <ThemedView className="flex-1 bg-main">
       <View className="absolute bottom-12 right-2 z-10">
         {isScrollUp && yIndex > height ? (
           <Pressable
-            onPress={() => scrollTo(0)}
+            onPress={() => scrollToSection(0)}
             className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
           >
             <Feather name="arrow-up" size={20} color="white" />
           </Pressable>
         ) : (
-          currentWeekY > height &&
-          yIndex < currentWeekY - height && (
+          yIndex > ITEM_HEIGHT &&
+          currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT > height &&
+          yIndex < currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT - height && (
             <Pressable
-              onPress={() => scrollTo(currentWeekY)}
+              onPress={() => scrollToSection(0, currentWeekY)}
               className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
             >
               <Feather name="arrow-down" size={20} color="white" />
@@ -613,71 +521,73 @@ const PixelScreen = () => {
       </View>
       <View
         style={{ paddingTop: StatusBar.currentHeight || 0 }}
-        className="h-full w-full"
+        className="h-full w-full px-3"
       >
-        <ScrollView
+        <SectionList
+          ref={sectionListRef}
           onScroll={(e) => {
             const newY = e.nativeEvent.contentOffset.y;
             setIsScrollUp(newY < yIndex);
             setYIndex(e.nativeEvent.contentOffset.y);
           }}
-          ref={scrollRef}
-          scrollEnabled={enableScroll}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-          className="px-3"
-          stickyHeaderIndices={[2]}
-        >
-          <PixelHeader />
-          <View className="mt-4 mb-6">
-            <PixelStatistic
+          getItemLayout={(data, index) => ({
+            length: ITEM_HEIGHT,
+            offset: ITEM_HEIGHT * index,
+            index,
+          })}
+          sections={[{ key: "calendar", data: gridData }]}
+          ListHeaderComponent={
+            <PixelHeader
               stats={stats}
-              trackingType={viewMode}
-              setTrackingType={setViewMode}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
             />
-          </View>
+          }
+          renderSectionHeader={() => (
+            <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
+              {/* Header Thứ (T2 -> CN) */}
+              <View className="flex-row mb-2 items-center">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  hitSlop={25}
+                  style={{ borderTopLeftRadius: 4 }}
+                  className="w-15 bg-primary justify-center items-center"
+                >
+                  <ThemedText className="text-[12px]! py-1 text-white! font-bold">
+                    Week
+                  </ThemedText>
+                </TouchableOpacity>
 
-          <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
-            {/* Header Thứ (T2 -> CN) */}
-            <View className="flex-row mb-2 items-center">
-              {/* Thu gọn chiều rộng xuống w-12 vì nhãn bây giờ rất ngắn (chỉ có 'FEB' hoặc '12') */}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                hitSlop={25}
-                style={{ borderTopLeftRadius: 4 }}
-                className="w-15 bg-primary justify-center items-center"
-              >
-                <ThemedText className="text-[12px]! py-1 text-white! font-bold">
-                  Week
-                </ThemedText>
-              </TouchableOpacity>
-              <View className="flex-1 flex-row justify-between">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                  (day, idx) => (
-                    <View
-                      key={idx}
-                      className="flex-1 items-center justify-center pt-1"
-                    >
-                      <ThemedText className="text-[10px]! text-white! opacity-70">
-                        {day}
-                      </ThemedText>
-                    </View>
-                  ),
-                )}
+                <View className="flex-1 flex-row justify-between">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (day, idx) => (
+                      <View
+                        key={idx}
+                        className="flex-1 items-center justify-center pt-1"
+                      >
+                        <ThemedText className="text-[10px]! text-white! opacity-70">
+                          {day}
+                        </ThemedText>
+                      </View>
+                    ),
+                  )}
+                </View>
               </View>
             </View>
-          </View>
-
-          {/* ─── BLOCK 2: PIXEL IN YEAR GRID ─── */}
-          <PixelInYear
-            displayType={viewMode}
-            year={year}
-            noteData={pixelNotes}
-            logData={pixelLogs}
-            shieldLogs={shieldLogs}
-          />
-        </ScrollView>
+          )}
+          stickySectionHeadersEnabled
+          contentContainerClassName="gap-1"
+          keyExtractor={(week) => week.weekIndex.toString()}
+          renderItem={({ item }) => (
+            <WeekRow
+              week={item}
+              todayStr={todayStr}
+              viewMode={viewMode}
+              yearPixelData={yearPixelData}
+              onSelectDate={handleSelectDate}
+            />
+          )}
+        />
       </View>
     </ThemedView>
   );

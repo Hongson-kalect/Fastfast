@@ -170,7 +170,7 @@ export const SwapButton = ({
   }, [todayNote]);
 
   return (
-    <View className="flex-row items-end justify-center gap-8">
+    <View className="flex-row items-end justify-center gap-4 h-28">
       <Animated.View
         style={[overlayStyle]}
         pointerEvents={isMenuOpen ? "auto" : "none"}
@@ -179,89 +179,95 @@ export const SwapButton = ({
         <Pressable className="flex-1" onPress={toggleMenu} />
       </Animated.View>
 
-      <View className="flex-row gap-8 items-center justify-center z-20 relative w-full h-20">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => setImageOptionVisible(true)}
-          disabled={loading}
-          className={`h-20 w-20 rounded-full flex-row items-center justify-center border shadow-md ${todayData.image ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
-          {...props}
-        >
-          {loading ? (
-            <ActivityIndicator color="#38BDF8" />
-          ) : (
-            <ThemedText
-              color={"white"}
-              type="subtitle"
-              style={{ fontWeight: "bold" }}
-            >
-              {todayData.image ? (
-                <Image
-                  source={{ uri: todayData.image }}
-                  className="w-20 h-20 rounded-full"
-                />
-              ) : (
-                <Feather name="image" size={28} color="white" />
-              )}
-              {/* <Feather name="image" size={28} color="white" /> */}
-            </ThemedText>
-          )}
-        </TouchableOpacity>
-
-        <Pressable
-          onLongPress={showDelayModal}
-          onPress={() => toggleCounting()}
-          activeOpacity={0.7}
-          disabled={loading}
-          className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
-          {...props}
-        >
-          {loading ? (
-            <ActivityIndicator color="#38BDF8" />
-          ) : isCounting ? (
-            <FontAwesome6 name="stop" size={52} color="white" />
-          ) : (
-            <FontAwesome6
-              name="play"
-              size={52}
-              style={{ marginLeft: 8 }}
-              color="white"
-            />
-          )}
-        </Pressable>
-
-        <TouchableOpacity
-          onPress={() => setNoteModalVisible(true)}
-          activeOpacity={0.7}
-          disabled={loading}
-          className={`h-20 w-20 rounded-full flex-row items-center justify-center border shadow-md ${todayData.mood ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
-          {...props}
-        >
-          {loading ? (
-            <ActivityIndicator color="#38BDF8" />
-          ) : (
-            <View className="flex items-center justify-center flex-1">
+      <View className="flex-row gap-7 items-center justify-center z-20 relative w-full">
+        <View className="p-1 mt-4 rounded-full">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setImageOptionVisible(true)}
+            disabled={loading}
+            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${todayData.image ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
+            {...props}
+          >
+            {loading ? (
+              <ActivityIndicator color="#38BDF8" />
+            ) : (
               <ThemedText
                 color={"white"}
                 type="subtitle"
                 style={{ fontWeight: "bold" }}
               >
-                {todayData?.mood ? (
-                  <ThemedText type="subtitle" className="">
-                    {EMOTIONS[todayData.mood].emoji}
-                  </ThemedText>
+                {todayData.image ? (
+                  <Image
+                    source={{ uri: todayData.image }}
+                    className="w-18 h-18 rounded-full"
+                  />
                 ) : (
-                  <Feather name="edit-2" size={28} color="white" />
+                  <Feather name="image" size={28} color="white" />
                 )}
+                {/* <Feather name="image" size={28} color="white" /> */}
               </ThemedText>
-              {todayData.note && (
-                <View className="absolute -top-4 right-0">
-                  <Ionicons name="chatbox" size={24} color="white" />
-                </View>
-              )}
-            </View>
-          )}
-        </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View className="p-1 rounded-full bg-background">
+          <Pressable
+            onLongPress={showDelayModal}
+            onPress={() => toggleCounting()}
+            activeOpacity={0.7}
+            disabled={loading}
+            className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
+            {...props}
+          >
+            {loading ? (
+              <ActivityIndicator color="#38BDF8" />
+            ) : isCounting ? (
+              <FontAwesome6 name="stop" size={52} color="white" />
+            ) : (
+              <FontAwesome6
+                name="play"
+                size={52}
+                style={{ marginLeft: 8 }}
+                color="white"
+              />
+            )}
+          </Pressable>
+        </View>
+
+        <View className="p-1 mt-4 rounded-full">
+          <TouchableOpacity
+            onPress={() => setNoteModalVisible(true)}
+            activeOpacity={0.7}
+            disabled={loading}
+            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${todayData.mood ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
+            {...props}
+          >
+            {loading ? (
+              <ActivityIndicator color="#38BDF8" />
+            ) : (
+              <View className="flex items-center justify-center flex-1">
+                <ThemedText
+                  color={"white"}
+                  type="subtitle"
+                  style={{ fontWeight: "bold" }}
+                >
+                  {todayData?.mood ? (
+                    <ThemedText type="subtitle" className="">
+                      {EMOTIONS[todayData.mood].emoji}
+                    </ThemedText>
+                  ) : (
+                    <Feather name="edit-2" size={28} color="white" />
+                  )}
+                </ThemedText>
+                {todayData.note && (
+                  <View className="absolute -top-4 right-0">
+                    <Ionicons name="chatbox" size={24} color="white" />
+                  </View>
+                )}
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
 
         {/* Note modal */}
         <NoteModal

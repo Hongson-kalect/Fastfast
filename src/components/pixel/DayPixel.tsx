@@ -71,10 +71,9 @@ const DayPixel = memo(
         pressable = true;
       }
     } else {
-
-    /*
-     * FAST
-     */
+      /*
+       * FAST
+       */
       /*
        * Không có log fasting
        */
@@ -87,10 +86,9 @@ const DayPixel = memo(
           pressable = true;
         }
       } else {
-
-      /*
-       * Có log fasting
-       */
+        /*
+         * Có log fasting
+         */
         const fast = pixelData.logs.reduce((best, current) =>
           current.hours_in_fast > best.hours_in_fast ? current : best,
         );
@@ -137,7 +135,10 @@ const DayPixel = memo(
     if (pressable) {
       return (
         <Pressable
-          onPress={() => onPress(day.dateString)}
+          onPress={() => {
+            console.log("pressed", Date.now());
+            onPress(day.dateString);
+          }}
           style={{
             opacity,
             backgroundColor,
