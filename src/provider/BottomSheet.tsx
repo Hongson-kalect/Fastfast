@@ -47,6 +47,7 @@ type BottomSheetListOptions<T> = {
 type ShowOptions<T = any> = {
   snapPoints?: string[];
   enablePanDownToClose?: boolean;
+  enableContentPanningGesture?: boolean;
   onClose?: () => void;
   isRaw?: boolean; // Dùng để khi mà giả sử dùng flatlist thi khóa scroll của provider
 
@@ -73,6 +74,8 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   const [enablePanDownToClose, setEnablePanDownToClose] = useState(true);
   const [onClose, setOnClose] = useState<(() => void) | null>(null);
   const [isRaw, setIsRaw] = useState(false);
+  const [enableContentPanningGesture, setEnableContentPanningGesture] =
+    useState(true);
 
   const [listOptions, setListOptions] =
     useState<BottomSheetListOptions<any> | null>(null);
@@ -83,6 +86,9 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
     (node: React.ReactElement, options?: ShowOptions) => {
       setContent(node);
       setSnapPoints(options?.snapPoints);
+      setEnableContentPanningGesture(
+        options?.enableContentPanningGesture ?? true,
+      );
       setListOptions(options?.list ?? null);
       setEnablePanDownToClose(options?.enablePanDownToClose ?? true);
       setOnClose(() => options?.onClose ?? null);
@@ -195,7 +201,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           enablePanDownToClose={enablePanDownToClose}
           backdropComponent={renderBackdrop}
           onDismiss={handleDismiss}
-          // enableContentPanningGesture={false}
+          enableContentPanningGesture={enableContentPanningGesture}
           keyboardBehavior="fillParent"
           backgroundStyle={{
             backgroundColor: theme.background,

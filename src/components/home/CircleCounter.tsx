@@ -14,8 +14,15 @@ import {
   SweepGradient,
   vec,
 } from "@shopify/react-native-skia";
-import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Pressable,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import {
   cancelAnimation,
   Easing,
@@ -25,7 +32,6 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { FastDetail } from "../fast_detail";
-import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
 import FastHistorySheet from "./FastHistorySheet";
 import FastingSheet from "./FastingSheet";
@@ -61,6 +67,12 @@ export const CircleCounter = ({
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
   const { addModal } = useModalStore();
+  const [now, setNow] = useState(() => Date.now());
+  useFocusEffect(
+    useCallback(() => {
+      setNow(Date.now());
+    }, []),
+  );
 
   const [selectedHistory, setSelectedHistory] = useState<FastSession | null>(
     null,
@@ -75,7 +87,7 @@ export const CircleCounter = ({
 
   // 2. Tính toán tỷ lệ tiến trình (0.05 -> 1)
   const progress = useMemo(() => {
-    return target ? Math.min(Math.max(counter / target, 0.05), 1) : 1;
+    return target ? Math.max(Math.max(counter / target, 0.05), 1) : 1;
   }, [target, counter]);
 
   const { width, height } = useWindowDimensions();
@@ -113,7 +125,7 @@ export const CircleCounter = ({
 
     rotation.value = withRepeat(
       withTiming(angle, {
-        duration: 7000,
+        duration: 6000,
         easing: Easing.linear,
       }),
       -1,
@@ -148,7 +160,11 @@ export const CircleCounter = ({
 
   // 9. Handlers & Modals
   const openTargetSheet = () => {
-    present(<TargetSheet currentFast={currentFast} />);
+    present(<TargetSheet currentFast={currentFast} />, {
+      isRaw: true,
+      snapPoints: ["100%"],
+      enableContentPanningGesture: false,
+    });
   };
 
   const changeTarget = () => {
@@ -158,13 +174,26 @@ export const CircleCounter = ({
     }, 500);
   };
 
+  const finishEstimate = useMemo(() => {
+    if (!settings?.target) return null;
+
+    const targetMs = Number(settings.target) * 3_600_000;
+
+    if (isCounting && currentFast?.start_time) {
+      return new Date(currentFast.start_time + targetMs);
+    }
+
+    return new Date(now + targetMs);
+  }, [isCounting, currentFast?.start_time, settings?.target, now]);
+
   const openFastingSheet = () => {
-    if (currentTarget && currentFast)
+    if (currentFast)
       present(
         <FastingSheet
           counter={counter}
-          fastTarget={currentTarget}
+          fastTarget={currentTarget || null}
           currentFast={currentFast}
+          finishDate={finishEstimate}
           onStopFasting={finishFasting}
           onCancelFasting={cancelFasting}
           onChangeTarget={changeTarget}
@@ -292,93 +321,129 @@ export const CircleCounter = ({
             height: width - strokeWidth - padding * 2,
           }}
         >
-          {isCounting ? (
+          {isCounting && currentFast ? (
             <Pressable
               onPress={openFastingSheet}
               hitSlop={10}
-              className="items-center justify-between h-full pt-8 pb-10"
+              className="items-center justify-between h-full pt-8 pb-14"
             >
               {/* 1. TẦNG TRÊN: Thời gian bắt đầu & Mục tiêu */}
               <View className="items-center gap-1">
                 {currentTarget ? (
-                  <Text
-                    style={{ color: currentTarget.colors.accent }}
-                    className="text-[14px] text-white/50 uppercase font-bold"
-                  >
-                    Intermittent {settings?.target || 16}h
-                  </Text>
+                  <>
+                    <TouchableOpacity onPress={openTargetSheet}>
+                      <Text
+                        style={{ color: currentTarget.colors.accent }}
+                        className="text-[14px] text-white/50 uppercase font-bold underline"
+                      >
+                        {currentTarget.label} {settings?.target || 16}h
+                      </Text>
+                    </TouchableOpacity>
+                    <Text className="text-[11px] text-white/60">
+                      Bắt đầu:{" "}
+                      {getRelativeTime(new Date(currentFast.start_time))}
+                    </Text>
+                  </>
                 ) : (
-                  <View></View>
-                )}
-                {currentFast?.start_time && (
-                  <Text className="text-[11px] text-white/80">
-                    Bắt đầu: {getRelativeTime(new Date(currentFast.start_time))}
-                    {/* VD: 08:00 */}
-                  </Text>
+                  <TouchableOpacity onPress={openTargetSheet}>
+                    <Text className="text-[14px] text-primary uppercase font-bold underline">
+                      Choose a target
+                    </Text>
+                    <Text className="text-[11px] text-white/60">
+                      No target had been selected
+                    </Text>
+                  </TouchableOpacity>
                 )}
               </View>
 
               {/* 2. TẦNG GIỮA: Đồng hồ đếm chính */}
-              <View className="my-auto">
+              <View className="my-auto items-center justify-center">
                 <Counter
                   itemClassName="text-white font-bold text-2xl"
                   counter={counter}
                   type="large"
                 />
+                {finishEstimate ? (
+                  <View>
+                    <Text className="text-[11px] text-white/40">
+                      Dự kiến: {getRelativeTime(finishEstimate)}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text className="text-[11px] text-white/40">Free mode</Text>
+                )}
               </View>
 
               {/* 3. TẦNG DƯỚI: Dự kiến kết thúc */}
               <View className="items-center gap-1">
-                {currentFast?.target_duration && (
-                  <View className="bg-white/10 px-2.5 py-0.5 rounded-full">
-                    <Text className="text-[12px] text-white/70">
-                      Dự kiến:{" "}
-                      {getRelativeTime(
-                        new Date(
-                          currentFast.start_time +
-                            currentFast.target_duration * 3_600_000,
-                        ),
-                      )}
-                    </Text>
-                  </View>
-                )}
-
                 <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
-                  <Text className="text-[11px] text-white/40 underline">
-                    Lịch sử nhịn
+                  <Text className="text-[12px] text-white/40 underline">
+                    Fasts history
                   </Text>
                 </Pressable>
               </View>
             </Pressable>
           ) : (
             <Pressable
-              hitSlop={10}
               onPress={openTargetSheet}
-              className="justify-center items-center w-full h-full gap-2"
+              hitSlop={10}
+              className="items-center justify-between h-full pt-8 pb-14"
             >
-              {settings?.target ? (
-                <ThemedText type="title">
-                  {settings?.target + ":00:00"}
-                </ThemedText>
-              ) : (
-                <ThemedText type="title">00:00:00</ThemedText>
-              )}
+              {/* 1. TẦNG TRÊN: Thời gian bắt đầu & Mục tiêu */}
+              <View className="items-center gap-1">
+                {currentTarget ? (
+                  <>
+                    <Text
+                      style={{ color: currentTarget.colors.accent }}
+                      className="text-[14px] text-white/50 uppercase font-bold underline"
+                    >
+                      {currentTarget.label} {settings?.target || 16}h
+                    </Text>
+                    <Text className="text-[11px] text-white/60">
+                      {currentTarget?.title}
+                      {/* VD: 08:00 */}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text className="text-[14px] text-primary uppercase font-bold underline">
+                      Choose a target
+                    </Text>
+                    <Text className="text-[11px] text-white/60">
+                      No target had been selected
+                    </Text>
+                  </>
+                )}
+              </View>
 
-              <View
-                style={{
-                  borderColor: currentTarget?.colors.accent || theme.warning,
-                }}
-                className="absolute border-b flex-row items-center gap-1 bottom-6"
-              >
-                <ThemedText
-                  style={{
-                    color: currentTarget?.colors.accent || theme.warning,
-                  }}
-                  type="small"
-                  className="text-[11px]!"
-                >
-                  {currentTarget?.label || "Set target"}
-                </ThemedText>
+              {/* 2. TẦNG GIỮA: Đồng hồ đếm chính */}
+              <View className="my-auto items-center justify-center">
+                <Counter
+                  itemClassName="text-white font-bold text-2xl"
+                  counter={
+                    settings?.target ? Number(settings.target) * 3_600_000 : 0
+                  }
+                  type="large"
+                />
+
+                {finishEstimate ? (
+                  <View>
+                    <Text className="text-[11px] text-white/40">
+                      Dự kiến: {getRelativeTime(finishEstimate)}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text className="text-[11px] text-white/40">Free mode</Text>
+                )}
+              </View>
+
+              {/* 3. TẦNG DƯỚI: Dự kiến kết thúc */}
+              <View className="items-center gap-1">
+                <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
+                  <Text className="text-[12px] text-white/60 underline">
+                    Fasts history
+                  </Text>
+                </Pressable>
               </View>
             </Pressable>
           )}

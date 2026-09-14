@@ -334,7 +334,7 @@ const HomeScreen = () => {
               />
             </View>
 
-            <View className="-mt-24 items-center justify-center">
+            <View className="-mt-26 items-center justify-center">
               <SwapButton
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}

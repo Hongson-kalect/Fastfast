@@ -29,21 +29,28 @@ const Counter = ({
       {timeString(timeLeft)
         .split("")
         .map((item, index) => {
-          if (typeof Number(item) === "number") {
-            return (
-              <View
-                key={index}
-                className={`${type === "large" ? "w-8" : type === "normal" ? "w-6" : "w-2"} flex-row items-center justify-center ${className}`}
+          let widthSize = "w-8";
+          const isNumber = !isNaN(Number(item));
+          if (isNumber)
+            widthSize =
+              type === "large" ? "w-8" : type === "normal" ? "w-6" : "w-2";
+          else
+            widthSize =
+              type === "large" ? "w-6" : type === "normal" ? "w-4" : "w-3";
+
+          return (
+            <View
+              key={index}
+              className={`${widthSize} flex-row items-center justify-center ${className}`}
+            >
+              <ThemedText
+                className={itemClassName}
+                type={type === "large" ? "title" : undefined}
               >
-                <ThemedText
-                  className={itemClassName}
-                  type={type === "large" ? "title" : undefined}
-                >
-                  {item}
-                </ThemedText>
-              </View>
-            );
-          }
+                {item}
+              </ThemedText>
+            </View>
+          );
         })}
     </View>
   );

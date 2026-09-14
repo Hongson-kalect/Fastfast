@@ -5,6 +5,7 @@ import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
+import { BottomSheetFlatList, BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
 import {
   FlatList,
@@ -70,12 +71,12 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
   const CARD_WIDTH = width - 34;
   const GAP = 6;
 
-  const listRef = useRef<FlatList>(null);
+  const listRef = useRef<BottomSheetFlatListMethods>(null);
 
   return (
     <View className="flex-1 bg-zinc-900 px-2 pb-20 pt-8">
       <View>
-        <FlatList
+        <BottomSheetFlatList
           ref={listRef}
           initialScrollIndex={selectIndex}
           horizontal

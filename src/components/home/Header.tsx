@@ -5,10 +5,10 @@ import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useEffect, useMemo, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, View } from "react-native";
 import CircularProgress from "../circleProgress";
 import { ThemedText } from "../themed-text";
-import HabitBottomSheet, { HabitLogComponent } from "./HabitBottomSheet";
+import HabitBottomSheet from "./HabitBottomSheet";
 import { HabitDetailModal } from "./HabitDetailModal";
 
 const radius = 50;
@@ -48,10 +48,10 @@ const HomeHeader = () => {
 
   const openHabitModal = () => {
     console.log("Vừng mở ra");
-    if(1===1){
-      return present(<HabitBottomSheet />,{
+    if (1 === 1) {
+      return present(<HabitBottomSheet />, {
         isRaw: true,
-        snapPoints: ['100%'],
+        snapPoints: ["100%"],
       });
     }
     // present(<HabitBottomSheet />, {
@@ -84,7 +84,7 @@ const HomeHeader = () => {
           FastFast
         </ThemedText>
       </View>
-      <Pressable hitSlop={10} onPress={openHabitModal}>
+      <Pressable className="z-10" hitSlop={10} onPress={openHabitModal}>
         <CircularProgress value={habit?.habit_snap || 0} />
       </Pressable>
     </View>
