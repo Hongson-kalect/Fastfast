@@ -22,6 +22,7 @@ import {
 } from "./shema/daily_note";
 import {
   deleteSession,
+  evaluateFastStatus,
   generateString as fast_sessionsGenerateString,
   fastFail,
   finishLastSession,
@@ -55,6 +56,8 @@ import {
   clearStreak,
   getUserProfile,
   increaseStreak,
+  updateLastLoginDate,
+  updateStreakDate,
   generateString as userGenerateString,
   userSeedData,
 } from "./shema/user";
@@ -70,6 +73,7 @@ import { getLocalTodayStr } from "@/util/timer";
 import {
   addHabitLogs,
   AddHabitType,
+  calculateStreakPenalties,
   getHabitLogs,
   getLastHabitLog,
   getShieldUsedLog,
@@ -239,13 +243,6 @@ type HandleLoginParams = {
   profile: UserProfile | null;
   habitLog: HabitLog | null;
 };
-// Helper tính khoảng cách số ngày giữa 2 chuỗi 'YYYY-MM-DD' (Tránh lỗi timezone)
-const getDaysDiff = (fromStr: string, toStr: string): number => {
-  const d1 = new Date(`${fromStr}T00:00:00Z`);
-  const d2 = new Date(`${toStr}T00:00:00Z`);
-  const diffTime = d2.getTime() - d1.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-};
 
 export const handleLogin = async ({
   db,
@@ -255,32 +252,81 @@ export const handleLogin = async ({
 }: HandleLoginParams) => {
   const todayStr = getLocalTodayStr();
 
-  if (!profile) {
-    return { lastFast, profile, habitLog, streak: null };
-  }
+  // Guard Clauses
+  if (!profile) return { lastFast, profile, habitLog, streak: null };
 
-  // Lần đầu vào app, khởi tạo streak_date
   if (!profile.streak_date) {
-    const returnProfile = await clearStreak(
-      db,
-      profile,
-      0,
-      habitLog?.habit_snap || 0,
-    );
+    const returnProfile = await clearStreak(db, profile, 0, habitLog?.shield_snap || 0, habitLog?.habit_snap || 0);
+    await updateLastLoginDate(db, profile, todayStr);
     return { lastFast, profile: returnProfile, habitLog, streak: null };
   }
 
-  // 0. Hôm nay đã xử lý rồi
   if (profile.streak_date === todayStr) {
     return { lastFast, profile, habitLog, streak: null };
   }
 
-  let isFastFail = false;
-  let increaseStreakNumber = 0;
-  let reduceShieldNumber = 0;
-  let reduceHabitNumber = 0;
-  let overRestDays = 0;
+  // 1. Evaluate Fast Fail
+  const previousLoginDate = profile.last_login_date || profile.streak_date;
+  const { isFastFail, referenceDate } = evaluateFastStatus(lastFast, previousLoginDate, todayStr);
 
+  if (lastFast && !lastFast.end_time && !isFastFail) {
+    await updateLastLoginDate(db, profile, todayStr);
+    return { lastFast, profile, habitLog, streak: null };
+  }
+
+  // 2. Calculate Penalties
+  const currentShield = habitLog?.shield_snap || 0;
+  const { gap, reduceShieldNumber, reduceHabitNumber, overRestDays, isStreakSavedByShield } =
+    calculateStreakPenalties(referenceDate, todayStr, currentShield);
+
+  // 3. Setup Stats & Dates
+  let returnLastFast = lastFast || null;
+  let returnHabitLog = habitLog || null;
+  let returnProfile: UserProfile | null = profile;
+
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayStr = getLocalTodayStr(yesterdayDate);
+
+  const streakStat = initStreakStats(profile, habitLog);
+
+  // 4. Apply Database Transaction
+  await db.withTransactionAsync(async () => {
+    if (isFastFail && lastFast) {
+      returnLastFast = await fastFail(db, lastFast);
+    }
+
+    returnProfile = await updateLastLoginDate(db, returnProfile || profile, todayStr);
+
+    if (gap <= 1) {
+      if (isFastFail) returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
+      return;
+    }
+
+    if (isStreakSavedByShield) {
+      returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
+      if (habitLog && reduceShieldNumber > 0) {
+        returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
+        streakStat.shield.current = returnHabitLog?.shield_snap || 0;
+      }
+    } else {
+      streakStat.streak.current = 0;
+      returnProfile = await clearStreak(db, returnProfile!, reduceHabitNumber, reduceShieldNumber, habitLog?.habit_snap || 0);
+      returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
+
+      if (habitLog) {
+        returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
+        streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
+        streakStat.shield.current = returnHabitLog?.shield_snap || 0;
+        streakStat.retain.current = returnHabitLog?.habit_retain || 0;
+      }
+    }
+  });
+
+  return { lastFast: returnLastFast, profile: returnProfile, habitLog: returnHabitLog, streak: streakStat };
+};
+
+const initStreakStats = (profile: UserProfile, habitLog: HabitLog | null) => {
   const streakStat: StreakCheckResult = {
     streak: {
       previous: profile.current_streak || 0,
@@ -301,115 +347,9 @@ export const handleLogin = async ({
     },
   };
 
-  // -------------------------------------------------------------
-  // 1. TÌM MỐC HOẠT ĐỘNG HỢP LỆ CUỐI CÙNG (effectiveLastDate)
-  // -------------------------------------------------------------
-  let effectiveLastDate = profile.streak_date;
-  // -------------------------------------------------------------
-  // 2. TÍNH KHOẢNG CÁCH NGÀY & KIỂM TRA STREAK / SHIELD
-  // -------------------------------------------------------------
-  let diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
+  return streakStat;
+}
 
-  console.log(todayStr, profile.streak_date, lastFast);
+const MAX_FAST_HOURS = 100;
 
-  // Nếu đang có phiên Fast chưa kết thúc
-  if (lastFast && !lastFast.end_time) {
-    const targetEndTime =
-      lastFast.start_time + (lastFast.target_duration || 24) * 60 * 60 * 1000;
-    const targetDayStr = getLocalTodayStr(new Date(targetEndTime));
-
-    // Lấy mốc LỚN NHẤT giữa streak_date và targetDayStr
-    if (targetDayStr > effectiveLastDate) {
-      effectiveLastDate = targetDayStr;
-      diffInDaysFromLastActive = getDaysDiff(effectiveLastDate, todayStr);
-    }
-
-    // Nếu thời gian hiện tại đã vượt quá targetDayStr ít nhất 1 ngày -> Cần chốt phiên Fast cũ
-    if (diffInDaysFromLastActive > 1) {
-      isFastFail = true;
-    }
-  }
-
-  // Khoảng cách thực tế từ Streak Date cũ -> Hôm Nay (Dùng để cộng dồn Streak)
-  const totalDaysFromStreakDate = getDaysDiff(profile.streak_date, todayStr);
-
-  if (diffInDaysFromLastActive > 1) {
-    // 🔴 BỊ BỎ VẮNG > 1 NGÀY: Cần trừ Shield hoặc Reset Streak
-    const shieldNeed = diffInDaysFromLastActive - 1;
-    const currentShield = habitLog?.shield_snap || 0;
-
-    overRestDays = shieldNeed - currentShield;
-
-    if (overRestDays > 0) {
-      // Shield không đủ gánh -> Reset Streak
-      reduceHabitNumber =
-        5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
-    } else {
-      // Shield gánh thành công! Giữ Streak và cộng bù số ngày
-      reduceShieldNumber = shieldNeed;
-      increaseStreakNumber = totalDaysFromStreakDate;
-    }
-  } else {
-    // 🟢 HỢP LỆ (Vào liên tục hoặc chênh 1 ngày): Cộng Streak bình thường
-    increaseStreakNumber = totalDaysFromStreakDate;
-  }
-
-  // -------------------------------------------------------------
-  // 3. THỰC THI DATABASE TRANSACTION
-  // -------------------------------------------------------------
-  let returnLastFast = lastFast || null;
-  let returnHabitLog = habitLog || null;
-  let returnProfile: UserProfile | null = profile;
-
-  await db.withTransactionAsync(async () => {
-    if (increaseStreakNumber > 0) {
-      returnProfile = await increaseStreak(
-        db,
-        profile,
-        increaseStreakNumber,
-        reduceShieldNumber,
-      );
-      streakStat.streak.max = returnProfile?.max_streak || 0;
-      streakStat.streak.current = returnProfile?.current_streak || 0;
-
-      if (habitLog && reduceShieldNumber > 0) {
-        returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
-      }
-    } else {
-      // Reset Streak về 1 (Cho ngày hôm nay)
-      streakStat.streak.current = 1;
-
-      returnProfile = await clearStreak(
-        db,
-        profile,
-        reduceHabitNumber,
-        habitLog?.shield_snap || 0,
-        habitLog?.habit_snap || 0,
-      );
-
-      if (habitLog && reduceHabitNumber > 0) {
-        returnHabitLog = await reduceHabit(
-          db,
-          habitLog,
-          reduceHabitNumber,
-          overRestDays,
-        );
-        streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
-        streakStat.shield.current = returnHabitLog?.shield_snap || 0;
-        streakStat.retain.current = returnHabitLog?.habit_retain || 0;
-      }
-    }
-
-    // Auto-close / Fail phiên Fast treo cũ
-    if (isFastFail && lastFast) {
-      returnLastFast = await fastFail(db, lastFast);
-    }
-  });
-
-  return {
-    lastFast: returnLastFast,
-    profile: returnProfile,
-    habitLog: returnHabitLog,
-    streak: streakStat,
-  };
-};
+// Helper 1: Check Fast Fail status

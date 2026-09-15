@@ -6,7 +6,7 @@ import { fixed } from "@/util/numberLimit";
 import { getRelativeTime, timeString } from "@/util/timer";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
 interface FastingSheetProps {
@@ -28,15 +28,13 @@ const FastingSheet = ({
   onCancelFasting,
   onChangeTarget,
 }: FastingSheetProps) => {
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
   const { addModal } = useModalStore();
   // Giả lập dữ liệu demo
   const finishTime = useMemo(() => {
     return finishDate?.getTime();
   }, [finishDate]);
   const [fastCounter, setFastCounter] = useState(Math.floor(counter / 1000));
-
-  console.log("counter", counter, fastCounter);
 
   const counterStatus = useMemo(() => {
     const status = getFastingStatus(fastCounter * 1000);
@@ -152,10 +150,20 @@ const FastingSheet = ({
             Bắt đầu {getRelativeTime(new Date(currentFast.start_time))}
           </ThemedText>
 
-          {finishTime && (
-            <ThemedText className="text-[11px]! text-zinc-500!">
-              Đạt mục tiêu {getRelativeTime(new Date(finishTime))}
-            </ThemedText>
+          {settings?.target && finishTime ? (
+            counter > settings?.target * 3_600 ? (
+              <View>
+                <Text className="text-[11px] text-success">Đã hoàn thành</Text>
+              </View>
+            ) : (
+              <View>
+                <Text className="text-[11px] text-white/40">
+                  Hoàn thành: {getRelativeTime(new Date(finishTime))}
+                </Text>
+              </View>
+            )
+          ) : (
+            <Text className="text-[11px] text-white/40">Free mode</Text>
           )}
         </View>
       </View>

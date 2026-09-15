@@ -113,3 +113,11 @@ export const formatHour = (hour: number) => {
 
   return `${pad(h % 24)}:${pad(m)}`;
 };
+
+// Helper tính khoảng cách số ngày giữa 2 chuỗi 'YYYY-MM-DD' (Tránh lỗi timezone)
+export const getDaysDiff = (fromStr: string, toStr: string): number => {
+  const d1 = new Date(`${fromStr}T00:00:00Z`);
+  const d2 = new Date(`${toStr}T00:00:00Z`);
+  const diffTime = d2.getTime() - d1.getTime();
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};

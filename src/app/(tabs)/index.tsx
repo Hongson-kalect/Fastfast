@@ -336,6 +336,7 @@ const HomeScreen = () => {
 
             <View className="-mt-26 items-center justify-center">
               <SwapButton
+                currentFast={currentFastSession}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
                 variant="primary"

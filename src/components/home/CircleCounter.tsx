@@ -363,12 +363,20 @@ export const CircleCounter = ({
                   counter={counter}
                   type="large"
                 />
-                {finishEstimate ? (
-                  <View>
-                    <Text className="text-[11px] text-white/40">
-                      Dự kiến: {getRelativeTime(finishEstimate)}
-                    </Text>
-                  </View>
+                {settings?.target && finishEstimate ? (
+                  counter > settings?.target * 3_600 ? (
+                    <View>
+                      <Text className="text-[11px] text-success">
+                        Đã hoàn thành
+                      </Text>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text className="text-[11px] text-white/40">
+                        Hoàn thành: {getRelativeTime(finishEstimate)}
+                      </Text>
+                    </View>
+                  )
                 ) : (
                   <Text className="text-[11px] text-white/40">Free mode</Text>
                 )}

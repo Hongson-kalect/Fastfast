@@ -2,7 +2,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyNote, MoodLevel } from "@/interfaces/db.type";
+import { DailyNote, FastSession, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
@@ -20,12 +20,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import DelayModal from "./DelayModal";
 import { PhotoPickerModal } from "./ImageModal";
 import NoteModal from "./NoteModal";
+import FastStartTimeModal from "./FastStartTimeModal";
+import FastEndTimeModal from "./FastEndTimeModal";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
+  currentFast: FastSession | null;
   toggleCounting: (time?: number) => void;
   variant?: "primary" | "secondary";
   loading?: boolean;
@@ -40,6 +42,7 @@ interface ButtonProps extends TouchableOpacityProps {
 export const SwapButton = ({
   isCounting,
   toggleCounting,
+  currentFast,
   variant = "primary",
   loading = false,
   className = "",
@@ -147,10 +150,18 @@ export const SwapButton = ({
   };
 
   const showDelayModal = () => {
+    if(isCounting && currentFast){
+      const finishTime = currentFast?.target_duration ? currentFast.start_time + currentFast.target_duration * 60 * 1000 :null
+      return addModal({
+        type: "custom",
+        render: (
+          <FastEndTimeModal startTime={currentFast?.start_time} targetFinishTime={finishTime} onSubmit={handleDelaySubmit} />
+        ),})
+      }
     addModal({
       type: "custom",
       render: (
-        <DelayModal isCounting={isCounting} onSubmit={handleDelaySubmit} />
+        <FastStartTimeModal onSubmit={handleDelaySubmit} />
       ),
     });
   };

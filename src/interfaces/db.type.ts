@@ -29,6 +29,7 @@ export interface UserProfile {
   active_days: number;
   max_streak: number;
   streak_date: string|null;
+  last_login_date: string|null;
 
   total_shield_used :number,
   total_shield_clamable :number,

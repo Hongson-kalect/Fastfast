@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     max_streak INTEGER DEFAULT 0,
     active_days INTEGER DEFAULT 0,
     streak_date TEXT,                -- 'YYYY-MM-DD' ngày streak cuối, để tính cộng streak
+    last_login_date TEXT,                -- 'YYYY-MM-DD' ngày cuối đăng nhập, để tính auto fast fail
 
     total_shield_used INTEGER DEFAULT 0,
     total_shield_clamable INTEGER DEFAULT 0,
@@ -227,5 +228,27 @@ export const clearStreak = async (
   } catch (e) {
     console.log("clearStreak error", e);
     return null;
+  }
+};
+
+export const updateLastLoginDate = async (db: SQLiteDatabase, profile: UserProfile, date_string:string) => {
+  try {
+    await db.runAsync(`Update user_profile SET updated_at = strftime('%s', 'now'), last_login_date = ? WHERE id = ?;`, [date_string, profile.id]); 
+    const newProfile = await getUserProfile(db);
+    return newProfile;
+  } catch (e) {
+    console.log("error on updateLastUserLogin", e);
+    return null
+  }
+};
+
+export const updateStreakDate = async (db: SQLiteDatabase, profile: UserProfile, date_string:string) => {
+  try {
+    await db.runAsync(`Update user_profile SET updated_at = strftime('%s', 'now'), streak_date = ? WHERE id = ?;`, [date_string, profile.id]); 
+    const newProfile = await getUserProfile(db);
+    return newProfile;
+  } catch (e) {
+    console.log("error on updateLastUserLogin", e);
+    return null
   }
 };
