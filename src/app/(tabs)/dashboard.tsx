@@ -111,17 +111,22 @@ const DashboardScreen = () => {
       weight: number | null;
     }[] = [];
 
-    initChartData(chartType).map((item, index, arr) =>
+    initChartData(chartType).map((item, index, arr) => {
+      // case ngày ko có data => lấy data ngày trước đó
+      let weight =
+        (weightMap[item.key] ?? weightsArr[index - 1]?.weight) || null;
+
+      // case ngày có data nằm ngoài range => ngày đầu sẽ lấy last weight
+      if (!weight && weights?.[0].log_date <= item.date) {
+        weight = weights?.[0].weight;
+      }
       weightsArr.push({
         key: item.key,
         x: item.x,
-        weight:
-          (weightMap[item.key] ?? weightsArr[index - 1]?.weight) ||
-          weights?.[0].weight ||
-          null, // case ngày có data nằm ngoài range => ngày đầu sẽ lấy last weight
+        weight,
         fast: Math.round(fastMap[item.key] ?? 0),
-      }),
-    );
+      });
+    });
 
     for (let i = weightsArr.length - 1; i < 0; i--) {
       const item = weightsArr[i];

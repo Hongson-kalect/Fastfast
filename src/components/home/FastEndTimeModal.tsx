@@ -1,7 +1,11 @@
+import {
+  MIN_FAST_DURATION,
+  TOO_QUICK_DURATION,
+} from "@/database/shema/fast_sessions";
 import { useAppStore } from "@/stores/appStore";
-import { getLocalTodayStr } from "@/util/timer";
-import Slider from "@react-native-community/slider";
-import { useMemo, useState } from "react";
+import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
+import { Slider } from "@miblanchard/react-native-slider";
+import { useMemo, useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
@@ -12,58 +16,105 @@ type Props = {
 };
 
 const MIN_SLIDER_RANGE = 60 * 60 * 1000; // 1 giờ
+const STEP = 5 * 60 * 1000; // 5 phút
 
 const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
   const { theme } = useAppStore();
 
-  const now = Date.now();
+  const { now, sliderMin, effectiveMax, today } = useMemo(() => {
+    const now = Date.now();
 
-  /**
-   * Target chỉ được dùng để mở rộng vùng slider.
-   *
-   * Ví dụ:
-   * start = 08:00
-   * target = 20:00
-   * now   = 18:00
-   *
-   * => slider: 08:00 -> 20:00
-   *
-   * Nhưng khi submit vẫn không cho endTime > now.
-   *
-   * Nếu:
-   * start = 08:00
-   * target = 12:00
-   * now   = 15:00
-   *
-   * => slider: 08:00 -> 15:00
-   */
-  const sliderMax = now;
+    // Không cho chọn tương lai.
+    const sliderMax = now;
 
-  /**
-   * Nếu start và max quá gần nhau thì mở rộng vùng slider
-   * để người dùng dễ thao tác.
-   */
-  const sliderMin = startTime;
-  const sliderRange = sliderMax - sliderMin;
+    const sliderMin = startTime;
+    const sliderRange = sliderMax - sliderMin;
 
-  const effectiveMax =
-    sliderRange < MIN_SLIDER_RANGE ? sliderMin + MIN_SLIDER_RANGE : sliderMax;
+    // Nếu khoảng quá nhỏ thì vẫn tạo vùng kéo tối thiểu 1 giờ.
+    const effectiveMax =
+      sliderRange < MIN_SLIDER_RANGE ? sliderMin + MIN_SLIDER_RANGE : sliderMax;
 
-  const [selectedTime, setSelectedTime] = useState(Math.min(now, effectiveMax));
+    return {
+      now,
+      sliderMin,
+      effectiveMax,
+      today: getLocalTodayStr(new Date(now)),
+    };
+  }, [startTime]);
 
-  const selectedDate = useMemo(() => new Date(selectedTime), [selectedTime]);
+  const initialTime = Math.min(now, effectiveMax);
 
-  const hours = selectedDate.getHours();
-  const minutes = selectedDate.getMinutes();
+  // Giá trị thực tế đang được slider giữ.
+  // Không dùng state để tránh render ngược vào slider.
+  const selectedTimeRef = useRef(initialTime);
 
-  const date = getLocalTodayStr(selectedDate);
-  const today = getLocalTodayStr(new Date());
+  // Chỉ dùng state cho phần text HH:mm.
+  const [displayTime, setDisplayTime] = useState(initialTime);
+
+  const { date, hours, minutes } = useMemo(() => {
+    const selectedDate = new Date(displayTime);
+
+    return {
+      hours: selectedDate.getHours(),
+      minutes: selectedDate.getMinutes(),
+      date: getLocalTodayStr(selectedDate),
+    };
+  }, [displayTime]);
+
+  const formatTime = (time: number) =>
+    new Date(time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+  const handleSliderChange = (values: number[]) => {
+    const value = values[0];
+
+    if (value == null) return;
+
+    selectedTimeRef.current = value;
+    setDisplayTime(value);
+  };
+
+  const handleSlidingComplete = (values: number[]) => {
+    const value = values[0];
+
+    if (value == null) return;
+
+    selectedTimeRef.current = value;
+    setDisplayTime(value);
+  };
+
+  const selectedDuration = displayTime - startTime;
+  const getFinishStatus = () => {
+    const seconds = selectedDuration / 1000;
+    if (seconds < TOO_QUICK_DURATION) {
+      return {
+        type: "too_quick" as const,
+        title: "Phiên sẽ bị hủy",
+        description: "Thời gian quá ngắn để được ghi nhận.",
+      };
+    }
+    if (seconds < MIN_FAST_DURATION) {
+      return {
+        type: "failed" as const,
+        title: "Phiên sẽ được đánh dấu thất bại",
+        description: "Chưa đạt thời gian tối thiểu để hoàn thành Fast.",
+      };
+    }
+    return {
+      type: "completed" as const,
+      title: "Phiên sẽ được hoàn thành",
+      description: "Thời gian này đủ để ghi nhận Fast.",
+    };
+  };
+  const finishStatus = getFinishStatus();
 
   const handleSubmit = () => {
-    /**
-     * Không cho xác nhận thời gian tương lai.
-     */
-    if (selectedTime > now) {
+    const finalTime = selectedTimeRef.current;
+
+    if (finalTime > now) {
       Toast.show({
         type: "error",
         text1: "Thời gian không hợp lệ",
@@ -72,7 +123,7 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
       return;
     }
 
-    if (selectedTime < startTime) {
+    if (finalTime < startTime) {
       Toast.show({
         type: "error",
         text1: "Thời gian không hợp lệ",
@@ -81,7 +132,7 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
       return;
     }
 
-    onSubmit(selectedTime);
+    onSubmit(finalTime);
   };
 
   return (
@@ -90,10 +141,6 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
       <View className="mb-5">
         <Text className="text-base font-bold text-white">
           Chọn thời gian kết thúc
-        </Text>
-
-        <Text className="mt-1 text-xs text-zinc-500">
-          Kéo thanh trượt đến thời điểm Fast thực sự kết thúc
         </Text>
       </View>
 
@@ -116,67 +163,56 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
       {/* Slider */}
       <View className="mt-6">
         <Slider
-          hitSlop={5}
-          style={{ height: 40 }}
-          value={selectedTime}
+          containerStyle={{
+            height: 40,
+          }}
           minimumValue={sliderMin}
           maximumValue={effectiveMax}
-          step={5 * 60 * 1000}
+          value={initialTime}
+          step={STEP}
           minimumTrackTintColor={theme.primary}
           maximumTrackTintColor="rgba(255,255,255,0.12)"
           thumbTintColor={theme.primary}
-          //   onSlidingComplete={setSelectedTime}
-          onValueChange={setSelectedTime}
+          thumbTouchSize={{
+            width: 40,
+            height: 40,
+          }}
+          onValueChange={handleSliderChange}
+          onSlidingComplete={handleSlidingComplete}
         />
 
         <View className="mt-1 flex-row justify-between">
           <Text className="text-[11px] text-zinc-500">
-            {new Date(sliderMin).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
+            {getRelativeTime(new Date(startTime))}
           </Text>
 
           <Text className="text-[11px] text-zinc-500">
-            {new Date(effectiveMax).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
+            {formatTime(effectiveMax)}
           </Text>
         </View>
       </View>
 
-      {/* Current / target info */}
       <View className="mt-5 rounded-xl bg-zinc-900/70 px-4 py-3">
-        <View className="flex-row justify-between">
-          <Text className="text-xs text-zinc-500">Bắt đầu</Text>
-
-          <Text className="text-xs font-medium text-zinc-300">
-            {new Date(startTime).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
+        <View className="mt-3 border-t border-white/5 pt-3">
+          <Text
+            className={`text-sm font-semibold ${finishStatus.type === "completed" ? "text-success" : "text-warning"}`}
+          >
+            {finishStatus.type === "completed" ? "✓ " : "⚠️ "}
+            {finishStatus.title}
+          </Text>
+          <Text className="mt-1 text-xs leading-5 text-zinc-500">
+            {finishStatus.description}
           </Text>
         </View>
-
         {targetFinishTime && (
-          <View className="mt-2 flex-row justify-between">
-            <Text className="text-xs text-zinc-500">Mục tiêu</Text>
-
+          <View className="mt-3 flex-row justify-between border-t border-white/5 pt-3">
+            <Text className="text-xs text-zinc-500"> Mục tiêu </Text>
             <Text className="text-xs font-medium text-zinc-300">
-              {new Date(targetFinishTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
+              {formatTime(targetFinishTime)}
             </Text>
           </View>
         )}
       </View>
-
       {/* Confirm */}
       <TouchableOpacity
         activeOpacity={0.8}

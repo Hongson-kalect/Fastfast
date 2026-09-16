@@ -161,7 +161,7 @@ export const SwapButton = ({
     addModal({
       type: "custom",
       render: (
-        <FastStartTimeModal onSubmit={handleDelaySubmit} />
+        <FastStartTimeModal minTime={currentFast?.end_time} onSubmit={handleDelaySubmit} />
       ),
     });
   };

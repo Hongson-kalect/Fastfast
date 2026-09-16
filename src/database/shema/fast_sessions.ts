@@ -168,9 +168,9 @@ export const getYearFastSession = async (
   }
 };
 
-const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
-const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
-const MAX_FAST_HOURS = 100;
+export const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
+export const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
+export const MAX_FAST_HOURS = 100;
 
 export const finishLastSession = async (
   db: SQLiteDatabase,

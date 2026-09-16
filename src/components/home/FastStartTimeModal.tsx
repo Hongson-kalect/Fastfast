@@ -6,6 +6,7 @@ import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 type Props = {
+  minTime?: number|null;
   onSubmit: (startTime: number) => void;
 };
 
@@ -19,7 +20,7 @@ const START_PRESETS = [
   { label: "6h", minutes: 360 },
 ];
 
-const FastStartTimeModal = ({ onSubmit }: Props) => {
+const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const { theme } = useAppStore();
 
   const [now] = useState(() => new Date());
@@ -36,6 +37,14 @@ const FastStartTimeModal = ({ onSubmit }: Props) => {
   const minAllowedTime = now.getTime() - MAX_DELAY_MS;
 
   const validateTime = (time: number): boolean => {
+    if (minTime && time < minTime) {
+      Toast.show({
+        type: "error",
+        text1: "Thời gian không hợp lệ",
+        text2: "Trùng thời gian với phiên trước đó!",
+      });
+      return false;
+    }
     if (time < minAllowedTime) {
       Toast.show({
         type: "error",

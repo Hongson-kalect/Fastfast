@@ -28,6 +28,7 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
         x: day.slice(5),
         weight: 0,
         fast: 0,
+        date: getLocalTodayStr(dayPointer),
       });
       dayPointer.setDate(dayPointer.getDate() + 1);
     }
@@ -41,6 +42,7 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
         x: "Week " + getWeek(dayPointer),
         weight: 0,
         fast: 0,
+        date: getLocalTodayStr(dayPointer),
       });
       dayPointer.setDate(dayPointer.getDate() + 7);
     }
@@ -52,6 +54,7 @@ export const initChartData = (chart_range: ChartRangeConfig) => {
       x: MONTHS[getMonth(dayPointer)],
       weight: 0,
       fast: 0,
+      date: getLocalTodayStr(dayPointer),
     });
     dayPointer.setMonth(dayPointer.getMonth() + 1);
   }

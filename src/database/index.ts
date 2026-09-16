@@ -261,7 +261,8 @@ export const handleLogin = async ({
     return { lastFast, profile: returnProfile, habitLog, streak: null };
   }
 
-  if (profile.streak_date === todayStr) {
+  // if (profile.streak_date === todayStr) {
+  if (profile.streak_date === todayStr || profile.last_login_date === todayStr) { // Mỗi ngày chỉ xử lý 1 lần
     return { lastFast, profile, habitLog, streak: null };
   }
 
@@ -270,6 +271,7 @@ export const handleLogin = async ({
   const { isFastFail, referenceDate } = evaluateFastStatus(lastFast, previousLoginDate, todayStr);
 
   if (lastFast && !lastFast.end_time && !isFastFail) {
+    console.log("fasting")
     await updateLastLoginDate(db, profile, todayStr);
     return { lastFast, profile, habitLog, streak: null };
   }
