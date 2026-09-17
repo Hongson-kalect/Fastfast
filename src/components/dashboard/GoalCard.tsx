@@ -1,6 +1,5 @@
 import { useDBService } from "@/hooks/useDBService";
 import { WeightTarget } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
@@ -63,7 +62,7 @@ export const GoalCard = () => {
   const remaining = useMemo(() => {
     if (!activeTarget || !weight) return 0;
     return (weight - activeTarget.target_weight).toFixed(1);
-  }, []);;
+  }, []);
 
   const openSetWeightModal = () => {
     addModal({
@@ -189,34 +188,42 @@ export const GoalCard = () => {
       </View>
 
       {/* Modern Slim Progress Bar */}
-      {!!weight && !!targetWeight && (
-        <View className="mt-3.5">
-          <View className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-            <Animated.View
-              className="h-full rounded-full bg-primary/80"
-              style={[animatedStyle]}
-            >
-              <LinearGradient
-                colors={[theme.primary + "aa", theme.primary]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={{
-                  flex: 1,
-                  borderRadius: 999,
-                }}
-              />
+      {!!weight ? (
+        !!targetWeight ? (
+          <View className="mt-3.5">
+            <View className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+              <Animated.View
+                className="h-full rounded-full bg-primary/80"
+                style={[animatedStyle]}
+              >
+                <LinearGradient
+                  colors={[theme.primary + "aa", theme.primary]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={{
+                    flex: 1,
+                    borderRadius: 999,
+                  }}
+                />
             </Animated.View>
+            </View>
+            <View className="mt-1.5 flex-row justify-between">
+              <Text className="text-[10px] text-zinc-500">
+                Start: {startWeight}kg
+              </Text>
+              <Text className="text-[10px] font-semibold text-primary">
+                {Math.round(percentage)}%
+              </Text>
+            </View>
           </View>
-          <View className="mt-1.5 flex-row justify-between">
-            <Text className="text-[10px] text-zinc-500">
-              Start: {startWeight}kg
-            </Text>
-            <Text className="text-[10px] font-semibold text-primary">
-              {Math.round(percentage)}%
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-[12px] text-text-base/50">
+              Set target to measure your progress
             </Text>
           </View>
-        </View>
-      )}
+        )
+      ) : null}
     </View>
   );
 };

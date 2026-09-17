@@ -81,6 +81,7 @@ import {
   reduceHabit,
   reduceShield,
 } from "./shema/habit_logs";
+import { applyClearStreak, applyHabitReduction, applyLastLoginDate, applyShieldReduction, applyStreakDate, createStreakContext, getYesterdayStr, saveStreakContext } from "@/util/streak";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -95,12 +96,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   finishLastSession: (data: {
     id: string;
     endTime: number;
-    duration: number;
-    isValid: boolean;
-    isTooFast:boolean,
-    profile?: UserProfile;
-    habitLog?: HabitLog;
-  }) => finishLastSession(db, data),
+  }) => finishLastSession({db,...data}),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number, targetDuration?: number) =>
     startNewSession(db, startTime, targetDuration),
@@ -252,106 +248,198 @@ export const handleLogin = async ({
 }: HandleLoginParams) => {
   const todayStr = getLocalTodayStr();
 
-  // Guard Clauses
-  if (!profile) return { lastFast, profile, habitLog, streak: null };
+  // Guard
+  if (!profile) {
+    return {
+      lastFast,
+      profile,
+      habitLog,
+      streak: null,
+    };
+  }
 
+  // Tạo streak context
+  const streak = createStreakContext(profile, habitLog);
+
+  // Chưa có streak -> reset state
   if (!profile.streak_date) {
-    const returnProfile = await clearStreak(db, profile, 0, habitLog?.shield_snap || 0, habitLog?.habit_snap || 0);
-    await updateLastLoginDate(db, profile, todayStr);
-    return { lastFast, profile: returnProfile, habitLog, streak: null };
+    applyClearStreak(streak);
+
+    // Login date vẫn được cập nhật
+    applyLastLoginDate(streak, todayStr);
+
+    await saveStreakContext(db, streak);
+
+    return {
+      lastFast,
+      profile: streak.profile,
+      habitLog: streak.habitLog,
+      streak: null,
+    };
   }
 
-  // if (profile.streak_date === todayStr) {
-  if (profile.streak_date === todayStr || profile.last_login_date === todayStr) { // Mỗi ngày chỉ xử lý 1 lần
-    return { lastFast, profile, habitLog, streak: null };
+  // Mỗi ngày chỉ reconcile một lần
+  if (
+    profile.streak_date === todayStr ||
+    profile.last_login_date === todayStr
+  ) {
+    return {
+      lastFast,
+      profile,
+      habitLog,
+      streak: null,
+    };
   }
 
-  // 1. Evaluate Fast Fail
-  const previousLoginDate = profile.last_login_date || profile.streak_date;
-  const { isFastFail, referenceDate } = evaluateFastStatus(lastFast, previousLoginDate, todayStr);
+  // --------------------------------------------------
+  // 1. Evaluate Fast
+  // --------------------------------------------------
 
-  if (lastFast && !lastFast.end_time && !isFastFail) {
-    console.log("fasting")
-    await updateLastLoginDate(db, profile, todayStr);
-    return { lastFast, profile, habitLog, streak: null };
+  const previousLoginDate =
+    profile.last_login_date || profile.streak_date;
+
+  const {
+    isFastFail,
+    referenceDate,
+  } = evaluateFastStatus(
+    lastFast,
+    previousLoginDate,
+    todayStr,
+  );
+
+  // Đang fasting và chưa fail:
+  // chỉ ghi nhận hôm nay đã login.
+  if (
+    lastFast &&
+    !lastFast.end_time &&
+    !isFastFail
+  ) {
+    applyLastLoginDate(streak, todayStr);
+
+    await saveStreakContext(db, streak);
+
+    return {
+      lastFast,
+      profile: streak.profile,
+      habitLog: streak.habitLog,
+      streak: null,
+    };
   }
 
-  // 2. Calculate Penalties
-  const currentShield = habitLog?.shield_snap || 0;
-  const { gap, reduceShieldNumber, reduceHabitNumber, overRestDays, isStreakSavedByShield } =
-    calculateStreakPenalties(referenceDate, todayStr, currentShield);
+  // --------------------------------------------------
+  // 2. Fast fail
+  // --------------------------------------------------
 
-  // 3. Setup Stats & Dates
-  let returnLastFast = lastFast || null;
-  let returnHabitLog = habitLog || null;
-  let returnProfile: UserProfile | null = profile;
+  let returnLastFast = lastFast;
 
-  const yesterdayDate = new Date();
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterdayStr = getLocalTodayStr(yesterdayDate);
+  if (isFastFail && lastFast) {
+    returnLastFast = await fastFail(db, lastFast);
+  }
 
-  const streakStat = initStreakStats(profile, habitLog);
+  // --------------------------------------------------
+  // 3. Calculate penalty
+  // --------------------------------------------------
 
-  // 4. Apply Database Transaction
-  await db.withTransactionAsync(async () => {
-    if (isFastFail && lastFast) {
-      returnLastFast = await fastFail(db, lastFast);
+  const currentShield =
+    streak.habitLog?.shield_snap || 0;
+
+  const {
+    gap,
+    reduceShieldNumber,
+    reduceHabitNumber,
+    overRestDays,
+    isStreakSavedByShield,
+  } = calculateStreakPenalties(
+    referenceDate,
+    todayStr,
+    currentShield,
+  );
+
+  // Login hôm nay đã được xử lý
+  applyLastLoginDate(streak, todayStr);
+
+  // --------------------------------------------------
+  // 4. No gap / Fast fail
+  // --------------------------------------------------
+
+  if (gap <= 1) {
+    if (isFastFail) {
+      applyStreakDate(
+        streak,
+        getYesterdayStr(todayStr),
+      );
     }
 
-    returnProfile = await updateLastLoginDate(db, returnProfile || profile, todayStr);
+    await saveStreakContext(db, streak);
 
-    if (gap <= 1) {
-      if (isFastFail) returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
-      return;
+    return {
+      lastFast: returnLastFast,
+      profile: streak.profile,
+      habitLog: streak.habitLog,
+      streak: streak.stats,
+    };
+  }
+
+  // --------------------------------------------------
+  // 5. Shield saves streak
+  // --------------------------------------------------
+
+  if (isStreakSavedByShield) {
+    applyStreakDate(
+      streak,
+      getYesterdayStr(todayStr),
+    );
+
+    if (reduceShieldNumber > 0) {
+      applyShieldReduction(
+        streak,
+        reduceShieldNumber,
+      );
     }
 
-    if (isStreakSavedByShield) {
-      returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
-      if (habitLog && reduceShieldNumber > 0) {
-        returnHabitLog = await reduceShield(db, habitLog, reduceShieldNumber);
-        streakStat.shield.current = returnHabitLog?.shield_snap || 0;
-      }
-    } else {
-      streakStat.streak.current = 0;
-      returnProfile = await clearStreak(db, returnProfile!, reduceHabitNumber, reduceShieldNumber, habitLog?.habit_snap || 0);
-      returnProfile = await updateStreakDate(db, returnProfile!, yesterdayStr);
+    await saveStreakContext(db, streak);
 
-      if (habitLog) {
-        returnHabitLog = await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
-        streakStat.habit.currentPercent = returnHabitLog?.habit_snap || 0;
-        streakStat.shield.current = returnHabitLog?.shield_snap || 0;
-        streakStat.retain.current = returnHabitLog?.habit_retain || 0;
-      }
-    }
-  });
+    return {
+      lastFast: returnLastFast,
+      profile: streak.profile,
+      habitLog: streak.habitLog,
+      streak: streak.stats,
+    };
+  }
 
-  return { lastFast: returnLastFast, profile: returnProfile, habitLog: returnHabitLog, streak: streakStat };
+  // --------------------------------------------------
+  // 6. Streak lost
+  // --------------------------------------------------
+
+  applyClearStreak(streak);
+
+  if (reduceShieldNumber > 0) {
+    applyShieldReduction(
+      streak,
+      reduceShieldNumber,
+    );
+  }
+
+  if (reduceHabitNumber > 0) {
+    applyHabitReduction(
+      streak,
+      reduceHabitNumber,
+      overRestDays,
+    );
+  }
+
+  applyStreakDate(
+    streak,
+    getYesterdayStr(todayStr),
+  );
+
+  await saveStreakContext(db, streak);
+
+  return {
+    lastFast: returnLastFast,
+    profile: streak.profile,
+    habitLog: streak.habitLog,
+    streak: streak.stats,
+  };
 };
 
-const initStreakStats = (profile: UserProfile, habitLog: HabitLog | null) => {
-  const streakStat: StreakCheckResult = {
-    streak: {
-      previous: profile.current_streak || 0,
-      max: profile.max_streak || 0,
-      current: profile.current_streak || 0,
-    },
-    habit: {
-      currentPercent: habitLog?.habit_snap || 0,
-      previousPercent: habitLog?.habit_snap || 0,
-    },
-    shield: {
-      previous: habitLog?.shield_snap || 0,
-      current: habitLog?.shield_snap || 0,
-    },
-    retain: {
-      previous: habitLog?.habit_retain || 0,
-      current: habitLog?.habit_retain || 0,
-    },
-  };
-
-  return streakStat;
-}
-
-const MAX_FAST_HOURS = 100;
-
-// Helper 1: Check Fast Fail status

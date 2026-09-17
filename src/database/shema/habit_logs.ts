@@ -117,7 +117,7 @@ export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
     habit_data.shield_snap = lastLog?.shield_snap || 0;
   }
 
-  if (lastLog?.habit_snap === 100) {
+  if (habit_data?.habit_snap && habit_data?.habit_snap >= 100) {
     // habit giảm
     if (habit_data.habit_detla) {
       if (habit_data.habit_detla < 0) retain = 0;

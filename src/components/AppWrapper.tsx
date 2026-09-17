@@ -26,84 +26,56 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { init, isLoadingData, userProfile } = useAppStore();
 
   useEffect(() => {
-    if (!db) return;
-    const id = Math.random().toString(36).slice(2);
+  if (!db) return;
 
-    const load = async () => {
-      const streakObj = await init(db);
-      setDBReady(true);
+  const load = async () => {
+    const result = await init(db);
+    setDBReady(true);
 
-      console.log("streak", streakObj);
-      if (!streakObj) return;
+    if (!result) return;
 
-      const { streak, habit, retain, shield } = streakObj;
+    const { streak, habit, retain, shield } = result;
 
-      // Danh sách các cột mốc quan trọng
-      // 1. Check xem lần cập nhật này có vượt qua cột mốc nào trong MILESTONES hay không
-      const hitMilestone = MILESTONES.some(
-        (m) => streak.previous < m && streak.current >= m,
-      );
+    // Login chỉ reconcile trạng thái streak.
+    // Không tăng streak ở đây nữa.
 
-      // 2. Check có dùng Shield hay không (Shield giảm)
-      const usedShield = shield.previous > shield.current;
+    const usedShield = shield.previous > shield.current;
+    const lostStreak = streak.previous > streak.current;
 
-      // 3. Check có bị gãy Streak hay không (Streak giảm)
-      const lostStreak = streak.previous > streak.current;
+    if (!usedShield && !lostStreak) return;
 
-      // --- ĐIỀU KIỆN MỞ MODAL EVENT-DRIVEN ---
-      if (hitMilestone || usedShield || lostStreak) {
-        setTimeout(
-          () =>
-            addModal({
-              type: "custom",
-              render: (
-                <StreakCheckModal
-                  data={{
-                    streak: {
-                      current: streak.current,
-                      max: streak.max,
-                      previous: streak.previous,
-                    },
-                    habit: {
-                      currentPercent: habit.currentPercent,
-                      previousPercent: habit.previousPercent,
-                    },
-                    retain: {
-                      current: retain.current,
-                      previous: retain.previous,
-                    },
-                    shield: {
-                      current: shield.current,
-                      previous: shield.previous,
-                    },
-                  }}
-                />
-              ),
-            }),
-          1000,
-        );
-      } else if (streak.current > 1 && streak.current > streak.previous) {
-        Toast.show({
-          type: "success",
-          text2: "Sreak increased!",
-          text1:
-            "+" +
-            (streak.current - streak.previous) +
-            ", Current Streak: " +
-            streak.current +
-            " 🔥",
-          position: "top",
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => console.log("Toast pressed"),
-          onShow: () => console.log("Toast shown"),
-          onHide: () => console.log("Toast hidden"),
-        });
-      }
-    };
+    setTimeout(() => {
+      addModal({
+        type: "custom",
+        render: (
+          <StreakCheckModal
+            data={{
+              streak: {
+                current: streak.current,
+                max: streak.max,
+                previous: streak.previous,
+              },
+              habit: {
+                currentPercent: habit.currentPercent,
+                previousPercent: habit.previousPercent,
+              },
+              retain: {
+                current: retain.current,
+                previous: retain.previous,
+              },
+              shield: {
+                current: shield.current,
+                previous: shield.previous,
+              },
+            }}
+          />
+        ),
+      });
+    }, 1000);
+  };
 
-    load();
-  }, [db]);
+  load();
+}, [db]);
 
   useEffect(() => {
     // wordSocket.connect();
