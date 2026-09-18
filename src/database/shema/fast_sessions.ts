@@ -1,14 +1,17 @@
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
-import { fixed } from "@/util/numberLimit";
+import { fixed, numberLimit } from "@/util/numberLimit";
 import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
   addHabitLogs,
+  calculatePenaltyEffect,
   calculateStreakPenalties,
   getLastHabitLog,
   reduceHabit,
   reduceShield,
+  RETAIN_LIMIT,
+  SHIELD_LIMIT,
 } from "./habit_logs";
 import {
   clearStreak,
@@ -18,7 +21,7 @@ import {
   updateStreakDate,
 } from "./user";
 import { StreakCheckResult } from "@/interfaces/home.type";
-import { applyClearStreak, applyHabitReduction, applyShieldReduction, applyShieldReward, applyStreakDate, applyStreakReward, createStreakContext, getYesterdayStr, saveStreakContext, StreakContext } from "@/util/streak";
+import { applyClearStreak, applyHabitReduction, applyHabitReward, applyShieldReduction, applyShieldReward, applyStreakDate, applyStreakReward, createStreakContext, getYesterdayStr, saveStreakContext, StreakContext } from "@/util/streak";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -189,241 +192,6 @@ export const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
 export const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
 export const MAX_FAST_HOURS = 100;
 
-export const finishLastSessionOld = async (
-  db: SQLiteDatabase,
-  data: {
-    id: string;
-    endTime: number;
-  },
-) => {
-  try {
-    const { id, endTime } = data;
-
-    let result = {
-      lastSession: null as FastSession | null,
-      habitLog: null as HabitLog | null,
-      profile: null as UserProfile | null,
-    };
-
-    await db.withTransactionAsync(async () => {
-      const session = await db.getFirstAsync<FastSession>(
-        `SELECT * FROM fast_sessions WHERE id = ?;`,
-        [id],
-      );
-
-      if (!session) {
-        throw new Error("FastSession not found");
-      }
-
-      // Chặn finish lại một session đã được xử lý
-      if (session.status !== "active") {
-        result = {
-          lastSession: session,
-          habitLog: await getLastHabitLog(db),
-          profile: await getUserProfile(db),
-        };
-        return;
-      }
-
-      const startTime = session.start_time;
-      if (endTime <= startTime) {
-        throw new Error("Invalid endTime");
-      }
-
-      const duration = Math.floor((endTime - startTime) / 1000);
-      const isTooQuick = duration < TOO_QUICK_DURATION;
-      const isCompleted = duration >= MIN_FAST_DURATION;
-
-      if (isTooQuick) {
-        await db.runAsync(
-          `UPDATE fast_sessions
-           SET status = 'failed',
-               end_time = ?,
-               submit_time = ?,
-               duration = ?,
-               is_deleted = 1
-           WHERE id = ?
-             AND status = 'active';`,
-          [endTime, Date.now(), duration, id],
-        );
-
-        const profile = await getUserProfile(db);
-        const habitLog = await getLastHabitLog(db);
-
-        if (!profile) {
-          throw new Error("UserProfile not found");
-        }
-        await reconcileStreakAfterInvalidFast(
-          db,
-          profile,
-          habitLog,
-          getLocalTodayStr(),
-        );
-
-        result = {
-          lastSession: null,
-          habitLog: await getLastHabitLog(db),
-          profile: await getUserProfile(db),
-        };
-
-        return;
-      }
-
-      const oldProfile = await getUserProfile(db);
-      const oldHabitLog = await getLastHabitLog(db);
-
-      if (!oldProfile) {
-        throw new Error("UserProfile not found");
-      }
-
-      if (!isCompleted) {
-        await db.runAsync(
-          `UPDATE fast_sessions
-           SET end_time = ?,
-               submit_time = ?,
-               duration = ?,
-               status = 'failed'
-           WHERE id = ?
-             AND status = 'active';`,
-          [endTime, Date.now(), duration, id],
-        );
-
-        await reconcileStreakAfterInvalidFast(
-          db,
-          oldProfile,
-          oldHabitLog,
-          getLocalTodayStr(),
-        );
-
-        result = {
-          lastSession: await db.getFirstAsync<FastSession>(
-            `SELECT * FROM fast_sessions WHERE id = ?;`,
-            [id],
-          ),
-          habitLog: await getLastHabitLog(db),
-          profile: await getUserProfile(db),
-        };
-
-        return;
-      }
-
-      const hours = duration / 3600;
-      const habitDelta = fixed(3.0 + (hours - 16) * 0.2);
-      const sessionShieldGain = Math.max(0, Math.floor(hours / 24) - 1);
-      const oldHabitScore = oldHabitLog?.habit_snap || 0;
-      const newHabitScore = fixed(oldHabitScore + habitDelta);
-
-      let milestoneShieldGain = 0;
-      let lowClaimable = oldProfile.low_shield_clamable;
-      let midClaimable = oldProfile.mid_shield_clamable;
-      let fullClaimable = oldProfile.full_shield_clamable;
-
-      if (newHabitScore >= shield_rewards[0] && lowClaimable) {
-        milestoneShieldGain += 1;
-        lowClaimable = 0;
-      }
-
-      if (newHabitScore >= shield_rewards[1] && midClaimable) {
-        milestoneShieldGain += 1;
-        midClaimable = 0;
-      }
-
-      if (newHabitScore >= shield_rewards[2] && fullClaimable) {
-        milestoneShieldGain += 1;
-        fullClaimable = 0;
-      }
-      await db.runAsync(
-        `UPDATE fast_sessions
-         SET end_time = ?,
-             submit_time = ?,
-             duration = ?,
-             status = 'completed'
-         WHERE id = ?
-           AND status = 'active';`,
-        [endTime, Date.now(), duration, id],
-      );
-      const newHabitLog = await addHabitLogs(db, {
-        fast_id: id,
-        log_date: getLocalTodayStr(new Date(endTime)),
-        habit_detla: habitDelta,
-        shield_delta: sessionShieldGain,
-        shield_milestone: milestoneShieldGain,
-        habit_snap: newHabitScore,
-      });
-      const totalShieldGain = sessionShieldGain + milestoneShieldGain;
-
-      await db.runAsync(
-        `UPDATE user_profile
-         SET total_shield_clamable = total_shield_clamable + ?,
-             low_shield_clamable = ?,
-             mid_shield_clamable = ?,
-             full_shield_clamable = ?,
-             updated_at = strftime('%s', 'now')
-         WHERE id = ?;`,
-        [
-          totalShieldGain,
-          lowClaimable,
-          midClaimable,
-          fullClaimable,
-          oldProfile.id,
-        ],
-      );
-      const startDate = getLocalTodayStr(new Date(startTime));
-      const endDate = getLocalTodayStr(new Date(endTime));
-      const streakGain = oldProfile.streak_date
-        ? Math.max(getDaysDiff(oldProfile.streak_date, endDate), 0)
-        : 0;
-
-      const updatedProfileByStreak = await increaseStreak(
-        db,
-        (await getUserProfile(db)) || oldProfile,
-        streakGain,
-        0,
-      );
-
-      const finalProfile = await updateStreakDate(
-        db,
-        updatedProfileByStreak!,
-        endDate,
-      );
-
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      const yesterdayStr = getLocalTodayStr(yesterday);
-
-      if (endDate < yesterdayStr) {
-        await reconcileStreakAfterCompletedFast(
-          db,
-          finalProfile!,
-          await getLastHabitLog(db),
-          endDate,
-          getLocalTodayStr(),
-        );
-      }
-
-      result = {
-        lastSession: await db.getFirstAsync<FastSession>(
-          `SELECT * FROM fast_sessions WHERE id = ?;`,
-          [id],
-        ),
-        habitLog: await getLastHabitLog(db),
-        profile: await getUserProfile(db),
-      };
-    });
-
-    return result;
-  } catch (error) {
-    console.error("error on finishLastSession:", error);
-
-    return {
-      lastSession: null,
-      habitLog: null,
-      profile: null,
-    };
-  }
-};
-
 type FinishFastResult = {
   lastSession: FastSession | null;
   habitLog: HabitLog | null;
@@ -460,7 +228,8 @@ export const finishLastSession = async ({
 
     // Idempotency
     if (lastFast.end_time) {
-      return result.lastSession = lastFast
+      result.lastSession = lastFast
+      return 
     }
 
     // --------------------------------------------------
@@ -502,12 +271,13 @@ export const finishLastSession = async ({
 
       await saveStreakContext(db, streak);
 
-      return result = {
+      result = {
         lastSession: returnLastFast,
         profile: streak.profile,
         habitLog: streak.habitLog,
         streak: streak.stats,
       };
+      return 
     }
 
     // --------------------------------------------------
@@ -525,12 +295,13 @@ export const finishLastSession = async ({
 
       await saveStreakContext(db, streak);
 
-      return result = {
+      result = {
         lastSession: returnLastFast,
         profile: streak.profile,
         habitLog: streak.habitLog,
         streak: streak.stats,
       };
+      return 
     }
 
     // --------------------------------------------------
@@ -548,12 +319,13 @@ export const finishLastSession = async ({
       streak,
     );
 
-    return {
-      lastFast: lastSession,
+    result = {
+      lastSession: lastSession,
       profile: streak.profile,
       habitLog: returnHabitLog,
       streak: streak.stats,
     };
+    return 
   });
 
   return result;
@@ -621,7 +393,9 @@ const handleFailedFast = async (
 
   return await getSessionById(db, session.id);
 
-};const handleCompletedFast = async (
+};
+
+const handleCompletedFast = async (
   db: SQLiteDatabase,
   session: FastSession,
   endTime: number,
@@ -654,18 +428,19 @@ const handleFailedFast = async (
     ],
   );
 
+  const sessionUpdated = await getSessionById(db, session.id);
+
   // ----------------------------------------
   // Habit history
   // ----------------------------------------
 
-  await addHabitLogs(db, {
+  const lastLog = await addHabitLogs(db, {
     fast_id: session.id,
     log_date: getLocalTodayStr(new Date(endTime)),
-    habit_detla: reward.habitDelta,
-    shield_delta: reward.totalShieldGain,
-    shield_milestone: reward.milestoneShieldGain,
-    habit_snap: reward.newHabitScore,
+    ...reward
   });
+
+  streak.habitLog = lastLog;
 
   // ----------------------------------------
   // Update current streak context
@@ -673,8 +448,7 @@ const handleFailedFast = async (
 
   applyHabitReward(
     streak,
-    reward.habitDelta,
-    reward.newHabitScore,
+    reward
   );
 
   applyShieldReward(
@@ -686,6 +460,11 @@ const handleFailedFast = async (
     streak,
     endTime,
   );
+
+  return {
+    lastSession: sessionUpdated,
+    habitLog: lastLog
+  }
 };
 
 export const calculateFastReward = (
@@ -695,7 +474,11 @@ export const calculateFastReward = (
 ) => {
   const hours = duration / 3600;
 
-  const habitDelta = fixed(
+  // ─────────────────────────────
+  // Fast reward
+  // ─────────────────────────────
+
+  const inputHabitDelta = fixed(
     3.0 + (hours - 16) * 0.2,
   );
 
@@ -705,10 +488,48 @@ export const calculateFastReward = (
   );
 
   const oldHabitScore = habitLog?.habit_snap || 0;
+  const oldRetain = habitLog?.habit_retain || 0;
+  const oldShieldScore = habitLog?.shield_snap || 0;
 
-  const newHabitScore = fixed(
-    oldHabitScore + habitDelta,
-  );
+  // ─────────────────────────────
+  // Habit / Retain
+  // ─────────────────────────────
+
+  let habitDelta = inputHabitDelta;
+  let newHabitScore = oldHabitScore;
+
+  let retainDelta = 0;
+  let newRetain = oldRetain;
+
+  let bonusShieldGain = 0;
+
+  if (inputHabitDelta < 0) {
+    // Habit giảm → không ảnh hưởng retain
+    newHabitScore = fixed(
+      oldHabitScore + inputHabitDelta,
+    );
+  } else if (oldHabitScore >= 100) {
+    // Habit đã đầy → chuyển reward sang retain
+    habitDelta = 0;
+
+    retainDelta = inputHabitDelta;
+    newRetain = oldRetain + retainDelta;
+
+    // Retain đủ một vòng
+    if (newRetain >= RETAIN_LIMIT) {
+      newRetain = 1;
+      bonusShieldGain = 1;
+    }
+  } else {
+    // Habit chưa đầy → cộng bình thường
+    newHabitScore = fixed(
+      oldHabitScore + inputHabitDelta,
+    );
+  }
+
+  // ─────────────────────────────
+  // Milestone shield
+  // ─────────────────────────────
 
   let milestoneShieldGain = 0;
 
@@ -740,14 +561,38 @@ export const calculateFastReward = (
     fullClaimable = 0;
   }
 
+  // ─────────────────────────────
+  // Total shield
+  // ─────────────────────────────
+
+  const totalShieldGain =
+    sessionShieldGain +
+    milestoneShieldGain +
+    bonusShieldGain;
+
+  const newShieldScore = numberLimit(
+    oldShieldScore + totalShieldGain,
+    0,
+    SHIELD_LIMIT,
+  );
+
   return {
+    // Habit
     habitDelta,
     newHabitScore,
+
+    // Retain
+    retainDelta,
+    newRetain,
+
+    // Shield
     sessionShieldGain,
     milestoneShieldGain,
-    totalShieldGain:
-      sessionShieldGain + milestoneShieldGain,
+    bonusShieldGain,
+    totalShieldGain,
+    newShieldScore,
 
+    // Milestone state
     lowClaimable,
     midClaimable,
     fullClaimable,
@@ -998,14 +843,13 @@ export const reconcileStreak = async (
 
   const {
     gap,
-    reduceShieldNumber,
-    reduceHabitNumber,
     overRestDays,
     isStreakSavedByShield,
-  } = calculateStreakPenalties(
+    ...data
+  } = calculatePenaltyEffect(
     referenceDate,
-    todayStr,
-    currentShield,
+    streak.profile,
+    streak.habitLog,
   );
 
   // --------------------------------------------------
@@ -1020,28 +864,34 @@ export const reconcileStreak = async (
     };
   }
 
+  const returnedHabitLog = await addHabitLogs(db, {
+    log_date: todayStr,
+    ...data,
+  });
+
+  streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
+  streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
+  streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
+
+   applyStreakDate(
+    streak,
+    getYesterdayStr(todayStr),
+  );
+
   // --------------------------------------------------
   // 4. Shield saves streak
   // --------------------------------------------------
+  if(data.shieldDelta){
+    streak.profile.total_shield_used=(streak.profile.total_shield_used||0)+data.shieldDelta;
+  }
 
   if (isStreakSavedByShield) {
-    applyStreakDate(
-      streak,
-      getYesterdayStr(todayStr),
-    );
-
-    if (reduceShieldNumber > 0) {
-      applyShieldReduction(
-        streak,
-        reduceShieldNumber,
-      );
-    }
 
     await saveStreakContext(db, streak);
 
     return {
       profile: streak.profile,
-      habitLog: streak.habitLog,
+      habitLog: returnedHabitLog,
       streak: streak.stats,
     };
   }
@@ -1052,31 +902,11 @@ export const reconcileStreak = async (
 
   applyClearStreak(streak);
 
-  if (reduceShieldNumber > 0) {
-    applyShieldReduction(
-      streak,
-      reduceShieldNumber,
-    );
-  }
-
-  if (reduceHabitNumber > 0) {
-    applyHabitReduction(
-      streak,
-      reduceHabitNumber,
-      overRestDays,
-    );
-  }
-
-  applyStreakDate(
-    streak,
-    getYesterdayStr(todayStr),
-  );
-
   await saveStreakContext(db, streak);
 
   return {
     profile: streak.profile,
-    habitLog: streak.habitLog,
+    habitLog: returnedHabitLog,
     streak: streak.stats,
   };
 };

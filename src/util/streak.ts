@@ -1,10 +1,13 @@
-import { reduceHabit, reduceShield } from "@/database/shema/habit_logs";
-import { clearStreak, increaseStreak, updateStreakDate } from "@/database/shema/user";
-import { HabitLog, UserProfile } from "@/interfaces/db.type";
+import { calculateFastReward } from "@/database/shema/fast_sessions";
+import {
+  addHabitLogs,
+  RETAIN_LIMIT,
+  SHIELD_LIMIT
+} from "@/database/shema/habit_logs";
+import { HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { SQLiteDatabase } from "expo-sqlite";
 import { getDaysDiff, getLocalTodayStr } from "./timer";
-import { calculateFastReward } from "@/database/shema/fast_sessions";
 
 export type StreakContext = {
   profile: UserProfile;
@@ -34,8 +37,7 @@ const initStreakStats = (profile: UserProfile, habitLog: HabitLog | null) => {
   };
 
   return streakStat;
-}
-
+};
 
 export const createStreakContext = (
   profile: UserProfile,
@@ -52,17 +54,12 @@ export const setStreakProfile = (
 ) => {
   context.profile = profile;
 
-  context.stats.streak.current =
-    profile.current_streak || 0;
+  context.stats.streak.current = profile.current_streak || 0;
 
-  context.stats.streak.max =
-    profile.max_streak || 0;
+  context.stats.streak.max = profile.max_streak || 0;
 };
 
-export const applyStreakIncrease = (
-  context: StreakContext,
-  amount: number,
-) => {
+export const applyStreakIncrease = (context: StreakContext, amount: number) => {
   if (amount <= 0) return;
 
   const current = context.profile.current_streak || 0;
@@ -77,16 +74,11 @@ export const applyStreakIncrease = (
   context.stats.streak.max = context.profile.max_streak;
 };
 
-export const applyStreakDate = (
-  context: StreakContext,
-  date: string,
-) => {
+export const applyStreakDate = (context: StreakContext, date: string) => {
   context.profile.streak_date = date;
 };
 
-export const applyClearStreak = (
-  context: StreakContext,
-) => {
+export const applyClearStreak = (context: StreakContext) => {
   context.profile.current_streak = 0;
 
   context.stats.streak.current = 0;
@@ -100,13 +92,9 @@ export const applyShieldReduction = (
 
   const current = context.habitLog.shield_snap || 0;
 
-  context.habitLog.shield_snap = Math.max(
-    current - amount,
-    0,
-  );
+  context.habitLog.shield_snap = Math.max(current - amount, 0);
 
-  context.stats.shield.current =
-    context.habitLog.shield_snap;
+  context.stats.shield.current = context.habitLog.shield_snap;
 };
 
 export const applyHabitReduction = (
@@ -123,19 +111,13 @@ export const applyHabitReduction = (
 
   const reduction = amount;
 
-  context.habitLog.habit_snap = Math.max(
-    current - reduction,
-    0,
-  );
+  context.habitLog.habit_snap = Math.max(current - reduction, 0);
 
-  context.stats.habit.currentPercent =
-    context.habitLog.habit_snap;
+  context.stats.habit.currentPercent = context.habitLog.habit_snap;
 
-  context.stats.shield.current =
-    context.habitLog.shield_snap || 0;
+  context.stats.shield.current = context.habitLog.shield_snap || 0;
 
-  context.stats.retain.current =
-    context.habitLog.habit_retain || 0;
+  context.stats.retain.current = context.habitLog.habit_retain || 0;
 };
 
 export const calculateStreakGain = (
@@ -144,15 +126,10 @@ export const calculateStreakGain = (
 ) => {
   if (!streakDate) return 0;
 
-  return Math.max(
-    getDaysDiff(streakDate, endDate),
-    0,
-  );
+  return Math.max(getDaysDiff(streakDate, endDate), 0);
 };
 
-export const getStreakResult = (
-  context: StreakContext,
-): StreakCheckResult => {
+export const getStreakResult = (context: StreakContext): StreakCheckResult => {
   return context.stats;
 };
 
@@ -176,34 +153,13 @@ export const saveStreakContext = async (
       profile.id,
     ],
   );
-
-  if (habitLog) {
-    await db.runAsync(
-      `UPDATE habit_logs
-       SET habit_snap = ?,
-           shield_snap = ?,
-           habit_retain = ?
-       WHERE id = ?;`,
-      [
-        habitLog.habit_snap,
-        habitLog.shield_snap,
-        habitLog.habit_retain||0,
-        habitLog.id,
-      ],
-    );
-  }
 };
 
-export const applyLastLoginDate = (
-  context: StreakContext,
-  date: string,
-) => {
+export const applyLastLoginDate = (context: StreakContext, date: string) => {
   context.profile.last_login_date = date;
 };
 
-export const getYesterdayStr = (
-  todayStr: string,
-) => {
+export const getYesterdayStr = (todayStr: string) => {
   const date = new Date(`${todayStr}T00:00:00`);
   date.setDate(date.getDate() - 1);
 
@@ -225,25 +181,44 @@ export const applyShieldReward = (
   profile.mid_shield_clamable = reward.midClaimable;
   profile.full_shield_clamable = reward.fullClaimable;
 
-  stats.shield.current = stats.shield.current + reward.totalShieldGain;
+  stats.shield.current = Math.max(
+    stats.shield.current + reward.totalShieldGain,
+    SHIELD_LIMIT,
+  );
 };
 
 export const applyStreakReward = async (
- context: StreakContext,
+  context: StreakContext,
   endTime: number,
 ) => {
-const { profile: oldProfile } = context;
+  const { profile: oldProfile } = context;
   const endDate = getLocalTodayStr(new Date(endTime));
 
   const streakGain = oldProfile.streak_date
-    ? Math.max(
-        getDaysDiff(oldProfile.streak_date, endDate),
-        0,
-      )
+    ? Math.max(getDaysDiff(oldProfile.streak_date, endDate), 0)
     : 0;
 
-    oldProfile.active_days = oldProfile.active_days + streakGain;
-    oldProfile.streak_date = endDate;
-    oldProfile.current_streak = oldProfile.current_streak + streakGain;
-    oldProfile.max_streak = Math.max(oldProfile.max_streak, oldProfile.current_streak);
+  oldProfile.active_days = oldProfile.active_days + streakGain;
+  oldProfile.streak_date = endDate;
+  oldProfile.current_streak = oldProfile.current_streak + streakGain;
+  oldProfile.max_streak = Math.max(
+    oldProfile.max_streak,
+    oldProfile.current_streak,
+  );
+};
+
+export const applyHabitReward = (
+  context: StreakContext,
+  reward: HabitEffect,
+) => {
+  if (!context.habitLog || !reward || !context.profile) {
+    return;
+  }
+
+  const { profile, stats } = context;
+  const { newHabitScore, newShieldScore, newRetain } = reward;
+
+  stats.habit.currentPercent = Math.min(newHabitScore, 100);
+  stats.shield.current = Math.min(newShieldScore, SHIELD_LIMIT);
+  stats.retain.current = Math.min(newRetain, RETAIN_LIMIT);
 };

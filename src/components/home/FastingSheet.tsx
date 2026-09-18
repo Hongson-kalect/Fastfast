@@ -15,7 +15,6 @@ interface FastingSheetProps {
   currentFast: FastSession;
   finishDate: Date | null;
   onStopFasting?: () => void;
-  onCancelFasting?: () => void;
   onChangeTarget: () => void;
 }
 
@@ -25,7 +24,6 @@ const FastingSheet = ({
   fastTarget,
   finishDate,
   onStopFasting,
-  onCancelFasting,
   onChangeTarget,
 }: FastingSheetProps) => {
   const { theme, settings } = useAppStore();
@@ -305,16 +303,6 @@ const FastingSheet = ({
         >
           <ThemedText className="text-white! font-bold! text-[15px]!">
             Kết thúc Fasting
-          </ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={onCancelFasting}
-          className="py-3 items-center"
-        >
-          <ThemedText className="text-zinc-400! text-sm! opacity-80">
-            Từ bỏ phiên nhịn
           </ThemedText>
         </TouchableOpacity>
       </View>

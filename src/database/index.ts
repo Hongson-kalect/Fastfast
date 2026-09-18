@@ -31,6 +31,7 @@ import {
   getFastStatsSummary,
   getLastFastSession,
   getYearFastSession,
+  reconcileStreak,
   startNewSession,
   updateSessionTarget,
 } from "./shema/fast_sessions";
@@ -53,13 +54,9 @@ import {
   generateString as themeGenerateString,
 } from "./shema/theme";
 import {
-  clearStreak,
   getUserProfile,
-  increaseStreak,
-  updateLastLoginDate,
-  updateStreakDate,
   generateString as userGenerateString,
-  userSeedData,
+  userSeedData
 } from "./shema/user";
 import {
   getCurrentWeight,
@@ -68,20 +65,23 @@ import {
   generateString as weight_trackerGenerateString,
 } from "./shema/weight_tracker";
 
-import { StreakCheckResult } from "@/interfaces/home.type";
+import {
+  applyClearStreak,
+  applyLastLoginDate,
+  applyStreakDate,
+  createStreakContext,
+  getYesterdayStr,
+  saveStreakContext
+} from "@/util/streak";
 import { getLocalTodayStr } from "@/util/timer";
 import {
   addHabitLogs,
-  AddHabitType,
-  calculateStreakPenalties,
+  calculatePenaltyEffect,
   getHabitLogs,
   getLastHabitLog,
   getShieldUsedLog,
-  generateString as habit_logsGenerateString,
-  reduceHabit,
-  reduceShield,
+  generateString as habit_logsGenerateString
 } from "./shema/habit_logs";
-import { applyClearStreak, applyHabitReduction, applyLastLoginDate, applyShieldReduction, applyStreakDate, createStreakContext, getYesterdayStr, saveStreakContext } from "@/util/streak";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -93,10 +93,10 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
   getYearFastSession: (year: number) => getYearFastSession(db, year),
-  finishLastSession: (data: {
-    id: string;
-    endTime: number;
-  }) => finishLastSession({db,...data}),
+  finishLastSession: (data: { id: string; endTime: number }) =>
+    finishLastSession({ db, ...data }),
+
+  reconcileStreak:({lastFast, profile, habitLog}:{lastFast: FastSession | null, profile: UserProfile | null, habitLog: HabitLog | null})=>reconcileStreak(db, lastFast, profile, habitLog),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number, targetDuration?: number) =>
     startNewSession(db, startTime, targetDuration),
@@ -143,7 +143,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   }) => createWeightTarget(db, newTarget),
   getAllWeightTargets: () => getAllWeightTargets(db),
   getHabitLogs: () => getHabitLogs(db),
-  addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
+  // addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
   getShieldUsedLog: (year: number) => getShieldUsedLog(db, year),
 
@@ -295,13 +295,9 @@ export const handleLogin = async ({
   // 1. Evaluate Fast
   // --------------------------------------------------
 
-  const previousLoginDate =
-    profile.last_login_date || profile.streak_date;
+  const previousLoginDate = profile.last_login_date || profile.streak_date;
 
-  const {
-    isFastFail,
-    referenceDate,
-  } = evaluateFastStatus(
+  const { isFastFail, referenceDate } = evaluateFastStatus(
     lastFast,
     previousLoginDate,
     todayStr,
@@ -309,11 +305,7 @@ export const handleLogin = async ({
 
   // Đang fasting và chưa fail:
   // chỉ ghi nhận hôm nay đã login.
-  if (
-    lastFast &&
-    !lastFast.end_time &&
-    !isFastFail
-  ) {
+  if (lastFast && !lastFast.end_time && !isFastFail) {
     applyLastLoginDate(streak, todayStr);
 
     await saveStreakContext(db, streak);
@@ -340,20 +332,8 @@ export const handleLogin = async ({
   // 3. Calculate penalty
   // --------------------------------------------------
 
-  const currentShield =
-    streak.habitLog?.shield_snap || 0;
-
-  const {
-    gap,
-    reduceShieldNumber,
-    reduceHabitNumber,
-    overRestDays,
-    isStreakSavedByShield,
-  } = calculateStreakPenalties(
-    referenceDate,
-    todayStr,
-    currentShield,
-  );
+  const { gap, overRestDays, isStreakSavedByShield, ...data } =
+    calculatePenaltyEffect(referenceDate, streak.profile, streak.habitLog);
 
   // Login hôm nay đã được xử lý
   applyLastLoginDate(streak, todayStr);
@@ -364,12 +344,8 @@ export const handleLogin = async ({
 
   if (gap <= 1) {
     if (isFastFail) {
-      applyStreakDate(
-        streak,
-        getYesterdayStr(todayStr),
-      );
+      applyStreakDate(streak, getYesterdayStr(todayStr));
     }
-
     await saveStreakContext(db, streak);
 
     return {
@@ -380,23 +356,30 @@ export const handleLogin = async ({
     };
   }
 
+  const returnedHabitLog = await addHabitLogs(db, {
+    log_date: todayStr,
+    ...data,
+  });
+
+  streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
+  streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
+  streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
+
+  applyStreakDate(streak, getYesterdayStr(todayStr));
+
+  // --------------------------------------------------
+  // 4. Shield saves streak
+  // --------------------------------------------------
+  if (data.shieldDelta) {
+    streak.profile.total_shield_used =
+      (streak.profile.total_shield_used || 0) + data.shieldDelta;
+  }
+
   // --------------------------------------------------
   // 5. Shield saves streak
   // --------------------------------------------------
 
   if (isStreakSavedByShield) {
-    applyStreakDate(
-      streak,
-      getYesterdayStr(todayStr),
-    );
-
-    if (reduceShieldNumber > 0) {
-      applyShieldReduction(
-        streak,
-        reduceShieldNumber,
-      );
-    }
-
     await saveStreakContext(db, streak);
 
     return {
@@ -413,26 +396,6 @@ export const handleLogin = async ({
 
   applyClearStreak(streak);
 
-  if (reduceShieldNumber > 0) {
-    applyShieldReduction(
-      streak,
-      reduceShieldNumber,
-    );
-  }
-
-  if (reduceHabitNumber > 0) {
-    applyHabitReduction(
-      streak,
-      reduceHabitNumber,
-      overRestDays,
-    );
-  }
-
-  applyStreakDate(
-    streak,
-    getYesterdayStr(todayStr),
-  );
-
   await saveStreakContext(db, streak);
 
   return {
@@ -442,4 +405,3 @@ export const handleLogin = async ({
     streak: streak.stats,
   };
 };
-

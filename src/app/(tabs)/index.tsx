@@ -3,13 +3,15 @@ import CircleCounter from "@/components/home/CircleCounter";
 import FullHabitModal from "@/components/home/FullHabitModal";
 import HomeHeader from "@/components/home/Header";
 import { FastResultData, ResultModal } from "@/components/home/ResultModal";
+import { StreakCheckModal } from "@/components/home/StreakModal";
 import { SwapButton } from "@/components/home/SwapButton";
 import {
   MIN_FAST_DURATION,
-  TOO_QUICK_DURATION,
+  TOO_QUICK_DURATION
 } from "@/database/shema/fast_sessions";
 import { SHIELD_LIMIT } from "@/database/shema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
+import { StreakCheckResult } from "@/interfaces/home.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
@@ -102,19 +104,15 @@ const HomeScreen = () => {
 
         console.log("current ", currentFastSession.id);
 
-        const { lastSession, habitLog, profile } =
+        const { lastSession, habitLog, profile, streak } =
           await dbService?.finishLastSession({
             id: currentFastSession?.id,
             endTime: now,
-            duration,
-            isValid,
-            isTooFast,
-            profile: userProfile || undefined,
-            habitLog: habit || undefined,
           });
 
         // update zustand
-        if (habitLog && userProfile) {
+        const tempProfile = { ...userProfile!, ...profile! };
+        if (userProfile && profile) {
           updateProfile({
             ...userProfile,
             ...profile,
@@ -178,76 +176,67 @@ const HomeScreen = () => {
             });
           }
         }
-      },
-    });
-  };
-
-  const cancelFasting = async () => {
-    if (!(isCounting && startTime && currentFastSession))
-      return alert("Invalid action");
-    let message = "Cancel this fast? It will mark as FAILED.";
-    let subMessage = "";
-    const now = new Date().getTime();
-    const duration = Math.floor(Math.abs(now - startTime) / 1000);
-    const isValid = false;
-    const isTooFast = duration < 2 * 60 * 60;
-
-    if (isTooFast) {
-      message = "This session too fast, it will be deleted, are you sure?";
-      subMessage = "The duration is less than 2 hours.";
-    }
-
-    addModal({
-      type: "confirm",
-      title: "Cancel",
-      message: message,
-
-      subMessage: subMessage || "",
-      onOk: async () => {
-        const { lastSession, habitLog, profile } =
-          await dbService?.finishLastSession({
-            id: currentFastSession?.id,
-            endTime: now,
-            duration,
-            isTooFast,
-            isValid,
-            profile: userProfile || undefined,
-            habitLog: habit || undefined,
+          const {habitLog:finalHabitLog,profile:finalProfile,streak:finalStreak}=await dbService.reconcileStreak({
+            lastFast: lastSession,
+            profile: tempProfile,
+            habitLog,
           });
-        hide();
-        if (habitLog && userProfile) {
-          updateProfile({
-            ...userProfile,
-            ...profile,
-          });
-        }
-
-        setCurrentFastSession(lastSession);
-        // Tính toán lưu giờ nhịn theo ngày của người dùng
-
-        // 🌟 BƯỚC 3: Lưu toàn bộ các khúc đã bẻ nhỏ vào bảng daily_logs
-        // Chạy vòng lặp để insert (Vì mối quan hệ là 1:N nên cứ thoải mái dội lệnh vào)
-        if (isValid) {
-          const parsedDays = splitSessionIntoDays(
-            startTime,
-            now,
-            currentFastSession.id,
-          );
-
-          for (const dayData of parsedDays) {
-            await dbService?.addDailyLogs({
-              log_date: dayData.log_date,
-              fast_id: currentFastSession.id,
-              hours_in_day: dayData.hours_in_day,
-              elapsed_times: dayData.elapsed_hours,
-              hour_in_fast: parseFloat((duration / 60 / 60).toFixed(2)),
-              // user_id, mood_level, note có thể bổ sung tùy thuộc form điền sau khi nhịn
+  
+          if (finalProfile) {
+            updateProfile({
+              ...tempProfile,
+              ...finalProfile,
             });
           }
-        }
+
+          console.log('reconcile',finalHabitLog,finalProfile,finalStreak);
+  
+          finalStreak&&checkStreak(finalStreak);
       },
     });
   };
+
+  const checkStreak=(result:StreakCheckResult)=>{
+    
+        const { streak, habit, retain, shield } = result;
+    
+        // Login chỉ reconcile trạng thái streak.
+        // Không tăng streak ở đây nữa.
+    
+        const usedShield = shield.previous > shield.current;
+        const lostStreak = streak.previous > streak.current;
+    
+        if (!usedShield && !lostStreak) return;
+    
+        setTimeout(() => {
+          addModal({
+            type: "custom",
+            render: (
+              <StreakCheckModal
+                data={{
+                  streak: {
+                    current: streak.current,
+                    max: streak.max,
+                    previous: streak.previous,
+                  },
+                  habit: {
+                    currentPercent: habit.currentPercent,
+                    previousPercent: habit.previousPercent,
+                  },
+                  retain: {
+                    current: retain.current,
+                    previous: retain.previous,
+                  },
+                  shield: {
+                    current: shield.current,
+                    previous: shield.previous,
+                  },
+                }}
+              />
+            ),
+          });
+        }, 1000);
+  }
 
   const startFast = async (now: number = Date.now()) => {
     if (currentFastSession?.end_time && now <= currentFastSession?.end_time) {
@@ -309,7 +298,6 @@ const HomeScreen = () => {
             <HomeHeader />
             {/* <View className="pb-2 mt-4">
               <HomeTimeCounter
-                cancelFasting={cancelFasting}
                 finishFasting={finishFast}
                 isCounting={isCounting}
                 counter={counter}
@@ -319,7 +307,6 @@ const HomeScreen = () => {
 
             <View className="">
               <CircleCounter
-                cancelFasting={cancelFasting}
                 finishFasting={finishFast}
                 isCounting={isCounting}
                 counter={counter}

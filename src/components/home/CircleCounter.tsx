@@ -42,7 +42,6 @@ type Props = {
   counter: number;
   currentFast: FastSession | null;
   finishFasting: () => void;
-  cancelFasting: () => void;
 };
 
 const colorRange = {
@@ -61,7 +60,6 @@ export const CircleCounter = ({
   counter,
   currentFast,
   finishFasting,
-  cancelFasting,
 }: Props) => {
   const { settings, theme } = useAppStore();
   const dbService = useDBService();
@@ -195,7 +193,6 @@ export const CircleCounter = ({
           currentFast={currentFast}
           finishDate={finishEstimate}
           onStopFasting={finishFasting}
-          onCancelFasting={cancelFasting}
           onChangeTarget={changeTarget}
         />,
       );

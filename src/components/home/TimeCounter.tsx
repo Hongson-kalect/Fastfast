@@ -34,7 +34,6 @@ type Props = {
   counter: number;
   currentFast: FastSession | null;
   finishFasting: () => void;
-  cancelFasting: () => void;
 };
 
 const colorRange = {
@@ -49,7 +48,6 @@ const HomeTimeCounter = ({
   counter,
   currentFast,
   finishFasting,
-  cancelFasting,
 }: Props) => {
   const [layout, setLayout] = useState<{
     width: number;
@@ -136,6 +134,19 @@ const HomeTimeCounter = ({
     return currentTarget?.colors.accent || theme.primary;
   }, [currentTarget]);
 
+  const [now, setNow] = useState(() => Date.now());
+    const finishEstimate = useMemo(() => {
+    if (!settings?.target) return null;
+
+    const targetMs = Number(settings.target) * 3_600_000;
+
+    if (isCounting && currentFast?.start_time) {
+      return new Date(currentFast.start_time + targetMs);
+    }
+
+    return new Date(now + targetMs);
+  }, [isCounting, currentFast?.start_time, settings?.target, now]);
+
   const openTargetSheet = () => {
     present(<TargetSheet currentFast={currentFast} />);
   };
@@ -153,10 +164,10 @@ const HomeTimeCounter = ({
       present(
         <FastingSheet
           counter={counter}
+          finishDate={finishEstimate}
           fastTarget={currentTarget}
           currentFast={currentFast}
           onStopFasting={finishFasting}
-          onCancelFasting={cancelFasting}
           onChangeTarget={changeTarget}
         />,
       );

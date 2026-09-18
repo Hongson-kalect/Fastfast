@@ -1,8 +1,9 @@
-import { FastSession, HabitLog } from "@/interfaces/db.type";
+import { FastSession, HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import { fixed, numberLimit } from "./../../util/numberLimit";
+import { shield_rewards } from "./user";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Habit Logs) để vẽ Chart và Grid
 export const generateString = /*sql*/ `
@@ -94,104 +95,85 @@ export type AddHabitType = {
   log_date?: string;
   fast_id?: string;
   habit_detla?: number;
+  habit_snap?: number;
   shield_delta?: number;
+  shield_snap?: number;
+
+  retain?: number;
+  retain_delta?: number;
+
   shield_milestone?: number;
 
-  habit_snap?: number;
-  shield_snap?: number;
-  lastLog?: HabitLog|null;
+  lastLog?: HabitLog | null;
 };
-export const addHabitLogs = async (db: SQLiteDatabase, data: AddHabitType) => {
+
+export const addHabitLogs = async (
+  db: SQLiteDatabase,
+  data: {
+    log_date?: string;
+    fast_id?: string;} & HabitEffect,
+) => {
   const id = uuidv7();
-  const log_date = data.log_date || getLocalTodayStr();
+  const logDate = data.log_date || getLocalTodayStr();
 
-  const habit_data = { ...data };
-  let retain = 0;
-  let bonusShield = 0;
-  let habitDetla = data.habit_detla || 0;
-  let retainDelta = 0;
+  const {
+    habitDelta,
+    newHabitScore: habitSnap,
+    retainDelta,
+    totalShieldGain: shieldDelta,
+    newShieldScore: shieldSnap,
+    milestoneShieldGain,
+    bonusShieldGain,
+    sessionShieldGain,
+    newRetain: retainSnap,
+  } = data;
 
-  const lastLog = data.lastLog || await getLastHabitLog(db);
-  if (!data.habit_snap || !data.shield_snap) {
-    habit_data.habit_snap = lastLog?.habit_snap || 0;
-    habit_data.shield_snap = lastLog?.shield_snap || 0;
+  let shieldDetail = null;
+  if (sessionShieldGain || milestoneShieldGain || bonusShieldGain) {
+    shieldDetail = {
+      session: sessionShieldGain,
+      milestone: milestoneShieldGain,
+      bonus: bonusShieldGain,
+    };
   }
 
-  if (habit_data?.habit_snap && habit_data?.habit_snap >= 100) {
-    // habit giảm
-    if (habit_data.habit_detla) {
-      if (habit_data.habit_detla < 0) retain = 0;
-      else {
-        retain = (lastLog?.habit_retain || 0) + (habit_data.habit_detla || 0);
+  await db.runAsync(
+    `INSERT INTO habit_logs (
+      id,
+      log_date,
+      fast_id,
+      habit_delta,
+      habit_snap,
+      retain_delta,
+      shield_delta,
+      shield_snap,
+      habit_retain,
+      shield_detail
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id,
+      logDate,
+      data.fast_id || null,
 
-        habitDetla = 0;
-        retainDelta = habit_data.habit_detla;
-      }
+      numberLimit(habitDelta, 0, 100),
+      numberLimit(habitSnap, 0, 100),
 
-      if (retain >= RETAIN_LIMIT) {
-        retain = 1; // Khi đủ 1 vòng thì retain sẽ về 1 thay vì về 0
-        bonusShield = 1;
-      }
-    }
-  }
+      retainDelta,
 
-  habit_data.habit_snap =
-    (habit_data?.habit_snap || 0) + (habit_data?.habit_detla || 0);
-  habit_data.shield_snap =
-    (habit_data?.shield_snap || 0) +
-    (habit_data?.shield_delta || 0) +
-    (habit_data?.shield_milestone || 0) +
-    bonusShield;
-    
-    let shield_detail = null;
-    
-    if (habit_data.shield_delta || bonusShield|| habit_data.shield_milestone) {
-      shield_detail = JSON.stringify([
-        habit_data.shield_delta || 0,
-        bonusShield || 0,
-        habit_data.shield_milestone || 0
-      ]);
-    }
+      shieldDelta,
+      numberLimit(shieldSnap, 0, SHIELD_LIMIT),
 
-    // Total shield increase, no matter source
-    habit_data.shield_delta = (habit_data?.shield_delta || 0) +
-    (habit_data?.shield_milestone || 0) +
-    bonusShield;
+      numberLimit(retainSnap, 0, RETAIN_LIMIT),
 
-  // Khi người dùng đang fast, hoàn toàn có thể thêm ghi chú cho ngày
-  // const currentLog = await db.getFirstAsync<HabitLog>(`SELECT * FROM habit_logs WHERE log_date = ? AND fast_id = ?`, [data.log_date, data.fast_id]);
+      shieldDetail && JSON.stringify(shieldDetail),
+    ],
+  );
 
-  // if(currentLog){
-  //   await db.runAsync(`UPDATE habit_logs SET hours_in_day = ?,  hours_in_fast = ? WHERE log_date = ? AND fast_id = ?`, [data.hours_in_day, data.hour_in_fast, data.log_date, data.fast_id]);
-  // }else{
-  //   await db.runAsync(`INSERT INTO habit_logs (log_date, fast_id, hours_in_day, hours_in_fast) VALUES (?, ?, ?, ?)`, [data.log_date, data.fast_id, data.hours_in_day, data.hour_in_fast]);
-  // }
-  console.log("retain 5", retain, numberLimit(retain, 0, RETAIN_LIMIT));
-
-  try {
-    await db.runAsync(
-      `INSERT INTO habit_logs (id, log_date, fast_id, habit_delta, habit_snap, retain_delta, shield_delta, shield_snap, habit_retain, shield_detail) VALUES (?, ?, ?, ?, ?,?,?,?,?,?)`,
-      [
-        id,
-        log_date,
-        data.fast_id || null,
-        numberLimit(habitDetla || 0, 0, 100),
-        numberLimit(habit_data.habit_snap || 0, 0, 100),
-        retainDelta,
-        habit_data.shield_delta || 0,
-        numberLimit(habit_data.shield_snap || 0, 0, SHIELD_LIMIT),
-        numberLimit(retain, 0, RETAIN_LIMIT),
-        shield_detail,
-      ],
-    );
-
-    const res = await getLastHabitLog(db);
-    console.log("res", res);
-    return res;
-  } catch (e) {
-    console.log("e", e);
-    return null;
-  }
+  return await db.getFirstAsync<HabitLog>(
+    `SELECT * FROM habit_logs WHERE id = ?`,
+    [id],
+  );
 };
 
 export const reduceShield = async (
@@ -243,7 +225,7 @@ export const reduceHabit = async (
         today,
         null,
         -reduce,
-        Math.max(fixed(lastHabitLog.habit_snap - reduce) , 0),
+        Math.max(fixed(lastHabitLog.habit_snap - reduce), 0),
         -lastHabitLog.shield_snap,
         0,
         0,
@@ -259,7 +241,10 @@ export const reduceHabit = async (
   }
 };
 
-export const getShieldUsedLog = async (db: SQLiteDatabase, year: number): Promise<HabitLog[]> => {
+export const getShieldUsedLog = async (
+  db: SQLiteDatabase,
+  year: number,
+): Promise<HabitLog[]> => {
   try {
     // Ngày bắt đầu: '2026-01-01'
     const startDate = `${year}-01-01`;
@@ -283,27 +268,39 @@ export const getShieldUsedLog = async (db: SQLiteDatabase, year: number): Promis
   }
 };
 
-
 // Helper 2: Calculate Gap, Shield & Habit Penalties
 export const calculateStreakPenalties = (
   referenceDate: string,
   todayStr: string,
-  currentShield: number
+  currentShield: number,
 ) => {
   const gap = getDaysDiff(referenceDate, todayStr);
   const shieldNeed = Math.max(gap - 1, 0);
 
   if (gap <= 1) {
-    return { gap, reduceShieldNumber: 0, reduceHabitNumber: 0, overRestDays: 0, isStreakSavedByShield: false };
+    return {
+      gap,
+      reduceShieldNumber: 0,
+      reduceHabitNumber: 0,
+      overRestDays: 0,
+      isStreakSavedByShield: false,
+    };
   }
 
   if (currentShield >= shieldNeed) {
-    return { gap, reduceShieldNumber: shieldNeed, reduceHabitNumber: 0, overRestDays: 0, isStreakSavedByShield: true };
+    return {
+      gap,
+      reduceShieldNumber: shieldNeed,
+      reduceHabitNumber: 0,
+      overRestDays: 0,
+      isStreakSavedByShield: true,
+    };
   }
 
   // Khái niệm overRestDays -= currentShield
   const overRestDays = shieldNeed - currentShield;
-  const reduceHabitNumber = 5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
+  const reduceHabitNumber =
+    5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
 
   return {
     gap,
@@ -311,5 +308,176 @@ export const calculateStreakPenalties = (
     reduceHabitNumber,
     overRestDays,
     isStreakSavedByShield: false,
+  };
+};
+
+export const calculatePenaltyEffect = (
+  referenceDate: string,
+  profile: UserProfile,
+  habitLog: HabitLog | null,
+) => {
+  const todayStr = getLocalTodayStr();
+  const gap = getDaysDiff(referenceDate, todayStr);
+  const shieldNeed = Math.max(gap - 1, 0);
+
+  const oldHabitScore = habitLog?.habit_snap || 0;
+  const oldRetain = habitLog?.habit_retain || 0;
+  const oldShieldScore = habitLog?.shield_snap || 0;
+
+  // Không có penalty
+  if (gap <= 1) {
+    return {
+      gap,
+
+      // Habit
+      habitDelta: 0,
+      newHabitScore: oldHabitScore,
+
+      // Retain
+      retainDelta: 0,
+      newRetain: oldRetain,
+
+      // Shield
+      shieldDelta: 0,
+      newShieldScore: oldShieldScore,
+
+      // Không có shield reward
+      totalShieldGain: 0,
+      sessionShieldGain: 0,
+      milestoneShieldGain: 0,
+      bonusShieldGain: 0,
+
+      // Milestone state giữ nguyên
+      lowClaimable: profile.low_shield_clamable,
+      midClaimable: profile.mid_shield_clamable,
+      fullClaimable: profile.full_shield_clamable,
+
+      overRestDays: 0,
+      isStreakSavedByShield: false,
+    };
+  }
+
+  // ─────────────────────────────
+  // Shield dùng để bảo vệ streak
+  // ─────────────────────────────
+
+  const reduceShieldNumber = Math.min(
+    oldShieldScore,
+    shieldNeed,
+  );
+
+  const overRestDays =
+    shieldNeed - reduceShieldNumber;
+
+  let habitDelta = 0;
+
+  if (overRestDays > 0) {
+    habitDelta =
+      -(
+        5 +
+        Math.round(
+          Math.pow(
+            overRestDays,
+            1 + overRestDays / 19,
+          ) * 10,
+        ) / 10
+      );
+  }
+
+  // ─────────────────────────────
+  // Habit
+  // ─────────────────────────────
+
+  const newHabitScore = numberLimit(
+    fixed(oldHabitScore + habitDelta),
+    0,
+    100,
+  );
+
+  // ─────────────────────────────
+  // Retain
+  // ─────────────────────────────
+
+  let newRetain = oldRetain;
+  let retainDelta = 0;
+
+  /*
+   * Khi Habit bị giảm:
+   * retain cũng bị clear/reduce.
+   *
+   * Nếu business rule của bạn là clear toàn bộ:
+   */
+  if (habitDelta < 0) {
+    retainDelta = -oldRetain;
+    newRetain = 0;
+  }
+
+  // ─────────────────────────────
+  // Milestone claimable
+  // ─────────────────────────────
+
+  let lowClaimable = profile.low_shield_clamable;
+  let midClaimable = profile.mid_shield_clamable;
+  let fullClaimable = profile.full_shield_clamable;
+
+  /*
+   * Habit tụt dưới milestone → cho phép nhận lại.
+   */
+
+  if (newHabitScore === 0) {
+    lowClaimable = 1;
+  }
+
+  if (newHabitScore < shield_rewards[0]) {
+    midClaimable = 1;
+  }
+
+  if (newHabitScore < shield_rewards[1]) {
+    fullClaimable = 1;
+  }
+
+
+  // ─────────────────────────────
+  // Shield
+  // ─────────────────────────────
+
+  const shieldDelta = - reduceShieldNumber;
+
+  const newShieldScore = numberLimit(
+    oldShieldScore + shieldDelta,
+    0,
+    SHIELD_LIMIT,
+  );
+
+  return {
+    gap,
+
+    // Habit
+    habitDelta,
+    newHabitScore,
+
+    // Retain
+    retainDelta,
+    newRetain,
+
+    // Shield
+    shieldDelta,
+    newShieldScore,
+
+    // Không phải reward
+    totalShieldGain: 0,
+    sessionShieldGain: 0,
+    milestoneShieldGain: 0,
+    bonusShieldGain: 0,
+
+    // Milestone state
+    lowClaimable,
+    midClaimable,
+    fullClaimable,
+
+    // Penalty metadata
+    overRestDays,
+    isStreakSavedByShield:
+      overRestDays === 0,
   };
 };

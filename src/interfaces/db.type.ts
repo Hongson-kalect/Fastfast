@@ -13,7 +13,7 @@ export interface AppSettings {
   weight_target?: number;
   chart_range?: ChartRangeKey;
   is_dark_mode?: boolean;
-  pixel_view_mode?:'fasting'|'mood';
+  pixel_view_mode?: "fasting" | "mood";
   theme?: string;
   language?: string;
 }
@@ -28,16 +28,16 @@ export interface UserProfile {
   current_streak: number;
   active_days: number;
   max_streak: number;
-  streak_date: string|null;
-  last_login_date: string|null;
+  streak_date: string | null;
+  last_login_date: string | null;
 
-  total_shield_used :number,
-  total_shield_clamable :number,
-  total_shield_wasted :number,
+  total_shield_used: number;
+  total_shield_clamable: number;
+  total_shield_wasted: number;
 
-  low_shield_clamable:number,
-  mid_shield_clamable:number,
-  full_shield_clamable:number,
+  low_shield_clamable: number;
+  mid_shield_clamable: number;
+  full_shield_clamable: number;
 
   last_fast_completed_at: number;
   rest_point: number;
@@ -60,7 +60,7 @@ export interface FastSession {
   rating: string | null; // Đánh giá phiên ('Excellent', 'Good', 'Failed')
   is_deleted: 0 | 1; // SQLite không có BOOLEAN, dùng 0 (false) và 1 (true)
   sync_status: SyncStatus;
-  status: 'active'|'completed'|'failed';
+  status: "active" | "completed" | "failed";
   created_at: number;
   updated_at: number;
 }
@@ -90,11 +90,11 @@ export interface DailyNote {
   updated_at: number;
 }
 
-export interface HabitLog{
+export interface HabitLog {
   id: string;
   log_date: string;
   fast_id: string;
-  type: 'habit'|'shield';
+  type: "habit" | "shield";
   habit_delta?: number;
   habit_snap: number;
   habit_retain?: number;
@@ -159,3 +159,18 @@ export type InsertDailyLogInput = Omit<
   DailyLog,
   "created_at" | "updated_at" | "is_deleted" | "sync_status"
 >;
+
+export type HabitEffect = {
+  habitDelta: number;
+  newHabitScore: number;
+  retainDelta: number;
+  newRetain: number;
+  sessionShieldGain: number;
+  milestoneShieldGain: number;
+  bonusShieldGain: number;
+  totalShieldGain: number;
+  newShieldScore: number;
+  lowClaimable: number;
+  midClaimable: number;
+  fullClaimable: number;
+};
