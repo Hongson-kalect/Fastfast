@@ -144,9 +144,9 @@ export const SwapButton = ({
   };
 
   const { addModal } = useModalStore();
-  const handleDelaySubmit = (startTime: number) => {
+  const handleDelaySubmit = (selectedTime: number) => {
     addModal(null);
-    toggleCounting(startTime);
+    toggleCounting(selectedTime);
   };
 
   const showDelayModal = () => {
@@ -155,7 +155,7 @@ export const SwapButton = ({
       return addModal({
         type: "custom",
         render: (
-          <FastEndTimeModal startTime={currentFast?.start_time} targetFinishTime={finishTime} onSubmit={handleDelaySubmit} />
+          <FastEndTimeModal startTime={currentFast?.start_time} targetFinishTime={finishTime} currentFast={currentFast}/>
         ),})
       }
     addModal({

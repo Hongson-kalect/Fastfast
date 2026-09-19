@@ -13,7 +13,7 @@ import {
 } from "date-fns";
 
 export const timeString = (time: number) => {
-  const timeCheck = Math.floor(time / 1000);
+  const timeCheck = time
   const seconds = timeCheck % 60;
   const minutes = Math.floor(timeCheck / 60) % 60;
   const hours = Math.floor(timeCheck / 60 / 60);

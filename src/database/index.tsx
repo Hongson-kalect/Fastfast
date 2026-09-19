@@ -22,9 +22,7 @@ import {
 } from "./shema/daily_note";
 import {
   deleteSession,
-  evaluateFastStatus,
   generateString as fast_sessionsGenerateString,
-  fastFail,
   finishLastSession,
   getFastSessionByIds,
   getFastSessions,
@@ -56,7 +54,7 @@ import {
 import {
   getUserProfile,
   generateString as userGenerateString,
-  userSeedData
+  userSeedData,
 } from "./shema/user";
 import {
   getCurrentWeight,
@@ -66,21 +64,10 @@ import {
 } from "./shema/weight_tracker";
 
 import {
-  applyClearStreak,
-  applyLastLoginDate,
-  applyStreakDate,
-  createStreakContext,
-  getYesterdayStr,
-  saveStreakContext
-} from "@/util/streak";
-import { getLocalTodayStr } from "@/util/timer";
-import {
-  addHabitLogs,
-  calculatePenaltyEffect,
   getHabitLogs,
   getLastHabitLog,
   getShieldUsedLog,
-  generateString as habit_logsGenerateString
+  generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
 
 export const DATABASE_NAME = "fast_fast";
@@ -96,7 +83,15 @@ export const createDBService = (db: SQLiteDatabase) => ({
   finishLastSession: (data: { id: string; endTime: number }) =>
     finishLastSession({ db, ...data }),
 
-  reconcileStreak:({lastFast, profile, habitLog}:{lastFast: FastSession | null, profile: UserProfile | null, habitLog: HabitLog | null})=>reconcileStreak(db, lastFast, profile, habitLog),
+  reconcileStreak: ({
+    lastFast,
+    profile,
+    habitLog,
+  }: {
+    lastFast: FastSession | null;
+    profile: UserProfile | null;
+    habitLog: HabitLog | null;
+  }) => reconcileStreak(db, lastFast, profile, habitLog),
   deleteSession: (id: string) => deleteSession(db, id),
   startNewSession: (startTime: number, targetDuration?: number) =>
     startNewSession(db, startTime, targetDuration),
@@ -231,177 +226,4 @@ export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
   await db.execAsync(`PRAGMA user_version = 0;`);
 
   console.log("Database cleared successfully!");
-};
-
-type HandleLoginParams = {
-  db: SQLiteDatabase;
-  lastFast: FastSession | null;
-  profile: UserProfile | null;
-  habitLog: HabitLog | null;
-};
-
-export const handleLogin = async ({
-  db,
-  lastFast,
-  profile,
-  habitLog,
-}: HandleLoginParams) => {
-  const todayStr = getLocalTodayStr();
-
-  // Guard
-  if (!profile) {
-    return {
-      lastFast,
-      profile,
-      habitLog,
-      streak: null,
-    };
-  }
-
-  // Tạo streak context
-  const streak = createStreakContext(profile, habitLog);
-
-  // Chưa có streak -> reset state
-  if (!profile.streak_date) {
-    applyClearStreak(streak);
-
-    // Login date vẫn được cập nhật
-    applyLastLoginDate(streak, todayStr);
-
-    await saveStreakContext(db, streak);
-
-    return {
-      lastFast,
-      profile: streak.profile,
-      habitLog: streak.habitLog,
-      streak: null,
-    };
-  }
-
-  // Mỗi ngày chỉ reconcile một lần
-  if (
-    profile.streak_date === todayStr ||
-    profile.last_login_date === todayStr
-  ) {
-    return {
-      lastFast,
-      profile,
-      habitLog,
-      streak: null,
-    };
-  }
-
-  // --------------------------------------------------
-  // 1. Evaluate Fast
-  // --------------------------------------------------
-
-  const previousLoginDate = profile.last_login_date || profile.streak_date;
-
-  const { isFastFail, referenceDate } = evaluateFastStatus(
-    lastFast,
-    previousLoginDate,
-    todayStr,
-  );
-
-  // Đang fasting và chưa fail:
-  // chỉ ghi nhận hôm nay đã login.
-  if (lastFast && !lastFast.end_time && !isFastFail) {
-    applyLastLoginDate(streak, todayStr);
-
-    await saveStreakContext(db, streak);
-
-    return {
-      lastFast,
-      profile: streak.profile,
-      habitLog: streak.habitLog,
-      streak: null,
-    };
-  }
-
-  // --------------------------------------------------
-  // 2. Fast fail
-  // --------------------------------------------------
-
-  let returnLastFast = lastFast;
-
-  if (isFastFail && lastFast) {
-    returnLastFast = await fastFail(db, lastFast);
-  }
-
-  // --------------------------------------------------
-  // 3. Calculate penalty
-  // --------------------------------------------------
-
-  const { gap, overRestDays, isStreakSavedByShield, ...data } =
-    calculatePenaltyEffect(referenceDate, streak.profile, streak.habitLog);
-
-  // Login hôm nay đã được xử lý
-  applyLastLoginDate(streak, todayStr);
-
-  // --------------------------------------------------
-  // 4. No gap / Fast fail
-  // --------------------------------------------------
-
-  if (gap <= 1) {
-    if (isFastFail) {
-      applyStreakDate(streak, getYesterdayStr(todayStr));
-    }
-    await saveStreakContext(db, streak);
-
-    return {
-      lastFast: returnLastFast,
-      profile: streak.profile,
-      habitLog: streak.habitLog,
-      streak: streak.stats,
-    };
-  }
-
-  const returnedHabitLog = await addHabitLogs(db, {
-    log_date: todayStr,
-    ...data,
-  });
-
-  streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
-  streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
-  streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
-
-  applyStreakDate(streak, getYesterdayStr(todayStr));
-
-  // --------------------------------------------------
-  // 4. Shield saves streak
-  // --------------------------------------------------
-  if (data.shieldDelta) {
-    streak.profile.total_shield_used =
-      (streak.profile.total_shield_used || 0) + data.shieldDelta;
-  }
-
-  // --------------------------------------------------
-  // 5. Shield saves streak
-  // --------------------------------------------------
-
-  if (isStreakSavedByShield) {
-    await saveStreakContext(db, streak);
-
-    return {
-      lastFast: returnLastFast,
-      profile: streak.profile,
-      habitLog: streak.habitLog,
-      streak: streak.stats,
-    };
-  }
-
-  // --------------------------------------------------
-  // 6. Streak lost
-  // --------------------------------------------------
-
-  applyClearStreak(streak);
-
-  await saveStreakContext(db, streak);
-
-  return {
-    lastFast: returnLastFast,
-    profile: streak.profile,
-    habitLog: streak.habitLog,
-    streak: streak.stats,
-  };
 };

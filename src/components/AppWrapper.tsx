@@ -7,8 +7,8 @@ import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
-import { Toast } from "toastify-react-native";
-import { MILESTONES, StreakCheckModal } from "./home/StreakModal";
+import FastEndTimeModal from "./home/FastEndTimeModal";
+import { StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings, isDarkMode } = useAppStore();
@@ -26,56 +26,76 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { init, isLoadingData, userProfile } = useAppStore();
 
   useEffect(() => {
-  if (!db) return;
+    if (!db) return;
 
-  const load = async () => {
-    const result = await init(db);
-    setDBReady(true);
+    const load = async () => {
+      const result = await init(db);
+      setDBReady(true);
 
-    if (!result) return;
+      const { streak: streakObj, modal, lastFast } = result;
 
-    const { streak, habit, retain, shield } = result;
+      if (modal) {
+        if (modal.type === "finishFast" && lastFast) {
+          const targetFinishTime = lastFast?.target_duration
+            ? lastFast.start_time + lastFast.target_duration * 60 * 1000
+            : null;
+          addModal({
+            closable: modal.closable,
+            type: "custom",
+            render: (
+              <FastEndTimeModal
+                startTime={lastFast?.start_time}
+                targetFinishTime={targetFinishTime}
+                currentFast={lastFast}
+              />
+            ),
+          });
+        }
+      }
+      if (!streakObj) return;
 
-    // Login chỉ reconcile trạng thái streak.
-    // Không tăng streak ở đây nữa.
+      const { streak, habit, retain, shield } = streakObj;
 
-    const usedShield = shield.previous > shield.current;
-    const lostStreak = streak.previous > streak.current;
+      // Login chỉ reconcile trạng thái streak.
+      // Không tăng streak ở đây nữa.
 
-    if (!usedShield && !lostStreak) return;
+      const usedShield = shield.previous > shield.current;
+      const lostStreak = streak.previous > streak.current;
 
-    setTimeout(() => {
-      addModal({
-        type: "custom",
-        render: (
-          <StreakCheckModal
-            data={{
-              streak: {
-                current: streak.current,
-                max: streak.max,
-                previous: streak.previous,
-              },
-              habit: {
-                currentPercent: habit.currentPercent,
-                previousPercent: habit.previousPercent,
-              },
-              retain: {
-                current: retain.current,
-                previous: retain.previous,
-              },
-              shield: {
-                current: shield.current,
-                previous: shield.previous,
-              },
-            }}
-          />
-        ),
-      });
-    }, 1000);
-  };
+      if (!usedShield && !lostStreak) return;
 
-  load();
-}, [db]);
+      setTimeout(() => {
+        addModal({
+          type: "custom",
+          render: (
+            <StreakCheckModal
+              data={{
+                streak: {
+                  current: streak.current,
+                  max: streak.max,
+                  previous: streak.previous,
+                },
+                habit: {
+                  currentPercent: habit.currentPercent,
+                  previousPercent: habit.previousPercent,
+                },
+                retain: {
+                  current: retain.current,
+                  previous: retain.previous,
+                },
+                shield: {
+                  current: shield.current,
+                  previous: shield.previous,
+                },
+              }}
+            />
+          ),
+        });
+      }, 1000);
+    };
+
+    load();
+  }, [db]);
 
   useEffect(() => {
     // wordSocket.connect();

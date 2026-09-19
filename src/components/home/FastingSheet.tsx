@@ -1,5 +1,6 @@
 import { FastingTargetItem, getFastingStatus } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
@@ -32,7 +33,7 @@ const FastingSheet = ({
   const finishTime = useMemo(() => {
     return finishDate?.getTime();
   }, [finishDate]);
-  const [fastCounter, setFastCounter] = useState(Math.floor(counter / 1000));
+  const [fastCounter, setFastCounter] = useState(counter);
 
   const counterStatus = useMemo(() => {
     const status = getFastingStatus(fastCounter * 1000);
@@ -88,6 +89,12 @@ const FastingSheet = ({
     });
   };
 
+  const { hide } = useBottomSheet();
+  const finishFasting = () => {
+    hide();
+    if (onStopFasting) onStopFasting();
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setFastCounter((prev) => prev + 1);
@@ -113,7 +120,7 @@ const FastingSheet = ({
               </ThemedText>
 
               <ThemedText className="text-xs! text-zinc-500!">
-                · {timeString(fastCounter * 1000)}
+                · {timeString(fastCounter)}
                 {fastTarget?.hours ? ` / ${fastTarget.hours}h` : ""}
               </ThemedText>
             </View>
@@ -211,7 +218,7 @@ const FastingSheet = ({
                   : ""
               }`}
             >
-              {timeString(fastCounter * 1000)}
+              {timeString(fastCounter)}
             </ThemedText>
 
             <View className="flex-row justify-between">
@@ -298,7 +305,7 @@ const FastingSheet = ({
       <View className="gap-2 mt-2">
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={onStopFasting}
+          onPress={finishFasting}
           className="bg-red-500 rounded-[14px] py-3.5 items-center"
         >
           <ThemedText className="text-white! font-bold! text-[15px]!">

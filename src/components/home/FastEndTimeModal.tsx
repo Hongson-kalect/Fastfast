@@ -2,7 +2,11 @@ import {
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
 } from "@/database/shema/fast_sessions";
+import { useDBService } from "@/hooks/useDBService";
+import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
+import { finishFast } from "@/util/home/fast";
 import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useMemo, useRef, useState } from "react";
@@ -12,13 +16,17 @@ import { Toast } from "toastify-react-native";
 type Props = {
   startTime: number;
   targetFinishTime: number | null;
-  onSubmit: (endTime: number) => void;
+  currentFast: FastSession;
 };
 
-const MIN_SLIDER_RANGE = 60 * 60 * 1000; // 1 giờ
 const STEP = 5 * 60 * 1000; // 5 phút
+const MIN_SLIDER_RANGE = STEP;
 
-const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
+const FastEndTimeModal = ({
+  startTime,
+  targetFinishTime,
+  currentFast,
+}: Props) => {
   const { theme } = useAppStore();
 
   const { now, sliderMin, effectiveMax, today } = useMemo(() => {
@@ -111,7 +119,9 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
   };
   const finishStatus = getFinishStatus();
 
-  const handleSubmit = () => {
+  const dbService = useDBService();
+  const { addModal } = useModalStore();
+  const handleSubmit = async () => {
     const finalTime = selectedTimeRef.current;
 
     if (finalTime > now) {
@@ -131,8 +141,8 @@ const FastEndTimeModal = ({ startTime, targetFinishTime, onSubmit }: Props) => {
       });
       return;
     }
-
-    onSubmit(finalTime);
+    addModal(null);
+    await finishFast({ dbService, currentFast, endTime: finalTime });
   };
 
   return (

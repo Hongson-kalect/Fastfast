@@ -10,6 +10,7 @@ import "@/global.css";
 import useModalStore from "@/stores/modalStore";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
+import { Toast } from "toastify-react-native";
 
 export type AlertModalOptions = {
   type: "alert";
@@ -105,6 +106,7 @@ export type BasicModalOptions = {
   modalTitle?: string;
   render?: React.ReactNode;
   onDismiss?: () => void; // lúc đóng modal
+  closable?:boolean,
   header?: React.ReactNode;
   footer?: React.ReactNode;
   middle?: React.ReactNode;
@@ -152,6 +154,13 @@ const GlobalModalComponent = () => {
 
   const closeModal = () => {
     if (!currentModal) return;
+    if(currentModal.closable===false){
+      return Toast.show({
+        type: "error",
+        text1: "Tác vụ không thể đóng",
+        text2: "Vui lòng hoàn thành hoạt động!",
+      });
+    }
     currentModal?.onDismiss?.();
     closeCurrentModal();
   };

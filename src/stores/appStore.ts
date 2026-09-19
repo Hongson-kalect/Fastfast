@@ -5,9 +5,15 @@ import {
   ThemeType,
 } from "@/database/shema/theme";
 // src/store/appStore.ts
-import { createDBService, handleLogin } from "@/database";
-import { AppSettings, FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
+import { createDBService } from "@/database";
+import {
+  AppSettings,
+  FastSession,
+  HabitLog,
+  UserProfile,
+} from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
+import { handleLogin } from "@/util/login";
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 import { create } from "zustand";
@@ -15,9 +21,9 @@ import { create } from "zustand";
 type ColorPalette = typeof darkTheme;
 
 interface AppState {
-  userProfile: UserProfile|null
-  habit: HabitLog | null
-    
+  userProfile: UserProfile | null;
+  habit: HabitLog | null;
+
   settings: AppSettings | null;
   weight: number | null;
   currentFastSession: FastSession | null;
@@ -30,7 +36,13 @@ interface AppState {
   isHydrated: boolean;
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
-  init: (db: SQLiteDatabase) => Promise<StreakCheckResult | null>;
+  init: (
+    db: SQLiteDatabase,
+  ) => Promise<{
+    streak: StreakCheckResult | null;
+    modal?: { type: string; closable: boolean };
+    lastFast?: FastSession | null;
+  }>;
   updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
   updateHabit: (val: { [K in keyof HabitLog]: any }) => void;
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
@@ -45,7 +57,7 @@ const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
 export const useAppStore = create<AppState>((set, get) => {
   return {
     userProfile: null,
-    habit:null,
+    habit: null,
     settings: {},
     currentFastSession: null,
     weight: null,
@@ -72,12 +84,13 @@ export const useAppStore = create<AppState>((set, get) => {
         const dbSettings = await dbService.getUserSettings();
         const themes = await dbService.getThemes();
         const currentHabitLog = await dbService.getLastHabitLog();
-        const { lastFast, profile, habitLog, streak } = await handleLogin({
-          db,
-          lastFast: currentFast,
-          profile: currentProfile,
-          habitLog: currentHabitLog,
-        });
+        const { lastFast, profile, habitLog, streak, modal } =
+          await handleLogin({
+            db,
+            lastFast: currentFast,
+            profile: currentProfile,
+            habitLog: currentHabitLog,
+          });
 
         const { themeObj, theme, is_dark_mode } = extractTheme(
           themes,
@@ -114,11 +127,17 @@ export const useAppStore = create<AppState>((set, get) => {
           "=> [Zustand] Khởi tạo dữ liệu Local DB thành công!",
           Date.now() - start,
         );
-        return streak;
+        return {
+          streak,
+          modal,
+          lastFast,
+        };
       } catch (error) {
         console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
         set({ isLoadingData: false });
-        return null;
+        return {
+          streak: null,
+        };
       }
     },
 

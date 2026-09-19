@@ -73,11 +73,11 @@ const HomeBodyProgress = ({ counter }: Props) => {
             let activeProcess = undefined;
             let percentage = 0;
             let startOn = 0;
-            const hours = counter / 1000 / 60 / 60;
+            const hours = counter / 3_600;
             for (let i = 0; i < process.length; i++) {
               const item = process[i];
               if (hours < item.hours) {
-                startOn = item.hours * 60 * 60 * 1000; // Số mili giây
+                startOn = item.hours * 3_600; // Số mili giây
                 activeProcess = null;
                 break;
               } else {
@@ -190,7 +190,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                     </View>
                   </View>
                 ) : (
-                  <View className="flex-row items-center gap-1 opacity-40">
+                  <View className="flex-row items-center justify-center flex-1 gap-1 opacity-40">
                     <ThemedText className="text-xs!">Start after</ThemedText>
                     <Counter
                       counter={counter}

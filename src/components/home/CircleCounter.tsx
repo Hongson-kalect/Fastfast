@@ -80,12 +80,12 @@ export const CircleCounter = ({
   // 1. Tính toán target thời gian (giờ -> ms)
   const target = useMemo<undefined | number>(() => {
     if (!settings?.target) return undefined;
-    return Number(settings.target * 3600000);
+    return Number(settings.target * 3_600);
   }, [settings?.target]);
 
   // 2. Tính toán tỷ lệ tiến trình (0.05 -> 1)
   const progress = useMemo(() => {
-    return target ? Math.max(Math.max(counter / target, 0.05), 1) : 1;
+    return target ? Math.min(Math.max(counter / target, 0.05), 1) : 1;
   }, [target, counter]);
 
   const { width, height } = useWindowDimensions();
@@ -222,6 +222,13 @@ export const CircleCounter = ({
         render: <FastDetail fast={selectedHistory} />,
       });
   }, [selectedHistory]);
+
+  console.log(
+    "Counter",
+    counter,
+    settings?.target,
+    (settings?.target || 1) * 3_600,
+  );
 
   return (
     <View className="items-center justify-center">
@@ -426,7 +433,7 @@ export const CircleCounter = ({
                 <Counter
                   itemClassName="text-white font-bold text-2xl"
                   counter={
-                    settings?.target ? Number(settings.target) * 3_600_000 : 0
+                    settings?.target ? Number(settings.target) * 3_600 : 0
                   }
                   type="large"
                 />
