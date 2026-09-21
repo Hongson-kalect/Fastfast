@@ -1,4 +1,5 @@
 import {
+  MAX_FAST_HOURS,
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
 } from "@/database/shema/fast_sessions";
@@ -20,7 +21,8 @@ type Props = {
 };
 
 const STEP = 5 * 60 * 1000; // 5 phút
-const MIN_SLIDER_RANGE = STEP;
+const MIN_SLIDER_RANGE = 60 * 60 * 1000; // 1 giờ
+const LIMIT_SLIDER_RANGE = MAX_FAST_HOURS * 60 * 60 * 1000;
 
 const FastEndTimeModal = ({
   startTime,
@@ -28,6 +30,7 @@ const FastEndTimeModal = ({
   currentFast,
 }: Props) => {
   const { theme } = useAppStore();
+  const [isMaxRange] = useState(Date.now() >= startTime + LIMIT_SLIDER_RANGE);
 
   const { now, sliderMin, effectiveMax, today } = useMemo(() => {
     const now = Date.now();
@@ -36,11 +39,13 @@ const FastEndTimeModal = ({
     const sliderMax = now;
 
     const sliderMin = startTime;
-    const sliderRange = sliderMax - sliderMin;
+    const sliderLimit = sliderMin + LIMIT_SLIDER_RANGE;
 
     // Nếu khoảng quá nhỏ thì vẫn tạo vùng kéo tối thiểu 1 giờ.
-    const effectiveMax =
-      sliderRange < MIN_SLIDER_RANGE ? sliderMin + MIN_SLIDER_RANGE : sliderMax;
+    const effectiveMax = Math.min(
+      sliderLimit,
+      Math.max(sliderMax, sliderMin + MIN_SLIDER_RANGE),
+    );
 
     return {
       now,
@@ -97,6 +102,12 @@ const FastEndTimeModal = ({
   const selectedDuration = displayTime - startTime;
   const getFinishStatus = () => {
     const seconds = selectedDuration / 1000;
+    if (displayTime > now)
+      return {
+        type: "failed" as const,
+        title: "Thời gian không hợp lệ",
+        description: "Đây là mốc thời gian trong tương lai.",
+      };
     if (seconds < TOO_QUICK_DURATION) {
       return {
         type: "too_quick" as const,
@@ -148,6 +159,11 @@ const FastEndTimeModal = ({
   return (
     <View className="pb-6 pt-4">
       {/* Header */}
+      <View className="flex-row justify-center items-center mb-4">
+        <Text className="text-warning/70 text-sm">
+          Phiên nhịn không quá {MAX_FAST_HOURS} giờ
+        </Text>
+      </View>
       <View className="mb-5">
         <Text className="text-base font-bold text-white">
           Chọn thời gian kết thúc
@@ -166,7 +182,9 @@ const FastEndTimeModal = ({
             date !== today ? "text-warning/90" : "text-white/50"
           }`}
         >
-          {date !== today ? `⚠️ ${date}` : "Hôm nay"}
+          {date !== today
+            ? `⚠️ ${getRelativeTime(new Date(date), false)}`
+            : "Hôm nay"}
         </Text>
       </View>
 

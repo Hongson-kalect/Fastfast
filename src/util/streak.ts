@@ -1,9 +1,5 @@
 import { calculateFastReward } from "@/database/shema/fast_sessions";
-import {
-  addHabitLogs,
-  RETAIN_LIMIT,
-  SHIELD_LIMIT
-} from "@/database/shema/habit_logs";
+import { RETAIN_LIMIT, SHIELD_LIMIT } from "@/database/shema/habit_logs";
 import { HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -144,12 +140,14 @@ export const saveStreakContext = async (
      SET current_streak = ?,
          max_streak = ?,
          streak_date = ?,
+         last_login_date=?,
          updated_at = strftime('%s', 'now')
      WHERE id = ?;`,
     [
       profile.current_streak,
       profile.max_streak,
       profile.streak_date,
+      profile.last_login_date,
       profile.id,
     ],
   );
@@ -181,17 +179,14 @@ export const applyShieldReward = (
   profile.mid_shield_clamable = reward.midClaimable;
   profile.full_shield_clamable = reward.fullClaimable;
 
-  stats.shield.current = Math.max(
-    stats.shield.current + reward.totalShieldGain,
-    SHIELD_LIMIT,
-  );
+  stats.shield.current = Math.min(reward.newShieldScore, SHIELD_LIMIT);
 };
 
 export const applyStreakReward = async (
   context: StreakContext,
   endTime: number,
 ) => {
-  const { profile: oldProfile } = context;
+  const { profile: oldProfile, stats } = context;
   const endDate = getLocalTodayStr(new Date(endTime));
 
   const streakGain = oldProfile.streak_date
@@ -205,6 +200,8 @@ export const applyStreakReward = async (
     oldProfile.max_streak,
     oldProfile.current_streak,
   );
+
+  stats.streak.current = oldProfile.current_streak;
 };
 
 export const applyHabitReward = (
@@ -215,10 +212,10 @@ export const applyHabitReward = (
     return;
   }
 
-  const { profile, stats } = context;
+  const { stats } = context;
   const { newHabitScore, newShieldScore, newRetain } = reward;
 
-  stats.habit.currentPercent = Math.min(newHabitScore, 100);
   stats.shield.current = Math.min(newShieldScore, SHIELD_LIMIT);
   stats.retain.current = Math.min(newRetain, RETAIN_LIMIT);
+  stats.habit.currentPercent = Math.min(newHabitScore, 100);
 };

@@ -190,7 +190,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                     </View>
                   </View>
                 ) : (
-                  <View className="flex-row items-center justify-center flex-1 gap-1 opacity-40">
+                  <View className="flex-row items-center justify-start flex-1 gap-1 opacity-40">
                     <ThemedText className="text-xs!">Start after</ThemedText>
                     <Counter
                       counter={counter}

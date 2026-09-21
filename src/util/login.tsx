@@ -1,4 +1,12 @@
-import { SQLiteDatabase } from "expo-sqlite";
+import {
+  evaluateFastStatus,
+  MAX_FAST_HOURS,
+} from "@/database/shema/fast_sessions";
+import {
+  addHabitLogs,
+  calculatePenaltyEffect
+} from "@/database/shema/habit_logs";
+import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import {
   applyClearStreak,
   applyLastLoginDate,
@@ -8,22 +16,7 @@ import {
   saveStreakContext,
 } from "@/util/streak";
 import { getLocalTodayStr } from "@/util/timer";
-import {
-  addHabitLogs,
-  calculatePenaltyEffect,
-  getHabitLogs,
-  getLastHabitLog,
-  getShieldUsedLog,
-  generateString as habit_logsGenerateString,
-} from "@/database/shema/habit_logs";
-import FastEndTimeModal from "@/components/home/FastEndTimeModal";
-import useModalStore from "@/stores/modalStore";
-import { StreakCheckResult } from "@/interfaces/home.type";
-import { StreakCheckModal } from "@/components/home/StreakModal";
-import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
-import { evaluateFastStatus, MAX_FAST_HOURS } from "@/database/shema/fast_sessions";
-import { useAppStore } from "@/stores/appStore";
-
+import { SQLiteDatabase } from "expo-sqlite";
 
 type HandleLoginParams = {
   db: SQLiteDatabase;
@@ -32,8 +25,6 @@ type HandleLoginParams = {
   habitLog: HabitLog | null;
 };
 
-
-
 export const handleLogin = async ({
   db,
   lastFast,
@@ -41,14 +32,16 @@ export const handleLogin = async ({
   habitLog,
 }: HandleLoginParams) => {
   const todayStr = getLocalTodayStr();
-    let modal: {
-    type: "finishFast",
-    closable: boolean,
-  }|undefined = undefined
-
+  let modal:
+    | {
+        type: "finishFast";
+        closable: boolean;
+      }
+    | undefined = undefined;
 
   // Guard
   if (!profile) {
+    console.log("handleLogin: profile not found");
     return {
       lastFast,
       profile,
@@ -62,6 +55,7 @@ export const handleLogin = async ({
 
   // Chưa có streak -> reset state
   if (!profile.streak_date) {
+    console.log("handleLogin: no streak date");
     applyClearStreak(streak);
 
     // Login date vẫn được cập nhật
@@ -77,11 +71,14 @@ export const handleLogin = async ({
     };
   }
 
+  console.log("dates", profile.streak_date, profile.last_login_date);
+
   // Mỗi ngày chỉ reconcile một lần
   if (
     profile.streak_date === todayStr ||
     profile.last_login_date === todayStr
   ) {
+    console.log("handleLogin: already check today");
     return {
       lastFast,
       profile,
@@ -90,15 +87,14 @@ export const handleLogin = async ({
     };
   }
 
-  
   // Hiện tại không có phiên nhịn nào
   if (!lastFast || lastFast.end_time) {
     const { gap, overRestDays, isStreakSavedByShield, ...data } =
       calculatePenaltyEffect(profile.streak_date, profile, habitLog);
     applyLastLoginDate(streak, todayStr);
-
     // Không sao cả
     if (gap <= 1) {
+      console.log("handleLogin: no fast, no penalty");
       await saveStreakContext(db, streak);
 
       return {
@@ -108,6 +104,7 @@ export const handleLogin = async ({
         streak: streak.stats,
       };
     }
+
     // Có sao, áp dụng biến động
     const returnedHabitLog = await addHabitLogs(db, {
       log_date: todayStr,
@@ -117,6 +114,7 @@ export const handleLogin = async ({
     streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
     streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
     streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
+
     applyStreakDate(streak, getYesterdayStr(todayStr));
 
     // --------------------------------------------------
@@ -150,6 +148,18 @@ export const handleLogin = async ({
 
     await saveStreakContext(db, streak);
 
+    console.log(
+      "handleLogin: no fast, penalty applied",
+      {
+        gap,
+        overRestDays,
+        isStreakSavedByShield,
+        ...data,
+      },
+      returnedHabitLog,
+      streak,
+    );
+
     return {
       lastFast: lastFast,
       profile: streak.profile,
@@ -177,6 +187,8 @@ export const handleLogin = async ({
 
     await saveStreakContext(db, streak);
 
+    console.log("handleLogin: fast in progress and not failed");
+
     return {
       lastFast,
       profile: streak.profile,
@@ -192,24 +204,26 @@ export const handleLogin = async ({
   let returnLastFast = lastFast;
 
   if (isFastFail && lastFast) {
-      const duration = Date.now() - lastFast.start_time;
+    const duration = Date.now() - lastFast.start_time;
     modal = {
-    type: "finishFast",
-    closable: duration>MAX_FAST_HOURS *(60*60*1000),
-  };
-    }
+      type: "finishFast",
+      closable: duration > MAX_FAST_HOURS * (60 * 60 * 1000),
+    };
+  }
 
-    // returnLastFast = await fastFail(db, lastFast);
+  // returnLastFast = await fastFail(db, lastFast);
 
   // Login hôm nay đã được xử lý
   applyLastLoginDate(streak, todayStr);
   await saveStreakContext(db, streak);
+
+  console.log("handleLogin: fast failed");
 
   return {
     lastFast: returnLastFast,
     profile: streak.profile,
     habitLog: streak.habitLog,
     streak: streak.stats,
-    modal
+    modal,
   };
 };

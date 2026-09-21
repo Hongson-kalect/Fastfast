@@ -6,7 +6,7 @@ import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 type Props = {
-  minTime?: number|null;
+  minTime?: number | null;
   onSubmit: (startTime: number) => void;
 };
 
@@ -182,7 +182,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           mode="time"
           is24Hour
           display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={handlePickerChange}
+          onValueChange={handlePickerChange}
         />
       )}
 

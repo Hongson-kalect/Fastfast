@@ -132,61 +132,21 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   }, [log]);
 
   const getFasts = useCallback(async () => {
+    console.log("fastIds", fastIds);
+    const result: FastMap = {};
     if (fastIds.length === 0) {
-      setFastObj({});
+      setFastObj(result);
       return;
-    }
-
-    if (3 === 3) {
-      const id = "fast_session_" + dateString;
-
-      const fast: FastMap = {
-        "fast_session_2026-08-08": {
-          start_time: new Date("2026-08-08T13:00:00.000Z").getTime(),
-          end_time: new Date("2026-08-09T09:00:00.000Z").getTime(),
-          duration: 20 * 3600,
-          target_duration: 20,
-          created_at: new Date("2026-08-08T13:00:00.000Z").getTime() / 1000,
-          updated_at: new Date("2026-08-08T13:00:00.000Z").getTime() / 1000,
-          home_data_snapshot: null,
-          id: id,
-          is_deleted: 0,
-          sync_status: "synced",
-          user_id: "qq",
-          status: "completed",
-          rating: null,
-        },
-        "fast_session_2026-08-09": {
-          start_time: new Date("2026-08-09T13:00:00.000Z").getTime(),
-          end_time: new Date("2026-08-10T09:00:00.000Z").getTime(),
-          duration: 20 * 3600,
-          target_duration: 20,
-          created_at: new Date("2026-08-09T13:00:00.000Z").getTime() / 1000,
-          updated_at: new Date("2026-08-09T13:00:00.000Z").getTime() / 1000,
-          home_data_snapshot: null,
-          id: id,
-          is_deleted: 0,
-          sync_status: "synced",
-          user_id: "qq",
-          status: "completed",
-          rating: null,
-        },
-      };
-      return setFastObj(fast);
     }
 
     try {
       setIsLoadingFasts(true);
 
       const fasts = await dbService.getFastSessionByIds(fastIds);
-
-      const nextFastObj: FastMap = {};
-
       for (const fast of fasts ?? []) {
-        nextFastObj[fast.id] = fast;
+        result[fast.id] = fast;
       }
-
-      setFastObj(nextFastObj);
+      return setFastObj(result);
     } catch (error) {
       console.error("PixelDetailSheet.getFasts", error);
       setFastObj({});
@@ -206,17 +166,16 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   useEffect(() => {
     getFasts();
     getWeight();
-  }, [getFasts]);
+  }, [dateString]);
 
   const timelineSegments = useMemo(() => {
     const segments: TimelineSegment[] = [];
 
+    console.log("timelineSegments", log, fastObj);
     for (const item of log) {
-      console.log("timelineSegments", log, fastObj);
       if (!item.fast_id) continue;
 
       const fast = fastObj[item.fast_id];
-
       if (!fast) continue;
 
       const fastSegments = getFastSegmentsForDay(fast, dateString);

@@ -1,5 +1,17 @@
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
+import { StreakCheckResult } from "@/interfaces/home.type";
 import { fixed, numberLimit } from "@/util/numberLimit";
+import {
+  applyClearStreak,
+  applyHabitReward,
+  applyShieldReward,
+  applyStreakDate,
+  applyStreakReward,
+  createStreakContext,
+  getYesterdayStr,
+  saveStreakContext,
+  StreakContext
+} from "@/util/streak";
 import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -16,12 +28,8 @@ import {
 import {
   clearStreak,
   getUserProfile,
-  increaseStreak,
-  shield_rewards,
-  updateStreakDate,
+  shield_rewards
 } from "./user";
-import { StreakCheckResult } from "@/interfaces/home.type";
-import { applyClearStreak, applyHabitReduction, applyHabitReward, applyShieldReduction, applyShieldReward, applyStreakDate, applyStreakReward, createStreakContext, getYesterdayStr, saveStreakContext, StreakContext } from "@/util/streak";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -145,11 +153,12 @@ export const getLastFastSession = async (
 
 export const getSessionById = async (
   db: SQLiteDatabase,
-  id:string
+  id: string,
 ): Promise<FastSession | null> => {
   try {
     const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions where is_deleted = 0 AND id = ? ORDER BY updated_at DESC LIMIT 1;`,[id]
+      `SELECT * FROM fast_sessions where is_deleted = 0 AND id = ? ORDER BY updated_at DESC LIMIT 1;`,
+      [id],
     );
     return row;
   } catch (e) {
@@ -163,13 +172,20 @@ export const getFastSessionByIds = async (
   fast_ids: string[],
 ) => {
   try {
+    if (!fast_ids.length) return [];
+
+    const placeholders = fast_ids.map(() => "?").join(",");
+
     const rows = await db.getAllAsync<FastSession>(
-      `SELECT * FROM fast_sessions WHERE id IN (${fast_ids.join(",")});`,
+      `SELECT * FROM fast_sessions
+       WHERE id IN (${placeholders})`,
+      fast_ids,
     );
+
     return rows;
   } catch (e) {
     console.log("error on getFastSessionByIds", e);
-    return null;
+    return [];
   }
 };
 
@@ -203,8 +219,12 @@ export const finishLastSession = async ({
   db,
   id,
   endTime,
-}: {db: SQLiteDatabase; id: string; endTime: number}): Promise<FinishFastResult> => {
-  let result:{
+}: {
+  db: SQLiteDatabase;
+  id: string;
+  endTime: number;
+}): Promise<FinishFastResult> => {
+  let result: {
     lastSession: FastSession | null;
     profile: UserProfile | null;
     habitLog: HabitLog | null;
@@ -214,7 +234,7 @@ export const finishLastSession = async ({
     profile: null,
     habitLog: null,
     streak: null,
-  }
+  };
   await db.withTransactionAsync(async () => {
     // --------------------------------------------------
     // 1. Load session
@@ -223,20 +243,20 @@ export const finishLastSession = async ({
     const lastFast = await getSessionById(db, id);
 
     if (!lastFast) {
-      return
+      return;
     }
 
     // Idempotency
     if (lastFast.end_time) {
-      result.lastSession = lastFast
-      return 
+      result.lastSession = lastFast;
+      return;
     }
 
     // --------------------------------------------------
     // 2. Calculate duration / status
     // --------------------------------------------------
 
-    const duration = Math.floor((endTime - lastFast.start_time)/1000)
+    const duration = Math.floor((endTime - lastFast.start_time) / 1000);
 
     const status = getFastFinishStatus(duration);
 
@@ -251,10 +271,9 @@ export const finishLastSession = async ({
       throw new Error("UserProfile not found");
     }
 
-    const streak = createStreakContext(
-      profile,
-      habitLog,
-    );
+    const streak = createStreakContext(profile, habitLog);
+
+    console.log("prev handleFast: ", { profile, habitLog, streak });
 
     // --------------------------------------------------
     // 4. Too quick
@@ -277,7 +296,7 @@ export const finishLastSession = async ({
         habitLog: streak.habitLog,
         streak: streak.stats,
       };
-      return 
+      return;
     }
 
     // --------------------------------------------------
@@ -301,17 +320,14 @@ export const finishLastSession = async ({
         habitLog: streak.habitLog,
         streak: streak.stats,
       };
-      return 
+      return;
     }
 
     // --------------------------------------------------
     // 6. Completed
     // --------------------------------------------------
 
-    const {
-      lastSession,
-      habitLog: returnHabitLog,
-    } = await handleCompletedFast(
+    const { lastSession, habitLog: returnHabitLog } = await handleCompletedFast(
       db,
       lastFast,
       endTime,
@@ -325,7 +341,7 @@ export const finishLastSession = async ({
       habitLog: returnHabitLog,
       streak: streak.stats,
     };
-    return 
+    return;
   });
 
   return result;
@@ -339,7 +355,7 @@ const getFastFinishStatus = (duration: number) => {
   } else {
     return "completed";
   }
-}
+};
 
 const handleTooQuickFast = async (
   db: SQLiteDatabase,
@@ -357,12 +373,7 @@ const handleTooQuickFast = async (
          is_deleted = 1
      WHERE id = ?
        AND status = 'active';`,
-    [
-      endTime,
-      Date.now(),
-      duration,
-      session.id,
-    ],
+    [endTime, Date.now(), duration, session.id],
   );
 
   return await getSessionById(db, session.id);
@@ -383,16 +394,10 @@ const handleFailedFast = async (
          status = 'failed'
      WHERE id = ?
        AND status = 'active';`,
-    [
-      endTime,
-      Date.now(),
-      duration,
-      session.id,
-    ],
+    [endTime, Date.now(), duration, session.id],
   );
 
   return await getSessionById(db, session.id);
-
 };
 
 const handleCompletedFast = async (
@@ -402,11 +407,7 @@ const handleCompletedFast = async (
   duration: number,
   streak: StreakContext,
 ) => {
-  const reward = calculateFastReward(
-    duration,
-    streak.profile,
-    streak.habitLog,
-  );
+  const reward = calculateFastReward(duration, streak.profile, streak.habitLog);
 
   // ----------------------------------------
   // Update FastSession
@@ -420,12 +421,7 @@ const handleCompletedFast = async (
          status = 'completed'
      WHERE id = ?
        AND status = 'active';`,
-    [
-      endTime,
-      Date.now(),
-      duration,
-      session.id,
-    ],
+    [endTime, Date.now(), duration, session.id],
   );
 
   const sessionUpdated = await getSessionById(db, session.id);
@@ -437,7 +433,7 @@ const handleCompletedFast = async (
   const lastLog = await addHabitLogs(db, {
     fast_id: session.id,
     log_date: getLocalTodayStr(new Date(endTime)),
-    ...reward
+    ...reward,
   });
 
   streak.habitLog = lastLog;
@@ -446,25 +442,16 @@ const handleCompletedFast = async (
   // Update current streak context
   // ----------------------------------------
 
-  applyHabitReward(
-    streak,
-    reward
-  );
+  applyHabitReward(streak, reward);
 
-  applyShieldReward(
-    streak,
-    reward,
-  );
+  applyShieldReward(streak, reward);
 
-  applyStreakReward(
-    streak,
-    endTime,
-  );
+  applyStreakReward(streak, endTime);
 
   return {
     lastSession: sessionUpdated,
-    habitLog: lastLog
-  }
+    habitLog: lastLog,
+  };
 };
 
 export const calculateFastReward = (
@@ -478,14 +465,9 @@ export const calculateFastReward = (
   // Fast reward
   // ─────────────────────────────
 
-  const inputHabitDelta = fixed(
-    3.0 + (hours - 16) * 0.2,
-  );
+  const inputHabitDelta = fixed(3.0 + (hours - 16) * 0.2);
 
-  const sessionShieldGain = Math.max(
-    0,
-    Math.floor(hours / 24) - 1,
-  );
+  const sessionShieldGain = Math.max(0, Math.floor(hours / 24) - 1);
 
   const oldHabitScore = habitLog?.habit_snap || 0;
   const oldRetain = habitLog?.habit_retain || 0;
@@ -505,9 +487,7 @@ export const calculateFastReward = (
 
   if (inputHabitDelta < 0) {
     // Habit giảm → không ảnh hưởng retain
-    newHabitScore = fixed(
-      oldHabitScore + inputHabitDelta,
-    );
+    newHabitScore = fixed(oldHabitScore + inputHabitDelta);
   } else if (oldHabitScore >= 100) {
     // Habit đã đầy → chuyển reward sang retain
     habitDelta = 0;
@@ -522,9 +502,7 @@ export const calculateFastReward = (
     }
   } else {
     // Habit chưa đầy → cộng bình thường
-    newHabitScore = fixed(
-      oldHabitScore + inputHabitDelta,
-    );
+    newHabitScore = fixed(oldHabitScore + inputHabitDelta);
   }
 
   // ─────────────────────────────
@@ -537,26 +515,17 @@ export const calculateFastReward = (
   let midClaimable = profile.mid_shield_clamable;
   let fullClaimable = profile.full_shield_clamable;
 
-  if (
-    newHabitScore >= shield_rewards[0] &&
-    lowClaimable
-  ) {
+  if (newHabitScore >= shield_rewards[0] && lowClaimable) {
     milestoneShieldGain++;
     lowClaimable = 0;
   }
 
-  if (
-    newHabitScore >= shield_rewards[1] &&
-    midClaimable
-  ) {
+  if (newHabitScore >= shield_rewards[1] && midClaimable) {
     milestoneShieldGain++;
     midClaimable = 0;
   }
 
-  if (
-    newHabitScore >= shield_rewards[2] &&
-    fullClaimable
-  ) {
+  if (newHabitScore >= shield_rewards[2] && fullClaimable) {
     milestoneShieldGain++;
     fullClaimable = 0;
   }
@@ -566,9 +535,7 @@ export const calculateFastReward = (
   // ─────────────────────────────
 
   const totalShieldGain =
-    sessionShieldGain +
-    milestoneShieldGain +
-    bonusShieldGain;
+    sessionShieldGain + milestoneShieldGain + bonusShieldGain;
 
   const newShieldScore = numberLimit(
     oldShieldScore + totalShieldGain,
@@ -767,23 +734,28 @@ export const deleteFast = async (db: SQLiteDatabase, id: string) => {
 export const evaluateFastStatus = (
   lastFast: FastSession | null,
   previousLoginDate: string,
-  todayStr: string
+  todayStr: string,
 ) => {
   if (!lastFast || lastFast.end_time) {
     return { isFastFail: false, referenceDate: previousLoginDate };
   }
 
-  const currentFastHours = (Date.now() - lastFast.start_time) / (60 * 60 * 1000);
-  const hasTarget = Boolean(lastFast.target_duration && lastFast.target_duration > 0);
+  const currentFastHours =
+    (Date.now() - lastFast.start_time) / (60 * 60 * 1000);
+  const hasTarget = Boolean(
+    lastFast.target_duration && lastFast.target_duration > 0,
+  );
 
   let isFastFail = false;
 
   if (currentFastHours > MAX_FAST_HOURS) {
     isFastFail = true;
   } else if (hasTarget) {
-    const targetEndTime = lastFast.start_time + lastFast.target_duration! * 3600 * 1000;
+    const targetEndTime =
+      lastFast.start_time + lastFast.target_duration! * 3600 * 1000;
     const targetDayStr = getLocalTodayStr(new Date(targetEndTime));
-    const effectiveLastActiveDate = targetDayStr > previousLoginDate ? targetDayStr : previousLoginDate;
+    const effectiveLastActiveDate =
+      targetDayStr > previousLoginDate ? targetDayStr : previousLoginDate;
 
     if (getDaysDiff(effectiveLastActiveDate, todayStr) > 1) {
       isFastFail = true;
@@ -821,10 +793,7 @@ export const reconcileStreak = async (
     };
   }
 
-  const streak = createStreakContext(
-    profile,
-    habitLog,
-  );
+  const streak = createStreakContext(profile, habitLog);
 
   // --------------------------------------------------
   // 1. Get reference date
@@ -838,19 +807,10 @@ export const reconcileStreak = async (
   // 2. Calculate penalty
   // --------------------------------------------------
 
-  const currentShield =
-    streak.habitLog?.shield_snap || 0;
+  const currentShield = streak.habitLog?.shield_snap || 0;
 
-  const {
-    gap,
-    overRestDays,
-    isStreakSavedByShield,
-    ...data
-  } = calculatePenaltyEffect(
-    referenceDate,
-    streak.profile,
-    streak.habitLog,
-  );
+  const { gap, overRestDays, isStreakSavedByShield, ...data } =
+    calculatePenaltyEffect(referenceDate, streak.profile, streak.habitLog);
 
   // --------------------------------------------------
   // 3. No gap
@@ -873,20 +833,17 @@ export const reconcileStreak = async (
   streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
   streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
 
-   applyStreakDate(
-    streak,
-    getYesterdayStr(todayStr),
-  );
+  applyStreakDate(streak, getYesterdayStr(todayStr));
 
   // --------------------------------------------------
   // 4. Shield saves streak
   // --------------------------------------------------
-  if(data.shieldDelta){
-    streak.profile.total_shield_used=(streak.profile.total_shield_used||0)+data.shieldDelta;
+  if (data.shieldDelta) {
+    streak.profile.total_shield_used =
+      (streak.profile.total_shield_used || 0) + data.shieldDelta;
   }
 
   if (isStreakSavedByShield) {
-
     await saveStreakContext(db, streak);
 
     return {

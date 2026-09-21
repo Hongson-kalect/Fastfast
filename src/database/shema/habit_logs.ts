@@ -91,6 +91,29 @@ export const getLastHabitLog = async (
   return rows;
 };
 
+export const getPixelShielLog = async (
+  db: SQLiteDatabase,
+  year: number,
+): Promise<HabitLog[]> => {
+  try {
+    // Tạo 2 mốc đầu năm và cuối năm theo chuẩn YYYY-MM-DD
+    const startOfYear = `${year}-01-01`;
+    const endOfYear = `${year}-12-31`;
+
+    const rows = await db.getAllAsync<HabitLog>(
+      `SELECT * FROM habit_logs 
+       WHERE shield_delta < 0 AND log_date BETWEEN ? AND ? 
+       ORDER BY log_date ASC;`,
+      [startOfYear, endOfYear],
+    );
+
+    return rows;
+  } catch (e) {
+    console.log("error on getPixelShielLog", e);
+    return [];
+  }
+};
+
 export type AddHabitType = {
   log_date?: string;
   fast_id?: string;

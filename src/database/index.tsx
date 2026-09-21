@@ -66,6 +66,7 @@ import {
 import {
   getHabitLogs,
   getLastHabitLog,
+  getPixelShielLog,
   getShieldUsedLog,
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
@@ -144,6 +145,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
 
   getPixelNoteData: (year: number) => getPixelNoteData(db, year),
   getPixelLogData: (year: number) => getPixelLogData(db, year),
+  getPixelShielLog: (year: number) => getPixelShielLog(db, year),
   getFastSessionByIds: (ids: string[]) => getFastSessionByIds(db, ids),
 });
 

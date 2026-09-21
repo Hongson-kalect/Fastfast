@@ -33,7 +33,7 @@ import {
   StatusBar,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 
 // 1. Định nghĩa các chế độ xem (View Options)
@@ -392,12 +392,17 @@ const PixelScreen = () => {
   const getYearData = useCallback(
     async (targetYear: number) => {
       setIsLoading(true);
+      const [logs, notes, shieldUsed] = await Promise.all([
+        dbService.getPixelLogData(targetYear),
+        dbService.getPixelNoteData(targetYear),
+        dbService.getPixelShielLog(targetYear),
+      ]);
 
-      const {
-        logs,
-        notes,
-        habitLogs: shieldUsed,
-      } = generateRealisticYearData(targetYear);
+      // const {
+      //   logs,
+      //   notes,
+      //   habitLogs: shieldUsed,
+      // } = generateRealisticYearData(targetYear);
 
       const yearMap: YearPixelDataMap = {};
       const newStats: PixelStats = { fastDays: 0, fastHour: 0, logDays: 0 };
@@ -491,10 +496,6 @@ const PixelScreen = () => {
       // };
     }, [year, getYearData]),
   );
-
-  useEffect(() => {
-    console.log("yIndex", yIndex);
-  }, [yIndex]);
 
   return (
     <ThemedView className="flex-1 bg-main">

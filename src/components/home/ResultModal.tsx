@@ -98,12 +98,6 @@ export const ResultModal = ({ data = testData }: Props) => {
     ? Math.min(1, data.fastingTime / 3600 / data.targetHours)
     : 1;
   const { theme } = useAppStore();
-  console.log("vào đc đây");
-
-  useEffect(() => {
-    console.log("mở ra");
-    return () => console.log("bị kill");
-  }, []);
 
   return (
     <View>

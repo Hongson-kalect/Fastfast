@@ -223,13 +223,6 @@ export const CircleCounter = ({
       });
   }, [selectedHistory]);
 
-  console.log(
-    "Counter",
-    counter,
-    settings?.target,
-    (settings?.target || 1) * 3_600,
-  );
-
   return (
     <View className="items-center justify-center">
       <View

@@ -36,6 +36,8 @@ export const finishFast = async ({
       id: currentFast?.id,
       endTime,
     });
+  
+    console.log("finishFast", {profile,habitLog, streak,lastSession});
 
   // update zustand
   const tempProfile = { ...userProfile!, ...profile! };
