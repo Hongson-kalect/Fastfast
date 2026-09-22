@@ -38,8 +38,8 @@ export const Button = ({
         <ActivityIndicator color="#38BDF8" />
       ) : (
         <ThemedText
-          color={variant === "primary" ? "white" : "textSecondary"}
-          className={`font-bold`}
+          colorHex={variant === "primary" ? "white" : "textSecondary"}
+          weight="bold"
         >
           {title}
         </ThemedText>

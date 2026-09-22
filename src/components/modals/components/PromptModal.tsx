@@ -23,7 +23,7 @@ const PromptModal = (modal: Props) => {
   }, [modal.defaultValue]);
   return (
     <View>
-      {modal.title && <ThemedText type="subtitle">{modal.title}</ThemedText>}
+      {modal.title && <ThemedText size='xxl' weight="semibold">{modal.title}</ThemedText>}
       {modal.message && (
         <ThemedText className="mt-2" numberOfLines={2}>
           {modal.message}
@@ -72,7 +72,7 @@ const PromptModal = (modal: Props) => {
               addModal(null);
             }}
           >
-            <ThemedText color="white">{modal.cancelText || "Close"}</ThemedText>
+            <ThemedText colorHex="white">{modal.cancelText || "Close"}</ThemedText>
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -87,7 +87,7 @@ const PromptModal = (modal: Props) => {
             addModal(null);
           }}
         >
-          <ThemedText color="white">{modal.okText || "OK"}</ThemedText>
+          <ThemedText colorHex="white">{modal.okText || "OK"}</ThemedText>
         </TouchableOpacity>
       </View>
     </View>

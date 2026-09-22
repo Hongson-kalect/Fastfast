@@ -34,6 +34,7 @@ import {
   updateSessionTarget,
 } from "./shema/fast_sessions";
 import {
+  changeTheme,
   getUserSettings,
   setAppSetting,
   generateString as settingGenerateString,
@@ -70,6 +71,8 @@ import {
   getShieldUsedLog,
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
+import {generateString as userAssetsGenerateString} from "./shema/user_assets";
+import {generateString as userAchievementsGenerateString, itemGenerateString as userArchivementsItemGenerateString} from "./shema/user_archievements";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -120,6 +123,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
 
   getActiveTheme: () => getActiveTheme(db),
   getThemes: () => getThemes(db),
+  changeTheme: (theme: string) => changeTheme(db, theme),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
   getCurrentWeight: (date?: string) => getCurrentWeight(db, date),
@@ -159,6 +163,9 @@ export const generateSchema = `
     ${weight_trackerGenerateString}
     ${target_GenerateString}
     ${habit_logsGenerateString}
+    ${userAssetsGenerateString}
+    ${userAchievementsGenerateString}
+    ${userArchivementsItemGenerateString}
 `;
 
 const generateSeedData = `

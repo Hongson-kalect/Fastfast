@@ -1,10 +1,9 @@
-import {
-  darkTheme,
-  defaultTheme,
-  extractTheme,
-  ThemeType,
-} from "@/database/shema/theme";
 // src/store/appStore.ts
+import {
+  defaultDark,
+  extractTheme,
+  ThemeType
+} from "@/constants/themes";
 import { createDBService } from "@/database";
 import {
   AppSettings,
@@ -18,8 +17,6 @@ import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 import { create } from "zustand";
 
-type ColorPalette = typeof darkTheme;
-
 interface AppState {
   userProfile: UserProfile | null;
   habit: HabitLog | null;
@@ -28,17 +25,13 @@ interface AppState {
   weight: number | null;
   currentFastSession: FastSession | null;
   // configs: SystemConfigObj | null;
-  themeObj: ThemeType;
-  theme: ColorPalette;
-  isDarkMode: boolean;
+  theme: ThemeType;
   isLoadingData: boolean;
   language: string;
   isHydrated: boolean;
 
   // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
-  init: (
-    db: SQLiteDatabase,
-  ) => Promise<{
+  init: (db: SQLiteDatabase) => Promise<{
     streak: StreakCheckResult | null;
     modal?: { type: string; closable: boolean };
     lastFast?: FastSession | null;
@@ -48,7 +41,7 @@ interface AppState {
   updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
   updateWeight: (weight: number) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
-  updateTheme: (obj: ThemeType) => void;
+  updateTheme: (db: ReturnType<typeof createDBService>, theme: string) => void;
   toggleDarkMode: (db: ReturnType<typeof createDBService>) => void;
 }
 
@@ -63,9 +56,7 @@ export const useAppStore = create<AppState>((set, get) => {
     weight: null,
     setCurrentFastSession: (fastSession) =>
       set({ currentFastSession: fastSession }),
-    themeObj: defaultTheme,
-    theme: darkTheme,
-    isDarkMode: true,
+    theme: defaultDark,
     isLoadingData: true, // Mặc định là true để giữ màn hình Loading/Splash
     language: "en",
     isHydrated: false, // Kiểm tra đã nạp xong data từ SecureStore chưa
@@ -82,7 +73,6 @@ export const useAppStore = create<AppState>((set, get) => {
         const weightObj = await dbService.getCurrentWeight();
         const currentProfile = await dbService.getUserProfile();
         const dbSettings = await dbService.getUserSettings();
-        const themes = await dbService.getThemes();
         const currentHabitLog = await dbService.getLastHabitLog();
         const { lastFast, profile, habitLog, streak, modal } =
           await handleLogin({
@@ -92,10 +82,10 @@ export const useAppStore = create<AppState>((set, get) => {
             habitLog: currentHabitLog,
           });
 
-        const { themeObj, theme, is_dark_mode } = extractTheme(
-          themes,
-          dbSettings,
-        );
+        const theme = extractTheme({
+          theme: dbSettings?.theme,
+          isDarkMode: dbSettings?.is_dark_mode,
+        });
 
         let locale =
           dbSettings?.language ||
@@ -107,7 +97,6 @@ export const useAppStore = create<AppState>((set, get) => {
 
         // 2. Lấy trạng thái dark mode lưu trong settings (hoặc fallback mặc định)
         // Giả sử Sơn lưu flag dark mode ở bảng app_settings với key là 'is_dark_mode'
-        const isDarkMode = dbSettings?.is_dark_mode === true || true;
 
         // 3. Bốc palette màu tương ứng từ cái themeObj vừa băm từ AsyncStorage ra
 
@@ -118,8 +107,6 @@ export const useAppStore = create<AppState>((set, get) => {
           habit: habitLog,
           settings: dbSettings,
           theme: theme,
-          themeObj: themeObj,
-          isDarkMode: is_dark_mode,
           isLoadingData: false,
           language: locale.toString(),
         });
@@ -161,23 +148,35 @@ export const useAppStore = create<AppState>((set, get) => {
         },
       })),
     updateWeight: (weight: number) => set({ weight: weight }),
-    updateTheme: async (obj: ThemeType) => {
-      const { isDarkMode } = get();
+    updateTheme: async (
+      dbService: ReturnType<typeof createDBService>,
+      themeId: string,
+    ) => {
+      const { settings } = get();
+      const currentMode = settings?.is_dark_mode ?? true;
+      await dbService?.changeTheme(themeId);
 
+      const theme = extractTheme({ theme: themeId, isDarkMode: currentMode });
       set((state) => ({
-        themeObj: obj,
-        theme: isDarkMode
-          ? obj.color_palette["dark"] || defaultTheme.color_palette.dark
-          : obj.color_palette["light"] || defaultTheme.color_palette.light,
+        theme: theme,
       }));
     },
 
     toggleDarkMode: async (dbService: ReturnType<typeof createDBService>) => {
-      const { isDarkMode, themeObj } = get();
-      await dbService?.toggleTheme(!isDarkMode);
+      const { settings } = get();
+      const currentMode = settings?.is_dark_mode ?? true;
+      await dbService?.toggleTheme(!currentMode);
+      const newTheme = extractTheme({
+        theme: settings?.theme,
+        isDarkMode: !currentMode,
+      });
 
       set((state) => ({
-        isDarkMode: !isDarkMode,
+        settings: {
+          ...state.settings,
+          is_dark_mode: !currentMode,
+        },
+        theme: newTheme,
       }));
     },
   };

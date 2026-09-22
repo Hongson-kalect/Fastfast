@@ -348,7 +348,7 @@ const PixelScreen = () => {
 
   const currentWeekY = useMemo(() => {
     const currentWeek = getWeek(new Date());
-    return Math.max(0, currentWeek);
+    return Math.max(0, currentWeek - 4);
   }, [width]);
 
   const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
@@ -498,7 +498,7 @@ const PixelScreen = () => {
   );
 
   return (
-    <ThemedView className="flex-1 bg-main">
+    <ThemedView className="flex-1 bg-background">
       <View className="absolute bottom-12 right-2 z-10">
         {isScrollUp && yIndex > height ? (
           <Pressable
@@ -522,10 +522,14 @@ const PixelScreen = () => {
       </View>
       <View
         style={{ paddingTop: StatusBar.currentHeight || 0 }}
-        className="h-full w-full px-3"
+        className="h-full w-full"
       >
         <SectionList
           ref={sectionListRef}
+          contentContainerStyle={{
+            paddingHorizontal: 10,
+            gap: 4,
+          }}
           onScroll={(e) => {
             const newY = e.nativeEvent.contentOffset.y;
             setIsScrollUp(newY < yIndex);
@@ -554,7 +558,12 @@ const PixelScreen = () => {
                   style={{ borderTopLeftRadius: 4 }}
                   className="w-15 bg-primary justify-center items-center"
                 >
-                  <ThemedText className="text-[12px]! py-1 text-white! font-bold">
+                  <ThemedText
+                    size="xs"
+                    weight="bold"
+                    colorHex="#FFFFFF"
+                    style={{ paddingVertical: 4 }}
+                  >
                     Week
                   </ThemedText>
                 </TouchableOpacity>
@@ -566,7 +575,7 @@ const PixelScreen = () => {
                         key={idx}
                         className="flex-1 items-center justify-center pt-1"
                       >
-                        <ThemedText className="text-[10px]! text-white! opacity-70">
+                        <ThemedText size="xxs" color="text" opacity="medium">
                           {day}
                         </ThemedText>
                       </View>

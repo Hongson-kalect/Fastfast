@@ -14,11 +14,7 @@ const MenuModal = (modal: Props) => {
 
   return (
     <View>
-      {modal.title && (
-        <ThemedText className="mb-4" type="subtitle">
-          {modal.title}
-        </ThemedText>
-      )}
+     {modal.title && <ThemedText size='xxl' weight="semibold" className='mb-4'>{modal.title}</ThemedText>}
       <ScrollView>
         {modal.menuOptions.map((menu, idx) => (
           <AppMenu

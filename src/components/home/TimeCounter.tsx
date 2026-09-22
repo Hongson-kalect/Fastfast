@@ -209,165 +209,189 @@ const HomeTimeCounter = ({
 
   return (
     <View className="items-center justify-center">
-      {!layout ? (
-        <View
-          key="measuring-layout"
-          onLayout={detectCounterLayout}
-          className="py-6 px-10 opacity-0 absolute"
-        >
-          <Counter itemClassName="text-white!" counter={counter} type="large" />
-        </View>
-      ) : (
-        <View
-          key="skia-counter-render"
-          style={{ width: layout.width, height: layout.height }}
-          className="justify-start items-start rounded-full"
-        >
-          {/* CANVAS SKIA DÙNG PATH CHUẨN ĐỂ SỬ DỤNG START/END */}
-          <Canvas
-            className=" "
-            style={{
-              borderWidth: 1,
-              borderColor: "white",
-              paddingTop: 20,
-              top: -padding,
-              left: -padding,
-              width: layout.width + padding * 2,
-              height: layout.height + padding * 2 + 4,
-            }}
-          >
-            {capsulePath && (
+  {!layout ? (
+    <View
+      key="measuring-layout"
+      onLayout={detectCounterLayout}
+      className="py-6 px-10 opacity-0 absolute"
+    >
+      <Counter
+        itemClassName="text-text-base!"
+        counter={counter}
+        type="large"
+      />
+    </View>
+  ) : (
+    <View
+      key="skia-counter-render"
+      style={{ width: layout.width, height: layout.height }}
+      className="justify-start items-start rounded-full"
+    >
+      {/* CANVAS SKIA DÙNG PATH CHUẨN ĐỂ SỬ DỤNG START/END */}
+      <Canvas
+        style={{
+          paddingTop: 20,
+          top: -padding,
+          left: -padding,
+          width: layout.width + padding * 2,
+          height: layout.height + padding * 2 + 4,
+        }}
+      >
+        {capsulePath && (
+          <>
+            {/* 1. Đường viền nền phía sau */}
+            <Path
+              path={capsulePath}
+              color={isCounting ? theme.text : theme.text + "77"}
+              style="stroke"
+              strokeWidth={strokeWidth}
+            />
+
+            {/* 2. Đường tiến độ hiện tại */}
+            {isCounting && (
               <>
-                {/* 1. Đường viền nền tối phía sau */}
                 <Path
                   path={capsulePath}
-                  color={isCounting ? "#333" : "#FFFFFF77"}
+                  color={
+                    progress === 1
+                      ? color + "dd"
+                      : color + Math.floor(progress * 100)
+                  }
                   style="stroke"
                   strokeWidth={strokeWidth}
+                  strokeCap="round"
+                  start={0}
+                  end={progress}
                 />
-                {/* 2. Đường tiến độ hiện tại */}
-                {isCounting && (
-                  <>
-                    <Path
-                      path={capsulePath}
-                      color={
-                        progress === 1
-                          ? color + "dd"
-                          : color + Math.floor(progress * 100)
-                      }
-                      style="stroke"
-                      strokeWidth={strokeWidth}
-                      strokeCap={"round"}
-                      start={0}
-                      end={progress}
-                    />
 
-                    {/* 3. Đường trắng chạy quanh */}
-                    <Path
-                      path={capsulePath}
-                      style="stroke"
-                      strokeWidth={strokeWidth}
-                      strokeCap="round"
-                      start={0}
-                      end={progress}
-                    >
-                      <SweepGradient
-                        c={vec(layout.width / 2, layout.height / 2)}
-                        matrix={animatedMatrix}
-                        colors={[
-                          color + "10",
-                          color + "30",
-                          color + "50",
-                          color,
-                          "#FFFFFF",
-                          color,
-                          color + "50",
-                          color + "30",
-                          color + "10",
-                        ]}
-                        positions={[
-                          0, 0.45, 0.75, 0.86, 0.9, 0.94, 0.97, 0.99, 1,
-                        ]}
-                      />
+                {/* 3. Đường trắng chạy quanh */}
+                <Path
+                  path={capsulePath}
+                  style="stroke"
+                  strokeWidth={strokeWidth}
+                  strokeCap="round"
+                  start={0}
+                  end={progress}
+                >
+                  <SweepGradient
+                    c={vec(layout.width / 2, layout.height / 2)}
+                    matrix={animatedMatrix}
+                    colors={[
+                      color + "10",
+                      color + "30",
+                      color + "50",
+                      color,
+                      "#FFFFFF",
+                      color,
+                      color + "50",
+                      color + "30",
+                      color + "10",
+                    ]}
+                    positions={[
+                      0,
+                      0.45,
+                      0.75,
+                      0.86,
+                      0.9,
+                      0.94,
+                      0.97,
+                      0.99,
+                      1,
+                    ]}
+                  />
 
-                      <BlurMask blur={10} style="solid" />
-                    </Path>
-                  </>
-                )}
+                  <BlurMask blur={10} style="solid" />
+                </Path>
               </>
             )}
-          </Canvas>
+          </>
+        )}
+      </Canvas>
 
-          {/* Ruột bên trong chứa Text đếm giờ */}
-          <View
-            className="absolute bg-black rounded-full justify-center items-center"
-            style={{
-              marginLeft: 6,
-              marginTop: 9,
-              width: layout.width - 20,
-              height: layout.height - 25,
-            }}
+      {/* Ruột bên trong chứa Text đếm giờ */}
+      <View
+        className="absolute bg-background rounded-full justify-center items-center"
+        style={{
+          marginLeft: 6,
+          marginTop: 9,
+          width: layout.width - 20,
+          height: layout.height - 25,
+        }}
+      >
+        {isCounting ? (
+          <Pressable onPress={openFastingSheet} hitSlop={10}>
+            <Counter
+              itemClassName="text-text-base!"
+              counter={counter}
+              type="large"
+            />
+          </Pressable>
+        ) : (
+          <Pressable
+            hitSlop={10}
+            onPress={openTargetSheet}
+            className="justify-center items-center w-full h-full gap-2"
           >
-            {isCounting ? (
-              <Pressable onPress={openFastingSheet} hitSlop={10}>
-                <Counter
-                  itemClassName="text-white!"
-                  counter={counter}
-                  type="large"
-                />
-              </Pressable>
-            ) : (
-              <Pressable
-                hitSlop={10}
-                onPress={openTargetSheet}
-                className="justify-center items-center w-full h-full gap-2"
+            {settings?.target ? (
+             <ThemedText
+                size="displayLarge"
+                weight="semibold"
               >
-                {settings?.target ? (
-                  <ThemedText type="title">
-                    {settings?.target + ":00:00"}
-                  </ThemedText>
-                ) : (
-                  <ThemedText type="title">00:00:00</ThemedText>
-                )}
-
-                <View
-                  style={{
-                    borderColor: currentTarget?.colors.accent || theme.warning,
-                  }}
-                  className={`absolute border-b flex-row items-center gap-1 bottom-2`}
-                >
-                  <ThemedText
-                    style={{
-                      color: currentTarget?.colors.accent || theme.warning,
-                    }}
-                    type="small"
-                    className={`text-[11px]!`}
-                  >
-                    {currentTarget?.label || "Set target"}
-                  </ThemedText>
-
-                  {/* <Feather
-                    name="edit"
-                    size={11}
-                    color={settings?.target ? theme.primary : theme.warning}
-                  /> */}
-                </View>
-              </Pressable>
-              //
-              // <Counter itemClassName="text-white!" counter={0} type="large" />
+                {settings.target + ":00:00"}
+              </ThemedText>
+            ) : (
+             <ThemedText
+                size="displayLarge"
+                weight="semibold"
+              >00:00:00</ThemedText>
             )}
-          </View>
-        </View>
-      )}
 
-      <View className="w-full pt-4 items-center justify-center">
-        <Pressable onPress={showHistory} hitSlop={10}>
-          <Text className="text-text-base/60 text-sm underline">
-            Fast History
-          </Text>
-        </Pressable>
+            <View
+              style={{
+                borderColor:
+                  currentTarget?.colors.accent || theme.warning,
+              }}
+              className="absolute border-b flex-row items-center gap-1 bottom-2"
+            >
+              <ThemedText
+                size="xs"
+                colorHex={
+                  currentTarget?.colors.accent || theme.warning
+                }
+                style={{
+                  fontSize: 11,
+                  lineHeight: 14,
+                  fontWeight: "500",
+                }}
+              >
+                {currentTarget?.label || "Set target"}
+              </ThemedText>
+
+              {/* <Feather
+                name="edit"
+                size={11}
+                color={settings?.target ? theme.primary : theme.warning}
+              /> */}
+            </View>
+          </Pressable>
+        )}
       </View>
     </View>
+  )}
+
+  <View className="w-full pt-4 items-center justify-center">
+    <Pressable onPress={showHistory} hitSlop={10}>
+      <ThemedText
+        size="sm"
+        color="text"
+        opacity="medium"
+        style={{ textDecorationLine: "underline" }}
+      >
+        Fast History
+      </ThemedText>
+    </Pressable>
+  </View>
+</View>
   );
 };
 

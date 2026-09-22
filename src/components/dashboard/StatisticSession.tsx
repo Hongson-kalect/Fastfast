@@ -1,6 +1,7 @@
 import { FastStatsSummary } from "@/database/shema/fast_sessions";
 import { useAppStore } from "@/stores/appStore";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { ThemedText } from "../themed-text";
 
 type StatCardProps = {
   icon: string;
@@ -22,60 +23,87 @@ const StatCard = ({
 }: StatCardProps) => {
   if (isHero) {
     return (
-      <View className="mb-3 w-full flex-row items-center justify-between rounded-2xl border border-[#7F92F8]/30 bg-[#7F92F8]/10 p-4">
+      <View className="mb-3 w-full flex-row items-center justify-between rounded-2xl border border-primary/30 bg-primary/10 p-4">
         <View className="flex-row items-center gap-3">
           <View
             style={{ backgroundColor: color + "25" }}
-            className="h-11 w-11 items-center justify-center rounded-xl border border-[#7F92F8]/20"
+            className="h-11 w-11 items-center justify-center rounded-xl border border-primary/20"
           >
-            <Text className="text-xl">{icon}</Text>
+            <ThemedText size="xl">{icon}</ThemedText>
           </View>
+
           <View>
-            <Text className="text-xs font-medium text-[#7F92F8] uppercase tracking-wider">
+            <ThemedText
+              size="xs"
+              weight="medium"
+              color="primary"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
               {title}
-            </Text>
+            </ThemedText>
+
             <View className="flex-row items-baseline gap-1">
-              <Text className="text-2xl font-extrabold text-white">
+              <ThemedText size="xxl" weight="bold" color="text">
                 {value}
-              </Text>
+              </ThemedText>
+
               {unit && (
-                <Text className="text-xs font-semibold text-zinc-300">
+                <ThemedText
+                  size="xs"
+                  weight="semibold"
+                  color="text"
+                  opacity="medium"
+                >
                   {unit}
-                </Text>
+                </ThemedText>
               )}
             </View>
           </View>
         </View>
 
-        <View className="rounded-full bg-[#7F92F8]/20 px-3 py-1 border border-[#7F92F8]/30">
-          <Text className="text-[11px] font-bold text-[#7F92F8]">
+        <View className="rounded-full border border-primary/30 bg-primary/20 px-3 py-1">
+          <ThemedText size="xxs" weight="bold" color="primary">
             Active 🔥
-          </Text>
+          </ThemedText>
         </View>
       </View>
     );
   }
 
   return (
-    <View className="w-[48%] rounded-2xl border border-zinc-800/80 bg-zinc-900/80 p-3.5">
+    <View className="w-[48%] rounded-2xl border border-text-base/10 bg-background2/80 p-3.5">
       <View className="mb-2.5 flex-row items-center gap-2">
         <View
           style={{ backgroundColor: color + "15" }}
           className="h-7 w-7 items-center justify-center rounded-lg"
         >
-          <Text className="text-xs">{icon}</Text>
+          <ThemedText size="xs">{icon}</ThemedText>
         </View>
-        <Text
-          className="text-[11px] font-medium text-zinc-400"
+
+        <ThemedText
+          size="xs"
+          weight="medium"
+          color="text"
+          opacity="medium"
           numberOfLines={1}
         >
           {title}
-        </Text>
+        </ThemedText>
       </View>
 
       <View className="flex-row items-baseline gap-1">
-        <Text className="text-xl font-bold text-white">{value}</Text>
-        {unit && <Text className="text-[10px] text-zinc-500">{unit}</Text>}
+        <ThemedText size="lg" weight="bold" color="text">
+          {value}
+        </ThemedText>
+
+        {unit && (
+          <ThemedText size="tiny" color="text" opacity="medium">
+            {unit}
+          </ThemedText>
+        )}
       </View>
     </View>
   );
@@ -143,7 +171,9 @@ export const StatisticsSection = ({ fastStatistics }: Props) => {
 
   return (
     <View className="mt-5">
-      <Text className="mb-3 text-base font-bold text-white">Statistics</Text>
+      <ThemedText weight="bold" className="mb-3 text-text-base">
+        Statistics
+      </ThemedText>
 
       {/* Streak Hero Card */}
       <StatCard {...heroStat} isHero />

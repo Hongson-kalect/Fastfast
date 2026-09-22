@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     id TEXT PRIMARY KEY, -- UUID v7 sinh từ Client
     name TEXT,
     account_type TEXT DEFAULT 'free',
+    account_type_expried_at INTEGER DEFAULT NULL,
     image_uri TEXT,
 
     -- Thêm các trường Thống kê Kỷ lục (Cache)

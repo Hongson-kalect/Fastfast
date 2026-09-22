@@ -1,6 +1,6 @@
 import { useAppStore } from "@/stores/appStore";
 import React, { useEffect } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedProps,
@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
+import { ThemedText } from "../themed-text";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -28,7 +29,7 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
   retainColor = "#3B82F6",
   size = 100,
 }) => {
-  const { isDarkMode } = useAppStore();
+  const { settings, theme } = useAppStore();
   const waveOffset = useSharedValue(0);
   const fillLevel = useSharedValue(0);
   const retainLevel = useSharedValue(0);
@@ -105,18 +106,17 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
   return (
     <View
       style={{ width: outerSize, height: outerSize }}
-      className="items-center justify-center relative"
+      className="relative items-center justify-center"
     >
-      {/* 1. KHUNG CHÍNH (INNER BUBBLE) - Giữ nguyên style bạn đã cấu hình */}
+      {/* 1. KHUNG CHÍNH (INNER BUBBLE) */}
       <View
         style={{
           width: size,
           height: size,
           borderColor: color + "88",
-          boxShadow: "0px 3px 6px " + color + "66",
-          backgroundColor: isDarkMode ? "#121318" : "#fff",
+          boxShadow: `0px 3px 6px ${color}66`,
         }}
-        className="rounded-full border-2 items-center justify-center relative overflow-hidden z-10"
+        className="relative z-10 items-center justify-center overflow-hidden rounded-full border-2 bg-background"
       >
         {/* Khung chứa SVG Nước Sóng Sánh */}
         <View className="absolute inset-0">
@@ -126,8 +126,9 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
               animatedProps={animatedPathProps}
               fill={color}
               opacity={0.4}
-              transform={`translate(-5, -2)`}
+              transform="translate(-5, -2)"
             />
+
             {/* Lớp sóng chính phía trước */}
             <AnimatedPath
               animatedProps={animatedPathProps}
@@ -138,37 +139,39 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
         </View>
 
         {/* TEXT HIỂN THỊ % ĐỢT SÓNG LÊN */}
-        <View className="items-center justify-center z-10">
-          <Text
-            style={{ fontSize: Math.floor(size / 3) }}
-            className="font-black text-white"
+        <View className="z-10 items-center justify-center">
+          <ThemedText
+            size="xxxl"
+            weight="bold"
+            color="text"
+            style={{
+              fontSize: Math.floor(size / 3),
+              lineHeight: Math.floor(size / 3) + 4,
+            }}
           >
             {Math.round(clampedPercent)}
-          </Text>
-          <Text
-            style={{ marginTop: 0 }}
-            className="text-[10px] font-bold text-white/80"
-          >
+          </ThemedText>
+
+          <ThemedText size="xxs" weight="bold" color="text" opacity="medium">
             %
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
       {/* 2. VIỀN RETAIN OUTER RING (XOAY TỪ MỐC 12 GIỜ) */}
-      <View className="absolute top-0 left-0 z-20">
+      <View className="absolute left-0 top-0 z-20">
         <Svg
           width={outerSize}
           height={outerSize}
-          style={{ transform: [{ rotate: "-90deg" }] }} // Đưa điểm 0% về 12 giờ
+          style={{ transform: [{ rotate: "-90deg" }] }}
         >
           {/* Track chìm phía dưới */}
           <Circle
             cx={outerSize / 2}
             cy={outerSize / 2}
             r={radius}
-            stroke={isDarkMode ? "#27272A" : "#E4E4E7"}
-            // stroke={isDarkMode ? "red" : "blue"}
-
+            stroke={theme.text}
+            strokeOpacity={0.15}
             strokeWidth={strokeWidth}
             fill="transparent"
           />
@@ -184,7 +187,7 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
               fill="transparent"
               strokeDasharray={circumference}
               animatedProps={animatedRetainCircleProps}
-              strokeLinecap="round" // Bo tròn 2 đầu nét vẽ
+              strokeLinecap="round"
             />
           )}
         </Svg>

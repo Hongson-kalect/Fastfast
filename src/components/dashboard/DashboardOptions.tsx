@@ -1,3 +1,4 @@
+import { CHART_RANGES } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
@@ -34,42 +35,49 @@ const DashboardOptions = () => {
   };
 
   return (
-    <View>
-      <View className="flex-row justify-between items-center my-4">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={openTimeRangeSheet}
-          className="flex-row items-center justify-center gap-2"
-        >
-          <ThemedText
-            type="small"
-            className="text-white/60! font-light! text-sm!"
-          >
-            Time ranger
-          </ThemedText>
-          <View
-            style={{ borderColor: theme.text + "aa" }}
-            className="flex-row items-center px-2 h-9 border rounded-lg gap-1"
-          >
-            <ThemedText className="text-sm!">
-              Last {settings?.chart_range} days
-            </ThemedText>
+    <View className="flex-row items-center justify-between my-4">
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={openTimeRangeSheet}
+        className="flex-row items-center gap-2"
+      >
+        <ThemedText size="sm" color="text" opacity="medium">
+          Time range
+        </ThemedText>
 
-            <Feather name="chevron-down" size={14} color={theme.text} />
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={openUpdateWeightModal}
-          className="flex-row items-center gap-1 px-2 h-9 bg-success rounded-lg"
+        <View
+          className="flex-row items-center gap-1 px-3 h-9 rounded-lg"
+          style={{
+            backgroundColor: theme.background2,
+            borderWidth: 1,
+            borderColor: theme.text + "15",
+          }}
         >
-          {/* <Feather name="plus" size={20} color={"white"} /> */}
-          <ThemedText className="text-sm! text-white!">
-            Update weight
+          <ThemedText size="sm" weight="medium" color="text">
+            {CHART_RANGES.find((item) => item.key === settings?.chart_range)
+              ?.label ?? "7 ngày qua"}
           </ThemedText>
-        </TouchableOpacity>
-      </View>
+
+          <Feather
+            name="chevron-down"
+            size={14}
+            color={theme.text}
+            style={{ opacity: 0.6 }}
+          />
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={openUpdateWeightModal}
+        className="flex-row items-center gap-1 px-3 h-9 rounded-lg bg-success"
+      >
+        <Feather name="plus" size={16} color="#FFFFFF" />
+
+        <ThemedText size="sm" weight="medium" colorHex="#FFFFFF">
+          Update weight
+        </ThemedText>
+      </TouchableOpacity>
     </View>
   );
 };

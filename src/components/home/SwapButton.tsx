@@ -1,12 +1,12 @@
 // @/components/Button.tsx
 import { ThemedText } from "@/components/themed-text";
-import { EMOTIONS } from "@/constants/data";
+import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, FastSession, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -20,16 +20,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import FastEndTimeModal from "./FastEndTimeModal";
+import FastStartTimeModal from "./FastStartTimeModal";
 import { PhotoPickerModal } from "./ImageModal";
 import NoteModal from "./NoteModal";
-import FastStartTimeModal from "./FastStartTimeModal";
-import FastEndTimeModal from "./FastEndTimeModal";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
   currentFast: FastSession | null;
   toggleCounting: (time?: number) => void;
   variant?: "primary" | "secondary";
+  target?: number;
   loading?: boolean;
   className?: string;
   data?: {
@@ -44,6 +45,7 @@ export const SwapButton = ({
   toggleCounting,
   currentFast,
   variant = "primary",
+  target,
   loading = false,
   className = "",
   ...props
@@ -51,6 +53,13 @@ export const SwapButton = ({
   const dbService = useDBService();
   const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
   const { weight, updateWeight } = useAppStore();
+
+  const accent = useMemo(() => {
+    console.log("target hour", target);
+    if (!target) return null;
+
+    return FASTING_TARGETS.find((item) => item.hours === target)?.colors.accent;
+  }, [target]);
 
   const detectTodayNote = async () => {
     const todayNote = await dbService?.getDailyNote();
@@ -150,18 +159,28 @@ export const SwapButton = ({
   };
 
   const showDelayModal = () => {
-    if(isCounting && currentFast){
-      const finishTime = currentFast?.target_duration ? currentFast.start_time + currentFast.target_duration * 60 * 1000 :null
+    if (isCounting && currentFast) {
+      const finishTime = currentFast?.target_duration
+        ? currentFast.start_time + currentFast.target_duration * 60 * 1000
+        : null;
       return addModal({
         type: "custom",
         render: (
-          <FastEndTimeModal startTime={currentFast?.start_time} targetFinishTime={finishTime} currentFast={currentFast}/>
-        ),})
-      }
+          <FastEndTimeModal
+            startTime={currentFast?.start_time}
+            targetFinishTime={finishTime}
+            currentFast={currentFast}
+          />
+        ),
+      });
+    }
     addModal({
       type: "custom",
       render: (
-        <FastStartTimeModal minTime={currentFast?.end_time} onSubmit={handleDelaySubmit} />
+        <FastStartTimeModal
+          minTime={currentFast?.end_time}
+          onSubmit={handleDelaySubmit}
+        />
       ),
     });
   };
@@ -196,50 +215,59 @@ export const SwapButton = ({
             activeOpacity={0.7}
             onPress={() => setImageOptionVisible(true)}
             disabled={loading}
-            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${todayData.image ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
+            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
+              todayData.image
+                ? "shadow-primary border-primary"
+                : "shadow-text-base/40 border-text-base/40"
+            } ${loading ? "opacity-60" : ""} ${className}`}
             {...props}
           >
             {loading ? (
-              <ActivityIndicator color="#38BDF8" />
+              <ActivityIndicator color={theme.primary} />
+            ) : todayData.image ? (
+              <Image
+                source={{ uri: todayData.image }}
+                className="w-18 h-18 rounded-full"
+              />
             ) : (
-              <ThemedText
-                color={"white"}
-                type="subtitle"
-                style={{ fontWeight: "bold" }}
-              >
-                {todayData.image ? (
-                  <Image
-                    source={{ uri: todayData.image }}
-                    className="w-18 h-18 rounded-full"
-                  />
-                ) : (
-                  <Feather name="image" size={28} color="white" />
-                )}
-                {/* <Feather name="image" size={28} color="white" /> */}
-              </ThemedText>
+              <Feather name="image" size={28} color={theme.text} />
             )}
           </TouchableOpacity>
         </View>
 
-        <View className="p-1 rounded-full bg-background">
+        <View className="rounded-full bg-background p-1">
           <Pressable
             onLongPress={showDelayModal}
             onPress={() => toggleCounting()}
             activeOpacity={0.7}
             disabled={loading}
-            className={`${baseStyle} ${variantStyle} ${loading ? "opacity-60" : ""} ${className}`}
+            style={{
+              borderWidth: 2,
+              borderColor: isCounting
+                ? (accent || theme.primary) + "80"
+                : theme.text + "80",
+            }}
+            className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${
+              isCounting
+                ? "border-2 border-primary/50 bg-background2"
+                : "bg-primary shadow-md shadow-primary"
+            } ${loading ? "opacity-60" : ""} ${className}`}
             {...props}
           >
             {loading ? (
-              <ActivityIndicator color="#38BDF8" />
+              <ActivityIndicator color={theme.primary} />
             ) : isCounting ? (
-              <FontAwesome6 name="stop" size={52} color="white" />
+              <FontAwesome6
+                name="stop"
+                size={52}
+                color={accent || theme.primary}
+              />
             ) : (
               <FontAwesome6
                 name="play"
                 size={52}
+                color={theme.text}
                 style={{ marginLeft: 8 }}
-                color="white"
               />
             )}
           </Pressable>
@@ -250,29 +278,28 @@ export const SwapButton = ({
             onPress={() => setNoteModalVisible(true)}
             activeOpacity={0.7}
             disabled={loading}
-            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${todayData.mood ? "shadow-primary border-primary" : "shadow-gray-200 border-gray-500"} ${loading ? "opacity-60" : ""} ${className}`}
+            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
+              todayData.mood
+                ? "shadow-primary border-primary"
+                : "shadow-text-base/40 border-text-base/40"
+            } ${loading ? "opacity-60" : ""} ${className}`}
             {...props}
           >
             {loading ? (
-              <ActivityIndicator color="#38BDF8" />
+              <ActivityIndicator color={theme.primary} />
             ) : (
-              <View className="flex items-center justify-center flex-1">
-                <ThemedText
-                  color={"white"}
-                  type="subtitle"
-                  style={{ fontWeight: "bold" }}
-                >
-                  {todayData?.mood ? (
-                    <ThemedText type="subtitle" className="">
-                      {EMOTIONS[todayData.mood].emoji}
-                    </ThemedText>
-                  ) : (
-                    <Feather name="edit-2" size={28} color="white" />
-                  )}
-                </ThemedText>
+              <View className="flex-1 items-center justify-center">
+                {todayData?.mood ? (
+                  <ThemedText size="lg">
+                    {EMOTIONS[todayData.mood].emoji}
+                  </ThemedText>
+                ) : (
+                  <Feather name="edit-2" size={28} color={theme.text} />
+                )}
+
                 {todayData.note && (
                   <View className="absolute -top-4 right-0">
-                    <Ionicons name="chatbox" size={24} color="white" />
+                    <Ionicons name="chatbox" size={24} color={theme.text} />
                   </View>
                 )}
               </View>

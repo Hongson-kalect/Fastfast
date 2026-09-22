@@ -1,3 +1,4 @@
+import { useAppStore } from "@/stores/appStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -6,7 +7,6 @@ import {
   Image,
   Modal,
   Pressable,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -15,6 +15,7 @@ import Animated, {
   SlideInDown,
   SlideOutDown,
 } from "react-native-reanimated";
+import { ThemedText } from "../themed-text";
 
 interface PhotoPickerModalProps {
   visible: boolean;
@@ -29,6 +30,7 @@ export const PhotoPickerModal = ({
   photoUri,
   updateImage,
 }: PhotoPickerModalProps) => {
+  const { theme } = useAppStore();
   // 1. Hàm xử lý lưu ảnh vĩnh viễn vào thư mục ứng dụng
   const saveImagePermanently = async (cacheUri: string) => {
     try {
@@ -132,13 +134,12 @@ export const PhotoPickerModal = ({
     >
       {/* Overlay nền mờ */}
       <Pressable
-        className="flex-1 bg-gray-900/60 justify-end"
+        className="flex-1 bg-background/60 justify-end"
         onPress={() => setVisible(false)}
       >
-        {/* Container nội dung đẩy từ dưới lên */}
         <Animated.View
           layout={LinearTransition.springify().duration(150).damping(80)}
-          className="w-full p-4 pb-8 bg-gray-800 rounded-t-3xl"
+          className="w-full rounded-t-3xl bg-background2 p-4 pb-8"
           entering={SlideInDown.springify().damping(18).stiffness(180).mass(1)}
           exiting={SlideOutDown.duration(150)}
         >
@@ -147,60 +148,81 @@ export const PhotoPickerModal = ({
             {photoUri && (
               <Animated.View
                 entering={SlideInDown.duration(200)}
-                className="aspect-2/3 rounded-2xl overflow-hidden mb-4 bg-black border border-gray-700 relative"
+                className="relative mb-4 aspect-2/3 overflow-hidden rounded-2xl border border-text-base/40 bg-background"
               >
                 <Image
                   source={{ uri: photoUri }}
-                  className="w-full h-full"
+                  className="h-full w-full"
                   resizeMode="contain"
                 />
 
-                {/* Nút xóa ảnh nằm gọn trong Preview */}
                 <TouchableOpacity
                   onPress={handleDeletePhoto}
-                  className="absolute top-2 right-2 bg-red-600/80 p-3 rounded-full active:bg-red-700"
+                  className="absolute right-2 top-2 rounded-full bg-error/80 p-3 active:bg-error"
                 >
-                  <MaterialIcons name="delete" size={24} color="white" />
+                  <MaterialIcons name="delete" size={24} color={theme.text} />
                 </TouchableOpacity>
               </Animated.View>
             )}
 
-            <Text className="text-gray-400 text-sm text-center mb-4 font-medium">
+            <ThemedText
+              size="sm"
+              weight="medium"
+              color="text"
+              opacity="medium"
+              style={{ textAlign: "center", marginBottom: 16 }}
+            >
               {photoUri ? "Cập nhật ảnh" : "Thêm ảnh đáng nhớ hôm nay"}
-            </Text>
+            </ThemedText>
 
             {/* ─── HÀNH ĐỘNG CHỌN ─── */}
             <View className="gap-3">
               {/* Chụp ảnh */}
               <TouchableOpacity
                 onPress={handleTakePhoto}
-                className="flex-row items-center justify-center h-14 rounded-xl gap-2 bg-primary active:opacity-80"
+                className="h-14 flex-row items-center justify-center gap-2 rounded-xl bg-primary active:opacity-80"
               >
-                <MaterialIcons name="photo-camera" size={22} color="white" />
-                <Text className="text-white font-semibold text-base">
+                <MaterialIcons
+                  name="photo-camera"
+                  size={22}
+                  color={theme.text}
+                />
+
+                <ThemedText size="md" weight="medium" color="text">
                   Chụp ảnh mới
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
 
               {/* Chọn từ bộ sưu tập */}
               <TouchableOpacity
                 onPress={handleSelectPhoto}
-                className="flex-row items-center justify-center bg-gray-700 h-14 rounded-xl gap-2 active:bg-gray-600 border border-gray-600"
+                className="h-14 flex-row items-center justify-center gap-2 rounded-xl border border-text-base/40 bg-background active:bg-text-base/10"
               >
-                <MaterialIcons name="photo-library" size={22} color="white" />
-                <Text className="text-white font-semibold text-base">
+                <MaterialIcons
+                  name="photo-library"
+                  size={22}
+                  color={theme.text}
+                />
+
+                <ThemedText size="md" weight="medium" color="text">
                   Chọn từ bộ sưu tập
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
 
               {/* Hủy đóng modal */}
               <TouchableOpacity
                 onPress={() => setVisible(false)}
-                className="flex-row items-center justify-center h-14 rounded-xl active:bg-gray-700/50"
+                className="h-14 flex-row items-center justify-center active:bg-text-base/10"
               >
-                <Text className="text-gray-400 font-medium text-base">
+                <ThemedText
+                  className="underline"
+                  size="md"
+                  weight="medium"
+                  color="text"
+                  opacity="medium"
+                >
                   Hủy bỏ
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
             </View>
           </Pressable>

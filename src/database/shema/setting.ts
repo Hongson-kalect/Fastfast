@@ -10,6 +10,15 @@ CREATE TABLE IF NOT EXISTS app_settings (
 );
 `;
 
+    // -- Các custom
+    // theme_id TEXT DEFAULT 'default',
+    // effect_id TEXT DEFAULT 'default',
+    // emotion_pack TEXT DEFAULT 'default',
+    // fasting_pack TEXT DEFAULT 'default',
+    // sound_pack TEXT DEFAULT 'default',
+    // notification_id TEXT DEFAULT 'default',
+    // notification_time INTEGER DEFAULT 0,
+
 export const getUserSettings = async (
   db: SQLiteDatabase,
 ): Promise<AppSettings | null> => {
@@ -33,18 +42,38 @@ export const getUserSettings = async (
   return null;}
 };
 
+export const changeTheme = async(
+  db: SQLiteDatabase,
+  theme: string)=>{
+    await db.runAsync(
+      `INSERT INTO app_settings (key, value, updated_at)
+       VALUES (?, ?, strftime('%s', 'now'))
+       ON CONFLICT(key) DO UPDATE SET
+         value = excluded.value,
+         updated_at = strftime('%s', 'now')`,
+      ["theme_id", theme],
+    );
+    return await getUserSettings(db);
+  }
+
 export const toggleTheme = async (
   db: SQLiteDatabase,
   val: boolean,
-): Promise<void> => {
+): Promise<AppSettings|null> => {
   try {
     const stringValue = String(val); // Chuyển boolean thành 'true' hoặc 'false' để lưu vào SQLite TEXT
     const key = "is_dark_mode";
     // Sử dụng db.runAsync để thực thi lệnh INSERT/UPDATE/DELETE
     await db.runAsync(
-      `UPDATE app_settings SET value = ?, updated_at = (strftime('%s', 'now')) WHERE key = ?`,
-      [stringValue, key], // Mảng các biến tương ứng với từng dấu ? theo thứ tự
-    );
+  `INSERT INTO app_settings (key, value, updated_at)
+   VALUES (?, ?, strftime('%s', 'now'))
+   ON CONFLICT(key) DO UPDATE SET
+     value = excluded.value,
+     updated_at = strftime('%s', 'now')`,
+  [key, stringValue],
+);
+
+    return await getUserSettings(db);
 
     console.log(
       `=> [DB] Cập nhật is_dark_mode thành ${stringValue} thành công.`,

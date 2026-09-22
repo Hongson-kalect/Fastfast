@@ -193,95 +193,129 @@ const PixelGridManager = (props: Props) => {
 
   return (
     <View>
-      {/* KHU VỰC CONTROLLER */}
-      <View className="bg-background/5 rounded-lg pr-1 py-1 overflow-hidden">
-        {/* Header Thứ (T2 -> CN) */}
+  {/* KHU VỰC CONTROLLER */}
+  <View className="overflow-hidden rounded-lg bg-background/5 py-1 pr-1">
+    {/* Header Thứ (T2 → CN) */}
 
-        {/* Danh sách các tuần */}
-        <View className="gap-y-1.5">
-          <FlatList
-            scrollEnabled={false}
-            data={gridData}
-            contentContainerClassName="gap-1"
-            keyExtractor={(week) => week.weekIndex.toString()}
-            renderItem={({ item: week }) => (
-              <View key={week.weekIndex} className="flex-row items-center">
-                {/* CỘT RIỀA TRÁI TỐI GIẢN (w-12) */}
-                <View className="w-15 pl-1 justify-center items-center">
-                  {week.isMonthHeader && (
-                    <View className="absolute -top-2 left-0 -rotate-45">
-                      <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
-                        {week.month}
-                      </ThemedText>
-                    </View>
-                  )}
+    {/* Danh sách các tuần */}
+    <View className="gap-y-1.5">
+      <FlatList
+        scrollEnabled={false}
+        data={gridData}
+        contentContainerClassName="gap-1"
+        keyExtractor={(week) => week.weekIndex.toString()}
+        renderItem={({ item: week }) => (
+          <View className="flex-row items-center">
+            {/* CỘT TUẦN */}
+            <View className="w-15 items-center justify-center pl-1">
+              {week.isMonthHeader && (
+                <View className="absolute left-0 -top-2 -rotate-45">
                   <ThemedText
-                    className={
-                      "text-center text-[10px]! font-regular text-white/70!"
-                    }
+                    size="tiny"
+                    weight="regular"
+                    color="primary"
                   >
-                    {week.weekOfYear}
+                    {week.month}
                   </ThemedText>
                 </View>
+              )}
 
-                {/* Hàng 7 ô pixel ngày */}
-                <View className="flex-1 flex-row justify-between gap-x-1">
-                  {week.days.map((day, dIdx) => {
-                    if (day.dateString > todayStr)
-                      return <EmptyPixel isToday={false} key={dIdx} />;
+              <ThemedText
+                size="xxs"
+                weight="regular"
+                color="text"
+                opacity="medium"
+                style={{ textAlign: "center" }}
+              >
+                {week.weekOfYear}
+              </ThemedText>
+            </View>
 
-                    const isToday = day.dateString === todayStr;
-                    if (props.displayType === "mood") {
-                      const pixelData = props.noteData[day.dateString];
-                      if (!pixelData)
-                        return <EmptyPixel isToday={isToday} key={dIdx} />;
-                      return (
-                        <MoodPixel
-                          onPress={() => setSelectedDate(day.dateString)}
-                          isToday={isToday}
-                          key={dIdx}
-                          data={pixelData}
-                          isCurrentYear={day.isCurrentYear}
-                        />
-                      );
-                    } else {
-                      const pixelData = props.logData[day.dateString];
-                      if (!pixelData) {
-                        const logs = props.shieldLogs[day.dateString];
-                        if (logs)
-                          return (
-                            <ShieldPixel
-                              onPress={() => setSelectedDate(day.dateString)}
-                              key={dIdx}
-                              shieldLogs={logs}
-                            />
-                          );
-                        return <EmptyPixel isToday={isToday} key={dIdx} />;
-                      }
+            {/* Hàng 7 ô pixel ngày */}
+            <View className="flex-1 flex-row justify-between gap-x-1">
+              {week.days.map((day, dIdx) => {
+                if (day.dateString > todayStr) {
+                  return (
+                    <EmptyPixel
+                      isToday={false}
+                      key={dIdx}
+                    />
+                  );
+                }
 
-                      let fast = pixelData[0];
-                      pixelData.forEach((data) => {
-                        if (data.hours_in_fast > fast.hours_in_fast)
-                          fast = data;
-                      });
-                      return (
-                        <FastPixel
-                          onPress={() => setSelectedDate(day.dateString)}
-                          isToday={isToday}
-                          key={dIdx}
-                          data={fast}
-                          isCurrentYear={day.isCurrentYear}
-                        />
-                      );
-                    }
-                  })}
-                </View>
-              </View>
-            )}
-          />
-        </View>
-      </View>
+                const isToday = day.dateString === todayStr;
+
+                if (props.displayType === "mood") {
+                  const pixelData = props.noteData[day.dateString];
+
+                  if (!pixelData) {
+                    return (
+                      <EmptyPixel
+                        isToday={isToday}
+                        key={dIdx}
+                      />
+                    );
+                  }
+
+                  return (
+                    <MoodPixel
+                      onPress={() => setSelectedDate(day.dateString)}
+                      isToday={isToday}
+                      key={dIdx}
+                      data={pixelData}
+                      isCurrentYear={day.isCurrentYear}
+                    />
+                  );
+                }
+
+                const pixelData = props.logData[day.dateString];
+
+                if (!pixelData) {
+                  const logs = props.shieldLogs[day.dateString];
+
+                  if (logs) {
+                    return (
+                      <ShieldPixel
+                        onPress={() => setSelectedDate(day.dateString)}
+                        key={dIdx}
+                        shieldLogs={logs}
+                      />
+                    );
+                  }
+
+                  return (
+                    <EmptyPixel
+                      isToday={isToday}
+                      key={dIdx}
+                    />
+                  );
+                }
+
+                let fast = pixelData[0];
+
+                pixelData.forEach((data) => {
+                  if (data.hours_in_fast > fast.hours_in_fast) {
+                    fast = data;
+                  }
+                });
+
+                return (
+                  <FastPixel
+                    onPress={() => setSelectedDate(day.dateString)}
+                    isToday={isToday}
+                    key={dIdx}
+                    data={fast}
+                    isCurrentYear={day.isCurrentYear}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        )}
+      />
     </View>
+  </View>
+</View>
   );
 };
 
@@ -315,7 +349,7 @@ const ShieldPixel = ({
         backgroundColor: "transparent",
       }}
       className={`flex-1 aspect-square justify-center items-center rounded-md border 
-                      border-dashed border-white/5`}
+                      border-dashed border-text-base/5`}
     >
       <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
     </Pressable>
@@ -337,28 +371,29 @@ const MoodPixel = ({
   const { theme } = useAppStore();
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        backgroundColor: pixel.color,
-        boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
-      }}
-      className={`flex-1 aspect-square justify-center items-center rounded-md border 
-                      ${
-                        isCurrentYear
-                          ? "border-white/10"
-                          : "border-dashed border-white/5"
-                      }`}
+  <Pressable
+    onPress={onPress}
+    style={{
+      backgroundColor: pixel.color,
+      boxShadow: isToday
+        ? `0 0 0 1px ${theme.primary}80`
+        : undefined,
+    }}
+    className={`flex-1 aspect-square items-center justify-center rounded-md border ${
+      isCurrentYear
+        ? "border-text-base/10"
+        : "border-dashed border-text-base/5"
+    }`}
+  >
+    <ThemedText
+      size="sm"
+      weight="medium"
+      colorHex={isCurrentYear ? "#FFFFFF" : "#FFFFFF33"}
     >
-      <Text
-        className={`text-[14px]! font-medium ${
-          isCurrentYear ? "text-white" : "text-white/20"
-        }`}
-      >
-        {pixel.emoji}
-      </Text>
-    </Pressable>
-  );
+      {pixel.emoji}
+    </ThemedText>
+  </Pressable>
+);
 };
 
 const FastPixel = ({
@@ -385,30 +420,30 @@ const FastPixel = ({
   if (!pixel) return <EmptyPixel isToday={isToday} />;
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        opacity,
-        backgroundColor: pixel.colors.accent + "88",
-        boxShadow: isToday ? "0 0 0 1px " + theme.primary + "80" : "none",
-      }}
-      className={`flex-1 aspect-square justify-center items-center rounded-md border 
-                      ${
-                        isCurrentYear
-                          ? "bg-white/10 border-white/10"
-                          : "bg-white/2 border-dashed border-white/5"
-                      }`}
+  <Pressable
+    onPress={onPress}
+    style={{
+      opacity,
+      backgroundColor: pixel.colors.accent + "88",
+      boxShadow: isToday
+        ? `0 0 0 1px ${theme.primary}80`
+        : undefined,
+    }}
+    className={`flex-1 aspect-square items-center justify-center rounded-md border ${
+      isCurrentYear
+        ? "border-text-base/10"
+        : "border-dashed border-text-base/5"
+    }`}
+  >
+    <ThemedText
+      size="sm"
+      weight="medium"
+      colorHex={isCurrentYear ? "#FFFFFF" : "#FFFFFF33"}
     >
-      <Text
-        // style={{ opacity }}
-        className={`text-[14px]! font-medium ${
-          isCurrentYear ? "text-white" : "text-white/20"
-        }`}
-      >
-        {pixel.emoji}
-      </Text>
-    </Pressable>
-  );
+      {pixel.emoji}
+    </ThemedText>
+  </Pressable>
+);
 };
 
 type PixelType =
@@ -430,7 +465,7 @@ const NoteContent = ({ note }: { note: DailyNote }) => {};
 const ShieldContent = ({ shieldLogs }: { shieldLogs: HabitLog }) => {
   return (
     <View>
-      <Text className="text-white!">{JSON.stringify(shieldLogs)}</Text>
+      <ThemedText>{JSON.stringify(shieldLogs)}</ThemedText>
     </View>
   );
 };

@@ -1,7 +1,8 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { ThemedText } from "../themed-text";
 import LiquidCircle from "./Waterball";
 
 const FullHabitModal = ({ habitName }: { habitName: string }) => {
@@ -13,7 +14,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
       {/* Icon */}
       <View className="items-center">
         <View
-          className="w-20 h-20 rounded-full items-center justify-center"
+          className="h-20 w-20 items-center justify-center rounded-full"
           style={{
             backgroundColor: `${theme.primary}18`,
             borderWidth: 1,
@@ -23,72 +24,90 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
           <Ionicons name="sparkles" size={36} color={theme.primary} />
         </View>
 
-        <Text className="text-2xl font-bold text-white mt-4">
+        <ThemedText size="xxl" weight="bold" style={{ marginTop: 16 }}>
           Thói quen hình thành
-        </Text>
+        </ThemedText>
       </View>
 
       {/* 100% */}
-      <View className="items-center my-3">
+      <View className="my-3 items-center">
         <LiquidCircle
           percent={100}
           size={120}
           color={theme.primary}
           retainPercent={0} // Ví dụ: 45% (Đang tích được 45% cho Shield tiếp theo)
-          retainColor="#3B82F6" // Viền Retain màu Xanh Shield
+          retainColor={theme.primary}
         />
       </View>
 
       {/* Explanation */}
-      <View className="bg-zinc-900/80 rounded-2xl border border-white/5 mt-2">
-        <Text className="text-white font-bold text-base">
+      <View className="mt-2 rounded-2xl border border-text-base/5 bg-background2/80 p-4">
+        <ThemedText size="md" weight="bold">
           Bước vào giai đoạn duy trì
-        </Text>
+        </ThemedText>
 
-        <Text className="text-sm text-zinc-400 leading-5 mt-2">
+        <ThemedText
+          size="sm"
+          color="text"
+          opacity="medium"
+          style={{ marginTop: 8, lineHeight: 20 }}
+        >
           Mỗi lần bạn tiếp tục duy trì thói quen, điểm sẽ được cộng vào Retain.
-        </Text>
+        </ThemedText>
       </View>
 
       {/* Retain */}
-      <View className="bg-blue-500/5 border border-blue-500/15 rounded-2xl px-4 pt-2 mt-3 items-center">
+      <View className="mt-3 items-center rounded-2xl border border-primary/15 bg-primary/5 px-4 pt-2">
         <View className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-full bg-blue-500/15 items-center justify-center">
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-primary/15">
             <Ionicons name="water" size={20} color={theme.primary} />
           </View>
 
           <View className="flex-1">
-            <Text className="text-white font-bold">Habit Retain</Text>
+            <ThemedText weight="bold">Habit Retain</ThemedText>
 
-            <Text className="text-xs text-zinc-500 mt-1">Điểm duy trì</Text>
+            <ThemedText
+              size="xxs"
+              color="text"
+              opacity="medium"
+              style={{ marginTop: 4 }}
+            >
+              Điểm duy trì
+            </ThemedText>
           </View>
 
-          <Text className="text-blue-400 font-bold text-lg">0 / 25</Text>
+          <ThemedText size="lg" weight="bold" color="primary">
+            0 / 25
+          </ThemedText>
         </View>
 
-        <View className="h-2 bg-zinc-800 rounded-full overflow-hidden mt-4">
+        <View className="mt-4 h-2 w-full overflow-hidden rounded-full bg-background2">
           <View
-            className="h-full bg-blue-500 rounded-full"
+            className="h-full rounded-full bg-primary"
             style={{ width: "0%" }}
           />
         </View>
       </View>
 
-      <Text className="text-xs text-zinc-500 mt-2">
+      <ThemedText
+        size="xs"
+        color="text"
+        opacity="medium"
+        style={{ marginTop: 8 }}
+      >
         Đầy 25 Retain sẽ tự quy đổi 1 Shield. Khi habit bị phá, toàn bộ Retain
         hiện có sẽ về 0.
-      </Text>
+      </ThemedText>
 
       {/* CTA */}
       <Pressable
         onPress={closeCurrentModal}
         hitSlop={10}
-        className="h-12 rounded-xl items-center justify-center mt-6"
-        style={{
-          backgroundColor: theme.primary,
-        }}
+        className="mt-6 h-12 items-center justify-center rounded-xl bg-primary"
       >
-        <Text className="text-white font-bold">Đã hiểu</Text>
+        <ThemedText size="md" weight="bold" colorHex="#FFFFFF">
+          Đã hiểu
+        </ThemedText>
       </Pressable>
     </View>
   );

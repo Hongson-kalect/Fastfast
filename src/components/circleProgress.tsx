@@ -92,7 +92,7 @@ export default function CircularProgress({
   strokeColor,
   strokeWidth = 5,
 
-  inactiveStrokeColor = "#FFFFFF22",
+  inactiveStrokeColor,
   inactiveStrokeWidth,
 
   title,
@@ -176,7 +176,7 @@ export default function CircularProgress({
           cx={actualSize / 2}
           cy={actualSize / 2}
           r={r}
-          stroke={inactiveStrokeColor}
+          stroke={inactiveStrokeColor || theme.text + "25"}
           strokeWidth={inactiveStrokeWidth || strokeWidth - 1}
           fill="none"
         />

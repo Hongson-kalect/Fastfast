@@ -5,6 +5,8 @@ import { formatHour, getLocalTodayStr } from "@/util/timer";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { FastDetail } from "../fast_detail";
 import { DEBUG_COLORS } from "./Circular24hTimeline";
+import { ThemedText } from "../themed-text";
+import { useAppStore } from "@/stores/appStore";
 
 type DailyFastSessionCardProps = {
   index?: number;
@@ -17,18 +19,28 @@ export function DailyFastSessionCard({
   dailyLog,
 }: DailyFastSessionCardProps) {
   const { addModal } = useModalStore();
+  const {theme} = useAppStore();
   if (!fast) {
-    return (
-      <View className="bg-zinc-900/80 rounded-2xl border border-white/5 px-4 py-3">
-        <View className="flex-row items-center">
-          <ActivityIndicator size="small" color="#71717a" />
-          <Text className="text-zinc-500 text-xs ml-3">
-            Đang tải phiên nhịn...
-          </Text>
-        </View>
+  return (
+    <View className="rounded-2xl border border-text-base/5 bg-background2/80 px-4 py-3">
+      <View className="flex-row items-center">
+        <ActivityIndicator
+          size="small"
+          color={theme.text + "70"}
+        />
+
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="medium"
+          style={{ marginLeft: 12 }}
+        >
+          Đang tải phiên nhịn...
+        </ThemedText>
       </View>
-    );
-  }
+    </View>
+  );
+}
 
   const start = new Date(fast.start_time);
   const end = fast.end_time ? new Date(fast.end_time) : null;
@@ -78,87 +90,114 @@ export function DailyFastSessionCard({
   };
   return (
     <Pressable
-      onPress={openFastModal}
-      className={[
-        "bg-zinc-900 rounded-2xl",
-        "border border-white/5",
-        "px-4 py-3",
-        isActive ? "border-emerald-400/15" : "",
-      ].join(" ")}
-    >
-      {/* Session header */}
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center flex-1">
-          <View
-            className="w-2 h-2 rounded-full mr-2.5"
-            style={{ backgroundColor: accentColor }}
-          />
-          <View className="flex-1">
-            <View className="flex-row items-center">
-              <Text
-                className="text-white text-sm font-semibold"
-                numberOfLines={1}
-              >
-                {startTime}
-                {end && (
-                  <>
-                    {" → "} {endTime}
-                  </>
-                )}
-              </Text>
-              {dateRange && (
-                <Text className="text-zinc-500 text-[10px] font-normal ml-2">
-                  {dateRange}
-                </Text>
-              )}
-            </View>
-          </View>
-        </View>
-        <Text className="text-zinc-400 text-xs font-medium ml-3">
-          {formatHour(actualDurationHours)}
-        </Text>
-      </View>
-      {/* Today's contribution — hero */}
-      <View className="mt-2.5 pt-2.5 border-t border-white/5">
-        <View className="flex-row items-end justify-between">
-          <View className="flex-row items-baseline">
-            <Text
-              style={{ color: contributionHours > 0 ? accentColor : "#71717A" }}
-              className="text-2xl font-bold tracking-tight"
+  onPress={openFastModal}
+  className={[
+    "rounded-2xl bg-background2",
+    "border border-text-base/5",
+    "px-4 py-3",
+    isActive ? "border-success/15" : "",
+  ].join(" ")}
+>
+  {/* Session header */}
+  <View className="flex-row items-center justify-between">
+    <View className="flex-1 flex-row items-center">
+      <View
+        className="mr-2.5 h-2 w-2 rounded-full"
+        style={{ backgroundColor: accentColor }}
+      />
+
+      <View className="flex-1">
+        <View className="flex-row items-center">
+          <ThemedText
+            size="sm"
+            weight="semibold"
+            color="text"
+            numberOfLines={1}
+          >
+            {startTime}
+            {end && (
+              <>
+                {" → "} {endTime}
+              </>
+            )}
+          </ThemedText>
+
+          {dateRange && (
+            <ThemedText
+              size="xxs"
+              color="text"
+              opacity="medium"
+              style={{ marginLeft: 8 }}
             >
-              {contributionHours > 0 ? `+${contributionHours.toFixed(1)}` : "0"}
-            </Text>
-            <Text
-              style={{
-                color: contributionHours > 0 ? accentColor : "#71717A",
-                opacity: 0.55,
-              }}
-              className="text-[10px] font-medium ml-1"
-            >
-              hours today
-            </Text>
-          </View>
-          {targetDurationHours > 0 && (
-            <Text className="text-zinc-600 text-[9px]">
-              mục tiêu {targetDurationHours}h
-            </Text>
+              {dateRange}
+            </ThemedText>
           )}
         </View>
-        {/* Progress */}
-        {targetDurationHours > 0 && (
-          <View className="mt-2">
-            <View className="h-1 bg-zinc-800 rounded-full overflow-hidden">
-              <View
-                className="h-full rounded-full"
-                style={{
-                  width: `${progress * 100}%`,
-                  backgroundColor: isFailed ? "#FB7185" : accentColor,
-                }}
-              />
-            </View>
-          </View>
-        )}
       </View>
-    </Pressable>
+    </View>
+
+    <ThemedText
+      size="xs"
+      weight="medium"
+      color="text"
+      opacity="medium"
+      style={{ marginLeft: 12 }}
+    >
+      {formatHour(actualDurationHours)}
+    </ThemedText>
+  </View>
+
+  {/* Today's contribution — hero */}
+  <View className="mt-2.5 border-t border-text-base/5 pt-2.5">
+    <View className="flex-row items-end justify-between">
+      <View className="flex-row items-baseline">
+        <ThemedText
+          size="xxl"
+          weight="bold"
+          colorHex={contributionHours > 0 ? accentColor : theme.text + "40"}
+        >
+          {contributionHours > 0
+            ? `+${contributionHours.toFixed(1)}`
+            : "0"}
+        </ThemedText>
+
+        <ThemedText
+          size="xxs"
+          weight="medium"
+          colorHex={contributionHours > 0 ? accentColor : theme.text}
+          opacity={contributionHours > 0 ? "medium" : "fade"}
+          style={{ marginLeft: 4 }}
+        >
+          hours today
+        </ThemedText>
+      </View>
+
+      {targetDurationHours > 0 && (
+        <ThemedText
+          size="tiny"
+          color="text"
+          opacity="low"
+        >
+          mục tiêu {targetDurationHours}h
+        </ThemedText>
+      )}
+    </View>
+
+    {/* Progress */}
+    {targetDurationHours > 0 && (
+      <View className="mt-2">
+        <View className="h-1 overflow-hidden rounded-full bg-background">
+          <View
+            className="h-full rounded-full"
+            style={{
+              width: `${progress * 100}%`,
+              backgroundColor: isFailed ? theme.error : accentColor,
+            }}
+          />
+        </View>
+      </View>
+    )}
+  </View>
+</Pressable>
   );
 }

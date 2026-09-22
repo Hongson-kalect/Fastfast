@@ -206,11 +206,11 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           backgroundStyle={{
             backgroundColor: theme.background,
             boxShadow: [
-              "-0.5px 0px 0.5px " + theme.white + "aa",
-              "0.5px 0px 0.5px " + theme.white + "aa",
+              "-0.5px 0px 0.5px " + theme.text + "aa",
+              "0.5px 0px 0.5px " + theme.text + "aa",
             ].join(","),
             borderTopWidth: 0.5,
-            borderTopColor: theme.white + "55",
+            borderTopColor: theme.text + "55",
           }}
           handleIndicatorStyle={{
             backgroundColor: theme.text,

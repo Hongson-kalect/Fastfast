@@ -1,27 +1,24 @@
-import { Platform, StyleSheet, Text, type TextProps } from "react-native";
+import { Text, type TextProps } from "react-native";
 
-import { Fonts } from "@/constants/theme";
-import { ThemeColors } from "@/store/useAppSettingStore";
+import { Opacity, TextSize, TextWeight } from "@/constants/theme";
+import { ThemeType } from "@/constants/themes";
 import { useAppStore } from "@/stores/appStore";
 import { useMemo } from "react";
 
 export type ThemedTextProps = TextProps & {
-  type?:
-    | "default"
-    | "title"
-    | "small"
-    | "smallBold"
-    | "subtitle"
-    | "link"
-    | "linkPrimary"
-    | "code";
-  color?: keyof ThemeColors;
+  color?: keyof ThemeType;
+  size?: keyof typeof TextSize;
+  weight?: keyof typeof TextWeight;
+  colorHex?: string;
+  opacity?: keyof typeof Opacity;
 };
 
 export function ThemedText({
   style,
-  type = "default",
-  color = "text",
+  size = "md",
+  weight = "regular",
+  color,
+  colorHex,
   ...rest
 }: ThemedTextProps) {
   // const theme = useTheme();
@@ -33,60 +30,15 @@ export function ThemedText({
   return (
     <Text
       style={[
-        { color: colors[color] },
-        type === "default" && styles.default,
-        type === "title" && styles.title,
-        type === "small" && styles.small,
-        type === "smallBold" && styles.smallBold,
-        type === "subtitle" && styles.subtitle,
-        type === "link" && styles.link,
-        type === "linkPrimary" && styles.linkPrimary,
-        type === "code" && styles.code,
+        {
+          fontWeight: TextWeight[weight],
+          ...TextSize[size],
+          color: color ? colors[color] : colorHex || colors["text"],
+          opacity: Opacity[rest.opacity || "full"],
+        },
         style,
       ]}
       {...rest}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  small: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 500,
-  },
-  smallBold: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 700,
-  },
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: 500,
-  },
-  title: {
-    fontSize: 44,
-    fontWeight: 600,
-    lineHeight: 52,
-  },
-  subtitle: {
-    fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 14,
-  },
-  linkPrimary: {
-    lineHeight: 30,
-    fontSize: 14,
-    color: "#3c87f7",
-  },
-  code: {
-    fontFamily: Fonts.mono,
-    fontWeight: Platform.select({ android: 700 }) ?? 500,
-    fontSize: 12,
-  },
-});

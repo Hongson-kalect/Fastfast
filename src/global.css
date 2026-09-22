@@ -7,27 +7,13 @@
 @theme {
   --color-primary: var(--dynamic-primary);
   --color-secondary: var(--dynamic-secondary);
-  --color-title: var(--dynamic-title);
   --color-text-base: var(--dynamic-text-base);
-  --color-textSecondary: var(--dynamic-textSecondary);
   --color-background: var(--dynamic-background);
-  --color-backgroundSecondary: var(--dynamic-backgroundSecondary);
-  --color-backgroundElement: var(--dynamic-backgroundElement);
-  --color-backgroundSelected: var(--dynamic-backgroundSelected);
+  --color-background2: var(--dynamic-background2);
+  --color-title: var(--dynamic-title);
   --color-error: var(--dynamic-error);
   --color-warning: var(--dynamic-warning);
   --color-success: var(--dynamic-success);
-
-  --color-main: #0b1528; /* Nền chính Xanh Biển Đậm sâu */
-  --color-surface: #16223f; /* Nền thẻ/card Xanh Navy nhám */
-  --color-brand: #2563eb; /* Xanh Công Nghệ (Royal Blue) chính của nút bấm */
-  --color-accent: #38bdf8; /* Xanh Sky sáng để nhấn hoặc làm màu Active */
-  --color-muted: #64748b; /* Màu xám phụ cho chữ nhỏ */
-
-  /* --color-primary: #2563eb; */
-  /* --color-secondary: #7c3aed; */
-  /* --color-success: #22c55e; */
-  --color-danger: #ef4444;
 
   --radius-card: 16px;
   --spacing-18: 4.5rem;

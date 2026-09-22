@@ -8,6 +8,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { FastDetail } from "../fast_detail";
+import { ThemedText } from "../themed-text";
 
 type HeaderProps = {
   data: FastSession[];
@@ -54,26 +55,26 @@ function FastHistorySheet() {
     await loadHistory();
   };
 
-    return (
-      <BottomSheetFlatList
-        data={history}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="px-3">
-            <FastHistoryItem item={item} onDelete={deleteFast} />
-          </View>
-        )}
-        contentContainerStyle={{
-          gap: 2,
-        }}
-        ListHeaderComponent={<FastHistoryHeader data={history} />}
-        ListEmptyComponent={
-          <View className="items-center justify-center px-3">
-            <Text className="text-zinc-400 text-center">Không có dữ liệu</Text>
-          </View>
-        }
-      />
-    );
+  return (
+    <BottomSheetFlatList
+      data={history}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View className="px-3">
+          <FastHistoryItem item={item} onDelete={deleteFast} />
+        </View>
+      )}
+      contentContainerStyle={{
+        gap: 2,
+      }}
+      ListHeaderComponent={<FastHistoryHeader data={history} />}
+      ListEmptyComponent={
+        <View className="items-center justify-center px-3">
+          <Text className="text-zinc-400 text-center">Không có dữ liệu</Text>
+        </View>
+      }
+    />
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -127,39 +128,42 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
   }, [data]);
 
   return (
-    <View className="px-4 pt-1 pb-4">
+    <View className="px-4 pb-4 pt-1">
       {/* Title */}
-      <View className="flex-row items-end justify-between mb-3">
+      <View className="mb-3 flex-row items-end justify-between">
         <View>
           <View className="flex-row items-center gap-2">
             <FontAwesome5 name="history" size={20} color={theme.primary} />
-            <Text className="text-xl font-bold text-white">Fasts history</Text>
+
+            <ThemedText size="xl" weight="bold" color="text">
+              Fasts history
+            </ThemedText>
           </View>
 
-          <Text className="text-zinc-500 text-xs mt-0.5">
+          <ThemedText
+            size="xs"
+            color="text"
+            opacity="medium"
+            style={{ marginTop: 2 }}
+          >
             Tổng quan các phiên nhịn
-          </Text>
+          </ThemedText>
         </View>
 
         <View
-          className="flex-row items-center py-1 rounded-full"
+          className="flex-row items-center rounded-full py-1 px-4"
           style={{
             backgroundColor: `${theme.success}15`,
           }}
         >
-          <Text
-            className="text-2xl font-semibold"
-            style={{
-              color: theme.primary,
-            }}
-          >
+          <ThemedText size="xxl" weight="semibold" color="primary">
             {stats.total} Fasts
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
       {/* Stats */}
-      <View className="flex-row items-center justify-between gap-2">
+      <View className="flex-row items-center justify-between gap-2 mt-2">
         <StatCard
           value={formatTime(stats.totalDuration)}
           label="Total"
@@ -169,7 +173,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
         <StatCard
           value={formatTime(stats.averageDuration)}
           label="Average"
-          color="#60A5FA"
+          color={theme.info}
         />
 
         <StatCard
@@ -179,10 +183,10 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
         />
       </View>
 
-      <View className="mt-5 px-2 items-end">
-        <Text className="text-xs font-medium text-text-base/40">
+      <View className="mt-5 items-end px-2">
+        <ThemedText size="xs" weight="medium" color="text" opacity="low">
           Recent fasts
-        </Text>
+        </ThemedText>
       </View>
     </View>
   );
@@ -327,46 +331,51 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
       onLongPress={handleLongPress}
       activeOpacity={0.7}
       onPress={showDetail}
-      className="mb-2.5 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden relative"
+      className="relative mb-2.5 overflow-hidden rounded-xl border border-text-base/10 bg-background2"
     >
-      <View className="p-3.5 flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between p-3.5">
         {/* Left Section: Emoji Icon & Titles */}
-        <View className="flex-row items-center flex-1 mr-3">
+        <View className="mr-3 flex-1 flex-row items-center">
           {/* Target Emoji Badge */}
-          <View className="w-9 h-9 rounded-full items-center justify-center mr-3 bg-zinc-800/80 border border-white/5">
+          <View className="mr-3 h-9 w-9 items-center justify-center rounded-full border border-text-base/5 bg-background2/80">
             <Text className="text-sm">{target?.emoji || "⚡"}</Text>
           </View>
 
           <View className="flex-1">
             {/* Status & Badge */}
             <View className="flex-row items-center gap-2">
-              <Text
-                className="text-xs font-semibold text-zinc-200"
+              <ThemedText
+                size="xs"
+                weight="semibold"
+                color="text"
                 numberOfLines={1}
               >
                 {statusLabel}
-              </Text>
+              </ThemedText>
 
               {/* Dot chỉ thị trạng thái */}
               <View
-                className="w-1.5 h-1.5 rounded-full"
+                className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: statusColor }}
               />
             </View>
 
             {/* Time range label */}
-            <Text
-              className="text-[10px] text-zinc-500 mt-0.5"
+            <ThemedText
+              size="xxs"
+              color="text"
+              opacity="medium"
               numberOfLines={1}
+              style={{ marginTop: 2 }}
             >
               {dateRangeLabel}
-            </Text>
+            </ThemedText>
           </View>
         </View>
 
         {/* Right Section: Duration & Percentage */}
         <View className="items-end">
-          <Text className="text-sm font-bold text-zinc-100">
+          <ThemedText size="sm" weight="semibold" color="text">
             {isFailed
               ? "--:--"
               : isActive
@@ -374,19 +383,25 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
                 : item.duration > 0
                   ? formatTime(item.duration)
                   : "0h"}
-          </Text>
+          </ThemedText>
 
           {item.target_duration > 0 && !isFailed && (
-            <Text className="text-[10px] font-medium text-zinc-400 mt-0.5">
+            <ThemedText
+              size="xxs"
+              weight="medium"
+              color="text"
+              opacity="medium"
+              style={{ marginTop: 2 }}
+            >
               {Math.round(rawProgress)}%
-            </Text>
+            </ThemedText>
           )}
         </View>
       </View>
 
       {/* Subtle Bottom Progress Bar */}
       {item.target_duration > 0 && (
-        <View className="w-full h-[3px] bg-zinc-800/60">
+        <View className="h-[3px] w-full bg-background/60">
           <View
             style={{
               height: "100%",

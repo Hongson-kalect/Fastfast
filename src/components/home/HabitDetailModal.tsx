@@ -6,8 +6,9 @@ import { fixed } from "@/util/numberLimit";
 import { getLocalTodayStr } from "@/util/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { FastDetail } from "../fast_detail";
+import { ThemedText } from "../themed-text";
 
 interface HabitDetailModalProps {
   log?: HabitLog & FastSession;
@@ -48,104 +49,154 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
     <View className="w-full">
       <Pressable onPress={(e) => e.stopPropagation()}>
         {/* ---------------------------------------------------- */}
-        {/* PHẦN 1: THÔNG SỐ HABIT (LUÔN HIỂN THỊ Ở ĐẦU)          */}
+        {/* PHẦN 1: THÔNG SỐ HABIT                               */}
         {/* ---------------------------------------------------- */}
         <View className="gap-y-2">
           <View className="flex-row justify-between items-center">
-            <Text className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
               Habit Log
-            </Text>
+            </ThemedText>
 
-            <Text className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
               {log.log_date ? getLocalTodayStr(new Date(log.log_date)) : "N/A"}
-            </Text>
+            </ThemedText>
           </View>
 
-          {/* Lưới Trạng thái Tích lũy (Habit Snap, Retain, Shield Snap) */}
-          <View className="flex-row justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-white/5">
+          {/* Lưới Trạng thái Tích lũy */}
+          <View className="flex-row justify-between items-center bg-background2/40 p-3 rounded-xl border border-text-base/5">
             <View className="items-center flex-1">
-              <Text className="text-[10px] text-zinc-400">Điểm Habit</Text>
-              <Text className="text-sm text-emerald-400 font-bold mt-1">
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Điểm Habit
+              </ThemedText>
+
+              <ThemedText
+                size="sm"
+                weight="bold"
+                color="success"
+                style={{ marginTop: 4 }}
+              >
                 {fixed(log.habit_snap ?? 0)}%
-              </Text>
+              </ThemedText>
 
               {log.habit_delta ? (
-                <Text
-                  className="text-xs font-medium"
-                  style={{
-                    color: isPositiveHabit ? theme.success : theme.error,
-                  }}
+                <ThemedText
+                  size="xs"
+                  weight="medium"
+                  color={isPositiveHabit ? "success" : "error"}
                 >
                   {isPositiveHabit ? "▲" : "▼"} {fixed(log.habit_delta)}
-                </Text>
+                </ThemedText>
               ) : null}
             </View>
 
-            <View className="w-[1px] h-6 bg-white/10" />
+            <View className="w-[1px] h-6 bg-text-base/10" />
 
             <View className="items-center flex-1">
-              <Text className="text-[10px] text-zinc-400">Retain</Text>
-              <Text className="text-sm text-blue-400 font-bold mt-1">
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Retain
+              </ThemedText>
+
+              <ThemedText
+                size="sm"
+                weight="bold"
+                color="primary"
+                style={{ marginTop: 4 }}
+              >
                 {fixed(log.habit_retain ?? 0)}%
-              </Text>
+              </ThemedText>
+
               {log.retain_delta ? (
-                <Text
-                  className="text-xs font-medium"
-                  style={{
-                    color: isPositiveHabit ? theme.success : theme.error,
-                  }}
+                <ThemedText
+                  size="xs"
+                  weight="medium"
+                  color={isPositiveHabit ? "success" : "error"}
                 >
                   {log.retain_delta > 0 ? "▲" : "▼"} {fixed(log.retain_delta)}
-                </Text>
+                </ThemedText>
               ) : null}
             </View>
 
-            <View className="w-[1px] h-6 bg-white/10" />
+            <View className="w-[1px] h-6 bg-text-base/10" />
 
             <View className="items-center flex-1">
-              <Text className="text-[10px] text-zinc-400">Số Khiên</Text>
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Số Khiên
+              </ThemedText>
+
               <View className="flex-row items-center gap-1 mt-1">
                 <FontAwesome5
                   name="shield-alt"
                   size={11}
                   color={theme.primary}
                 />
-                <Text className="text-sm text-primary font-bold">
+
+                <ThemedText size="sm" weight="bold" color="primary">
                   {log.shield_snap ?? 0}
-                </Text>
+                </ThemedText>
               </View>
+
               {log.shield_delta ? (
-                <Text
-                  className="text-xs font-medium"
-                  style={{
-                    color: isPositiveHabit ? theme.success : theme.error,
-                  }}
+                <ThemedText
+                  size="xs"
+                  weight="medium"
+                  color={isPositiveHabit ? "success" : "error"}
                 >
                   {log.shield_delta > 0 ? "▲" : "▼"} {fixed(log.shield_delta)}
-                </Text>
+                </ThemedText>
               ) : null}
             </View>
           </View>
         </View>
 
         {/* ---------------------------------------------------- */}
-        {/* PHẦN 2: CHI TIẾT FAST (CHỈ HIỂN THỊ NẾU CÓ)            */}
+        {/* PHẦN 2: CHI TIẾT FAST / EXCEPTION                    */}
         {/* ---------------------------------------------------- */}
         {hasFastDetail ? (
-          <View className="gap-y-2 mt-4">
-            <Text className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+          <View className="gap-y-2 mt-5">
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
               Chi tiết phiên Fast
-            </Text>
+            </ThemedText>
 
             <FastDetail fast={log} />
           </View>
         ) : log.shield_delta && log.shield_delta < 0 ? (
-          <View>
-            <Text className="text-text-base">Ngày nghỉ em ây</Text>
+          <View className="mt-6 py-4 items-center">
+            <ThemedText size="sm" color="text" opacity="medium">
+              Ngày nghỉ
+            </ThemedText>
           </View>
         ) : log.habit_delta && log.habit_delta < 0 ? (
-          <View>
-            <Text className="text-text-base">Quá đà em ây</Text>
+          <View className="mt-6 py-4 items-center">
+            <ThemedText size="sm" color="text" opacity="medium">
+              Quá đà
+            </ThemedText>
           </View>
         ) : null}
       </Pressable>

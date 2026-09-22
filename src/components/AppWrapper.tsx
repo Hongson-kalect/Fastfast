@@ -11,7 +11,7 @@ import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { theme, settings, isDarkMode } = useAppStore();
+  const { theme, settings } = useAppStore();
   const { addModal } = useModalStore();
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
@@ -138,7 +138,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       <StatusBar
         translucent
         backgroundColor={"transparent"}
-        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        barStyle={settings?.is_dark_mode===false ? "light-content" : "dark-content"}
       />
       {children}
     </View>

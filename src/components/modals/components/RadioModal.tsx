@@ -86,7 +86,7 @@ export const OptionsModal = (props: ListModalProps) => {
     <ReactNativeModal
       onBackButtonPress={props.onCancel}
       animationIn={props.inAnimation || "slideInUp"}
-      animationOut={outAnimation || "fadeOut"}
+      // animationOut={outAnimation || "fadeOut"}
       isVisible={props.show}
       backdropTransitionOutTiming={1}
       backdropColor={theme.text}
@@ -105,7 +105,8 @@ export const OptionsModal = (props: ListModalProps) => {
         {showValue.title && (
           <ThemedText
             className="mb-4 px-4"
-            type='subtitle'
+            size="xxl"
+            weight="semibold"
           >
             {showValue.title}
           </ThemedText>

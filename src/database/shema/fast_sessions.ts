@@ -10,7 +10,7 @@ import {
   createStreakContext,
   getYesterdayStr,
   saveStreakContext,
-  StreakContext
+  StreakContext,
 } from "@/util/streak";
 import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
 import { uuidv7 } from "@/util/uuidv7";
@@ -25,11 +25,7 @@ import {
   RETAIN_LIMIT,
   SHIELD_LIMIT,
 } from "./habit_logs";
-import {
-  clearStreak,
-  getUserProfile,
-  shield_rewards
-} from "./user";
+import { clearStreak, getUserProfile, shield_rewards } from "./user";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -679,14 +675,17 @@ export const updateSessionTarget = async (
   db: SQLiteDatabase,
   id: string,
   targetDuration: number | null,
-) => {
+): Promise<FastSession | null> => {
   try {
     await db.runAsync(
       `UPDATE fast_sessions SET target_duration = ? WHERE id = ?;`,
       [targetDuration, id],
     );
 
-    const res = await getLastFastSession(db);
+    const res = await db.getFirstAsync<FastSession>(
+      `SELECT * FROM fast_sessions WHERE id = ?;`,
+      [id],
+    );
     return res;
   } catch (e) {
     console.log("error on updateSessionTarget", e);

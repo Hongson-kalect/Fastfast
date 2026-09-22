@@ -116,38 +116,40 @@ const NoteModal = ({
                 </TouchableOpacity>
               </View> */}
               <View className="mb-1 flex-row items-center justify-between">
-                <ThemedText color="white" className="text-xs!">
-                  Weight
-                </ThemedText>
+                <ThemedText size="xs">Weight</ThemedText>
+
                 <View>
-                  <ThemedText color="error" className="text-xs! font-medium">
+                  <ThemedText size="xs" weight="medium" color="error">
                     {weightError ? weightError : " "}
                   </ThemedText>
                 </View>
+
                 <View className="items-end">
-                  <ThemedText
-                    color="primary"
-                    className="text-gray-200! text-xs!"
-                  >
+                  <ThemedText size="xs" color="primary">
                     Daily note
                   </ThemedText>
                 </View>
               </View>
-              <View className="flex-row items-center justify-between gap-2 mb-4">
+
+              <View className="mb-4 flex-row items-center justify-between gap-2">
                 <View
-                  className={`h-20 w-20 shadow ${weightError ? "shadow-error bg-error" : "shadow-primary bg-primary"} rounded-xl items-center justify-center`}
+                  className={`h-20 w-20 items-center justify-center rounded-xl shadow ${
+                    weightError
+                      ? "shadow-error bg-error"
+                      : "shadow-primary bg-primary"
+                  }`}
                 >
                   <TextInput
                     ref={inputRef}
                     value={tempWeight}
                     placeholder={weight?.toString() || "0"}
-                    placeholderTextColor={"#ddd"}
+                    placeholderTextColor={theme.text + "DD"}
                     onChangeText={setTempWeight}
                     maxLength={6}
                     selection={selection}
                     hitSlop={10}
                     keyboardType="numeric"
-                    className="text-white! text-xl! font-bold!"
+                    className="text-text-base! text-xl! font-bold!"
                     onSelectionChange={(e) =>
                       setSelection(e.nativeEvent.selection)
                     }
@@ -160,25 +162,32 @@ const NoteModal = ({
                       });
                     }}
                   />
+
                   <View className="absolute bottom-1.5 right-1.5">
-                    <ThemedText className="text-white/70! italic text-xs!">
+                    <ThemedText
+                      size="xs"
+                      color="text"
+                      opacity="medium"
+                      style={{ fontStyle: "italic" }}
+                    >
                       kg
                     </ThemedText>
                   </View>
                 </View>
+
                 <View className="flex-1">
                   <TextInput
                     textAlignVertical="top"
-                    cursorColor={theme.white}
-                    style={{ fontSize: 14 }}
+                    cursorColor={theme.text}
+                    style={{ fontSize: 12 }}
                     value={tempText}
-                    onChangeText={(text) => setTempText(text)}
+                    onChangeText={setTempText}
                     multiline
                     placeholder="What are you feeling today?"
-                    placeholderTextColor={theme.white + "99"}
+                    placeholderTextColor={theme.text + "99"}
                     numberOfLines={3}
-                    className="h-20 shadow shadow-white border-solid rounded-xl p-2 bg-gray-500  text-white"
-                  ></TextInput>
+                    className="h-20 rounded-xl border border-solid border-text-base/50 bg-background p-2 text-text-base"
+                  />
                 </View>
               </View>
 

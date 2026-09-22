@@ -50,7 +50,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
   return (
     <View>
       <View className="flex-row items-center justify-between">
-        <ThemedText type="default" className=" text-primary! font-bold!">
+        <ThemedText size="md" weight="bold" color="primary">
           Estimated fasting phase
         </ThemedText>
 
@@ -62,11 +62,10 @@ const HomeBodyProgress = ({ counter }: Props) => {
           <FontAwesome6
             name="question-circle"
             size={20}
-            color={theme.primary + "aa"}
+            color={theme.primary + "AA"}
           />
         </TouchableOpacity>
       </View>
-
       <View>
         <View className="mt-4 gap-1">
           {processData.map(({ key, title, icon, color, process }) => {
@@ -106,10 +105,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
             //   : 100;
 
             return (
-              <View
-                key={key}
-                className="flex-row items-center gap-2 py-2 " // Tăng khoảng trống thở cho dòng
-              >
+              <View key={key} className="flex-row items-center gap-2 py-2">
                 {/* Khối Nhãn & Icon bên trái */}
                 <View className="flex-row items-center gap-2">
                   <View className="w-5 items-center justify-center">
@@ -117,18 +113,20 @@ const HomeBodyProgress = ({ counter }: Props) => {
                       style={{ opacity: activeProcess ? 1 : 0.6 }}
                       name={icon}
                       size={14}
-                      color={activeProcess ? color : theme.subText2} // Sáng icon lên nếu đã kích hoạt tiến trình
+                      color={activeProcess ? color : theme.text}
                     />
                   </View>
+
                   <ThemedText
+                    size="xs"
+                    weight="regular"
+                    color="text"
+                    opacity={activeProcess ? "half" : "low"}
                     style={{
                       width: labelWidth || "auto",
-                      opacity: activeProcess ? 1 : 0.6,
+                      marginRight: 4,
                     }}
                     onLayout={detectLabelWidth}
-                    // type="small"
-                    color="subText2"
-                    className="font-medium text-sm! mr-1"
                   >
                     {title}
                   </ThemedText>
@@ -137,9 +135,9 @@ const HomeBodyProgress = ({ counter }: Props) => {
                 {/* Khối Thanh Progress + Ô trạng thái động */}
                 {activeProcess ? (
                   <View className="flex-1 flex-row items-center gap-1">
-                    {/* Thanh Progress với Background tối của Dark Mode */}
+                    {/* Thanh Progress */}
                     {Array.from({ length: 5 }).map((_, index) => {
-                      if (index < activeProcess.level)
+                      if (index < activeProcess.level) {
                         return (
                           <View
                             key={index}
@@ -148,14 +146,15 @@ const HomeBodyProgress = ({ counter }: Props) => {
                               opacity: 0.5 + (index + 1) * 0.1,
                             }}
                             className="h-2 flex-1 rounded-full"
-                          ></View>
+                          />
                         );
+                      }
 
                       if (percentage && index === activeProcess.level) {
                         return (
                           <View
                             key={index}
-                            className="h-2 flex-1 bg-slate-500/60 rounded-full overflow-hidden"
+                            className="h-2 flex-1 overflow-hidden rounded-full bg-text-base/30"
                           >
                             <View
                               style={{
@@ -163,35 +162,37 @@ const HomeBodyProgress = ({ counter }: Props) => {
                                 backgroundColor: color,
                               }}
                               className="h-full rounded-full"
-                            ></View>
+                            />
                           </View>
                         );
                       }
+
                       return (
                         <View
                           key={index}
-                          className="h-2 flex-1 bg-slate-500/60 rounded-full"
-                        ></View>
+                          className="h-2 flex-1 rounded-full bg-text-base/40"
+                        />
                       );
                     })}
 
-                    {/* Ô hiển thị đánh giá tiến trình nhỏ gọn bên phải cùng */}
+                    {/* Trạng thái */}
                     <View className="w-16 items-end">
                       <ThemedText
-                        style={{
-                          color: activeProcess ? color : theme.textSecondary,
-                        }}
-                        className={`text-xs! font-semibold tracking-wide ${!activeProcess ? "opacity-40" : ""}`}
+                        size="xs"
+                        weight="semibold"
+                        colorHex={color}
+                        opacity="full"
                         numberOfLines={1}
+                        style={{ letterSpacing: 0.5 }}
                       >
-                        {/* {getStatusLabel(value, process)} */}
                         {getProcessLevelTitle(key, activeProcess.level) || ""}
                       </ThemedText>
                     </View>
                   </View>
                 ) : (
-                  <View className="flex-row items-center justify-start flex-1 gap-1 opacity-40">
-                    <ThemedText className="text-xs!">Start after</ThemedText>
+                  <View className="flex-1 flex-row items-center justify-start gap-1 opacity-40">
+                    <ThemedText size="xs">Start after</ThemedText>
+
                     <Counter
                       counter={counter}
                       countTo={startOn}

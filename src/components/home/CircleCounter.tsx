@@ -18,7 +18,6 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Pressable,
-  Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -32,6 +31,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { FastDetail } from "../fast_detail";
+import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
 import FastHistorySheet from "./FastHistorySheet";
 import FastingSheet from "./FastingSheet";
@@ -147,6 +147,7 @@ export const CircleCounter = ({
 
   // 8. Theme & Colors
   const currentTarget = useMemo(() => {
+    console.log("settings?.target", settings?.target, typeof settings?.target);
     return settings?.target
       ? FASTING_TARGETS.find((item) => item.hours === settings?.target)
       : null;
@@ -329,26 +330,42 @@ export const CircleCounter = ({
                 {currentTarget ? (
                   <>
                     <TouchableOpacity onPress={openTargetSheet}>
-                      <Text
+                      <ThemedText
+                        weight="bold"
+                        size="sm"
+                        colorHex={currentTarget.colors.accent}
+                        className="uppercase underline"
+                      >
+                        {currentTarget.label} {settings?.target || 16}h
+                      </ThemedText>
+                      {/* <Text
                         style={{ color: currentTarget.colors.accent }}
                         className="text-[14px] text-white/50 uppercase font-bold underline"
                       >
                         {currentTarget.label} {settings?.target || 16}h
-                      </Text>
+                      </Text> */}
                     </TouchableOpacity>
-                    <Text className="text-[11px] text-white/60">
+                    <ThemedText opacity="half" size="xs">
                       Bắt đầu:{" "}
                       {getRelativeTime(new Date(currentFast.start_time))}
-                    </Text>
+                    </ThemedText>
                   </>
                 ) : (
-                  <TouchableOpacity onPress={openTargetSheet}>
-                    <Text className="text-[14px] text-primary uppercase font-bold underline">
+                  <TouchableOpacity
+                    onPress={openTargetSheet}
+                    className="items-center"
+                  >
+                    <ThemedText
+                      weight="bold"
+                      size="sm"
+                      colorHex={theme.primary}
+                      className="uppercase underline"
+                    >
                       Choose a target
-                    </Text>
-                    <Text className="text-[11px] text-white/60">
+                    </ThemedText>
+                    <ThemedText opacity="half" size="xs">
                       No target had been selected
-                    </Text>
+                    </ThemedText>
                   </TouchableOpacity>
                 )}
               </View>
@@ -361,30 +378,33 @@ export const CircleCounter = ({
                   type="large"
                 />
                 {settings?.target && finishEstimate ? (
-                  counter > settings?.target * 3_600 ? (
-                    <View>
-                      <Text className="text-[11px] text-success">
-                        Đã hoàn thành
-                      </Text>
-                    </View>
+                  counter > settings.target * 3_600 ? (
+                    <ThemedText size="xxs" color="success">
+                      Đã hoàn thành
+                    </ThemedText>
                   ) : (
-                    <View>
-                      <Text className="text-[11px] text-white/40">
-                        Hoàn thành: {getRelativeTime(finishEstimate)}
-                      </Text>
-                    </View>
+                    <ThemedText size="xxs" color="text" opacity="low">
+                      Hoàn thành: {getRelativeTime(finishEstimate)}
+                    </ThemedText>
                   )
                 ) : (
-                  <Text className="text-[11px] text-white/40">Free mode</Text>
+                  <ThemedText size="xxs" color="text" opacity="low">
+                    Free mode
+                  </ThemedText>
                 )}
               </View>
 
               {/* 3. TẦNG DƯỚI: Dự kiến kết thúc */}
               <View className="items-center gap-1">
                 <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
-                  <Text className="text-[12px] text-white/40 underline">
+                  <ThemedText
+                    size="xs"
+                    color="text"
+                    opacity="half"
+                    style={{ textDecorationLine: "underline" }}
+                  >
                     Fasts history
-                  </Text>
+                  </ThemedText>
                 </Pressable>
               </View>
             </Pressable>
@@ -398,25 +418,39 @@ export const CircleCounter = ({
               <View className="items-center gap-1">
                 {currentTarget ? (
                   <>
-                    <Text
-                      style={{ color: currentTarget.colors.accent }}
-                      className="text-[14px] text-white/50 uppercase font-bold underline"
+                    <ThemedText
+                      size="sm"
+                      weight="bold"
+                      colorHex={currentTarget.colors.accent}
+                      style={{
+                        textTransform: "uppercase",
+                        textDecorationLine: "underline",
+                      }}
                     >
                       {currentTarget.label} {settings?.target || 16}h
-                    </Text>
-                    <Text className="text-[11px] text-white/60">
-                      {currentTarget?.title}
-                      {/* VD: 08:00 */}
-                    </Text>
+                    </ThemedText>
+
+                    <ThemedText size="xxs" color="text" opacity="medium">
+                      {currentTarget.title}
+                    </ThemedText>
                   </>
                 ) : (
                   <>
-                    <Text className="text-[14px] text-primary uppercase font-bold underline">
+                    <ThemedText
+                      size="sm"
+                      weight="bold"
+                      color="primary"
+                      style={{
+                        textTransform: "uppercase",
+                        textDecorationLine: "underline",
+                      }}
+                    >
                       Choose a target
-                    </Text>
-                    <Text className="text-[11px] text-white/60">
+                    </ThemedText>
+
+                    <ThemedText size="xxs" color="text" opacity="medium">
                       No target had been selected
-                    </Text>
+                    </ThemedText>
                   </>
                 )}
               </View>
@@ -432,22 +466,27 @@ export const CircleCounter = ({
                 />
 
                 {finishEstimate ? (
-                  <View>
-                    <Text className="text-[11px] text-white/40">
-                      Dự kiến: {getRelativeTime(finishEstimate)}
-                    </Text>
-                  </View>
+                  <ThemedText size="xxs" color="text" opacity="low">
+                    Dự kiến: {getRelativeTime(finishEstimate)}
+                  </ThemedText>
                 ) : (
-                  <Text className="text-[11px] text-white/40">Free mode</Text>
+                  <ThemedText size="xxs" color="text" opacity="low">
+                    Free mode
+                  </ThemedText>
                 )}
               </View>
 
-              {/* 3. TẦNG DƯỚI: Dự kiến kết thúc */}
+              {/* 3. TẦNG DƯỚI: Lịch sử */}
               <View className="items-center gap-1">
                 <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
-                  <Text className="text-[12px] text-white/60 underline">
+                  <ThemedText
+                    size="xs"
+                    color="text"
+                    opacity="medium"
+                    style={{ textDecorationLine: "underline" }}
+                  >
                     Fasts history
-                  </Text>
+                  </ThemedText>
                 </Pressable>
               </View>
             </Pressable>

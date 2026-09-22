@@ -105,215 +105,232 @@ const FastingSheet = ({
   }, [finishTime]);
 
   return (
-    <View className="px-5 pb-12 gap-5">
-      {/* Progress summary */}
-      <View className="gap-3 mt-4">
-        <View className="flex-row items-end justify-between">
-          <View>
-            <ThemedText type="small" className="text-zinc-400! text-[11px]!">
-              Tiến độ
-            </ThemedText>
+    <View className="gap-5 px-5 pb-12">
+  {/* Progress summary */}
+  <View className="mt-4 gap-3">
+    <View className="flex-row items-end justify-between">
+      <View>
+        <ThemedText size="xxs" color="text" opacity="medium">
+          Tiến độ
+        </ThemedText>
 
-            <View className="flex-row items-baseline gap-1 mt-0.5">
-              <ThemedText className="text-2xl! font-bold!">
-                {progressPercent}%
-              </ThemedText>
+        <View className="mt-0.5 flex-row items-baseline gap-1">
+          <ThemedText size="xxl" weight="bold">
+            {progressPercent}%
+          </ThemedText>
 
-              <ThemedText className="text-xs! text-zinc-500!">
-                · {timeString(fastCounter)}
-                {fastTarget?.hours ? ` / ${fastTarget.hours}h` : ""}
-              </ThemedText>
-            </View>
-          </View>
-
-          <ThemedText
-            style={{ color: fastTarget?.colors.accent || theme.primary }}
-            className="text-xs! font-semibold! uppercase"
-          >
-            {fastTarget?.label || "FREE MODE"}
+          <ThemedText size="xs" color="text" opacity="medium">
+            · {timeString(fastCounter)}
+            {fastTarget?.hours ? ` / ${fastTarget.hours}h` : ""}
           </ThemedText>
         </View>
+      </View>
 
-        <View className="h-3 bg-zinc-700/80 rounded-full overflow-hidden">
-          <LinearGradient
-            style={{
-              width: `${progressPercent}%`,
-              borderRadius: 100,
-            }}
-            className="h-full"
-            colors={[
-              (fastTarget?.colors.accent || theme.primary) + "50",
-              fastTarget?.colors.accent || theme.primary,
-            ]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
+      <ThemedText
+        size="xs"
+        weight="semibold"
+        colorHex={fastTarget?.colors.accent || theme.primary}
+        style={{ textTransform: "uppercase" }}
+      >
+        {fastTarget?.label || "FREE MODE"}
+      </ThemedText>
+    </View>
+
+    <View className="h-3 overflow-hidden rounded-full bg-text-base/20">
+      <LinearGradient
+        style={{
+          width: `${progressPercent}%`,
+          borderRadius: 100,
+        }}
+        className="h-full"
+        colors={[
+          (fastTarget?.colors.accent || theme.primary) + "50",
+          fastTarget?.colors.accent || theme.primary,
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      />
+    </View>
+
+    <View className="flex-row justify-between">
+      <ThemedText size="xxs" color="text" opacity="medium">
+        Bắt đầu {getRelativeTime(new Date(currentFast.start_time))}
+      </ThemedText>
+
+      {settings?.target && finishTime ? (
+        counter >= settings.target * 3_600 ? (
+          <ThemedText size="xxs" color="success">
+            Đã hoàn thành
+          </ThemedText>
+        ) : (
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Hoàn thành: {getRelativeTime(new Date(finishTime))}
+          </ThemedText>
+        )
+      ) : (
+        <ThemedText size="xxs" color="text" opacity="medium">
+          Free mode
+        </ThemedText>
+      )}
+    </View>
+  </View>
+
+  {/* Result */}
+  <View className="gap-3">
+    <ThemedText size="sm" weight="bold" color="primary">
+      Kết quả
+    </ThemedText>
+
+    <View className="flex-row gap-3">
+      {/* Current */}
+      <View
+        style={{
+          borderColor:
+            theme.success +
+            Math.floor(
+              Math.min(
+                fastCounter / ((fastTarget?.hours || 16) * 3_600),
+                1,
+              ) * 99,
+            )
+              .toString(16)
+              .padStart(2, "0"),
+
+          backgroundColor:
+            theme.success +
+            Math.floor(
+              Math.min(
+                fastCounter / ((fastTarget?.hours || 16) * 3_600),
+                1,
+              ) * 15,
+            )
+              .toString(16)
+              .padStart(2, "0"),
+        }}
+        className="flex-1 gap-2 rounded-2xl border p-3.5"
+      >
+        <ThemedText size="xxs" weight="bold" color="text" opacity="medium">
+          HIỆN TẠI
+        </ThemedText>
+
+        <ThemedText
+          size="sm"
+          weight="semibold"
+          color={
+            fastCounter >= (fastTarget?.hours || 16) * 3_600
+              ? "success"
+              : "text"
+          }
+        >
+          {timeString(fastCounter)}
+        </ThemedText>
+
+        <View className="flex-row justify-between">
+          <ThemedText size="xs" color="text" opacity="medium">
+            Habit
+          </ThemedText>
+
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            color={currentReward.habitGain ? "success" : "text"}
+            opacity={currentReward.habitGain ? "full" : "medium"}
+          >
+            {currentReward.habitGain
+              ? `+${currentReward.habitGain}%`
+              : "—"}
+          </ThemedText>
         </View>
 
         <View className="flex-row justify-between">
-          <ThemedText className="text-[11px]! text-zinc-500!">
-            Bắt đầu {getRelativeTime(new Date(currentFast.start_time))}
+          <ThemedText size="xs" color="text" opacity="medium">
+            Shield
           </ThemedText>
 
-          {settings?.target && finishTime ? (
-            counter > settings?.target * 3_600 ? (
-              <View>
-                <Text className="text-[11px] text-success">Đã hoàn thành</Text>
-              </View>
-            ) : (
-              <View>
-                <Text className="text-[11px] text-white/40">
-                  Hoàn thành: {getRelativeTime(new Date(finishTime))}
-                </Text>
-              </View>
-            )
-          ) : (
-            <Text className="text-[11px] text-white/40">Free mode</Text>
-          )}
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            color={currentReward.shieldBonus ? "primary" : "text"}
+            opacity={currentReward.shieldBonus ? "full" : "medium"}
+          >
+            {currentReward.shieldBonus
+              ? `+${currentReward.shieldBonus}`
+              : "—"}
+          </ThemedText>
         </View>
       </View>
 
-      {/* Result */}
-      <View className="gap-3">
-        <ThemedText type="small" className="text-primary! font-bold!">
-          Kết quả
+      {/* Target result */}
+      <View
+        style={{
+          borderColor: fastTarget?.colors.accent || theme.primary,
+          backgroundColor:
+            (fastTarget?.colors.accent || theme.primary) + "30",
+        }}
+        className="flex-1 gap-2 rounded-2xl border p-3.5"
+      >
+        <ThemedText
+          size="xxs"
+          weight="bold"
+          colorHex={fastTarget?.colors.accent || theme.primary}
+        >
+          HOÀN THÀNH
         </ThemedText>
 
-        <View className="flex-row gap-3">
-          {/* Current */}
-          <View
-            style={{
-              borderColor:
-                theme.success +
-                Math.floor(
-                  Math.min(
-                    fastCounter / ((fastTarget?.hours || 16) * 3_600),
-                    1,
-                  ) * 99,
-                )
-                  .toString(16)
-                  .padStart(2, "0"),
+        <ThemedText size="sm" weight="semibold">
+          {targetReward.finishTime}
+        </ThemedText>
 
-              backgroundColor:
-                theme.success +
-                Math.floor(
-                  Math.min(
-                    fastCounter / ((fastTarget?.hours || 16) * 3_600),
-                    1,
-                  ) * 15,
-                )
-                  .toString(16)
-                  .padStart(2, "0"),
-            }}
-            className="flex-1 rounded-2xl p-3.5 border gap-2"
+        <View className="flex-row justify-between">
+          <ThemedText size="xs" color="text" opacity="medium">
+            Habit
+          </ThemedText>
+
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            color={targetReward.habitGain ? "success" : "text"}
+            opacity={targetReward.habitGain ? "full" : "medium"}
           >
-            <ThemedText className="text-[10px]! font-extrabold! text-zinc-400!">
-              HIỆN TẠI
-            </ThemedText>
+            {targetReward.habitGain
+              ? `+${targetReward.habitGain}%`
+              : "—"}
+          </ThemedText>
+        </View>
 
-            <ThemedText
-              className={`text-sm! font-semibold! ${
-                fastCounter >= (fastTarget?.hours || 16) * 3_600
-                  ? "text-success!"
-                  : ""
-              }`}
-            >
-              {timeString(fastCounter)}
-            </ThemedText>
+        <View className="flex-row justify-between">
+          <ThemedText size="xs" color="text" opacity="medium">
+            Shield
+          </ThemedText>
 
-            <View className="flex-row justify-between">
-              <ThemedText className="text-xs! text-zinc-500!">Habit</ThemedText>
-
-              <ThemedText
-                className={`text-xs! font-semibold! ${
-                  currentReward.habitGain ? "text-success!" : "text-zinc-500!"
-                }`}
-              >
-                {currentReward.habitGain ? `+${currentReward.habitGain}%` : "—"}
-              </ThemedText>
-            </View>
-
-            <View className="flex-row justify-between">
-              <ThemedText className="text-xs! text-zinc-500!">
-                Shield
-              </ThemedText>
-
-              <ThemedText
-                className={`text-xs! font-semibold! ${
-                  currentReward.shieldBonus ? "text-primary!" : "text-zinc-500!"
-                }`}
-              >
-                {currentReward.shieldBonus
-                  ? `+${currentReward.shieldBonus}`
-                  : "—"}
-              </ThemedText>
-            </View>
-          </View>
-
-          {/* Target result */}
-          <View
-            style={{
-              borderColor: fastTarget?.colors.accent || theme.primary,
-              backgroundColor:
-                (fastTarget?.colors.accent || theme.primary) + "30",
-            }}
-            className="flex-1 rounded-2xl p-3.5 border gap-2"
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            color={targetReward.shieldBonus ? "primary" : "text"}
+            opacity={targetReward.shieldBonus ? "full" : "medium"}
           >
-            <ThemedText
-              style={{ color: fastTarget?.colors.accent || theme.primary }}
-              className="text-[10px]! font-extrabold!"
-            >
-              HOÀN THÀNH
-            </ThemedText>
-
-            <ThemedText className="text-sm! font-semibold!">
-              {targetReward.finishTime}
-            </ThemedText>
-
-            <View className="flex-row justify-between">
-              <ThemedText className="text-xs! text-zinc-500!">Habit</ThemedText>
-
-              <ThemedText
-                className={`text-xs! font-semibold! ${
-                  targetReward.habitGain ? "text-success!" : "text-zinc-500!"
-                }`}
-              >
-                {targetReward.habitGain ? `+${targetReward.habitGain}%` : "—"}
-              </ThemedText>
-            </View>
-
-            <View className="flex-row justify-between">
-              <ThemedText className="text-xs! text-zinc-500!">
-                Shield
-              </ThemedText>
-
-              <ThemedText
-                className={`text-xs! font-semibold! ${
-                  targetReward.shieldBonus ? "text-primary!" : "text-zinc-500!"
-                }`}
-              >
-                {targetReward.shieldBonus
-                  ? `+${targetReward.shieldBonus}`
-                  : "—"}
-              </ThemedText>
-            </View>
-          </View>
+            {targetReward.shieldBonus
+              ? `+${targetReward.shieldBonus}`
+              : "—"}
+          </ThemedText>
         </View>
       </View>
-
-      {/* Actions */}
-      <View className="gap-2 mt-2">
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={finishFasting}
-          className="bg-red-500 rounded-[14px] py-3.5 items-center"
-        >
-          <ThemedText className="text-white! font-bold! text-[15px]!">
-            Kết thúc Fasting
-          </ThemedText>
-        </TouchableOpacity>
-      </View>
     </View>
+  </View>
+
+  {/* Actions */}
+  <View className="mt-2 gap-2">
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={finishFasting}
+      className="items-center rounded-[14px] bg-error py-3.5"
+    >
+      <ThemedText size="md" weight="bold" colorHex="#FFFFFF">
+        Kết thúc Fasting
+      </ThemedText>
+    </TouchableOpacity>
+  </View>
+</View>
   );
 };
 

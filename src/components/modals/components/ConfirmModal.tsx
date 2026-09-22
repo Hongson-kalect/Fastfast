@@ -11,11 +11,7 @@ const ConfirmModal = (modal: Props) => {
   const { theme } = useAppStore();
   return (
     <View>
-      {modal.title && (
-        <ThemedText className="mb-4" type="subtitle">
-          {modal.title}
-        </ThemedText>
-      )}
+      {modal.title && <ThemedText size='xxl' weight="semibold">{modal.title}</ThemedText>}
       <ThemedText className="mb-4">{modal.message}</ThemedText>
 
       {modal?.middle}
@@ -28,7 +24,7 @@ const ConfirmModal = (modal: Props) => {
             addModal(null);
           }}
         >
-          <ThemedText color="white">{modal.cancelText || "Cancel"}</ThemedText>
+          <ThemedText colorHex="white">{modal.cancelText || "Cancel"}</ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
           style={{ backgroundColor: theme.primary }}
@@ -38,7 +34,7 @@ const ConfirmModal = (modal: Props) => {
             addModal(null);
           }}
         >
-          <ThemedText color="white">{modal.okText || "OK"}</ThemedText>
+          <ThemedText colorHex="white">{modal.okText || "OK"}</ThemedText>
         </TouchableOpacity>
       </View>
     </View>

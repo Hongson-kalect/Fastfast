@@ -1,14 +1,15 @@
 import { useAppStore } from "@/stores/appStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
+import { ThemedText } from "../themed-text";
 
 interface FastCount {
   above_16: number;
@@ -76,7 +77,7 @@ const FastLevelItem = ({
   }));
 
   return (
-    <View className="mb-4 last:mb-0">
+    <View className="mb-4">
       {/* Header */}
       <View
         style={{ opacity: count ? 1 : 0.5 }}
@@ -84,37 +85,52 @@ const FastLevelItem = ({
       >
         <View className="flex-row items-center">
           <View
-            style={{
-              backgroundColor: colors[0],
-            }}
+            style={{ backgroundColor: colors[0] }}
             className="mr-2 h-3 w-3 rounded-full"
           />
 
-          <Text className="text-white text-sm font-bold">{label}</Text>
+          <ThemedText size="sm" weight="bold" color="text">
+            {label}
+          </ThemedText>
 
           {badge && (
-            <View className="ml-2 rounded-full bg-white/10 px-2 py-0.5">
-              <Text className="text-[10px]">{badge}</Text>
+            <View className="ml-2 rounded-full bg-text-base/10 px-2 py-0.5">
+              <ThemedText size="xxs" color="text" opacity="medium">
+                {badge}
+              </ThemedText>
             </View>
           )}
         </View>
 
         <View className="flex-row items-center">
-          <Text className="text-white font-semibold text-sm">
+          <ThemedText size="sm" weight="semibold" color="text">
             {count}
-            <Text className="text-zinc-500 text-xs font-normal"> times</Text>
-          </Text>
+            <ThemedText
+              size="xs"
+              weight="regular"
+              color="text"
+              opacity="medium"
+            >
+              {" "}
+              times
+            </ThemedText>
+          </ThemedText>
 
-          <Text className="ml-2 w-8 text-center text-xs text-zinc-400">
-            {Math.round((count / allCount) * 100)}%
-          </Text>
+          <ThemedText
+            size="xs"
+            color="text"
+            opacity="medium"
+            style={{ marginLeft: 8, width: 32, textAlign: "center" }}
+          >
+            {allCount > 0 ? Math.round((count / allCount) * 100) : 0}%
+          </ThemedText>
         </View>
       </View>
 
       {/* Track */}
       <View
         onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width - 4)}
-        className="h-4 overflow-hidden rounded-full bg-zinc-800 p-0.5"
+        className="h-4 overflow-hidden rounded-full bg-background2 p-0.5"
       >
         {trackWidth > 0 && (
           <Animated.View
@@ -128,7 +144,7 @@ const FastLevelItem = ({
             ]}
           >
             <LinearGradient
-              colors={[theme.primary + "aa", theme.primary]}
+              colors={[theme.primary + "AA", theme.primary]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               style={{
@@ -144,6 +160,7 @@ const FastLevelItem = ({
 };
 
 export const FastLevelBarChart = ({ fastStatistics }: Props) => {
+  const { theme } = useAppStore();
   const levels = [
     {
       label: "16-20 hrs",
@@ -184,26 +201,46 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
     <View className="mt-5">
       {/* Header */}
       <View className="mb-4 flex-row items-center justify-between">
-        <View>
-          <Text className="font-bold text-base! text-white">
+        <View className="flex-1 mr-3">
+          <ThemedText size="md" weight="bold" color="text">
             Fast Distribution
-          </Text>
+          </ThemedText>
 
-          <Text className="mt-1 text-xs! text-zinc-400">
+          <ThemedText
+            size="xs"
+            color="text"
+            opacity="medium"
+            style={{ marginTop: 4 }}
+          >
             Distribution of your fasting sessions
-          </Text>
+          </ThemedText>
         </View>
 
-        <View className="rounded-xl bg-indigo-500/15 px-3 py-1">
-          <Text className="text-center text-lg font-bold text-indigo-400">
+        <View
+          className="rounded-xl px-3 py-1 items-center"
+          style={{
+            backgroundColor: theme.primary + "18",
+          }}
+        >
+          <ThemedText size="lg" weight="bold" color="primary">
             {total}
-          </Text>
-          <Text className="text-[11px] text-zinc-400">Total</Text>
+          </ThemedText>
+
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Total
+          </ThemedText>
         </View>
       </View>
 
       {/* Card */}
-      <View className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
+      <View
+        className="rounded-3xl p-5"
+        style={{
+          backgroundColor: theme.background2 + "B3",
+          borderWidth: 1,
+          borderColor: theme.text + "12",
+        }}
+      >
         {levels.map((item, index) => (
           <FastLevelItem
             key={item.label}

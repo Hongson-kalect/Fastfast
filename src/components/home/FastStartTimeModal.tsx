@@ -2,8 +2,9 @@ import { useAppStore } from "@/stores/appStore";
 import { getLocalTodayStr } from "@/util/timer";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
+import { ThemedText } from "../themed-text";
 
 type Props = {
   minTime?: number | null;
@@ -100,19 +101,34 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
     <View className="pb-6 pt-4">
       {/* Header */}
       <View className="mb-4">
-        <Text className="text-base font-bold text-white">
+        <ThemedText size="md" weight="bold">
           Chọn thời gian bắt đầu Fast
-        </Text>
+        </ThemedText>
 
-        <Text className="mt-1 text-xs text-zinc-500">
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="medium"
+          style={{ marginTop: 4 }}
+        >
           Có thể bắt đầu sớm hơn hiện tại tối đa 6 giờ
-        </Text>
+        </ThemedText>
       </View>
 
       {/* Quick Presets */}
-      <Text className="mb-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+      <ThemedText
+        size="xxs"
+        weight="bold"
+        color="text"
+        opacity="medium"
+        style={{
+          marginBottom: 8,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+        }}
+      >
         Bắt đầu sớm
-      </Text>
+      </ThemedText>
 
       <View className="mb-6 flex-row gap-x-2">
         {START_PRESETS.map((preset) => (
@@ -120,58 +136,67 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             key={preset.label}
             activeOpacity={0.7}
             onPress={() => handleQuickPreset(preset.minutes)}
-            className="flex-1 items-center justify-center rounded-xl border border-white/10 bg-zinc-800/80 py-2.5 active:border-sky-500/50 active:bg-sky-500/20"
+            className="flex-1 items-center justify-center rounded-xl border border-text-base/10 bg-background2/80 py-2.5 active:border-primary/50 active:bg-primary/20"
           >
-            <Text className="text-xs font-bold text-sky-400">
+            <ThemedText size="xs" weight="bold" color="primary">
               -{preset.label}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Time */}
-      <View className="items-center justify-center rounded-2xl border border-white/5 bg-zinc-950/60 p-4">
+      <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background/60 p-4">
         <View className="flex-row items-center justify-center gap-x-4">
           <TouchableOpacity
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10 }}
             onPress={() => adjustMinutes(-5)}
-            className="h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-zinc-800 active:bg-zinc-700"
+            className="h-12 w-12 items-center justify-center rounded-full border border-text-base/10 bg-background2 active:bg-background2/70"
           >
-            <Text className="text-sm font-bold text-zinc-300">-5</Text>
+            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
+              -5
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setShowPicker(true)}
-            className="w-36 items-center justify-center rounded-xl border border-dashed border-white/20 bg-zinc-900/80 py-3"
+            className="w-36 items-center justify-center rounded-xl border border-text-base/20 bg-background2/80 py-3"
           >
-            <Text className="text-4xl font-bold text-white tabular-nums">
+            <ThemedText
+              size="xxxl"
+              weight="bold"
+              style={{ fontVariant: ["tabular-nums"] }}
+            >
               {hours.toString().padStart(2, "0")}:
               {minutes.toString().padStart(2, "0")}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, right: 10 }}
             onPress={() => adjustMinutes(5)}
-            className="h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-zinc-800 active:bg-zinc-700"
+            className="h-12 w-12 items-center justify-center rounded-full border border-text-base/10 bg-background2 active:bg-background2/70"
           >
-            <Text className="text-sm font-bold text-zinc-300">+5</Text>
+            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
+              +5
+            </ThemedText>
           </TouchableOpacity>
         </View>
 
         {/* Date */}
         <View className="mt-3 flex-row items-center justify-center">
-          <Text
-            className={`text-xs font-medium ${
-              date !== today ? "text-warning/90" : "text-white/60"
-            }`}
+          <ThemedText
+            size="xs"
+            weight="medium"
+            color={date !== today ? "warning" : "text"}
+            opacity={date !== today ? "full" : "medium"}
           >
             {date !== today && "⚠️ "}
             {date === today ? "Hôm nay" : date}
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
@@ -195,9 +220,9 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         }}
         className="mt-5 items-center justify-center rounded-2xl bg-primary py-3.5"
       >
-        <Text className="text-sm font-bold text-white">
+        <ThemedText size="sm" weight="bold" colorHex="#FFFFFF">
           Xác nhận bắt đầu Fast
-        </Text>
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );

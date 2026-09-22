@@ -146,7 +146,7 @@ const DashboardScreen = () => {
   );
 
   return (
-    <ThemedView className="flex-1 bg-main">
+    <ThemedView className="flex-1 bg-background">
       <View
         style={{ paddingTop: StatusBar.currentHeight || 0 }}
         className="h-full w-full"

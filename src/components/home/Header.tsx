@@ -79,7 +79,7 @@ const HomeHeader = () => {
   return (
     <View className="flex-row justify-between items-center">
       <View>
-        <ThemedText type="subtitle" color="white">
+        <ThemedText size="xxxl" weight="semibold">
           {/* Hi, Kalect */}
           FastFast
         </ThemedText>

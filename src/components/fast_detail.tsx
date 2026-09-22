@@ -1,9 +1,11 @@
 import { getTarget } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr } from "@/util/timer";
 import { useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { ThemedText } from "./themed-text";
 
 type FastDetailProps = {
   fast: FastSession;
@@ -103,27 +105,37 @@ function Timeline({
   const displayTotalHours = totalTimelineHours > 0 ? totalTimelineHours : 1;
 
   return (
-    <View className="m-3.5 bg-zinc-900 rounded-2xl border border-white/5 px-4 py-2">
+    <View className="m-3.5 rounded-xl border border-text-base/5 bg-background2 px-4 py-2">
       <View className="flex-row items-center">
         {/* Start time */}
         <View className="absolute bottom-3 -left-3">
-          <Text style={{ color }} className="opacity-70 text-xs font-semibold">
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            colorHex={color}
+            opacity="medium"
+          >
             {startDate.getHours()}h
-          </Text>
+          </ThemedText>
         </View>
 
         {/* End time */}
         <View className="absolute bottom-3 -right-3">
-          <Text style={{ color }} className="opacity-70 text-xs font-semibold">
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            colorHex={color}
+            opacity="medium"
+          >
             {isActive && !end
               ? "Now"
               : endDate
                 ? `${endDate.getHours()}h`
                 : `${startDate.getHours()}h`}
-          </Text>
+          </ThemedText>
         </View>
 
-        <View className="flex-1 flex-row items-center h-[58px]">
+        <View className="h-[58px] flex-1 flex-row items-center">
           {displayParts.map((part, index) => {
             const isPlaceholder = !hasProgress;
 
@@ -146,14 +158,17 @@ function Timeline({
               >
                 {/* Date */}
                 <View className="absolute left-0 right-0 top-0 items-center">
-                  <Text
-                    className="text-zinc-500 text-[9px] font-semibold"
+                  <ThemedText
+                    size="tiny"
+                    weight="semibold"
+                    color="text"
+                    opacity="medium"
                     numberOfLines={1}
                   >
                     {isPlaceholder
                       ? formatTimelineDate(getLocalTodayStr(start))
                       : formatTimelineDate(part.log_date)}
-                  </Text>
+                  </ThemedText>
                 </View>
 
                 {/* Progress bar */}
@@ -170,23 +185,27 @@ function Timeline({
                 />
 
                 {/* Duration */}
-                <View className="absolute left-0 right-0 bottom-2 items-center">
-                  <Text
-                    className="text-text-base/40 text-[9px] font-light"
+                <View className="absolute bottom-2 left-0 right-0 items-center">
+                  <ThemedText
+                    size="tiny"
+                    weight="light"
+                    color="text"
+                    opacity="low"
                     numberOfLines={1}
                   >
                     {isPlaceholder
                       ? formatDayDuration(durationHours)
                       : formatDayDuration(part.hours_in_day)}
-                  </Text>
+                  </ThemedText>
                 </View>
 
                 {/* Day separator */}
                 {!isLast && (
-                  <View className="absolute right-0 top-2 bottom-2 items-center">
-                    <View className="w-px flex-1 bg-white/15" />
+                  <View className="absolute bottom-2 right-0 top-2 items-center">
+                    <View className="w-px flex-1 bg-text-base/15" />
+
                     <View
-                      className="absolute w-1 h-1 rounded-full"
+                      className="absolute h-1 w-1 rounded-full"
                       style={{
                         backgroundColor: color,
                         opacity: 0.55,
@@ -206,6 +225,7 @@ function Timeline({
 export function FastDetail({ fast }: FastDetailProps) {
   const durationHours = fast.duration / S_PER_HOUR;
   const targetHours = fast.target_duration;
+  const { theme } = useAppStore();
 
   const target = useMemo(() => getTarget(targetHours), [targetHours]);
   const targetColor = target?.colors.accent ?? "#34D399";
@@ -235,12 +255,12 @@ export function FastDetail({ fast }: FastDetailProps) {
 
   const statusColor =
     fast.status === "failed"
-      ? "#FB7185"
+      ? theme.error
       : fast.status === "active"
-        ? "#34D399"
+        ? theme.primary
         : reached
           ? targetColor
-          : "#FBBF24";
+          : theme.warning;
 
   const difference = Math.abs(durationHours - targetHours);
 
@@ -248,33 +268,48 @@ export function FastDetail({ fast }: FastDetailProps) {
     <View className="pb-4">
       {/* 1. Header Detail */}
       <View className="flex-row items-center justify-between px-1 pt-1">
-        <View className="flex-1 mr-4">
+        <View className="mr-4 flex-1">
           {target && (
             <View
-              className="self-start flex-row items-center px-2.5 py-1 rounded-full"
-              style={{ backgroundColor: target.colors.badgeBg }}
+              className="self-start flex-row items-center rounded-full px-2.5 py-1"
+              style={{ backgroundColor: target.colors.accent + "40" }}
             >
-              <Text className="text-sm mr-1">{target.emoji}</Text>
-              <Text
-                className="text-[9px] font-bold uppercase tracking-wider"
-                style={{ color: target.colors.badgeText }}
+              <ThemedText size="xs" style={{ marginRight: 4 }}>
+                {target.emoji}
+              </ThemedText>
+
+              <ThemedText
+                size="xxs"
+                weight="bold"
+                colorHex={target.colors.badgeText}
+                style={{
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}
               >
                 {target.label}
-              </Text>
+              </ThemedText>
             </View>
           )}
 
-          <Text
-            className="text-xs font-bold mt-2"
-            style={{ color: statusColor }}
+          <ThemedText
+            size="xs"
+            weight="bold"
+            colorHex={statusColor}
+            style={{ marginTop: 6 }}
           >
             {status}
-          </Text>
+          </ThemedText>
         </View>
 
-        <Text className="text-white text-4xl font-extrabold tracking-tight">
+        <ThemedText
+          size="xxxl"
+          weight="bold"
+          color="text"
+          style={{ letterSpacing: -0.5 }}
+        >
           {formatDuration(durationHours)}
-        </Text>
+        </ThemedText>
       </View>
 
       {/* 2. Timeline Component */}
@@ -288,29 +323,40 @@ export function FastDetail({ fast }: FastDetailProps) {
         />
       </View>
 
-      {/* 3. Progress Card (Gộp gọn gàng, tránh lặp lại text) */}
+      {/* 3. Progress Card */}
       {target && (
         <View
-          className="mt-4 rounded-2xl border p-4 bg-zinc-900/80"
+          className="mt-4 rounded-xl border bg-background2/80 px-3 py-2"
           style={{ borderColor: `${targetColor}30` }}
         >
           <View className="flex-row items-center justify-between">
-            <View className="flex-1 mr-3">
-              <Text className="text-sm font-bold text-white" numberOfLines={1}>
+            <View className="mr-3 flex-1">
+              <ThemedText
+                size="sm"
+                weight="bold"
+                color="text"
+                numberOfLines={1}
+              >
                 {target.title}
-              </Text>
-              <Text className="text-zinc-400 text-[11px] mt-0.5">
+              </ThemedText>
+
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="half"
+                style={{ marginTop: 2 }}
+              >
                 Mục tiêu: {target.hours} giờ
-              </Text>
+              </ThemedText>
             </View>
 
-            <Text className="text-xl font-black" style={{ color: targetColor }}>
+            <ThemedText size="xl" weight="bold" colorHex={targetColor}>
               {percent}%
-            </Text>
+            </ThemedText>
           </View>
 
           {/* Progress Bar */}
-          <View className="h-2 bg-zinc-800 rounded-full overflow-hidden mt-3">
+          <View className="mt-3 h-2 overflow-hidden rounded-full bg-background2">
             <View
               className="h-full rounded-full"
               style={{
@@ -320,19 +366,16 @@ export function FastDetail({ fast }: FastDetailProps) {
             />
           </View>
 
-          <View className="flex-row justify-between mt-2">
-            <Text className="text-zinc-400 text-[10px]">
+          <View className="mt-2 flex-row justify-between">
+            <ThemedText size="xxs" color="text" opacity="medium">
               {formatDuration(durationHours)}
-            </Text>
+            </ThemedText>
 
-            <Text
-              className="text-[10px] font-semibold"
-              style={{ color: targetColor }}
-            >
+            <ThemedText size="xxs" weight="semibold" colorHex={targetColor}>
               {reached
                 ? `Vượt ${formatSignedDuration(difference)}`
                 : `Còn ${formatDuration(difference)}`}
-            </Text>
+            </ThemedText>
           </View>
         </View>
       )}
@@ -340,66 +383,113 @@ export function FastDetail({ fast }: FastDetailProps) {
       {/* 4. Rating Section */}
       {fast.rating && (
         <View className="mt-4">
-          <Text className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest mb-1.5 px-1">
+          <ThemedText
+            size="xxs"
+            weight="bold"
+            color="text"
+            opacity="medium"
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              marginBottom: 6,
+              paddingHorizontal: 4,
+            }}
+          >
             Đánh giá phiên
-          </Text>
+          </ThemedText>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/10 p-3.5 flex-row items-center">
-            <Text className="text-2xl mr-3">
+          <View className="flex-row items-center rounded-xl border border-text-base/10 bg-background2 p-3.5">
+            <ThemedText size="xxl" style={{ marginRight: 12 }}>
               {fast.rating === "Excellent"
                 ? "🏆"
                 : fast.rating === "Good"
                   ? "👍"
                   : "😮‍💨"}
-            </Text>
+            </ThemedText>
+
             <View>
-              <Text className="text-white text-sm font-bold">
+              <ThemedText size="sm" weight="bold" color="text">
                 {fast.rating}
-              </Text>
-              <Text className="text-zinc-400 text-[11px]">
+              </ThemedText>
+
+              <ThemedText size="xxs" color="text" opacity="medium">
                 Trạng thái cơ thể lúc kết thúc
-              </Text>
+              </ThemedText>
             </View>
           </View>
         </View>
       )}
 
-      {/* 5. Health Snapshot (Parsed Data dạng Grid UI) */}
+      {/* 5. Health Snapshot */}
       {parsedSnapshot && (
         <View className="mt-4">
-          <Text className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest mb-1.5 px-1">
+          <ThemedText
+            size="xxs"
+            weight="bold"
+            color="text"
+            opacity="medium"
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              marginBottom: 6,
+              paddingHorizontal: 4,
+            }}
+          >
             Chỉ số ghi nhận
-          </Text>
+          </ThemedText>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/10 p-3.5 flex-row flex-wrap gap-2">
+          <View className="flex-row flex-wrap gap-2 rounded-xl border border-text-base/10 bg-background2 p-3.5">
             {Object.entries(parsedSnapshot).map(([key, val]) => (
               <View
                 key={key}
-                className="bg-zinc-800/60 px-3 py-2 rounded-xl border border-white/5"
+                className="rounded-xl border border-text-base/5 bg-background2/60 px-3 py-2"
               >
-                <Text className="text-zinc-400 text-[9px] uppercase font-bold">
+                <ThemedText
+                  size="tiny"
+                  weight="bold"
+                  color="text"
+                  opacity="medium"
+                  style={{ textTransform: "uppercase" }}
+                >
                   {key}
-                </Text>
-                <Text className="text-white text-xs font-bold mt-0.5">
+                </ThemedText>
+
+                <ThemedText
+                  size="xs"
+                  weight="bold"
+                  color="text"
+                  style={{ marginTop: 2 }}
+                >
                   {String(val)}
-                </Text>
+                </ThemedText>
               </View>
             ))}
           </View>
         </View>
       )}
 
-      {/* 6. About Target (Thông tin kiến thức khoa học) */}
+      {/* 6. About Target */}
       {target?.adviceLong && (
         <View className="mt-4">
-          <Text className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest mb-1.5 px-1">
+          <ThemedText
+            size="xxs"
+            weight="bold"
+            color="text"
+            opacity="medium"
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              marginBottom: 6,
+              paddingHorizontal: 4,
+            }}
+          >
             Lời khuyên
-          </Text>
+          </ThemedText>
 
-          <View className="bg-zinc-900 rounded-2xl border border-white/10 p-4">
-            <Text className="text-zinc-300 text-xs leading-5">
+          <View className="rounded-xl border border-text-base/10 bg-background2 px-3 py-2">
+            <ThemedText size="xxs" color="text" opacity="medium">
               {target.adviceLong}
-            </Text>
+            </ThemedText>
           </View>
         </View>
       )}

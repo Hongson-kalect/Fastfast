@@ -116,23 +116,34 @@ export function FastBarChart({
       yKeys={["y"]}
       chartPressState={state}
       axisOptions={{
-        font: font,
-        labelColor: theme.white,
-        lineColor: "#ddd",
+        font,
+        labelColor: theme.text + "99",
+        lineColor: theme.text + "15",
       }}
-      domainPadding={{ top: 35, right: 32, bottom: 0, left: 32 }}
+      domainPadding={{
+        top: 35,
+        right: 32,
+        bottom: 0,
+        left: 32,
+      }}
       domain={{ y: [0, yMax] }}
     >
       {({ points, chartBounds }) => (
         <>
           <Group opacity={isActive ? 0.5 : 1}>
             <Bar
-              points={points.y} // Truyền từng point riêng rẽ
+              points={points.y}
               chartBounds={chartBounds}
               color={theme.primary}
-              roundedCorners={{ topLeft: 4, topRight: 4 }}
+              roundedCorners={{
+                topLeft: 4,
+                topRight: 4,
+              }}
               barWidth={(width - 64) / data.length - 4}
-              animate={{ type: "timing", duration: 300 }}
+              animate={{
+                type: "timing",
+                duration: 300,
+              }}
             >
               <LinearGradient
                 start={vec(0, 0)}
@@ -141,10 +152,12 @@ export function FastBarChart({
               />
             </Bar>
           </Group>
-          {/* Render nhãn giá trị trên đầu mỗi cột (ẩn khi Tooltip active) */}
+
+          {/* Value trên đầu mỗi cột */}
           {!isActive &&
             points.y.map((point, index) => {
               const val = Number(data[index]?.y);
+
               if (!val || val === 0) return null;
 
               const textStr = `${val}`;
@@ -157,12 +170,12 @@ export function FastBarChart({
                   y={(point.y ?? 0) - 4}
                   text={textStr}
                   font={activeFont}
-                  color={theme.white}
+                  color={theme.text}
                 />
               );
             })}
 
-          {/* Tooltip khi Touch/Press vào Chart */}
+          {/* Tooltip */}
           {isActive && activeIndex !== null && (
             <Group>
               <RoundedRect
@@ -171,14 +184,17 @@ export function FastBarChart({
                 width={140}
                 height={54}
                 r={12}
-                color="#222222aa"
+                color={theme.background2 + "EE"}
               />
 
               <Bar
                 points={[points.y[activeIndex]]}
                 chartBounds={chartBounds}
                 color={theme.primary}
-                roundedCorners={{ topLeft: 4, topRight: 4 }}
+                roundedCorners={{
+                  topLeft: 4,
+                  topRight: 4,
+                }}
                 barWidth={(width - 64) / data.length - 4}
               >
                 <LinearGradient
@@ -188,22 +204,22 @@ export function FastBarChart({
                 />
               </Bar>
 
-              {/* Label Tooltip */}
+              {/* Tooltip label */}
               <Text
                 x={22}
                 y={15}
                 text={labelText}
                 font={font}
-                color={theme.white + "CC"}
+                color={theme.text + "CC"}
               />
 
-              {/* Value Tooltip */}
+              {/* Tooltip value */}
               <Text
                 x={22}
                 y={40}
                 text={toolTipText}
                 font={font3}
-                color={theme.white}
+                color={theme.text}
               />
             </Group>
           )}

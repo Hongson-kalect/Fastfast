@@ -5,16 +5,14 @@ import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
-import { BottomSheetFlatList, BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
-import { useMemo, useRef, useState } from "react";
 import {
-  FlatList,
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+  BottomSheetFlatList,
+  BottomSheetFlatListMethods,
+} from "@gorhom/bottom-sheet";
+import { useMemo, useRef, useState } from "react";
+import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { ThemedText } from "../themed-text";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
@@ -23,7 +21,8 @@ interface TargetSheetProps {
 
 const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
   const dbService = useDBService();
-  const { settings, updateSetting, theme } = useAppStore();
+  const { settings, updateSetting, theme, setCurrentFastSession } =
+    useAppStore();
   const { hide } = useBottomSheet();
   const { width } = useWindowDimensions();
   const [selectIndex, setSelectIndex] = useState(() => {
@@ -43,14 +42,18 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
     return FASTING_TARGETS[selectIndex];
   }, [selectIndex]);
 
-  const handleSelect = () => {
+  const handleSelect = async () => {
     updateSetting({ [settingKey.target]: selected.hours });
     dbService.setting(settingKey.target, selected.hours);
     if (onSelectTarget) onSelectTarget(selected);
 
     // Nếu đang có phiên hiện tại thì cập nhật target vào phiên
     if (currentFast) {
-      dbService.updateSessionTarget(currentFast.id, selected.hours);
+      const res = await dbService.updateSessionTarget(
+        currentFast.id,
+        selected.hours,
+      );
+      setCurrentFastSession(res);
     }
     hide();
   };
@@ -74,7 +77,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
   const listRef = useRef<BottomSheetFlatListMethods>(null);
 
   return (
-    <View className="flex-1 bg-zinc-900 px-2 pb-20 pt-8">
+    <View className="flex-1 bg-background px-2 pb-20 pt-8">
       <View>
         <BottomSheetFlatList
           ref={listRef}
@@ -90,7 +93,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
           }}
           snapToInterval={CARD_WIDTH + GAP}
           snapToAlignment="start"
-          decelerationRate="fast"
+          // decelerationRate="fast"
           disableIntervalMomentum
           onMomentumScrollEnd={(e) => {
             const offset = e.nativeEvent.contentOffset.x;
@@ -101,7 +104,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
             setIsScrolling(false);
           }}
           // 🟢 1. Bật sự kiện scroll liên tục
-          scrollEventThrottle={16}
+          // scrollEventThrottle={16}
           // 🟢 4. Khi buông tay mà KHÔNG CÓ đà trượt (dừng tay ngay lập tức)
           onScrollBeginDrag={() => setIsScrolling(true)}
           onScrollEndDrag={(e) => {
@@ -130,7 +133,9 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                     borderColor: active
                       ? item.colors.border
                       : item.colors.border + "66",
-                    backgroundColor: active ? item.colors.badgeBg : "#161616",
+                    backgroundColor: active
+                      ? item.colors.badgeBg
+                      : theme.background2,
                     padding: 18,
                     marginBottom: 0,
                   }}
@@ -143,26 +148,18 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                     }}
                   >
                     <View>
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          fontWeight: "600",
-                          color: "white",
-                        }}
-                      >
+                      <ThemedText size="xl" weight="semibold" color="text">
                         {item.label}
-                      </Text>
+                      </ThemedText>
 
-                      <Text
-                        style={{
-                          marginTop: 2,
-                          color: "white",
-                          fontWeight: "500",
-                          fontSize: 14,
-                        }}
+                      <ThemedText
+                        size="sm"
+                        weight="medium"
+                        color="text"
+                        style={{ marginTop: 2 }}
                       >
                         {item.title}
-                      </Text>
+                      </ThemedText>
                     </View>
 
                     <View
@@ -173,28 +170,28 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         borderRadius: 999,
                       }}
                     >
-                      <Text
-                        style={{
-                          color: item.colors.badgeText,
-                          fontWeight: "500",
-                        }}
+                      <ThemedText
+                        size="xs"
+                        weight="medium"
+                        colorHex={item.colors.badgeText}
                       >
                         {item.level}
-                      </Text>
+                      </ThemedText>
                     </View>
                   </View>
 
-                  <Text
+                  <ThemedText
+                    size="xs"
+                    color="text"
+                    opacity="medium"
                     style={{
-                      color: "#FFFFFF77",
                       marginTop: 12,
                       marginBottom: 4,
                       lineHeight: 22,
-                      fontSize: 13,
                     }}
                   >
                     {item.description}
-                  </Text>
+                  </ThemedText>
 
                   {active && (
                     <View
@@ -226,27 +223,25 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                       paddingHorizontal: 12,
                     }}
                   >
-                    <Text
-                      style={{
-                        color: item.colors.accent,
-                        fontSize: 14,
-                        fontWeight: "700",
-                      }}
+                    <ThemedText
+                      size="sm"
+                      weight="bold"
+                      colorHex={item.colors.accent}
                     >
                       💡 {item.advice}
-                    </Text>
+                    </ThemedText>
 
-                    <Text
+                    <ThemedText
+                      size="xs"
+                      color="text"
+                      opacity="low"
                       style={{
-                        opacity: 0.4,
-                        color: "#FFFFFF",
-                        fontSize: 13,
                         marginTop: 14,
                         lineHeight: 23,
                       }}
                     >
                       {item.adviceLong}
-                    </Text>
+                    </ThemedText>
 
                     <Pressable
                       onPress={isCurrent ? hide : handleSelect}
@@ -259,41 +254,32 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         alignItems: "center",
                       }}
                     >
-                      <Text
-                        style={{
-                          color: "white",
-                          fontWeight: "700",
-                          fontSize: 17,
-                        }}
-                      >
+                      <ThemedText size="lg" weight="bold" colorHex="#FFFFFF">
                         {isCurrent ? "Xác nhận" : "Chọn mục tiêu này"}
-                      </Text>
+                      </ThemedText>
                     </Pressable>
+
                     {isCurrent && (
                       <View className="flex-row justify-center items-center mt-4">
                         <Pressable
                           onPress={handleClearTarget}
-                          // className="bg-gray-700"
                           style={{
                             paddingHorizontal: 16,
                             height: 40,
                             borderRadius: 12,
-                            // borderColor: "#FFFFFF" + "99",
                             justifyContent: "center",
                             alignItems: "center",
                           }}
                         >
-                          <Text
-                            style={{
-                              opacity: 0.6,
-                              color: "#FFFFFF",
-                              fontWeight: "500",
-                              fontSize: 13,
-                            }}
-                            className="underline"
+                          <ThemedText
+                            size="xs"
+                            weight="medium"
+                            color="text"
+                            opacity="medium"
+                            style={{ textDecorationLine: "underline" }}
                           >
                             Hủy mục tiêu
-                          </Text>
+                          </ThemedText>
                         </Pressable>
                       </View>
                     )}

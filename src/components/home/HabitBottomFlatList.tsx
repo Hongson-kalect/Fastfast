@@ -1,16 +1,17 @@
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ListRenderItemInfo, Text, TouchableOpacity, View } from "react-native";
+import { FASTING_TARGETS } from "@/constants/data";
+import { RETAIN_LIMIT } from "@/database/shema/habit_logs";
+import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { ListRenderItemInfo, TouchableOpacity, View } from "react-native";
+import { ThemedText } from "../themed-text";
+import { HabitLogComponent } from "./HabitBottomSheet";
 import { HabitDetailModal } from "./HabitDetailModal";
 import LiquidCircle from "./Waterball";
-import { RETAIN_LIMIT } from "@/database/shema/habit_logs";
-import { FASTING_TARGETS } from "@/constants/data";
-import useModalStore from "@/stores/modalStore";
-import { useAppStore } from "@/stores/appStore";
-import { useDBService } from "@/hooks/useDBService";
-import { HabitLogComponent } from "./HabitBottomSheet";
 
 interface HabitBottomFlatListProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -22,9 +23,7 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
   const { theme, userProfile, habit } = useAppStore();
   const dbService = useDBService();
 
-  const [habitLogs, setHabitLogs] = useState<
-    (HabitLog & FastSession)[]
-  >([]);
+  const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
 
   const [showAllHistory, setShowAllHistory] = useState(false);
 
@@ -36,14 +35,11 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
     ];
   }, [habit]);
 
-  const isMilestone35Reached =
-    !!userProfile?.low_shield_clamable;
+  const isMilestone35Reached = !!userProfile?.low_shield_clamable;
 
-  const isMilestone70Reached =
-    !!userProfile?.mid_shield_clamable;
+  const isMilestone70Reached = !!userProfile?.mid_shield_clamable;
 
-  const isMilestone100Reached =
-    !!userProfile?.full_shield_clamable;
+  const isMilestone100Reached = !!userProfile?.full_shield_clamable;
 
   const getMotivationalText = useCallback((percent: number) => {
     if (percent >= 100) {
@@ -92,16 +88,8 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
    */
 
   const handleSelectHabit = useCallback(
-    (
-      log: HabitLog & FastSession,
-      target?: (typeof FASTING_TARGETS)[0],
-    ) => {
-      addModal(
-        <HabitDetailModal
-          log={log}
-          targetInfo={target}
-        />,
-      );
+    (log: HabitLog & FastSession, target?: (typeof FASTING_TARGETS)[0]) => {
+      addModal(<HabitDetailModal log={log} targetInfo={target} />);
     },
     [addModal],
   );
@@ -119,79 +107,82 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
             HEADER
             ================================= */}
 
-        <View className="flex-row justify-between items-center mb-4">
+        <View className="mb-4 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
-            <Ionicons
-              name="sparkles"
-              size={20}
-              color={theme.primary}
-            />
+            <Ionicons name="sparkles" size={20} color={theme.primary} />
 
-            <Text className="text-xl font-bold text-white">
+            <ThemedText size="xl" weight="bold">
               Habit Index
-            </Text>
+            </ThemedText>
           </View>
 
-          <View className="flex-row items-center gap-4 rounded-lg px-3 py-1 bg-gray-700">
-            <Text className="text-white text-xs font-bold opacity-60">
+          <View className="flex-row items-center gap-4 rounded-lg bg-background2 px-3 py-1">
+            <ThemedText size="xs" weight="bold" color="text" opacity="medium">
               Shield:
-            </Text>
+            </ThemedText>
 
             <View className="flex-row items-center gap-1">
-              <Text className="text-white font-bold text-lg">
+              <ThemedText size="lg" weight="bold">
                 {shieldCount}
-              </Text>
+              </ThemedText>
 
-              <FontAwesome5
-                name="shield-alt"
-                size={16}
-                color={theme.primary}
-              />
+              <FontAwesome5 name="shield-alt" size={16} color={theme.primary} />
             </View>
           </View>
         </View>
 
         {/* =================================
-            HERO
-            ================================= */}
+    HERO
+    ================================= */}
 
         <TouchableOpacity
           onPress={() => {
-            addModal(
-              <HabitDetailModal />,
-            );
+            addModal(<HabitDetailModal />);
           }}
-          className="items-center my-3"
+          className="my-3 items-center"
         >
           <LiquidCircle
             percent={habitPercent}
             size={120}
             color={theme.primary}
-            retainPercent={
-              (habitRetain / RETAIN_LIMIT) * 100
-            }
-            retainColor="#3B82F6"
+            retainPercent={(habitRetain / RETAIN_LIMIT) * 100}
+            retainColor={theme.primary}
           />
 
-          <Text className="text-xs text-zinc-300 font-medium text-center mt-6 px-6">
+          <ThemedText
+            size="xs"
+            weight="medium"
+            color="text"
+            opacity="medium"
+            style={{
+              marginTop: 24,
+              paddingHorizontal: 24,
+              textAlign: "center",
+            }}
+          >
             {getMotivationalText(habitPercent)}
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
 
         {/* =================================
-            PROGRESS
-            ================================= */}
+    PROGRESS
+    ================================= */}
 
-        <View className="bg-zinc-900/80 p-4 rounded-2xl border border-white/5 my-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xs font-semibold text-zinc-400">
+        <View className="my-4 rounded-2xl border border-text-base/5 bg-background2/80 p-4">
+          <View className="mb-4 flex-row items-center justify-between">
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+            >
               Tiến trình
-            </Text>
+            </ThemedText>
           </View>
 
-          <View className="relative h-3 bg-zinc-700 rounded-full w-full overflow-hidden">
+          <View className="relative h-3 w-full overflow-hidden rounded-full bg-text-base/20">
             <View
-              className="h-full bg-primary rounded-full"
+              className="h-full rounded-full bg-primary"
               style={{
                 width: `${Math.min(habitPercent, 100)}%`,
               }}
@@ -200,113 +191,121 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
 
           <View className="relative h-12 w-full flex-row justify-between px-1">
             {/* 0% */}
+            <View className="-ml-2 items-center opacity-0">
+              <View className="mb-1 h-2 w-0.5 bg-text-base/30" />
 
-            <View className="items-center -ml-2 opacity-0">
-              <View className="w-0.5 h-2 bg-zinc-600 mb-1" />
-
-              <Text className="text-[10px] text-zinc-500">
+              <ThemedText size="xxs" color="text" opacity="medium">
                 0%
-              </Text>
+              </ThemedText>
             </View>
 
             {/* 35% */}
-
             <View className="absolute left-[35%] -translate-x-1/2 items-center">
-              <View className="w-0.5 h-2 bg-zinc-600 mb-1" />
+              <View className="mb-1 h-2 w-0.5 bg-text-base/30" />
 
               <View
-                className={`p-1 rounded-full ${
+                className={
                   isMilestone35Reached
-                    ? "bg-blue-500/20 border border-blue-500/50"
-                    : "bg-zinc-800 opacity-40"
-                }`}
+                    ? "rounded-full border border-primary/50 bg-primary/20 p-1"
+                    : "rounded-full bg-background2 p-1 opacity-40"
+                }
               >
                 <FontAwesome5
                   name="shield-alt"
                   size={10}
-                  color={
-                    isMilestone35Reached
-                      ? "#60A5FA"
-                      : "#71717A"
-                  }
+                  color={isMilestone35Reached ? theme.primary : theme.text}
+                  style={{
+                    opacity: isMilestone35Reached ? 1 : 0.5,
+                  }}
                 />
               </View>
 
-              <Text className="text-[10px] text-zinc-400 mt-0.5">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+                style={{ marginTop: 2 }}
+              >
                 35%
-              </Text>
+              </ThemedText>
             </View>
 
             {/* 70% */}
-
             <View className="absolute left-[70%] -translate-x-1/2 items-center">
-              <View className="w-0.5 h-2 bg-zinc-600 mb-1" />
+              <View className="mb-1 h-2 w-0.5 bg-text-base/30" />
 
               <View
-                className={`p-1 rounded-full ${
+                className={
                   isMilestone70Reached
-                    ? "bg-blue-500/20 border border-blue-500/50"
-                    : "bg-zinc-800 opacity-40"
-                }`}
+                    ? "rounded-full border border-primary/50 bg-primary/20 p-1"
+                    : "rounded-full bg-background2 p-1 opacity-40"
+                }
               >
                 <FontAwesome5
                   name="shield-alt"
                   size={10}
-                  color={
-                    isMilestone70Reached
-                      ? "#60A5FA"
-                      : "#71717A"
-                  }
+                  color={isMilestone70Reached ? theme.primary : theme.text}
+                  style={{
+                    opacity: isMilestone70Reached ? 1 : 0.5,
+                  }}
                 />
               </View>
 
-              <Text className="text-[10px] text-zinc-400 mt-0.5">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+                style={{ marginTop: 2 }}
+              >
                 70%
-              </Text>
+              </ThemedText>
             </View>
 
             {/* 100% */}
-
-            <View className="items-center -mr-2">
-              <View className="w-0.5 h-2 bg-zinc-600 mb-1" />
+            <View className="-mr-2 items-center">
+              <View className="mb-1 h-2 w-0.5 bg-text-base/30" />
 
               <View
-                className={`p-1 rounded-full ${
+                className={
                   isMilestone100Reached
-                    ? "bg-amber-500/20 border border-amber-500/50"
-                    : "bg-zinc-800 opacity-40"
-                }`}
+                    ? "rounded-full border border-amber-500/50 bg-amber-500/20 p-1"
+                    : "rounded-full bg-background2 p-1 opacity-40"
+                }
               >
                 <FontAwesome5
                   name="crown"
                   size={10}
-                  color={
-                    isMilestone100Reached
-                      ? "#FBBF24"
-                      : "#71717A"
-                  }
+                  color={isMilestone100Reached ? "#FBBF24" : theme.text}
+                  style={{
+                    opacity: isMilestone100Reached ? 1 : 0.5,
+                  }}
                 />
               </View>
 
-              <Text className="text-[10px] text-zinc-400 mt-0.5">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+                style={{ marginTop: 2 }}
+              >
                 100%
-              </Text>
+              </ThemedText>
             </View>
           </View>
         </View>
 
         {/* =================================
-            HISTORY HEADER
-            ================================= */}
+    HISTORY HEADER
+    ================================= */}
 
-        <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-sm font-bold text-zinc-300">
-            Lịch sử phiên gần đây
-          </Text>
+        <View className="mb-3 flex-row items-center justify-between">
+          <ThemedText size="sm" weight="bold" color="text" opacity="medium">
+            Lịch sử phiên gần đâyyyy
+          </ThemedText>
 
-          <Text className="text-xs text-zinc-500">
+          <ThemedText size="xs" color="text" opacity="medium">
             {habitLogs.length} phiên
-          </Text>
+          </ThemedText>
         </View>
       </>
     );
@@ -330,14 +329,8 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
    */
 
   const renderItem = useCallback(
-    ({
-      item,
-    }: ListRenderItemInfo<HabitLog & FastSession>) => {
-      return (
-        <HabitLogComponent
-          log={item}
-        />
-      );
+    ({ item }: ListRenderItemInfo<HabitLog & FastSession>) => {
+      return <HabitLogComponent log={item} />;
     },
     [handleSelectHabit],
   );
@@ -351,9 +344,9 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
   const renderEmpty = useCallback(() => {
     return (
       <View className="mt-8 gap-3 items-center">
-        <Text className="italic text-text-base/40">
+        <ThemedText color="text" opacity="low" style={{ fontStyle: "italic" }}>
           Chưa có lịch sử phiên gần đây
-        </Text>
+        </ThemedText>
       </View>
     );
   }, []);

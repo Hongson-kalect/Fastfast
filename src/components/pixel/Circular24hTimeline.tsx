@@ -347,24 +347,16 @@ const TimelineSegmentItem = React.memo(
       };
     });
 
-    const color = DEBUG_COLORS[index % colors.length];
+    const color = index % 2 === 0 ? theme.success : theme.success + "CC";
 
     return (
       <AnimatedPath
         d={path}
         fill="none"
-        stroke={color ?? segment.color ?? "#34D399"}
+        stroke={color}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
-        /**
-         * Dash = đúng chiều dài arc.
-         *
-         * Gap = đúng chiều dài arc.
-         *
-         * Nhờ vậy chỉ có một segment duy nhất
-         * được render trên path.
-         */
         strokeDasharray={[arcLength, arcLength]}
         animatedProps={animatedProps}
       />
@@ -517,6 +509,7 @@ export default function Circular24hTimeline({
 * ---
 
 */
+
   const { theme } = useAppStore();
 
   return (
@@ -533,9 +526,10 @@ export default function Circular24hTimeline({
           cy={center}
           r={anchorRadius}
           fill="none"
-          stroke="#181D1A"
+          stroke={theme.text + "20"}
           strokeWidth={1}
         />
+
         {/* =====================================================
         TIME ANCHORS
     ===================================================== */}
@@ -570,7 +564,7 @@ export default function Circular24hTimeline({
                 y1={inner.y}
                 x2={outer.x}
                 y2={outer.y}
-                stroke="#4B554F"
+                stroke={theme.text + "50"}
                 strokeWidth={2}
                 strokeLinecap="round"
               />
@@ -579,7 +573,7 @@ export default function Circular24hTimeline({
               <SvgText
                 x={labelPos.x}
                 y={labelPos.y}
-                fill="#7B847F"
+                fill={theme.text + "80"}
                 fontSize={10}
                 fontWeight="600"
                 textAnchor="middle"
@@ -590,6 +584,7 @@ export default function Circular24hTimeline({
             </G>
           );
         })}
+
         {/* =====================================================
         FASTING BASE TRACK
     ===================================================== */}
@@ -598,9 +593,10 @@ export default function Circular24hTimeline({
           cy={center}
           r={ringRadius}
           fill="none"
-          stroke="#19201C"
+          stroke={theme.text + "12"}
           strokeWidth={strokeWidth}
         />
+
         {/* =====================================================
         FASTING SEGMENTS
     ===================================================== */}
@@ -616,6 +612,7 @@ export default function Circular24hTimeline({
             animated={animated}
           />
         ))}
+
         {/* =====================================================
         0H / 24H CUT
     ===================================================== */}
@@ -632,24 +629,26 @@ export default function Circular24hTimeline({
           y1={boundaryInner.y}
           x2={boundaryOuter.x}
           y2={boundaryOuter.y}
-          stroke="#ff0000aa"
+          stroke={theme.error + "AA"}
           strokeWidth={4}
           strokeLinecap="round"
         />
+
         {/* Boundary dot */}
         <Circle
           cx={boundaryOuter.x}
           cy={boundaryOuter.y}
           r={2.5}
-          fill="#ff0000"
+          fill={theme.error}
         />
+
         {/* =====================================================
         CENTER VALUE
     ===================================================== */}
         <SvgText
           x={center}
           y={center - 8}
-          fill="#FFFFFF"
+          fill={theme.text}
           fontSize={30}
           fontWeight="700"
           textAnchor="middle"
@@ -657,10 +656,11 @@ export default function Circular24hTimeline({
         >
           {totalDuration.toFixed(1)}
         </SvgText>
+
         <SvgText
           x={center}
           y={center + 18}
-          fill="#717873"
+          fill={theme.text + "70"}
           fontSize={9}
           fontWeight="600"
           letterSpacing={1.2}
@@ -676,8 +676,8 @@ export default function Circular24hTimeline({
   ======================================================= */}
       {isLoading && (
         <View className="absolute inset-0 items-center justify-center">
-          <View className="w-10 h-10 rounded-full bg-zinc-900/90 items-center justify-center">
-            <ActivityIndicator size="small" color="#34D399" />
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-background/90">
+            <ActivityIndicator size="small" color={theme.success} />
           </View>
         </View>
       )}

@@ -1,9 +1,11 @@
 import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
 import { DailyPixelData, DayItem, ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
+import { lighter } from "@/util/color";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { memo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { ThemedText } from "../themed-text";
 
 const DayPixel = memo(
   ({
@@ -34,13 +36,7 @@ const DayPixel = memo(
      */
     if (day.dateString > todayStr) {
       return (
-        <View
-          style={{
-            backgroundColor: "transparent",
-            boxShadow: "none",
-          }}
-          className="flex-1 aspect-square justify-center items-center rounded-md border border-white/5"
-        />
+        <View className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5" />
       );
     }
 
@@ -51,10 +47,9 @@ const DayPixel = memo(
       return (
         <View
           style={{
-            backgroundColor: "transparent",
-            boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : "none",
+            boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : undefined,
           }}
-          className="flex-1 aspect-square justify-center items-center rounded-md border border-white/5"
+          className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5"
         />
       );
     }
@@ -74,6 +69,7 @@ const DayPixel = memo(
       /*
        * FAST
        */
+
       /*
        * Không có log fasting
        */
@@ -103,7 +99,8 @@ const DayPixel = memo(
           const progress = fast.elapsed_hours / fast.hours_in_fast;
 
           opacity = 0.5 + 0.5 * progress;
-          backgroundColor = pixel.colors.accent + "88";
+          // backgroundColor = darker(pixel.colors.accent, 0.5); //lighter(pixel.colors.accent, 0.8); // Chỗ này icon pack phải bao hàm cả light và dark, không dùng hàm random thế này
+          backgroundColor = lighter(pixel.colors.accent, 0.8); // Chỗ này icon pack phải bao hàm cả light và dark, không dùng hàm random thế này
           emoji = pixel.emoji;
           pressable = true;
         }
@@ -116,18 +113,18 @@ const DayPixel = memo(
     const content =
       icon ||
       (emoji ? (
-        <Text
-          className={`text-[14px]! font-medium ${
-            day.isCurrentYear ? "text-white" : "text-white/20"
-          }`}
+        <ThemedText
+          size="sm"
+          weight="medium"
+          colorHex={day.isCurrentYear ? "#FFFFFF" : "#FFFFFF33"}
         >
           {emoji}
-        </Text>
+        </ThemedText>
       ) : null);
 
     const borderClass = day.isCurrentYear
-      ? "border-white/10"
-      : "border-dashed border-white/5";
+      ? "border-text-base/10"
+      : "border-dashed border-text-base/5";
 
     /*
      * Pixel có thể click
@@ -136,17 +133,20 @@ const DayPixel = memo(
       return (
         <Pressable
           onPress={() => {
-            console.log("pressed", Date.now());
             onPress(day.dateString);
           }}
           style={{
-            opacity,
             backgroundColor,
-            boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : "none",
+            boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : undefined,
           }}
-          className={`flex-1 aspect-square justify-center items-center rounded-md border ${borderClass}`}
+          className={`flex-1 aspect-square items-center justify-center rounded-md border ${borderClass}`}
         >
-          {content}
+          <View
+            style={{ opacity }}
+            className="flex-1 items-center justify-center"
+          >
+            {content}
+          </View>
         </Pressable>
       );
     }
@@ -157,16 +157,19 @@ const DayPixel = memo(
     return (
       <View
         style={{
-          opacity,
           backgroundColor,
-          boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : "none",
+          boxShadow: isToday ? `0 0 0 1px ${theme.primary}80` : undefined,
         }}
-        className={`flex-1 aspect-square justify-center items-center rounded-md border ${borderClass}`}
+        className={`flex-1 aspect-square rounded-md border ${borderClass}`}
       >
-        {content}
+        <View
+          style={{ opacity }}
+          className="flex-1 items-center justify-center"
+        >
+          {content}
+        </View>
       </View>
     );
   },
 );
-
 export default DayPixel;

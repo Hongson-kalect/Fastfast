@@ -136,14 +136,6 @@ const BottomSheet = (props: Props) => {
               }}
               showsVerticalScrollIndicator={false}
             >
-              {/* <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText>
-              <ThemedText>aaaaaaaa </ThemedText> */}
-              {/* {contentRef.current && contentRef.current()} */}
               {props.children}
               <View style={{ height: 80 }}></View>
             </ScrollView>

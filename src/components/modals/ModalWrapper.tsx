@@ -240,7 +240,6 @@ export default function ModalWrapper({
                         {title}
                       </ThemedText>
 
-                      <Divider className="bg-red-400" />
                     </View>
                   ) : (
                     title
@@ -289,9 +288,10 @@ export default function ModalWrapper({
                 >
                   <ThemedText
                     style={{
-                      color: theme.subText1,
+                      color: theme.text,
                     }}
-                    className="text-lg font-semibold"
+                    size='lg'
+                    weight='semibold'
                   >
                     ×
                   </ThemedText>

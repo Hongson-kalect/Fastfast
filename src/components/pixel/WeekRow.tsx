@@ -20,16 +20,22 @@ const WeekRow = React.memo(
   }) => {
     return (
       <View className="flex-row items-center">
-        <View className="w-15 pl-1 justify-center items-center">
+        <View className="w-15 pl-1 items-center justify-center">
           {week.isMonthHeader && (
             <View className="absolute -top-2 left-0 -rotate-45">
-              <ThemedText className="text-[8px]! text-emerald-400! opacity-100">
+              <ThemedText size="tiny" color="primary" opacity="full" style={{}}>
                 {week.month}
               </ThemedText>
             </View>
           )}
 
-          <ThemedText className="text-center text-[10px]! font-regular text-white/70!">
+          <ThemedText
+            size="xxs"
+            weight="regular"
+            color="text"
+            opacity="medium"
+            style={{ textAlign: "center" }}
+          >
             {week.weekOfYear}
           </ThemedText>
         </View>

@@ -1,9 +1,11 @@
 import { EMOTIONS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
+import { useAppStore } from "@/stores/appStore";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, TouchableOpacity, View } from "react-native";
+import { ThemedText } from "../themed-text";
 import Circular24hTimeline from "./Circular24hTimeline";
 import { DailyFastSessionCard } from "./DailySessionFast";
 
@@ -119,6 +121,7 @@ const formatDuration = (hours: number) => {
 
 const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const dbService = useDBService();
+  const { theme } = useAppStore();
 
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
@@ -220,76 +223,103 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const [activeTab, setActiveTab] = useState<"fasting" | "journal">("fasting");
 
   return (
-    <View className="flex-1 bg-zinc-950">
-      {/* 1. HEADER CHÍNH (Cố định ở trên) */}
-      <View className="px-4 pt-3 pb-3 border-b border-white/10 flex-row items-center justify-between">
+    <View className="flex-1 bg-background">
+      {/* 1. HEADER CHÍNH */}
+      <View className="flex-row items-center justify-between border-b border-text-base/10 px-4 pb-3 pt-3">
         <View className="flex-1">
-          <Text className="text-zinc-500 text-[11px]">Nhật ký ngày</Text>
-          <Text className="text-white text-xl font-bold mt-0.5">
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Nhật ký ngày
+          </ThemedText>
+
+          <ThemedText
+            size="xl"
+            weight="bold"
+            color="text"
+            style={{ marginTop: 2 }}
+          >
             {dateString}
-          </Text>
+          </ThemedText>
         </View>
 
-        {/* Mood Badge thu gọn */}
+        {/* Mood Badge */}
         {currentMood ? (
           <View
-            style={{ backgroundColor: currentMood.color }}
-            className="flex-row items-center gap-x-1.5 px-5 py-1.5 rounded-full border border-white/10"
+            style={{
+              backgroundColor: currentMood.color,
+            }}
+            className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
           >
-            <Text className="text-zinc-200 text-xs font-semibold">
+            <ThemedText size="xs" weight="semibold" colorHex="#E4E4E7">
               {currentMood.label}
-            </Text>
-            <Text className="text-lg font-medium">{currentMood.emoji}</Text>
+            </ThemedText>
+
+            <ThemedText size="lg" weight="medium">
+              {currentMood.emoji}
+            </ThemedText>
           </View>
         ) : (
-          <View className="bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
-            <Text className="text-zinc-500 text-[11px]">Chưa có mood</Text>
+          <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
+            <ThemedText size="xxs" color="text" opacity="medium">
+              Chưa có mood
+            </ThemedText>
           </View>
         )}
       </View>
 
-      {/* 2. TAB SWITCHER (Nút chuyển Tab) */}
-      <View className="px-4 mt-3">
-        <View className="flex-row gap-3 bg-zinc-900 p-1 rounded-xl border border-white/5">
+      {/* 2. TAB SWITCHER */}
+      <View className="mt-3 px-4">
+        <View className="flex-row gap-3 rounded-xl border border-text-base/5 bg-background2 p-1">
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setActiveTab("fasting")}
-            className={`flex-1 py-4 items-center justify-center ${
+            className="flex-1 items-center justify-center rounded-2xl py-4"
+            style={
               activeTab === "fasting"
-                ? "bg-zinc-800  border rounded-2xl border-emerald-400"
-                : "bg-transparent"
-            }`}
+                ? {
+                    backgroundColor: theme.primary + "18",
+                    borderWidth: 1,
+                    borderColor: theme.primary + "70",
+                  }
+                : undefined
+            }
           >
-            <Text
-              className={`text-xs font-semibold ${
-                activeTab === "fasting" ? "text-emerald-400" : "text-zinc-400"
-              }`}
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color={activeTab === "fasting" ? "primary" : "text"}
+              opacity={activeTab === "fasting" ? "full" : "medium"}
             >
               ⏱️ Daily Fast
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setActiveTab("journal")}
-            className={`flex-1 py-4 items-center justify-center ${
+            className="flex-1 items-center justify-center rounded-2xl py-4"
+            style={
               activeTab === "journal"
-                ? "bg-zinc-800 border rounded-2xl border-emerald-400"
-                : "bg-transparent"
-            }`}
+                ? {
+                    backgroundColor: theme.primary + "18",
+                    borderWidth: 1,
+                    borderColor: theme.primary + "70",
+                  }
+                : undefined
+            }
           >
-            <Text
-              className={`text-xs font-semibold ${
-                activeTab === "journal" ? "text-emerald-400" : "text-zinc-400"
-              }`}
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color={activeTab === "journal" ? "primary" : "text"}
+              opacity={activeTab === "journal" ? "full" : "medium"}
             >
               📝 Daily Note
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* 3. NỘI DUNG SCROLLVIEW TƯƠNG ỨNG THEO TAB */}
+      {/* 3. NỘI DUNG */}
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -303,7 +333,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
         {activeTab === "fasting" && (
           <View className="gap-y-5">
             {/* 24H CIRCULAR TIMELINE */}
-            <View className="bg-zinc-900 rounded-2xl border border-white/10 p-5 items-center justify-center">
+            <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background2 p-5">
               <Circular24hTimeline
                 segments={circularSegments}
                 totalDuration={totalDuration}
@@ -317,13 +347,19 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
             {/* DANH SÁCH PHIÊN LIÊN QUAN */}
             {fastIds.length > 0 && (
               <View>
-                <View className="flex-row items-center justify-between mb-2.5 px-1">
-                  <Text className="text-white text-xs font-semibold uppercase tracking-wider">
-                    Các phiên liên quan
-                  </Text>
-                  <Text className="text-zinc-500 text-xs">
+                <View className="mb-2.5 flex-row items-center justify-between px-1">
+                  <ThemedText
+                    size="xs"
+                    weight="semibold"
+                    color="text"
+                    style={{ letterSpacing: 1 }}
+                  >
+                    CÁC PHIÊN LIÊN QUAN
+                  </ThemedText>
+
+                  <ThemedText size="xs" color="text" opacity="medium">
                     {fastIds.length} phiên
-                  </Text>
+                  </ThemedText>
                 </View>
 
                 <View className="gap-y-2">
@@ -333,7 +369,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
                       key={item.fast_id}
                       fast={fastObj[item.fast_id] ?? null}
                       dailyLog={item}
-                      // item={item}
                     />
                   ))}
                 </View>
@@ -345,51 +380,89 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
         {/* ================= TAB 2: JOURNAL & METRICS ================= */}
         {activeTab === "journal" && (
           <View className="gap-y-4">
-            {/* CARD THÔNG SỐ SỨC KHỎE (CÂN NẶNG & MOOD) */}
+            {/* CARD THÔNG SỐ SỨC KHỎE */}
             <View className="flex-row items-center gap-x-3">
-              <View className="flex-1 bg-zinc-900 p-3.5 rounded-2xl border border-white/10 flex-row items-center justify-between">
-                <Text className="text-zinc-400 text-xs font-medium">
+              <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-text-base/10 bg-background2 p-3.5">
+                <ThemedText
+                  size="xs"
+                  weight="medium"
+                  color="text"
+                  opacity="medium"
+                >
                   Cân nặng
-                </Text>
+                </ThemedText>
+
                 <View className="flex-row items-baseline">
-                  <Text className="text-amber-400 text-lg font-bold">
+                  <ThemedText size="lg" weight="bold" color="warning">
                     {weight ?? "--"}
-                  </Text>
-                  <Text className="text-zinc-500 text-xs ml-0.5">kg</Text>
+                  </ThemedText>
+
+                  <ThemedText
+                    size="xs"
+                    color="text"
+                    opacity="medium"
+                    style={{ marginLeft: 2 }}
+                  >
+                    kg
+                  </ThemedText>
                 </View>
               </View>
             </View>
 
-            {/* GHI CHÚ (NOTE) */}
-            <View className="bg-zinc-900 rounded-2xl border border-white/10 p-4">
-              <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-2.5">
-                Ghi chú trong ngày
-              </Text>
+            {/* GHI CHÚ */}
+            <View className="rounded-2xl border border-text-base/10 bg-background2 p-4">
+              <ThemedText
+                size="xxs"
+                weight="semibold"
+                color="text"
+                opacity="medium"
+                style={{
+                  letterSpacing: 1.5,
+                  marginBottom: 10,
+                }}
+              >
+                GHI CHÚ TRONG NGÀY
+              </ThemedText>
 
               {note?.note ? (
-                <Text className="text-zinc-200 text-sm leading-6">
+                <ThemedText size="sm" color="text" style={{ lineHeight: 24 }}>
                   {note.note}
-                </Text>
+                </ThemedText>
               ) : (
                 <View className="py-2">
-                  <Text className="text-zinc-600 text-sm italic">
+                  <ThemedText
+                    size="sm"
+                    color="text"
+                    opacity="low"
+                    style={{ fontStyle: "italic" }}
+                  >
                     Chưa có ghi chú nào được thêm.
-                  </Text>
+                  </ThemedText>
                 </View>
               )}
             </View>
 
-            {/* HÌNH ẢNH (IMAGE) - Đã sửa lỗi h-screen */}
+            {/* HÌNH ẢNH */}
             {note?.image_uri && (
-              <View className="bg-zinc-900 rounded-2xl border border-white/10 p-3">
-                <Text className="text-zinc-500 text-[11px] font-semibold uppercase tracking-[1.5px] mb-2.5 ml-1">
-                  Hình ảnh
-                </Text>
+              <View className="rounded-2xl border border-text-base/10 bg-background2 p-3">
+                <ThemedText
+                  size="xxs"
+                  weight="semibold"
+                  color="text"
+                  opacity="medium"
+                  style={{
+                    letterSpacing: 1.5,
+                    marginBottom: 10,
+                    marginLeft: 4,
+                  }}
+                >
+                  HÌNH ẢNH
+                </ThemedText>
 
-                <View className="overflow-hidden rounded-xl bg-zinc-950">
+                <View className="overflow-hidden rounded-xl bg-background">
                   <Image
                     source={{ uri: note.image_uri }}
-                    className="w-full aspect-9/16 rounded-xl"
+                    className="aspect-9/16 w-full rounded-xl"
                     resizeMode="cover"
                   />
                 </View>

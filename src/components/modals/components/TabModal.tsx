@@ -12,7 +12,7 @@ const TabsModal = (modal: Props) => {
   const [tabIndex, setTabIndex] = useState(0);
   return (
     <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
-      {modal.title && <ThemedText type="subtitle">{modal.title}</ThemedText>}
+      {modal.title && <ThemedText size="xxl" weight="semibold">{modal.title}</ThemedText>}
       <ThemedText className="text-gray-700">{modal.message}</ThemedText>
       {modal.subMessage && (
         <ThemedText className="text-sm mt-1.5 text-gray-500">

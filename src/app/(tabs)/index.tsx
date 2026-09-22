@@ -153,7 +153,7 @@ const HomeScreen = () => {
   }, [startTime, isCounting]);
 
   return (
-    <View className="flex-1 bg-main">
+    <View className="flex-1 bg-background">
       <View
         style={{ paddingTop: StatusBar.currentHeight || 0 }}
         className="h-full w-full"
@@ -181,6 +181,7 @@ const HomeScreen = () => {
 
             <View className="-mt-26 items-center justify-center">
               <SwapButton
+                target={currentFastSession?.target_duration}
                 currentFast={currentFastSession}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}

@@ -45,7 +45,8 @@ const Counter = ({
             >
               <ThemedText
                 className={itemClassName}
-                type={type === "large" ? "title" : undefined}
+                size="displayLarge"
+                weight="semibold"
               >
                 {item}
               </ThemedText>

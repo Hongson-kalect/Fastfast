@@ -69,11 +69,7 @@ export const OptionsModal = (props: ListModalProps) => {
           backgroundColor: theme.background,
         }}
       >
-        {props.title && (
-          <ThemedText type='subtitle'>
-            {props.title}
-          </ThemedText>
-        )}
+       {props.title && <ThemedText size='xxl' weight="semibold">{props.title}</ThemedText>}
 
         <ScrollView>
           {props.options.map((option, index) => (

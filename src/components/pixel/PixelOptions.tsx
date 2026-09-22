@@ -17,9 +17,9 @@ const PixelOptions = ({ viewMode, setViewMode, currentGuides }: Props) => {
           className="flex-1 items-center justify-evenly gap-1.5"
         >
           <View className="items-center justify-center">
-            <ThemedText className="text-xl!">{item.emoji}</ThemedText>
+            <ThemedText size='xl'>{item.emoji}</ThemedText>
           </View>
-          <ThemedText className="text-xs! text-white!">{item.label}</ThemedText>
+          <ThemedText size="xs">{item.label}</ThemedText>
           <View
             style={{ backgroundColor: item.color }}
             className="w-3 h-3 rounded-full"

@@ -11,8 +11,9 @@ import { finishFast } from "@/util/home/fast";
 import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useMemo, useRef, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
+import { ThemedText } from "../themed-text";
 
 type Props = {
   startTime: number;
@@ -159,33 +160,40 @@ const FastEndTimeModal = ({
   return (
     <View className="pb-6 pt-4">
       {/* Header */}
-      <View className="flex-row justify-center items-center mb-4">
-        <Text className="text-warning/70 text-sm">
+      <View className="mb-4 flex-row items-center justify-center">
+        <ThemedText size="sm" color="warning" opacity="medium">
           Phiên nhịn không quá {MAX_FAST_HOURS} giờ
-        </Text>
+        </ThemedText>
       </View>
+
       <View className="mb-5">
-        <Text className="text-base font-bold text-white">
+        <ThemedText size="md" weight="bold">
           Chọn thời gian kết thúc
-        </Text>
+        </ThemedText>
       </View>
 
       {/* Selected time */}
-      <View className="items-center justify-center rounded-2xl border border-white/5 bg-zinc-950/60 p-5">
-        <Text className="text-4xl font-bold text-white tabular-nums">
+      <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background/60 p-5">
+        <ThemedText
+          size="xxxl"
+          weight="bold"
+          style={{ fontVariant: ["tabular-nums"] }}
+        >
           {hours.toString().padStart(2, "0")}:
           {minutes.toString().padStart(2, "0")}
-        </Text>
+        </ThemedText>
 
-        <Text
-          className={`mt-2 text-xs font-medium ${
-            date !== today ? "text-warning/90" : "text-white/50"
-          }`}
+        <ThemedText
+          size="xs"
+          weight="medium"
+          color={date !== today ? "warning" : "text"}
+          opacity={date !== today ? "full" : "medium"}
+          style={{ marginTop: 8 }}
         >
           {date !== today
             ? `⚠️ ${getRelativeTime(new Date(date), false)}`
             : "Hôm nay"}
-        </Text>
+        </ThemedText>
       </View>
 
       {/* Slider */}
@@ -199,7 +207,7 @@ const FastEndTimeModal = ({
           value={initialTime}
           step={STEP}
           minimumTrackTintColor={theme.primary}
-          maximumTrackTintColor="rgba(255,255,255,0.12)"
+          maximumTrackTintColor={theme.text + "1F"}
           thumbTintColor={theme.primary}
           thumbTouchSize={{
             width: 40,
@@ -210,37 +218,50 @@ const FastEndTimeModal = ({
         />
 
         <View className="mt-1 flex-row justify-between">
-          <Text className="text-[11px] text-zinc-500">
+          <ThemedText size="xxs" color="text" opacity="medium">
             {getRelativeTime(new Date(startTime))}
-          </Text>
+          </ThemedText>
 
-          <Text className="text-[11px] text-zinc-500">
+          <ThemedText size="xxs" color="text" opacity="medium">
             {formatTime(effectiveMax)}
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
-      <View className="mt-5 rounded-xl bg-zinc-900/70 px-4 py-3">
-        <View className="mt-3 border-t border-white/5 pt-3">
-          <Text
-            className={`text-sm font-semibold ${finishStatus.type === "completed" ? "text-success" : "text-warning"}`}
+      <View className="mt-5 rounded-xl bg-background2/70 px-4 py-3">
+        <View className="mt-3 border-t border-text-base/10 pt-3">
+          <ThemedText
+            size="sm"
+            weight="semibold"
+            color={finishStatus.type === "completed" ? "success" : "warning"}
           >
             {finishStatus.type === "completed" ? "✓ " : "⚠️ "}
             {finishStatus.title}
-          </Text>
-          <Text className="mt-1 text-xs leading-5 text-zinc-500">
+          </ThemedText>
+
+          <ThemedText
+            size="xs"
+            color="text"
+            opacity="medium"
+            style={{ marginTop: 4, lineHeight: 20 }}
+          >
             {finishStatus.description}
-          </Text>
+          </ThemedText>
         </View>
+
         {targetFinishTime && (
-          <View className="mt-3 flex-row justify-between border-t border-white/5 pt-3">
-            <Text className="text-xs text-zinc-500"> Mục tiêu </Text>
-            <Text className="text-xs font-medium text-zinc-300">
+          <View className="mt-3 flex-row justify-between border-t border-text-base/10 pt-3">
+            <ThemedText size="xs" color="text" opacity="medium">
+              Mục tiêu
+            </ThemedText>
+
+            <ThemedText size="xs" weight="medium" color="text" opacity="medium">
               {formatTime(targetFinishTime)}
-            </Text>
+            </ThemedText>
           </View>
         )}
       </View>
+
       {/* Confirm */}
       <TouchableOpacity
         activeOpacity={0.8}
@@ -250,9 +271,9 @@ const FastEndTimeModal = ({
         }}
         className="mt-5 items-center justify-center rounded-2xl bg-error py-3.5"
       >
-        <Text className="text-sm font-bold text-white">
+        <ThemedText size="sm" weight="bold" colorHex="#FFFFFF">
           Xác nhận kết thúc Fast
-        </Text>
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );

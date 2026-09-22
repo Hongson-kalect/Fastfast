@@ -118,112 +118,140 @@ export const GoalCard = () => {
 
   if (!weight)
     return (
-      <View className="items-end mb-4">
+      <View className="mb-4 items-end">
         <Pressable
           onPress={handleSetWeight}
-          className="px-2 py-3 rounded-lg bg-success flex-row items-center gap-1"
+          className="flex-row items-center gap-1 rounded-lg bg-success px-2 py-3"
         >
-          <Feather name="plus" size={16} color="white" />
-          <ThemedText color="white" className="text-sm!">
-            Add current Weigth
+          <Feather name="plus" size={16} color="#FFFFFF" />
+
+          <ThemedText size="sm" weight="medium" colorHex="#FFFFFF">
+            Add current Weight
           </ThemedText>
         </Pressable>
       </View>
     );
 
   return (
-    <View className="mb-4 rounded-2xl border border-zinc-800 bg-primary/40 p-4 h-36">
+    <View
+      className="mb-4 h-36 rounded-2xl p-4"
+      style={{
+        backgroundColor: theme.primary + "40",
+        borderWidth: 1,
+        borderColor: theme.text + "12",
+      }}
+    >
       {/* Header Goal */}
       <View className="flex-row items-center justify-between">
-        {!!weight ? (
-          activeTarget ? (
-            <Pressable
-              onPress={handleSetTarget}
-              className="flex-row items-center gap-2.5"
+        {activeTarget ? (
+          <Pressable
+            onPress={handleSetTarget}
+            className="flex-row items-center gap-2.5"
+          >
+            <View
+              className="h-8 w-8 items-center justify-center rounded-lg"
+              style={{
+                backgroundColor: theme.primary + "50",
+              }}
             >
-              <View className="h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/50">
-                <Text>🎯</Text>
-              </View>
-              <View>
-                <Text className="text-[10px] text-zinc-400">Weight Target</Text>
-                <View className="flex-row items-center gap-1">
-                  <Text className="text-sm text-white font-semibold">
-                    {targetWeight} kg
-                  </Text>
-                  <MaterialIcons name="edit" size={14} color="orange" />
-                </View>
-              </View>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={handleSetTarget}
-              className="px-2 py-3 rounded-lg bg-orange-600"
-            >
-              <ThemedText color="white" className="text-xs!">
-                Set Weight Target
+              <Text>🎯</Text>
+            </View>
+
+            <View>
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Weight Target
               </ThemedText>
-            </Pressable>
-          )
+
+              <View className="flex-row items-center gap-1">
+                <ThemedText size="sm" weight="semibold" color="text">
+                  {targetWeight} kg
+                </ThemedText>
+
+                <MaterialIcons name="edit" size={14} color={theme.warning} />
+              </View>
+            </View>
+          </Pressable>
         ) : (
-          <View></View>
+          <Pressable
+            onPress={handleSetTarget}
+            className="rounded-lg bg-warning px-2 py-3"
+          >
+            <ThemedText size="xs" weight="medium" colorHex="#FFFFFF">
+              Set Weight Target
+            </ThemedText>
+          </Pressable>
         )}
 
         <Pressable
           onPress={handleSetWeight}
-          className="items-end p-1.5 border-dashed border-white/20 rounded-lg border bg-white/10"
+          className="items-end rounded-lg border p-1.5"
+          style={{
+            borderStyle: "dashed",
+            borderColor: theme.text + "20",
+            backgroundColor: theme.text + "10",
+          }}
         >
           <View className="flex-row items-baseline gap-0.5">
-            <MaterialCommunityIcons name="weight" size={16} color="white" />
-            <Text className="text-lg font-bold text-white">
+            <MaterialCommunityIcons
+              name="weight"
+              size={16}
+              color={theme.text}
+            />
+
+            <ThemedText size="lg" weight="bold" color="text">
               {fixed(weight)}
-            </Text>
-            <Text className="text-[10px] text-zinc-400">kg</Text>
+            </ThemedText>
+
+            <ThemedText size="xxs" color="text" opacity="medium">
+              kg
+            </ThemedText>
           </View>
+
           {targetWeight && (
-            <Text className="text-[10px] font-medium text-green-400">
+            <ThemedText size="xxs" weight="medium" color="success">
               -{remaining} kg to go
-            </Text>
+            </ThemedText>
           )}
         </Pressable>
       </View>
 
-      {/* Modern Slim Progress Bar */}
-      {!!weight ? (
-        !!targetWeight ? (
-          <View className="mt-3.5">
-            <View className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-              <Animated.View
-                className="h-full rounded-full bg-primary/80"
-                style={[animatedStyle]}
-              >
-                <LinearGradient
-                  colors={[theme.primary + "aa", theme.primary]}
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }}
-                  style={{
-                    flex: 1,
-                    borderRadius: 999,
-                  }}
-                />
+      {/* Progress */}
+      {targetWeight ? (
+        <View className="mt-3.5">
+          <View className="h-2 w-full overflow-hidden rounded-full bg-background2">
+            <Animated.View
+              className="h-full rounded-full bg-primary/80"
+              style={[animatedStyle]}
+            >
+              <LinearGradient
+                colors={[theme.primary + "AA", theme.primary]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={{
+                  flex: 1,
+                  borderRadius: 999,
+                }}
+              />
             </Animated.View>
-            </View>
-            <View className="mt-1.5 flex-row justify-between">
-              <Text className="text-[10px] text-zinc-500">
-                Start: {startWeight}kg
-              </Text>
-              <Text className="text-[10px] font-semibold text-primary">
-                {Math.round(percentage)}%
-              </Text>
-            </View>
           </View>
-        ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-[12px] text-text-base/50">
-              Set target to measure your progress
-            </Text>
+
+          <View className="mt-1.5 flex-row justify-between">
+            <ThemedText size="xxs" color="text" opacity="medium">
+              Start: {startWeight}kg
+            </ThemedText>
+
+            <ThemedText size="xxs" weight="semibold" color="primary">
+              {Math.round(percentage)}%
+            </ThemedText>
           </View>
-        )
-      ) : null}
+        </View>
+      ) : (
+        <View className="flex-1 items-center justify-center">
+          <ThemedText size="xs" color="text" opacity="low">
+            Set target to measure your progress
+          </ThemedText>
+        </View>
+      )}
     </View>
   );
 };

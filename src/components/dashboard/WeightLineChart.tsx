@@ -128,6 +128,10 @@ const WeightLineChart = ({
     return [chartHeight, arr, rightAxisData];
   }, [data, settings]);
 
+  const rightAxisReversed = useMemo(() => {
+    return rightAxis.reverse();
+  }, [rightAxis]);
+
   const openTimeRangeSheet = () => {
     present(<ChartRangeSheet />);
   };
@@ -166,12 +170,11 @@ const WeightLineChart = ({
 
   return (
     <View className="my-4">
-      <View className="flex-row justify-between items-center mb-3">
-        <View className="items-center justify-center gap-2">
-          <ThemedText className="font-bold! text-base!">
-            Weight & Fast progress
-          </ThemedText>
-        </View>
+      {/* Header */}
+      <View className="mb-3 flex-row items-center justify-between">
+        <ThemedText size="md" weight="bold" color="text">
+          Weight & Fast progress
+        </ThemedText>
 
         <TouchableOpacity
           activeOpacity={0.7}
@@ -179,10 +182,13 @@ const WeightLineChart = ({
           className="flex-row items-center justify-center gap-2"
         >
           <View
-            style={{ borderColor: theme.text + "aa" }}
-            className="flex-row items-center px-2 h-8 border rounded-lg gap-1"
+            className="h-8 flex-row items-center gap-1 rounded-lg px-2"
+            style={{
+              borderWidth: 1,
+              borderColor: theme.text + "AA",
+            }}
           >
-            <ThemedText className="text-sm!">
+            <ThemedText size="xs" color="text">
               Last {settings?.chart_range || 7} days
             </ThemedText>
 
@@ -192,77 +198,111 @@ const WeightLineChart = ({
       </View>
 
       <View
-        style={{ height: 400 }}
-        className="bg-[#1A1C24] py-4 px-2 border border-dashed border-gray-700 rounded-lg"
+        style={{
+          height: 400,
+          backgroundColor: theme.background2,
+          borderWidth: 1,
+          borderStyle: "dashed",
+          borderColor: theme.text + "15",
+        }}
+        className="rounded-lg px-2 py-4"
       >
         <GestureHandlerRootView
-          style={{ flex: 1, paddingRight: 17, paddingLeft: 5 }}
+          style={{
+            flex: 1,
+            paddingRight: 17,
+            paddingLeft: 5,
+          }}
         >
+          {/* Left axis label */}
           <View className="absolute left-0 -top-4 items-end">
             <ThemedText
+              size="xxs"
+              color="text"
+              opacity="medium"
               style={{
                 fontFamily: "MulishRegular",
+                left: 4,
               }}
-              className="text-[9px]! left-1 text-white/50!"
             >
               (h)
             </ThemedText>
           </View>
-          <View className="absolute -right-1 bottom-0 -top-4 justify-between ">
+
+          {/* Right axis */}
+          <View className="absolute -right-1 bottom-0 -top-4 justify-between">
             {!!rightAxis[4] &&
-              rightAxis.reverse().map((item, index) => {
-                if (index === 0)
+              rightAxisReversed.map((item, index) => {
+                if (index === 0) {
                   return (
                     <ThemedText
+                      key={index}
+                      size="xxs"
+                      color="text"
+                      opacity="medium"
                       style={{
                         fontFamily: "MulishRegular",
                       }}
-                      key={index}
-                      className="text-[9px]!  text-white/50!"
                     >
                       (kg)
                     </ThemedText>
                   );
+                }
+
                 return (
                   <ThemedText
+                    key={index}
+                    size="tiny"
+                    color="text"
+                    opacity={[1, 2, 3, 4].includes(index) ? "medium" : "none"}
                     style={{
                       fontFamily: "MulishRegular",
                     }}
-                    key={index}
-                    className={`text-[7px]! text-white/50! ${![1, 2, 3, 4].includes(index) && "opacity-0!"} `}
                   >
                     {item}
                   </ThemedText>
                 );
               })}
           </View>
+
           <CartesianChart
             data={chartData}
             xKey="x"
-            yKeys={["weight", "target", "fast", "weightRatio"]} // fast đã normalize
+            yKeys={["weight", "target", "fast", "weightRatio"]}
             chartPressState={state}
             axisOptions={{
-              font: font,
-              labelColor: theme.white + "88",
-              lineColor: theme.white + "44",
+              font,
+              labelColor: theme.text + "88",
+              lineColor: theme.text + "44",
             }}
-            domainPadding={{ top: 400 / 6, right: 25, bottom: 0, left: 25 }}
+            domainPadding={{
+              top: 400 / 6,
+              right: 25,
+              bottom: 0,
+              left: 25,
+            }}
             domain={{
-              y: [0, chartHeight], // Domain cân nhắc sao cho khoảng dưới thoáng cho Bar
+              y: [0, chartHeight],
             }}
           >
             {({ points, chartBounds }) => {
               return (
                 <>
-                  {/* 1. RENDER BAR (THỜI GIAN NHỊN ĂN) - Lớp nền dưới cùng */}
+                  {/* Fast bars */}
                   <Group opacity={isActive ? 0.5 : 1}>
                     <Bar
-                      points={points.fast} // Truyền từng point riêng rẽ
+                      points={points.fast}
                       chartBounds={chartBounds}
                       color={theme.primary}
-                      roundedCorners={{ topLeft: 2, topRight: 2 }}
-                      barWidth={(width - 64 - 80) / data.length} //80 cho gap
-                      animate={{ type: "timing", duration: 300 }}
+                      roundedCorners={{
+                        topLeft: 2,
+                        topRight: 2,
+                      }}
+                      barWidth={(width - 64 - 80) / chartData.length}
+                      animate={{
+                        type: "timing",
+                        duration: 300,
+                      }}
                     >
                       <LinearGradient
                         start={vec(0, 220)}
@@ -270,9 +310,11 @@ const WeightLineChart = ({
                         colors={[theme.primary, theme.primary + "50"]}
                       />
                     </Bar>
+
                     {!isActive &&
                       points.fast.map((point, index) => {
-                        const val = Number(data[index]?.fast);
+                        const val = Number(chartData[index]?.fast);
+
                         if (!val || val === 0) return null;
 
                         const textStr = `${val}`;
@@ -286,14 +328,13 @@ const WeightLineChart = ({
                             y={(point.y ?? 0) - 4}
                             text={textStr}
                             font={activeBarFont}
-                            color={theme.white + "dd"}
+                            color={theme.text + "DD"}
                           />
                         );
                       })}
                   </Group>
 
-                  {/* 2. RENDER LINE (CÂN NẶNG & TARGET) - Lớp đè phía trên */}
-                  {/* Đường Target */}
+                  {/* Target line */}
                   {points.target && (
                     <Line
                       points={points.target}
@@ -305,37 +346,41 @@ const WeightLineChart = ({
                     </Line>
                   )}
 
-                  {/* Đường Cân Nặng Chính */}
+                  {/* Weight line */}
                   <Line
                     opacity={isActive ? 0.5 : 1}
                     points={points.weightRatio}
-                    curveType="linear" // Dùng natural để đường cân nặng mềm mại hơn
+                    curveType="linear"
                     color={theme.secondary}
                     strokeWidth={2}
-                    animate={{ type: "timing", duration: 300 }}
+                    animate={{
+                      type: "timing",
+                      duration: 300,
+                    }}
                   />
 
-                  {/* 3. STATIC VALUE LABELS (Chỉ hiển thị khi KHÔNG Touch) */}
+                  {/* Static weight labels */}
                   {!isActive &&
                     points.weightRatio.map((point, index) => {
                       const val = chartData[index]?.weight;
                       const prevVal = chartData[index - 1]?.weight;
                       const nextVal = chartData[index + 1]?.weight;
 
-                      if (!val || (val === prevVal && val === nextVal))
+                      if (!val || (val === prevVal && val === nextVal)) {
                         return null;
+                      }
 
                       if (index === chartData.length - 1) {
                         return (
                           <Group key={`weight-label-${index}`}>
                             <Text
-                              key={`weight-label-${index}`}
                               x={point.x - `${val}`.length * 3}
                               y={(point.y ?? 0) - 12}
                               text={`${val}`}
                               font={activeLineFont}
                               color={theme.secondary}
                             />
+
                             <Circle
                               cx={point.x}
                               cy={point.y ?? 0}
@@ -343,7 +388,7 @@ const WeightLineChart = ({
                               color={theme.secondary}
                               opacity={0.3}
                             />
-                            {/* Nút tròn chính bên trong (Inner Solid Circle) */}
+
                             <Circle
                               cx={point.x}
                               cy={point.y ?? 0}
@@ -366,12 +411,12 @@ const WeightLineChart = ({
                       );
                     })}
 
-                  {/* 4. TOOLTIP INTERACTIVE (Khi Press/Pan) */}
+                  {/* Interactive tooltip */}
                   {isActive && state.x.position && (
                     <ActiveTooltip
                       state={state}
                       chartBounds={chartBounds}
-                      length={data.length}
+                      length={chartData.length}
                     />
                   )}
                 </>
@@ -448,16 +493,18 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
 
   return (
     <Group opacity={barOpacity}>
-      {/* Vạch kẻ dọc chỉ ngày đang chọn (Crosshair Line) */}
-      <SkiaLine p1={p1} p2={p2} color={theme.white + "40"} strokeWidth={1} />
+      {/* Crosshair */}
+      <SkiaLine p1={p1} p2={p2} color={theme.text + "40"} strokeWidth={1} />
 
-      {/* Dot điểm cân nặng */}
+      {/* Weight point */}
       <Circle
         cx={state.x.position}
         cy={state.y.weightRatio.position}
         r={6}
-        color={theme.white}
+        color={theme.text}
       />
+
+      {/* Selected bar */}
       <RoundedRect
         x={rectX}
         y={rectY}
@@ -467,14 +514,14 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
         color={theme.primary}
       />
 
-      {/* Panel Tooltip hiển thị đồng thời cả 2 thông số */}
+      {/* Tooltip */}
       <RoundedRect
         x={4}
         y={4}
         width={170}
         height={75}
         r={10}
-        color={theme.background + "CC"}
+        color={theme.background2 + "EE"}
       />
 
       <Text
@@ -482,7 +529,7 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
         y={20}
         text={labelText}
         font={font2}
-        color={theme.white + "CC"}
+        color={theme.text + "CC"}
       />
 
       <Text
@@ -492,6 +539,7 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
         font={font4}
         color={theme.secondary}
       />
+
       <Text x={24} y={60} text={fastText} font={font4} color={theme.primary} />
     </Group>
   );

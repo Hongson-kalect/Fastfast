@@ -11,7 +11,7 @@ const AlertModal = (modal: Props) => {
   const { theme } = useAppStore();
   return (
     <View>
-      {modal.title && <ThemedText type="subtitle">{modal.title}</ThemedText>}
+      {modal.title && <ThemedText size='xxl' weight="semibold">{modal.title}</ThemedText>}
       <ThemedText>{modal.message}</ThemedText>
       {modal.subMessage && (
         <ThemedText className="text-sm mt-1.5 opacity-70">
@@ -31,7 +31,7 @@ const AlertModal = (modal: Props) => {
         <ThemedText
           style={{ fontFamily: "PlaypenSans-Semibold" }}
           className="text-center"
-          color="white"
+          colorHex="white"
         >
           {modal.okText || "OK"}
         </ThemedText>
