@@ -250,7 +250,7 @@ export const CircleCounter = ({
               {/* 1. Đường viền nền phía sau */}
               <Path
                 path={circlePath}
-                color={isCounting ? "#333333" : "#FFFFFF77"}
+                color={theme.text + "40"}
                 style="stroke"
                 strokeWidth={strokeWidth}
               />
@@ -383,12 +383,12 @@ export const CircleCounter = ({
                       Đã hoàn thành
                     </ThemedText>
                   ) : (
-                    <ThemedText size="xxs" color="text" opacity="low">
+                    <ThemedText size="xxs" color="text" opacity="half">
                       Hoàn thành: {getRelativeTime(finishEstimate)}
                     </ThemedText>
                   )
                 ) : (
-                  <ThemedText size="xxs" color="text" opacity="low">
+                  <ThemedText size="xxs" color="text" opacity="half">
                     Free mode
                   </ThemedText>
                 )}
@@ -466,11 +466,11 @@ export const CircleCounter = ({
                 />
 
                 {finishEstimate ? (
-                  <ThemedText size="xxs" color="text" opacity="low">
+                  <ThemedText size="xxs" color="text" opacity="half">
                     Dự kiến: {getRelativeTime(finishEstimate)}
                   </ThemedText>
                 ) : (
-                  <ThemedText size="xxs" color="text" opacity="low">
+                  <ThemedText size="xxs" color="text" opacity="half">
                     Free mode
                   </ThemedText>
                 )}

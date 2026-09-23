@@ -174,3 +174,37 @@ export type HabitEffect = {
   midClaimable: number;
   fullClaimable: number;
 };
+
+export type UserAsset = {
+  id: string;
+  user_id: string;
+  asset_id: string;
+  source: string;
+  purchased_at: string | null;
+  is_deleted: number;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserAchievement = {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  current_value: number;
+  is_deleted: number;
+  unlocked_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserAchievementMilestone = {
+  id: string;
+  user_id: string;
+  achievement_item_id: string;
+  value: number | null;
+  unlocked_at: string;
+  is_deleted: number;
+  created_at: string;
+  updated_at: string;
+};

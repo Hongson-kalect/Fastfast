@@ -47,13 +47,11 @@ const HomeHeader = () => {
   };
 
   const openHabitModal = () => {
-    console.log("Vừng mở ra");
-    if (1 === 1) {
       return present(<HabitBottomSheet />, {
         isRaw: true,
         snapPoints: ["100%"],
       });
-    }
+    
     // present(<HabitBottomSheet />, {
     //   list: {
     //     data: habitLogs,

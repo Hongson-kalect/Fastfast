@@ -45,21 +45,23 @@ export const SwapButton = ({
   toggleCounting,
   currentFast,
   variant = "primary",
-  target,
   loading = false,
   className = "",
   ...props
 }: ButtonProps) => {
   const dbService = useDBService();
   const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-  const { weight, updateWeight } = useAppStore();
+  const { weight, updateWeight, settings } = useAppStore();
 
-  const accent = useMemo(() => {
-    console.log("target hour", target);
-    if (!target) return null;
+  const color = useMemo(() => {
+    console.log("target hour", settings?.target);
+    if (!settings?.target) return theme.primary;
 
-    return FASTING_TARGETS.find((item) => item.hours === target)?.colors.accent;
-  }, [target]);
+    return (
+      FASTING_TARGETS.find((item) => item.hours === settings?.target)?.colors
+        .accent || theme.primary
+    );
+  }, [settings?.target]);
 
   const detectTodayNote = async () => {
     const todayNote = await dbService?.getDailyNote();
@@ -242,31 +244,23 @@ export const SwapButton = ({
             activeOpacity={0.7}
             disabled={loading}
             style={{
-              borderWidth: 2,
-              borderColor: isCounting
-                ? (accent || theme.primary) + "80"
-                : theme.text + "80",
+              borderWidth: 4,
+              borderColor: color,
+              backgroundColor: isCounting ? "transparent" : color,
+              boxShadow: isCounting ? "none" : `1px 2px 4px ${color}`,
             }}
-            className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${
-              isCounting
-                ? "border-2 border-primary/50 bg-background2"
-                : "bg-primary shadow-md shadow-primary"
-            } ${loading ? "opacity-60" : ""} ${className}`}
+            className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${loading ? "opacity-60" : ""} ${className}`}
             {...props}
           >
             {loading ? (
               <ActivityIndicator color={theme.primary} />
             ) : isCounting ? (
-              <FontAwesome6
-                name="stop"
-                size={52}
-                color={accent || theme.primary}
-              />
+              <FontAwesome6 name="stop" size={52} color={color} />
             ) : (
               <FontAwesome6
                 name="play"
                 size={52}
-                color={theme.text}
+                color={"white"}
                 style={{ marginLeft: 8 }}
               />
             )}

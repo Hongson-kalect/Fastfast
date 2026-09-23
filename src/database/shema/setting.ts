@@ -10,74 +10,70 @@ CREATE TABLE IF NOT EXISTS app_settings (
 );
 `;
 
-    // -- Các custom
-    // theme_id TEXT DEFAULT 'default',
-    // effect_id TEXT DEFAULT 'default',
-    // emotion_pack TEXT DEFAULT 'default',
-    // fasting_pack TEXT DEFAULT 'default',
-    // sound_pack TEXT DEFAULT 'default',
-    // notification_id TEXT DEFAULT 'default',
-    // notification_time INTEGER DEFAULT 0,
+// -- Các custom
+// theme_id TEXT DEFAULT 'default',
+// effect_id TEXT DEFAULT 'default',
+// emotion_pack TEXT DEFAULT 'default',
+// fasting_pack TEXT DEFAULT 'default',
+// sound_pack TEXT DEFAULT 'default',
+// notification_id TEXT DEFAULT 'default',
+// notification_time INTEGER DEFAULT 0,
 
 export const getUserSettings = async (
   db: SQLiteDatabase,
 ): Promise<AppSettings | null> => {
-  try{
+  try {
+    const rows = await db.getAllAsync<{
+      key: keyof AppSettings;
+      value: string;
+    }>(`SELECT * FROM app_settings;`);
+    const settingsObj: AppSettings = {};
 
-    const rows = await db.getAllAsync<{ key: keyof AppSettings; value: string }>(
-      `SELECT * FROM app_settings;`,
-    );
-  const settingsObj: AppSettings = {};
-  
-  rows.forEach((row) => {
-    try {
-      settingsObj[row.key] = JSON.parse(row.value);
-    } catch {
-      settingsObj[row.key] = row.value as any;
-    }
-  });
-  return settingsObj;
-}catch(e){
-  console.log('error on getUserSettings', e);
-  return null;}
+    rows.forEach((row) => {
+      try {
+        settingsObj[row.key] = JSON.parse(row.value);
+      } catch {
+        settingsObj[row.key] = row.value as any;
+      }
+    });
+    return settingsObj;
+  } catch (e) {
+    console.log("error on getUserSettings", e);
+    return null;
+  }
 };
 
-export const changeTheme = async(
-  db: SQLiteDatabase,
-  theme: string)=>{
-    await db.runAsync(
-      `INSERT INTO app_settings (key, value, updated_at)
+export const changeTheme = async (db: SQLiteDatabase, theme: string) => {
+  await db.runAsync(
+    `INSERT INTO app_settings (key, value, updated_at)
        VALUES (?, ?, strftime('%s', 'now'))
        ON CONFLICT(key) DO UPDATE SET
          value = excluded.value,
          updated_at = strftime('%s', 'now')`,
-      ["theme_id", theme],
-    );
-    return await getUserSettings(db);
-  }
+    ["theme", theme],
+  );
+  return await getUserSettings(db);
+};
 
 export const toggleTheme = async (
   db: SQLiteDatabase,
   val: boolean,
-): Promise<AppSettings|null> => {
+): Promise<AppSettings | null> => {
   try {
     const stringValue = String(val); // Chuyển boolean thành 'true' hoặc 'false' để lưu vào SQLite TEXT
     const key = "is_dark_mode";
     // Sử dụng db.runAsync để thực thi lệnh INSERT/UPDATE/DELETE
     await db.runAsync(
-  `INSERT INTO app_settings (key, value, updated_at)
+      `INSERT INTO app_settings (key, value, updated_at)
    VALUES (?, ?, strftime('%s', 'now'))
    ON CONFLICT(key) DO UPDATE SET
      value = excluded.value,
      updated_at = strftime('%s', 'now')`,
-  [key, stringValue],
-);
+      [key, stringValue],
+    );
 
     return await getUserSettings(db);
 
-    console.log(
-      `=> [DB] Cập nhật is_dark_mode thành ${stringValue} thành công.`,
-    );
   } catch (error) {
     console.error("Lỗi khi update theme mode trong DB:", error);
     throw error;

@@ -1,6 +1,7 @@
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { Pressable } from "react-native";
 
 const MainTab = () => {
   const { theme } = useAppStore();
@@ -8,6 +9,7 @@ const MainTab = () => {
   return (
     <Tabs
       screenOptions={{
+        tabBarButton: (props) => <TabButton {...props} />,
         tabBarStyle: {
           backgroundColor: theme.background,
           borderTopWidth: 1,
@@ -70,4 +72,19 @@ const MainTab = () => {
     </Tabs>
   );
 };
+
+const TabButton = (props: any) => {
+  const { theme } = useAppStore();
+
+  return (
+    <Pressable
+      {...props}
+      android_ripple={{
+        color: theme.primary + "20",
+        borderless: true,
+      }}
+    />
+  );
+};
+
 export default MainTab;

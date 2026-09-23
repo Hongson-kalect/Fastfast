@@ -72,7 +72,7 @@ import {
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
 import {generateString as userAssetsGenerateString} from "./shema/user_assets";
-import {generateString as userAchievementsGenerateString, itemGenerateString as userArchivementsItemGenerateString} from "./shema/user_archievements";
+import {generateString as userAchievementsGenerateString, itemGenerateString as userArchivementsItemGenerateString} from "./shema/user_achievements";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -174,7 +174,7 @@ ${userSeedData}
 
 export const initDatabase = async (db: SQLiteDatabase) => {
   try {
-    const DATABASE_VERSION = 1; // get from server
+    const DATABASE_VERSION = 2; // get from server
     // let version = 0;
     // await clearDatabase(db);
     const version = await getDatabaseVersion(db);
@@ -182,8 +182,8 @@ export const initDatabase = async (db: SQLiteDatabase) => {
       return;
     }
 
-    if (version >= DATABASE_VERSION) {
-      return;
+    if (version < DATABASE_VERSION) {
+      updateDatabase(db, version);
     }
 
     if (version === 0) {
@@ -191,9 +191,9 @@ export const initDatabase = async (db: SQLiteDatabase) => {
 
       console.log("generateSchema completed");
       await db.execAsync(generateSeedData);
+      await db.execAsync(`PRAGMA user_version = 1`);
     }
 
-    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
   } catch (error) {
     console.error("Lỗi khi tạo DB:", error);
   }
@@ -235,4 +235,24 @@ export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
   await db.execAsync(`PRAGMA user_version = 0;`);
 
   console.log("Database cleared successfully!");
+};
+
+const updateDatabase = async (db: SQLiteDatabase, version: number) => {
+  let lastVersion = version
+  let needUpdate = false
+
+  if(version <=2){
+    await db.execAsync(`
+    ${userAssetsGenerateString}
+    ${userAchievementsGenerateString}
+    ${userArchivementsItemGenerateString}
+  `);
+  lastVersion =2
+  needUpdate = true
+
+  console.log("Database migration v1 -> v2 completed");
+  }
+
+  if(needUpdate)
+  await db.runAsync(`PRAGMA user_version = ?;`,[lastVersion]);
 };

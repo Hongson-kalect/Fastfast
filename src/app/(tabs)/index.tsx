@@ -181,7 +181,6 @@ const HomeScreen = () => {
 
             <View className="-mt-26 items-center justify-center">
               <SwapButton
-                target={currentFastSession?.target_duration}
                 currentFast={currentFastSession}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}

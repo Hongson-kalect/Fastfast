@@ -1,9 +1,5 @@
 // src/store/appStore.ts
-import {
-  defaultDark,
-  extractTheme,
-  ThemeType
-} from "@/constants/themes";
+import { defaultDark, extractTheme, ThemeType } from "@/constants/themes";
 import { createDBService } from "@/database";
 import {
   AppSettings,
@@ -158,6 +154,10 @@ export const useAppStore = create<AppState>((set, get) => {
 
       const theme = extractTheme({ theme: themeId, isDarkMode: currentMode });
       set((state) => ({
+        settings: {
+          ...settings,
+          theme: themeId,
+        },
         theme: theme,
       }));
     },
