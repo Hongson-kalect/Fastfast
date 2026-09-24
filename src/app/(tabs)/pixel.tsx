@@ -491,9 +491,9 @@ const PixelScreen = () => {
         getYearData(year);
       });
 
-      // return () => {
-      //   task.cancel();
-      // };
+      return () => {
+        cancelIdleCallback(task);
+      };
     }, [year, getYearData]),
   );
 

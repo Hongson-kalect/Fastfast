@@ -117,7 +117,7 @@ const DashboardScreen = () => {
         (weightMap[item.key] ?? weightsArr[index - 1]?.weight) || null;
 
       // case ngày có data nằm ngoài range => ngày đầu sẽ lấy last weight
-      if (!weight && weights?.[0].log_date <= item.date) {
+      if (!weight && weights?.[0]?.log_date <= item.date) {
         weight = weights?.[0].weight;
       }
       weightsArr.push({
@@ -141,7 +141,12 @@ const DashboardScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      refreshData();
+      const task = requestIdleCallback(() => {
+        refreshData();
+      });
+      return () => {
+        cancelIdleCallback(task);
+      };
     }, [chartRange, currentFastSession, weight]),
   );
 

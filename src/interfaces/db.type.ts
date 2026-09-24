@@ -179,6 +179,8 @@ export type UserAsset = {
   id: string;
   user_id: string;
   asset_id: string;
+  type:'theme'|'effect'
+  token:string
   source: string;
   purchased_at: string | null;
   is_deleted: number;
@@ -191,6 +193,7 @@ export type UserAchievement = {
   id: string;
   user_id: string;
   achievement_id: string;
+  input: string;
   current_value: number;
   is_deleted: number;
   unlocked_at: string | null;

@@ -74,7 +74,10 @@ const StatCard = ({
   }
 
   return (
-    <View className="w-[48%] rounded-2xl border border-text-base/10 bg-background2/80 p-3.5">
+    <View
+      style={{ opacity: value ? 1 : 0.5 }}
+      className="w-[48%] rounded-2xl border border-text-base/10 bg-background2/80 p-3.5"
+    >
       <View className="mb-2.5 flex-row items-center gap-2">
         <View
           style={{ backgroundColor: color + "15" }}

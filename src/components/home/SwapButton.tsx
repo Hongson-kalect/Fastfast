@@ -51,7 +51,7 @@ export const SwapButton = ({
 }: ButtonProps) => {
   const dbService = useDBService();
   const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-  const { weight, updateWeight, settings } = useAppStore();
+  const { weight, updateWeight, settings, theme } = useAppStore();
 
   const color = useMemo(() => {
     console.log("target hour", settings?.target);
@@ -141,7 +141,6 @@ export const SwapButton = ({
 
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [imageOptionVisible, setImageOptionVisible] = useState(false);
-  const { theme } = useAppStore();
 
   const [tempImage, setTempImage] = useState<string | undefined>(undefined);
 

@@ -11,6 +11,7 @@ import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
 import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { capitalize } from "@/util/text";
 import { useState } from "react";
 
 export default function SettingsScreen() {
@@ -85,7 +86,7 @@ export default function SettingsScreen() {
           <SettingsValueItem
             icon="droplet"
             title="Theme"
-            value="Default"
+            value={capitalize(settings?.theme || "default")}
             onPress={() => {
               openThemeModal();
               // TODO: open Theme BottomSheet

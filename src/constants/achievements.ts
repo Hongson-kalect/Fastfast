@@ -1,272 +1,410 @@
+import { UserAchievement } from "@/interfaces/db.type";
+
 export type AchievementItem = {
   id: string;
-  target: number | null;
+  target: number | boolean;
   title: string;
-  description: string;
-  image: string;
+  image?: string;
 };
+export type AchievementType = "progress" | "max" | "boolean";
+
 export type Achievement = {
   id: string;
   input: AchievementInput;
-  target: number | null;
-  title: string;
+  type: AchievementType;
+  name: string;
   description: string;
-  image: string;
   items: AchievementItem[];
 };
 
 export type AchievementInput =
-  | "completedFast"
-  | "fastHours"
-  | "habit"
-  | "shield"
+| "fastInvalidCount"
+  | "fastFailedCount"
+  | "fastCompletedCount"
+  | "duration"
+  | "habitMax"
+  | "habitGain"
+  | "shieldGain"
   | "shieldFromFast"
   | "shieldFromMilestone"
-  | "retain"
-  | "streak";
+  | "retainGain"
+  | "retainCircleGain"
+  | "streakGain"
+  | "streakMax";
 
-export const achievements = [
-  {
-    id: "first_fast",
-    type: "milestone",
-    name: "First Fast",
-    description: "Complete your first fast.",
-    items: [
-      {
-        id: "first_fast_1",
-        target: null,
-        title: "First Fast",
-        description: "Complete your first fast.",
-        image: "achievement_first_fast",
-      },
-    ],
-  },
+export type AchievementProgressUpdate = {
+  achievementId: string;
+  currentValue: number;
+};
+
+export type AchievementMilestoneUnlock = {
+  achievementId: string;
+  achievementItemId: string;
+  value: number | null;
+};
+
+export type CheckAchievementsResult = {
+  progresses: AchievementProgressUpdate[];
+  milestones: AchievementMilestoneUnlock[];
+};
+
+// Payload chứa giá trị thực tế của user
+export type UserStats = Record<AchievementInput, number>;
+
+export const checkAchievements = (
+  userStats: UserStats,
+  userAchievements: UserAchievement[],
+  unlockedIds: Set<string>,
+): CheckAchievementsResult => {
+  const progresses: AchievementProgressUpdate[] = [];
+  const milestones: AchievementMilestoneUnlock[] = [];
+
+  // ---------------------------------------------------------
+  // 1. Group ACHIEVEMENTS by input
+  // ---------------------------------------------------------
+
+  const achievementsByInput = new Map<AchievementInput, Achievement[]>();
+
+  for (const achievement of ACHIEVEMENTS) {
+    const list = achievementsByInput.get(achievement.input) ?? [];
+
+    list.push(achievement);
+    achievementsByInput.set(achievement.input, list);
+  }
+
+  // ---------------------------------------------------------
+  // 2. Current user achievement lookup
+  // ---------------------------------------------------------
+
+  const currentMap = new Map<string, UserAchievement>();
+
+  for (const achievement of userAchievements) {
+    currentMap.set(achievement.achievement_id, achievement);
+  }
+
+  // ---------------------------------------------------------
+  // 3. Process current event/stat changes
+  // ---------------------------------------------------------
+
+  for (const [input, rawValue] of Object.entries(userStats)) {
+    if (rawValue === undefined || rawValue === null) {
+      continue;
+    }
+
+    const ACHIEVEMENTS = achievementsByInput.get(input as AchievementInput);
+
+    if (!ACHIEVEMENTS?.length) {
+      continue;
+    }
+
+    // -------------------------------------------------------
+    // 4. Process all ACHIEVEMENTS using this input
+    // -------------------------------------------------------
+
+    for (const achievement of ACHIEVEMENTS) {
+      const current = currentMap.get(achievement.id);
+
+      const currentValue = current?.current_value ?? 0;
+
+      let newValue: number | null = null;
+
+      // -----------------------------------------------------
+      // PROGRESS
+      // Accumulate value
+      // -----------------------------------------------------
+
+      if (achievement.type === "progress") {
+        if (typeof rawValue !== "number") {
+          continue;
+        }
+
+        newValue = currentValue + rawValue;
+      }
+
+      // -----------------------------------------------------
+      // MAX
+      // Keep the highest value ever reached
+      // -----------------------------------------------------
+      else if (achievement.type === "max") {
+        if (typeof rawValue !== "number") {
+          continue;
+        }
+
+        newValue = Math.max(currentValue, rawValue);
+      }
+
+      // -----------------------------------------------------
+      // BOOLEAN
+      // One-time achievement/statistic
+      // -----------------------------------------------------
+      else if (achievement.type === "boolean") {
+        if (typeof rawValue !== "boolean") {
+          continue;
+        }
+
+        // Already achieved
+        if (currentValue >= 1) {
+          continue;
+        }
+
+        // Not achieved yet
+        if (!rawValue) {
+          continue;
+        }
+
+        newValue = 1;
+      }
+
+      // Unknown type
+      else {
+        continue;
+      }
+
+      // -----------------------------------------------------
+      // 5. Nothing changed
+      // -----------------------------------------------------
+
+      if (newValue === null || newValue === currentValue) {
+        continue;
+      }
+
+      // -----------------------------------------------------
+      // 6. Store new statistic/progress
+      // -----------------------------------------------------
+
+      progresses.push({
+        achievementId: achievement.id,
+        currentValue: newValue,
+      });
+
+      // -----------------------------------------------------
+      // 7. Check milestones
+      // -----------------------------------------------------
+
+      if (!achievement.items.length) {
+        continue;
+      }
+
+      for (const item of achievement.items) {
+        // Already unlocked
+        if (unlockedIds.has(item.id)) {
+          continue;
+        }
+
+        // Numeric milestone
+        if (typeof item.target === "number") {
+          if (newValue >= item.target) {
+            milestones.push({
+              achievementId: achievement.id,
+              achievementItemId: item.id,
+              value: newValue,
+            });
+          }
+        }
+
+        // Boolean milestone
+        else if (typeof item.target === "boolean") {
+          if (item.target === true && newValue === 1) {
+            milestones.push({
+              achievementId: achievement.id,
+              achievementItemId: item.id,
+              value: null,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    progresses,
+    milestones,
+  };
+};
+
+const SECONDS_IN_HOUR = 60 * 60;
+export const ACHIEVEMENTS: Achievement[] = [
+  // ---------------------------------------------------------
+  // Statistics
+  // ---------------------------------------------------------
 
   {
-    id: "fast_hours",
+    id: "fasting_hours",
+    name: "Total Fasting",
+    description: "Total number of hours spent fasting.",
+    input: "duration",
     type: "progress",
-    name: "Fasting Hours",
-    description: "Accumulate fasting hours.",
     items: [
       {
-        id: "fast_hours_10",
-        target: 10,
-        title: "10 Hours",
-        image: "achievement_fast_10",
+        id: "fasting_hours_10",
+        target: 10 * SECONDS_IN_HOUR,
+        title: "10 fasting hours",
       },
       {
-        id: "fast_hours_50",
-        target: 50,
-        title: "50 Hours",
-        image: "achievement_fast_50",
+        id: "fasting_hours_50",
+        target: 50 * SECONDS_IN_HOUR,
+        title: "50 fasting hours",
       },
       {
-        id: "fast_hours_100",
-        target: 100,
-        title: "100 Hours",
-        image: "achievement_fast_100",
-      },
-      {
-        id: "fast_hours_500",
-        target: 500,
-        title: "500 Hours",
-        image: "achievement_fast_500",
-      },
-      {
-        id: "fast_hours_1000",
-        target: 1000,
-        title: "1000 Hours",
-        image: "achievement_fast_1000",
+        id: "fasting_hours_100",
+        target: 100 * SECONDS_IN_HOUR,
+        title: "100 fasting hours",
       },
     ],
   },
 
+  {
+    id: "invalid_fasts",
+    name: "Invalid Fasts",
+    description: "Total number of invalid fasting sessions.",
+    input: "fastInvalidCount",
+    type: "progress",
+    items: [
+    ],
+  },
+  {
+    id: "failed_fasts",
+    name: "Failed Fasts",
+    description: "Total number of failed fasting sessions.",
+    input: "fastFailedCount",
+    type: "progress",
+    items: [
+    ],
+  },
   {
     id: "completed_fasts",
+    name: "Completed Fasts",
+    description: "Total number of completed fasting sessions.",
+    input: "fastCompletedCount",
     type: "progress",
-    name: "Fasting Journey",
-    description: "Complete fasting sessions.",
     items: [
       {
         id: "completed_fasts_1",
         target: 1,
-        title: "First Step",
-        image: "achievement_fast_count_1",
+        title: "Complete first fasts",
+      },
+      {
+        id: "completed_fasts_5",
+        target: 5,
+        title: "Complete 5 fasts",
       },
       {
         id: "completed_fasts_10",
         target: 10,
-        title: "Getting Started",
-        image: "achievement_fast_count_10",
+        title: "Complete 10 fasts",
       },
       {
         id: "completed_fasts_50",
         target: 50,
-        title: "Dedicated",
-        image: "achievement_fast_count_50",
-      },
-      {
-        id: "completed_fasts_100",
-        target: 100,
-        title: "Committed",
-        image: "achievement_fast_count_100",
+        title: "Complete 50 fasts",
       },
     ],
   },
 
   {
-    id: "longest_fast",
+    id: "active_days",
+    name: "Active Days",
+    description: "Number of days you actively use the app.",
+    input: "streakGain",
     type: "progress",
-    name: "Long Fast",
-    description: "Reach longer fasting durations.",
-    items: [
-      {
-        id: "longest_fast_16",
-        target: 16,
-        title: "16 Hours",
-        image: "achievement_long_fast_16",
-      },
-      {
-        id: "longest_fast_24",
-        target: 24,
-        title: "24 Hours",
-        image: "achievement_long_fast_24",
-      },
-      {
-        id: "longest_fast_36",
-        target: 36,
-        title: "36 Hours",
-        image: "achievement_long_fast_36",
-      },
-      {
-        id: "longest_fast_48",
-        target: 48,
-        title: "48 Hours",
-        image: "achievement_long_fast_48",
-      },
-      {
-        id: "longest_fast_72",
-        target: 72,
-        title: "72 Hours",
-        image: "achievement_long_fast_72",
-      },
-    ],
-  },
-
-  {
-    id: "streak",
-    type: "progress",
-    name: "Consistency",
-    description: "Maintain your fasting habit.",
-    items: [
-      {
-        id: "streak_3",
-        target: 3,
-        title: "3 Days",
-        image: "achievement_streak_3",
-      },
-      {
-        id: "streak_7",
-        target: 7,
-        title: "7 Days",
-        image: "achievement_streak_7",
-      },
-      {
-        id: "streak_30",
-        target: 30,
-        title: "30 Days",
-        image: "achievement_streak_30",
-      },
-      {
-        id: "streak_100",
-        target: 100,
-        title: "100 Days",
-        image: "achievement_streak_100",
-      },
-    ],
-  },
-
-  {
-    id: "shield",
-    type: "progress",
-    name: "Shield Keeper",
-    description: "Earn fasting shields.",
-    items: [
-      {
-        id: "shield_1",
-        target: 1,
-        title: "First Shield",
-        image: "achievement_shield_1",
-      },
-      {
-        id: "shield_5",
-        target: 5,
-        title: "Shield Keeper",
-        image: "achievement_shield_5",
-      },
-      {
-        id: "shield_10",
-        target: 10,
-        title: "Shield Master",
-        image: "achievement_shield_10",
-      },
-    ],
+    items: [],
   },
 
   {
     id: "habit",
-    type: "progress",
-    name: "Fasting Habit",
-    description: "Build your fasting habit.",
+    name: "Habit",
+    description: "Current fasting habit score.",
+    input: "habitMax",
+    type: "max",
     items: [
       {
-        id: "habit_25",
-        target: 25,
-        title: "25 Habit",
-        image: "achievement_habit_25",
+        id: "habit_30",
+        target: 30,
+        title: "Reach 30 habit",
       },
       {
-        id: "habit_50",
-        target: 50,
-        title: "50 Habit",
-        image: "achievement_habit_50",
+        id: "habit_70",
+        target: 70,
+        title: "Reach 70 habit",
       },
       {
         id: "habit_100",
         target: 100,
-        title: "Habit Master",
-        image: "achievement_habit_100",
+        title: "Reach 100 habit",
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------
+  // Records
+  // ---------------------------------------------------------
+
+  {
+    id: "longest_fast",
+    name: "Longest Fast",
+    description: "Longest fasting session ever completed.",
+    input: "duration",
+    type: "max",
+    items: [
+      {
+        id: "longest_fast_16",
+        target: 16 * SECONDS_IN_HOUR,
+        title: "Complete a 16-hour fast",
+      },
+      {
+        id: "longest_fast_24",
+        target: 24 * SECONDS_IN_HOUR,
+        title: "Complete a 24-hour fast",
+      },
+      {
+        id: "longest_fast_36",
+        target: 36 * SECONDS_IN_HOUR,
+        title: "Complete a 36-hour fast",
+      },
+      {
+        id: "longest_fast_48",
+        target: 48 * SECONDS_IN_HOUR,
+        title: "Complete a 48-hour fast",
+      },
+      {
+        id: "longest_fast_72",
+        target: 72 * SECONDS_IN_HOUR,
+        title: "Complete a 72-hour fast",
       },
     ],
   },
 
   {
-    id: "pixel_year",
-    type: "milestone",
-    name: "Pixel Year",
-    description: "Build your first Pixel Year.",
+    id: "max_streak",
+    name: "Longest Streak",
+    description: "Longest fasting streak ever achieved.",
+    input: "streakMax",
+    type: "max",
     items: [
       {
-        id: "pixel_year_1",
-        target: null,
-        title: "First Pixel Year",
-        image: "achievement_pixel_year",
+        id: "max_streak_7",
+        target: 7,
+        title: "Reach a 7-day streak",
+      },
+      {
+        id: "max_streak_30",
+        target: 30,
+        title: "Reach a 30-day streak",
+      },
+      {
+        id: "max_streak_100",
+        target: 100,
+        title: "Reach a 100-day streak",
       },
     ],
   },
 
   {
-    id: "first_rest",
-    type: "milestone",
-    name: "Take a Rest",
-    description: "Use a Shield to protect your habit.",
-    items: [
-      {
-        id: "first_rest_1",
-        target: null,
-        title: "First Rest",
-        image: "achievement_first_rest",
-      },
-    ],
+    id: "total_shields",
+    name: "Total Shields",
+    description: "Total number of shields earned.",
+    input: "shieldGain",
+    type: "progress",
+    items: [],
   },
-] as const;
+];

@@ -13,6 +13,20 @@ export type ThemeType = {
   background2: string;
   card: string;
 };
+type PremiumThemeType = { type: "premium" };
+type NormalThemeType = { type: "normal" };
+type LimitedThemeType = {
+  type: "limited";
+  isMoonTime?: boolean;
+  freeStartAt: string;
+  freeEndAt: string;
+  saleEndAt?: string;
+};
+export type ThemeItem = {
+  light: ThemeType;
+  dark: ThemeType;
+} & (PremiumThemeType | NormalThemeType | LimitedThemeType);
+
 export const defaultDark = {
   primary: "#3B82F6",
   secondary: "#64B5F6",
@@ -31,11 +45,12 @@ export const defaultDark = {
   card: "#1E1E1E",
 };
 
-export const themes = {
+export const themes: { [key: string]: ThemeItem } = {
   // ─────────────────────────────────────────────
   // SKY
   // ─────────────────────────────────────────────
   default: {
+    type: "normal",
     light: {
       primary: "#0284C7",
       secondary: "#0369A1",
@@ -61,6 +76,7 @@ export const themes = {
   // VIOLET
   // ─────────────────────────────────────────────
   violet: {
+    type: "normal",
     light: {
       primary: "#7C3AED",
       secondary: "#6D28D9",
@@ -102,6 +118,7 @@ export const themes = {
   // EMERALD
   // ─────────────────────────────────────────────
   emerald: {
+    type: "premium",
     light: {
       primary: "#059669",
       secondary: "#047857",
@@ -143,6 +160,9 @@ export const themes = {
   // ROSE
   // ─────────────────────────────────────────────
   rose: {
+    type: "limited",
+    freeStartAt: "2026-09-21",
+    freeEndAt: "2026-09-28",
     light: {
       primary: "#E11D48",
       secondary: "#BE123C",
@@ -193,4 +213,45 @@ export const extractTheme = ({
 
   const mode = isDarkMode ?? true;
   return mode ? themeObj["dark"] : themeObj["light"];
+};
+
+type ThemeAccessState =
+  | "available"
+  | "free"
+  | "premium"
+  | "purchase"
+  | "unavailable";
+
+export const getThemeAccess = (
+  themeData: ThemeItem,
+  owned: boolean,
+  now = new Date(),
+): ThemeAccessState => {
+  if (owned) return "available";
+
+  if (themeData.type === "normal") {
+    return "available";
+  }
+
+  if (themeData.type === "premium") {
+    return "premium";
+  }
+
+  const freeStart = themeData.freeStartAt
+    ? new Date(themeData.freeStartAt)
+    : null;
+
+  const freeEnd = themeData.freeEndAt ? new Date(themeData.freeEndAt) : null;
+
+  const saleEnd = themeData.saleEndAt ? new Date(themeData.saleEndAt) : null;
+
+  if ((!freeStart || now >= freeStart) && (!freeEnd || now <= freeEnd)) {
+    return "free";
+  }
+
+  if (!saleEnd || now <= saleEnd) {
+    return "purchase";
+  }
+
+  return "unavailable";
 };

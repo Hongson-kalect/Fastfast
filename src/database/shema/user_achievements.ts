@@ -1,4 +1,4 @@
-import { Achievement, AchievementItem } from "@/constants/achievements";
+import { Achievement, AchievementInput, AchievementItem } from "@/constants/achievements";
 import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS user_achievement (
     user_id TEXT NOT NULL,
 
     achievement_id TEXT NOT NULL,
+    input TEXT NOT NULL,
 
     current_value REAL NOT NULL DEFAULT 0,
 
@@ -17,9 +18,7 @@ CREATE TABLE IF NOT EXISTS user_achievement (
     is_deleted INTEGER DEFAULT 0, 
 
     created_at TEXT NOT NULL DEFAULT (DATETIME('now')),
-    updated_at TEXT NOT NULL DEFAULT (DATETIME('now')),
-
-    UNIQUE (user_id, achievement_id)
+    updated_at TEXT NOT NULL DEFAULT (DATETIME('now'))
 );
 `;
 
@@ -38,25 +37,38 @@ CREATE TABLE IF NOT EXISTS user_achievement_milestone (
     unlocked_at TEXT NOT NULL DEFAULT (DATETIME('now')),
 
     created_at TEXT NOT NULL DEFAULT (DATETIME('now')),
-    updated_at TEXT NOT NULL DEFAULT (DATETIME('now')),
-
-    UNIQUE (user_id, achievement_item_id)
+    updated_at TEXT NOT NULL DEFAULT (DATETIME('now'))
 );
 `;
 
-export const getUserArchievements = async (
+export const getUserAchievements = async (
   db: SQLiteDatabase,
-  userId: string
+  userId: string,
+  inputs?: AchievementInput[]
 ): Promise<UserAchievement[]> => {
-  return db.getAllAsync<UserAchievement>(
+  if (!inputs) {
+   return db.getAllAsync<UserAchievement>(
     `
       SELECT *
       FROM user_achievement
       WHERE user_id = ?
         AND is_deleted = 0
-      ORDER BY created_at DESC
     `,
     [userId]
+  );
+  }
+
+  const placeholders = inputs.map(() => "?").join(", ");
+
+  return db.getAllAsync<UserAchievement>(
+    `
+      SELECT *
+      FROM user_achievement
+      WHERE user_id = ?
+        AND input IN (${placeholders})
+        AND is_deleted = 0
+    `,
+    [userId, ...inputs]
   );
 };
 

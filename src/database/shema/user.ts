@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     id TEXT PRIMARY KEY, -- UUID v7 sinh từ Client
     name TEXT,
     account_type TEXT DEFAULT 'free',
+    account_type_sync_at INTEGER DEFAULT NULL,
     account_type_expried_at INTEGER DEFAULT NULL,
     image_uri TEXT,
 
@@ -115,6 +116,13 @@ export const getUserProfile = async (
     return null;
   }
 };
+
+export const togglePremium = async(db:SQLiteDatabase, isPremium: boolean)=>{
+  const sync_at = isPremium ? Date.now() : null;
+
+  await db.runAsync("update user_profile set account_type = ?, account_type_sync_at = ?",[isPremium, sync_at]);
+  return getUserProfile(db);
+}
 
 // Kiểm trả streak và trả về profile mới
 export const increaseStreak = async (

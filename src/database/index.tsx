@@ -54,6 +54,7 @@ import {
 } from "./shema/theme";
 import {
   getUserProfile,
+  togglePremium,
   generateString as userGenerateString,
   userSeedData,
 } from "./shema/user";
@@ -71,8 +72,15 @@ import {
   getShieldUsedLog,
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
-import {generateString as userAssetsGenerateString} from "./shema/user_assets";
-import {generateString as userAchievementsGenerateString, itemGenerateString as userArchivementsItemGenerateString} from "./shema/user_achievements";
+import {
+  generateString as userAchievementsGenerateString,
+  itemGenerateString as userArchivementsItemGenerateString,
+} from "./shema/user_achievements";
+import {
+  createUserAsset,
+  removeUserAsset,
+  generateString as userAssetsGenerateString,
+} from "./shema/user_assets";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -151,6 +159,26 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getPixelLogData: (year: number) => getPixelLogData(db, year),
   getPixelShielLog: (year: number) => getPixelShielLog(db, year),
   getFastSessionByIds: (ids: string[]) => getFastSessionByIds(db, ids),
+
+  addPurchasedTheme: ({
+    userId,
+    theme,
+    token,
+  }: {
+    userId: string;
+    theme: string;
+    token: string;
+  }) =>
+    createUserAsset(db, {
+      asset_id: theme,
+      type: "theme",
+      source: "purchased",
+      token: token,
+      user_id: userId,
+    }),
+  unPurchasedTheme: (theme: string) => removeUserAsset(db, theme),
+
+  togglePremium: (isPremium: boolean) => togglePremium(db, isPremium),
 });
 
 export const generateSchema = `
@@ -174,26 +202,14 @@ ${userSeedData}
 
 export const initDatabase = async (db: SQLiteDatabase) => {
   try {
-    const DATABASE_VERSION = 2; // get from server
+    const DATABASE_VERSION = 1; // get from server
     // let version = 0;
     // await clearDatabase(db);
     const version = await getDatabaseVersion(db);
-    if (version >= 1) {
-      return;
-    }
 
-    if (version < DATABASE_VERSION) {
-      updateDatabase(db, version);
-    }
+    console.log("db version", version);
 
-    if (version === 0) {
-      await db.execAsync(generateSchema);
-
-      console.log("generateSchema completed");
-      await db.execAsync(generateSeedData);
-      await db.execAsync(`PRAGMA user_version = 1`);
-    }
-
+    await migrateDatabase(db, version, DATABASE_VERSION);
   } catch (error) {
     console.error("Lỗi khi tạo DB:", error);
   }
@@ -237,22 +253,37 @@ export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
   console.log("Database cleared successfully!");
 };
 
-const updateDatabase = async (db: SQLiteDatabase, version: number) => {
-  let lastVersion = version
-  let needUpdate = false
+const migrateDatabase = async (
+  db: SQLiteDatabase,
+  version: number,
+  DATABASE_VERSION: number,
+) => {
+  for (
+    let nextVersion = version + 1;
+    nextVersion <= DATABASE_VERSION;
+    nextVersion++
+  ) {
+    await handleMigrate(db, nextVersion);
+  }
+};
 
-  if(version <=2){
-    await db.execAsync(`
-    ${userAssetsGenerateString}
-    ${userAchievementsGenerateString}
-    ${userArchivementsItemGenerateString}
-  `);
-  lastVersion =2
-  needUpdate = true
+const handleMigrate = async (db: SQLiteDatabase, version: number) => {
+  if (version === 1) {
+    await db.execAsync(generateSchema);
 
-  console.log("Database migration v1 -> v2 completed");
+    console.log("generateSchema completed");
+    await db.execAsync(generateSeedData);
   }
 
-  if(needUpdate)
-  await db.runAsync(`PRAGMA user_version = ?;`,[lastVersion]);
+  // if(version === 2) {
+  //   await db.execAsync(`
+  //   ${userAssetsGenerateString}
+  //   ${userAchievementsGenerateString}
+  //   ${userArchivementsItemGenerateString}
+  // `);
+
+  //   console.log('migrateDB completed to version 2');
+  // }
+
+  await db.execAsync(`PRAGMA user_version = ${version};`);
 };

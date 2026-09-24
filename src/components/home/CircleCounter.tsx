@@ -329,7 +329,7 @@ export const CircleCounter = ({
               <View className="items-center gap-1">
                 {currentTarget ? (
                   <>
-                    <TouchableOpacity onPress={openTargetSheet}>
+                    <TouchableOpacity hitSlop={10} onPress={openTargetSheet}>
                       <ThemedText
                         weight="bold"
                         size="sm"
