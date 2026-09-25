@@ -11,7 +11,7 @@ import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { finishFast } from "@/util/home/fast";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StatusBar, View } from "react-native";
 
 const rating = [
@@ -22,14 +22,13 @@ const rating = [
 ];
 
 const HomeScreen = () => {
-  const {
-    currentFastSession,
-    setCurrentFastSession,
-    settings,
-    userProfile,
-    habit,
-    updateProfile,
-  } = useAppStore();
+  const setCurrentFastSession = useAppStore(
+    (state) => state.setCurrentFastSession,
+  );
+
+  const settings = useAppStore((state) => state.settings);
+
+  const currentFastSession = useAppStore((state) => state.currentFastSession);
   const [startTime, setStartTime] = useState<number | null>(
     currentFastSession?.start_time || null,
   );
@@ -38,7 +37,12 @@ const HomeScreen = () => {
   const { hide } = useBottomSheet();
   const dbService = useDBService();
 
+  const prevSession = useRef(currentFastSession);
+
+  prevSession.current = currentFastSession;
+
   const isCounting = useMemo(() => {
+    console.log("isCounting reset");
     if (!currentFastSession) return false;
     return currentFastSession.end_time ? false : true;
   }, [currentFastSession]);
@@ -119,15 +123,17 @@ const HomeScreen = () => {
     console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
-  const toggleCounting = async (delay?: number) => {
-    //Kết thúc đếm
-    if (isCounting && startTime && currentFastSession) {
-      handleFinishFast(delay);
-    } else {
-      startFast(delay);
-    }
-    // lấy dữ liệu fast lần này để xem ghi vào db
-  };
+  const toggleCounting = useCallback(() => {
+    async (delay?: number) => {
+      //Kết thúc đếm
+      if (isCounting && startTime && currentFastSession) {
+        handleFinishFast(delay);
+      } else {
+        startFast(delay);
+      }
+      // lấy dữ liệu fast lần này để xem ghi vào db
+    };
+  }, []);
 
   const [counter, setCounter] = useState(0);
   const handleCounter = () => {
@@ -151,6 +157,13 @@ const HomeScreen = () => {
 
     return () => clearInterval(interval);
   }, [startTime, isCounting]);
+
+  // if (1 === 1)
+  //   return (
+  //     <View>
+  //       <ThemedText>Home</ThemedText>
+  //     </View>
+  //   );
 
   return (
     <View className="flex-1 bg-background">
@@ -181,7 +194,6 @@ const HomeScreen = () => {
 
             <View className="-mt-26 items-center justify-center">
               <SwapButton
-                currentFast={currentFastSession}
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
                 variant="primary"

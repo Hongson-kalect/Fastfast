@@ -2,6 +2,7 @@ import {
   FastSession,
   HabitLog,
   MoodLevel,
+  UserAsset,
   UserProfile,
 } from "@/interfaces/db.type";
 import * as SQLite from "expo-sqlite";
@@ -78,6 +79,7 @@ import {
 } from "./shema/user_achievements";
 import {
   createUserAsset,
+  getUserAssets,
   removeUserAsset,
   generateString as userAssetsGenerateString,
 } from "./shema/user_assets";
@@ -159,6 +161,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getPixelLogData: (year: number) => getPixelLogData(db, year),
   getPixelShielLog: (year: number) => getPixelShielLog(db, year),
   getFastSessionByIds: (ids: string[]) => getFastSessionByIds(db, ids),
+
+  getUserAssets: (userId: string, type?:UserAsset["type"]) => getUserAssets(db, userId,type),
 
   addPurchasedTheme: ({
     userId,

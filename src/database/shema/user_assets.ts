@@ -24,34 +24,38 @@ CREATE TABLE IF NOT EXISTS user_asset (
 `;
 export const createUserAsset = async (
   db: SQLiteDatabase,
-  data: Omit<UserAsset, "created_at" | "updated_at" | "is_deleted" | 'id'|"purchased_at"| "expires_at">
+  data: Omit<
+    UserAsset,
+    | "created_at"
+    | "updated_at"
+    | "is_deleted"
+    | "id"
+    | "purchased_at"
+    | "expires_at"
+  >,
 ) => {
-  const id = uuidv7()
-  const userId= 
-  await db.runAsync(
+  const id = uuidv7();
+  const userId = await db.runAsync(
     `
       INSERT INTO user_asset (
         id,
         user_id,
+        type,
         asset_id,
-        source,
-        purchased_at,
-        expires_at
+        token,
+        source
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?,?, ?, ?,?)
     `,
-    [
-      id,
-      data.user_id,
-      data.asset_id,
-      data.source
-    ]
+    [id, data.user_id, data.type, data.asset_id, data.token, data.source],
   );
+
+  return await getUserAsset(db, id);
 };
 
 export const getUserAsset = async (
   db: SQLiteDatabase,
-  id: string
+  id: string,
 ): Promise<UserAsset | null> => {
   return db.getFirstAsync<UserAsset>(
     `
@@ -61,7 +65,7 @@ export const getUserAsset = async (
         AND is_deleted = 0
       LIMIT 1
     `,
-    [id]
+    [id],
   );
 };
 
@@ -69,16 +73,30 @@ export const removeUserAsset = async (db: SQLiteDatabase, id: string) => {
   await db.runAsync(
     `
       delete from user_asset
-      WHERE id = ?
+      WHERE asset_id = ?
     `,
-    [id]
+    [id],
   );
-}
+};
 
 export const getUserAssets = async (
   db: SQLiteDatabase,
-  userId: string
+  userId: string,
+  type?: string,
 ): Promise<UserAsset[]> => {
+  if (type) {
+    return db.getAllAsync<UserAsset>(
+      `
+        SELECT *
+        FROM user_asset
+        WHERE user_id = ?
+          AND type = ?
+          AND is_deleted = 0
+        ORDER BY created_at DESC
+      `,
+      [userId, type],
+    );
+  }
   return db.getAllAsync<UserAsset>(
     `
       SELECT *
@@ -87,19 +105,14 @@ export const getUserAssets = async (
         AND is_deleted = 0
       ORDER BY created_at DESC
     `,
-    [userId]
+    [userId],
   );
 };
 
 export const updateUserAsset = async (
   db: SQLiteDatabase,
   id: string,
-  data: Partial<
-    Pick<
-      UserAsset,
-      "source" | "purchased_at" | "expires_at"
-    >
-  >
+  data: Partial<Pick<UserAsset, "source" | "purchased_at" | "expires_at">>,
 ) => {
   await db.runAsync(
     `
@@ -117,14 +130,11 @@ export const updateUserAsset = async (
       data.purchased_at ?? null,
       data.expires_at ?? null,
       id,
-    ]
+    ],
   );
 };
 
-export const deleteUserAsset = async (
-  db: SQLiteDatabase,
-  id: string
-) => {
+export const deleteUserAsset = async (db: SQLiteDatabase, id: string) => {
   await db.runAsync(
     `
       UPDATE user_asset
@@ -134,6 +144,6 @@ export const deleteUserAsset = async (
       WHERE id = ?
         AND is_deleted = 0
     `,
-    [id]
+    [id],
   );
 };

@@ -2,11 +2,11 @@
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyNote, FastSession, MoodLevel } from "@/interfaces/db.type";
+import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -27,7 +27,6 @@ import NoteModal from "./NoteModal";
 
 interface ButtonProps extends TouchableOpacityProps {
   isCounting: boolean;
-  currentFast: FastSession | null;
   toggleCounting: (time?: number) => void;
   variant?: "primary" | "secondary";
   target?: number;
@@ -40,282 +39,287 @@ interface ButtonProps extends TouchableOpacityProps {
   };
 }
 
-export const SwapButton = ({
-  isCounting,
-  toggleCounting,
-  currentFast,
-  variant = "primary",
-  loading = false,
-  className = "",
-  ...props
-}: ButtonProps) => {
-  const dbService = useDBService();
-  const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
-  const { weight, updateWeight, settings, theme } = useAppStore();
+export const SwapButton = React.memo(
+  ({
+    isCounting,
+    toggleCounting,
+    variant = "primary",
+    loading = false,
+    className = "",
+    ...props
+  }: ButtonProps) => {
+    const dbService = useDBService();
+    const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
+    const { updateWeight, weight, currentFastSession, theme, settings } =
+      useAppStore();
+    const target = useAppStore((state) => state.settings?.target);
 
-  const color = useMemo(() => {
-    console.log("target hour", settings?.target);
-    if (!settings?.target) return theme.primary;
+    console.log("Re render swap button ", Math.floor(Date.now() / 1000));
 
-    return (
-      FASTING_TARGETS.find((item) => item.hours === settings?.target)?.colors
-        .accent || theme.primary
-    );
-  }, [settings?.target]);
+    const color = useMemo(() => {
+      if (!settings?.target) return theme.primary;
 
-  const detectTodayNote = async () => {
-    const todayNote = await dbService?.getDailyNote();
-    console.log("todayNote", todayNote);
-    setTodayNote(todayNote || null);
-  };
+      return (
+        FASTING_TARGETS.find((item) => item.hours === settings?.target)?.colors
+          .accent || theme.primary
+      );
+    }, []);
 
-  const getCurrrentWeight = async () => {
-    const weightObj = await dbService?.getCurrentWeight();
-    console.log("weight", weight);
-    updateWeight(weightObj?.weight || 0);
-  };
-
-  const [todayData, setTodayData] = useState<{
-    note?: string;
-    mood?: MoodLevel;
-    image?: string;
-  }>(() => {
-    return {
-      note: todayNote?.note,
-      image: todayNote?.image_uri,
-      mood: todayNote?.mood_level,
+    const detectTodayNote = async () => {
+      const todayNote = await dbService?.getDailyNote();
+      console.log("todayNote", todayNote);
+      setTodayNote(todayNote || null);
     };
-  });
 
-  const baseStyle =
-    "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
-  const variantStyle = isCounting
-    ? "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 "
-    : "bg-primary shadow-md shadow-primary";
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Shared Value chỉ thuần túy phục vụ vẽ hiệu ứng ở UI Thread (0: Đóng, 1: Mở)
-  const animationProgress = useSharedValue(0);
-
-  // Animation cho lớp Overlay nền mờ
-  const overlayStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(animationProgress.value, { duration: 200 }),
+    const getCurrrentWeight = async () => {
+      const weightObj = await dbService?.getCurrentWeight();
+      console.log("weight", weight);
+      updateWeight(weightObj?.weight || 0);
     };
-  });
 
-  // Xử lý bật/tắt Menu điều hướng nhịp nhàng cả 2 luồng
-  const toggleMenu = () => {
-    if (isMenuOpen) {
-      animationProgress.value = 0; // Thu hồi animation về 0
+    const [todayData, setTodayData] = useState<{
+      note?: string;
+      mood?: MoodLevel;
+      image?: string;
+    }>(() => {
+      return {
+        note: todayNote?.note,
+        image: todayNote?.image_uri,
+        mood: todayNote?.mood_level,
+      };
+    });
+
+    const baseStyle =
+      "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
+    const variantStyle = isCounting
+      ? "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 "
+      : "bg-primary shadow-md shadow-primary";
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // Shared Value chỉ thuần túy phục vụ vẽ hiệu ứng ở UI Thread (0: Đóng, 1: Mở)
+    const animationProgress = useSharedValue(0);
+
+    // Animation cho lớp Overlay nền mờ
+    const overlayStyle = useAnimatedStyle(() => {
+      return {
+        opacity: withTiming(animationProgress.value, { duration: 200 }),
+      };
+    });
+
+    // Xử lý bật/tắt Menu điều hướng nhịp nhàng cả 2 luồng
+    const toggleMenu = () => {
+      if (isMenuOpen) {
+        animationProgress.value = 0; // Thu hồi animation về 0
+        setIsMenuOpen(false);
+      } else {
+        setIsMenuOpen(true);
+        animationProgress.value = 1; // Bung animation lên 1
+      }
+    };
+
+    const handleSelectMood = async (
+      mood?: MoodLevel,
+      note?: string,
+      newWeight?: number,
+    ) => {
+      if (!dbService) return console.log("db not ready");
+      console.log("Selected Mood:", mood);
+      // Lưu vào database local của bạn tại đây...
+
+      // Đóng menu an toàn
+      animationProgress.value = 0;
       setIsMenuOpen(false);
-    } else {
-      setIsMenuOpen(true);
-      animationProgress.value = 1; // Bung animation lên 1
-    }
-  };
+      setTodayData({ ...todayData, note: note, mood: mood });
 
-  const handleSelectMood = async (
-    mood?: MoodLevel,
-    note?: string,
-    newWeight?: number,
-  ) => {
-    if (!dbService) return console.log("db not ready");
-    console.log("Selected Mood:", mood);
-    // Lưu vào database local của bạn tại đây...
+      await dbService.setDailyNote(mood, note, todayData?.image);
 
-    // Đóng menu an toàn
-    animationProgress.value = 0;
-    setIsMenuOpen(false);
-    setTodayData({ ...todayData, note: note, mood: mood });
+      if (newWeight && weight !== newWeight) {
+        await dbService.updateWeight(newWeight);
+        updateWeight(newWeight);
+      }
+      // Thêm emoji và node(nếu có vào trong db)
+    };
 
-    await dbService.setDailyNote(mood, note, todayData?.image);
+    const [noteModalVisible, setNoteModalVisible] = useState(false);
+    const [imageOptionVisible, setImageOptionVisible] = useState(false);
 
-    if (newWeight && weight !== newWeight) {
-      await dbService.updateWeight(newWeight);
-      updateWeight(newWeight);
-    }
-    // Thêm emoji và node(nếu có vào trong db)
-  };
+    const [tempImage, setTempImage] = useState<string | undefined>(undefined);
 
-  const [noteModalVisible, setNoteModalVisible] = useState(false);
-  const [imageOptionVisible, setImageOptionVisible] = useState(false);
+    const handleUpdateImage = async (uri: string | undefined) => {
+      if (!dbService) return console.log("db not ready");
+      setTodayData({ ...todayData, image: uri });
 
-  const [tempImage, setTempImage] = useState<string | undefined>(undefined);
+      await dbService.setDailyNote(todayNote?.mood_level, todayNote?.note, uri);
+      console.log(uri);
+      setTempImage(uri);
+    };
 
-  const handleUpdateImage = async (uri: string | undefined) => {
-    if (!dbService) return console.log("db not ready");
-    setTodayData({ ...todayData, image: uri });
+    const { addModal } = useModalStore();
+    const handleDelaySubmit = (selectedTime: number) => {
+      addModal(null);
+      toggleCounting(selectedTime);
+    };
 
-    await dbService.setDailyNote(todayNote?.mood_level, todayNote?.note, uri);
-    console.log(uri);
-    setTempImage(uri);
-  };
-
-  const { addModal } = useModalStore();
-  const handleDelaySubmit = (selectedTime: number) => {
-    addModal(null);
-    toggleCounting(selectedTime);
-  };
-
-  const showDelayModal = () => {
-    if (isCounting && currentFast) {
-      const finishTime = currentFast?.target_duration
-        ? currentFast.start_time + currentFast.target_duration * 60 * 1000
-        : null;
-      return addModal({
+    const showDelayModal = () => {
+      if (isCounting && currentFastSession) {
+        const finishTime = currentFastSession?.target_duration
+          ? currentFastSession.start_time +
+            currentFastSession.target_duration * 60 * 1000
+          : null;
+        return addModal({
+          type: "custom",
+          render: (
+            <FastEndTimeModal
+              startTime={currentFastSession?.start_time}
+              targetFinishTime={finishTime}
+              currentFast={currentFastSession}
+            />
+          ),
+        });
+      }
+      addModal({
         type: "custom",
         render: (
-          <FastEndTimeModal
-            startTime={currentFast?.start_time}
-            targetFinishTime={finishTime}
-            currentFast={currentFast}
+          <FastStartTimeModal
+            minTime={currentFastSession?.end_time}
+            onSubmit={handleDelaySubmit}
           />
         ),
       });
-    }
-    addModal({
-      type: "custom",
-      render: (
-        <FastStartTimeModal
-          minTime={currentFast?.end_time}
-          onSubmit={handleDelaySubmit}
-        />
-      ),
-    });
-  };
-  useEffect(() => {
-    if (!dbService) return;
-    detectTodayNote();
-    getCurrrentWeight();
-  }, [dbService]);
+    };
+    useEffect(() => {
+      if (!dbService) return;
+      detectTodayNote();
+      getCurrrentWeight();
+    }, [dbService]);
 
-  useEffect(() => {
-    if (!todayNote) return;
-    setTodayData({
-      note: todayNote?.note || undefined,
-      image: todayNote?.image_uri || undefined,
-      mood: todayNote?.mood_level || undefined,
-    });
-  }, [todayNote]);
+    useEffect(() => {
+      if (!todayNote) return;
+      setTodayData({
+        note: todayNote?.note || undefined,
+        image: todayNote?.image_uri || undefined,
+        mood: todayNote?.mood_level || undefined,
+      });
+    }, [todayNote]);
 
-  return (
-    <View className="flex-row items-end justify-center gap-4 h-28">
-      <Animated.View
-        style={[overlayStyle]}
-        pointerEvents={isMenuOpen ? "auto" : "none"}
-        className="absolute h-screen w-screen inset-0 bg-red-200/60 z-10"
-      >
-        <Pressable className="flex-1" onPress={toggleMenu} />
-      </Animated.View>
+    return (
+      <View className="flex-row items-end justify-center gap-4 h-28">
+        <Animated.View
+          style={[overlayStyle]}
+          pointerEvents={isMenuOpen ? "auto" : "none"}
+          className="absolute h-screen w-screen inset-0 bg-red-200/60 z-10"
+        >
+          <Pressable className="flex-1" onPress={toggleMenu} />
+        </Animated.View>
 
-      <View className="flex-row gap-7 items-center justify-center z-20 relative w-full">
-        <View className="p-1 mt-4 rounded-full">
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => setImageOptionVisible(true)}
-            disabled={loading}
-            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
-              todayData.image
-                ? "shadow-primary border-primary"
-                : "shadow-text-base/40 border-text-base/40"
-            } ${loading ? "opacity-60" : ""} ${className}`}
-            {...props}
-          >
-            {loading ? (
-              <ActivityIndicator color={theme.primary} />
-            ) : todayData.image ? (
-              <Image
-                source={{ uri: todayData.image }}
-                className="w-18 h-18 rounded-full"
-              />
-            ) : (
-              <Feather name="image" size={28} color={theme.text} />
-            )}
-          </TouchableOpacity>
+        <View className="flex-row gap-7 items-center justify-center z-20 relative w-full">
+          <View className="p-1 mt-4 rounded-full">
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setImageOptionVisible(true)}
+              disabled={loading}
+              className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
+                todayData.image
+                  ? "shadow-primary border-primary"
+                  : "shadow-text-base/40 border-text-base/40"
+              } ${loading ? "opacity-60" : ""} ${className}`}
+              {...props}
+            >
+              {loading ? (
+                <ActivityIndicator color={theme.primary} />
+              ) : todayData.image ? (
+                <Image
+                  source={{ uri: todayData.image }}
+                  className="w-18 h-18 rounded-full"
+                />
+              ) : (
+                <Feather name="image" size={28} color={theme.text} />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View className="rounded-full bg-background p-1">
+            <Pressable
+              onLongPress={showDelayModal}
+              onPress={() => toggleCounting()}
+              activeOpacity={0.7}
+              disabled={loading}
+              style={{
+                borderWidth: 4,
+                borderColor: color,
+                backgroundColor: isCounting ? "transparent" : color,
+                boxShadow: isCounting ? "none" : `1px 2px 4px ${color}`,
+              }}
+              className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${loading ? "opacity-60" : ""} ${className}`}
+              {...props}
+            >
+              {loading ? (
+                <ActivityIndicator color={theme.primary} />
+              ) : isCounting ? (
+                <FontAwesome6 name="stop" size={52} color={color} />
+              ) : (
+                <FontAwesome6
+                  name="play"
+                  size={52}
+                  color={"white"}
+                  style={{ marginLeft: 8 }}
+                />
+              )}
+            </Pressable>
+          </View>
+
+          <View className="p-1 mt-4 rounded-full">
+            <TouchableOpacity
+              onPress={() => setNoteModalVisible(true)}
+              activeOpacity={0.7}
+              disabled={loading}
+              className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
+                todayData.mood
+                  ? "shadow-primary border-primary"
+                  : "shadow-text-base/40 border-text-base/40"
+              } ${loading ? "opacity-60" : ""} ${className}`}
+              {...props}
+            >
+              {loading ? (
+                <ActivityIndicator color={theme.primary} />
+              ) : (
+                <View className="flex-1 items-center justify-center">
+                  {todayData?.mood ? (
+                    <ThemedText size="lg">
+                      {EMOTIONS[todayData.mood].emoji}
+                    </ThemedText>
+                  ) : (
+                    <Feather name="edit-2" size={28} color={theme.text} />
+                  )}
+
+                  {todayData.note && (
+                    <View className="absolute -top-4 right-0">
+                      <Ionicons name="chatbox" size={24} color={theme.text} />
+                    </View>
+                  )}
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Note modal */}
+          <NoteModal
+            visible={noteModalVisible}
+            setVisible={setNoteModalVisible}
+            note={todayData.note}
+            mood={todayData.mood}
+            weight={weight}
+            onSelectMood={handleSelectMood}
+          />
+          <PhotoPickerModal
+            visible={imageOptionVisible}
+            setVisible={setImageOptionVisible}
+            photoUri={todayData.image || tempImage}
+            updateImage={handleUpdateImage}
+          />
         </View>
-
-        <View className="rounded-full bg-background p-1">
-          <Pressable
-            onLongPress={showDelayModal}
-            onPress={() => toggleCounting()}
-            activeOpacity={0.7}
-            disabled={loading}
-            style={{
-              borderWidth: 4,
-              borderColor: color,
-              backgroundColor: isCounting ? "transparent" : color,
-              boxShadow: isCounting ? "none" : `1px 2px 4px ${color}`,
-            }}
-            className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${loading ? "opacity-60" : ""} ${className}`}
-            {...props}
-          >
-            {loading ? (
-              <ActivityIndicator color={theme.primary} />
-            ) : isCounting ? (
-              <FontAwesome6 name="stop" size={52} color={color} />
-            ) : (
-              <FontAwesome6
-                name="play"
-                size={52}
-                color={"white"}
-                style={{ marginLeft: 8 }}
-              />
-            )}
-          </Pressable>
-        </View>
-
-        <View className="p-1 mt-4 rounded-full">
-          <TouchableOpacity
-            onPress={() => setNoteModalVisible(true)}
-            activeOpacity={0.7}
-            disabled={loading}
-            className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
-              todayData.mood
-                ? "shadow-primary border-primary"
-                : "shadow-text-base/40 border-text-base/40"
-            } ${loading ? "opacity-60" : ""} ${className}`}
-            {...props}
-          >
-            {loading ? (
-              <ActivityIndicator color={theme.primary} />
-            ) : (
-              <View className="flex-1 items-center justify-center">
-                {todayData?.mood ? (
-                  <ThemedText size="lg">
-                    {EMOTIONS[todayData.mood].emoji}
-                  </ThemedText>
-                ) : (
-                  <Feather name="edit-2" size={28} color={theme.text} />
-                )}
-
-                {todayData.note && (
-                  <View className="absolute -top-4 right-0">
-                    <Ionicons name="chatbox" size={24} color={theme.text} />
-                  </View>
-                )}
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* Note modal */}
-        <NoteModal
-          visible={noteModalVisible}
-          setVisible={setNoteModalVisible}
-          note={todayData.note}
-          mood={todayData.mood}
-          weight={weight}
-          onSelectMood={handleSelectMood}
-        />
-        <PhotoPickerModal
-          visible={imageOptionVisible}
-          setVisible={setImageOptionVisible}
-          photoUri={todayData.image || tempImage}
-          updateImage={handleUpdateImage}
-        />
       </View>
-    </View>
-  );
-};
+    );
+  },
+);

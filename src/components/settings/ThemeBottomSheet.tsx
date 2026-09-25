@@ -4,9 +4,11 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { getThemeAccess, ThemeItem, themes } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
+import { UserAsset } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
 
 type ThemeBottomSheetProps = {
@@ -20,14 +22,32 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
   isDarkMode,
   onSelect,
 }) => {
-  const { theme } = useAppStore();
+  const { theme, userProfile, settings, updateProfile } = useAppStore();
   const { hide } = useBottomSheet();
 
   // TODO: thay bằng API/store thật
-  const isPremiumUser = false;
-  const userAssets: string[] = [];
+  const isPremiumUser = userProfile?.account_type === "premium" || false;
+  const [userAssets, setUserAssets] = useState<
+    { asset_id: string; id: string; type: "theme" | "effect" }[]
+  >([]);
 
-  const hasAsset = (themeId: string) => userAssets.includes(themeId);
+  const getUserAsset = () => {
+    if (!userProfile) return;
+    dbService?.getUserAssets(userProfile?.id, "theme").then((res) => {
+      setUserAssets(
+        res.map((item: UserAsset) => ({
+          id: item.id,
+          asset_id: item.asset_id,
+          type: item.type,
+        })),
+      );
+    });
+  };
+
+  const hasAsset = (themeId: string) =>
+    !!userAssets.find(
+      (item) => item.asset_id === themeId && item.type === "theme",
+    );
 
   const canUseTheme = (themeData: ThemeItem, themeId: string) => {
     if (themeData.type === "normal") return true;
@@ -41,7 +61,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
     return false;
   };
 
-  const { userProfile, settings, updateProfile } = useAppStore();
   const dbService = useDBService();
   const { addModal } = useModalStore();
   const onPurchased = async (themeId: string) => {
@@ -61,6 +80,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
         });
         Toast.success(`Theme ${themeId} đã mua thành công`);
         onSelect(themeId);
+        hide();
       },
     });
   };
@@ -79,16 +99,24 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
           account_type: !isPremium ? "premium" : "free",
         });
         Toast.success(`Premium=${!isPremium}`);
-        onSelect(themeId);
+
+        if (!isPremium) {
+          onSelect(themeId);
+          hide();
+        }
       },
     });
   };
 
   const onUnPurchase = async (themeId: string) => {
     await dbService?.unPurchasedTheme(themeId);
-    Toast.success(`Theme ${themeId} đã mua thành công`);
-    onSelect(themeId);
+    Toast.success(`Theme ${themeId} đã bị xóa`);
+    // onSelect(themeId);
   };
+
+  useEffect(() => {
+    getUserAsset();
+  }, []);
 
   return (
     <View className="flex-1 bg-background2">
@@ -347,7 +375,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                         className="flex-row items-center px-4 py-2 rounded-xl"
                       >
                         <ThemedText size="sm" colorHex={"white"}>
-                          {usable ? "Be premium" : "Un premium"}
+                          {!usable ? "Be premium" : "Un premium"}
                           {/* Be Premium */}
                         </ThemedText>
                       </Pressable>
