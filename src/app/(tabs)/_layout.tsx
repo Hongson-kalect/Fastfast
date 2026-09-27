@@ -1,4 +1,3 @@
-import { SnowEffect } from "@/components/effect/Snow";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
@@ -9,7 +8,7 @@ const MainTab = () => {
 
   return (
     <>
-      <SnowEffect />
+      {/* <SnowEffect /> */}
 
       <Tabs
         screenOptions={{

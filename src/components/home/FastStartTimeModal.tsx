@@ -11,14 +11,14 @@ type Props = {
   onSubmit: (startTime: number) => void;
 };
 
-const MAX_DELAY_MS = 6 * 60 * 60 * 1000;
+const MAX_DELAY_MS = 24 * 60 * 60 * 1000;
 
 const START_PRESETS = [
-  { label: "30p", minutes: 30 },
-  { label: "1h", minutes: 60 },
   { label: "2h", minutes: 120 },
-  { label: "4h", minutes: 240 },
   { label: "6h", minutes: 360 },
+  { label: "12h", minutes: 720 },
+  { label: "18h", minutes: 1080 },
+  { label: "24h", minutes: 1440 },
 ];
 
 const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
@@ -50,7 +50,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
       Toast.show({
         type: "error",
         text1: "Thời gian không hợp lệ",
-        text2: "Chỉ được phép bắt đầu sớm tối đa 6 giờ!",
+        text2: "Chỉ được phép bắt đầu sớm tối đa 24 giờ!",
       });
       return false;
     }
@@ -111,7 +111,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           opacity="medium"
           style={{ marginTop: 4 }}
         >
-          Có thể bắt đầu sớm hơn hiện tại tối đa 6 giờ
+          Có thể bắt đầu sớm hơn hiện tại tối đa 24 giờ
         </ThemedText>
       </View>
 

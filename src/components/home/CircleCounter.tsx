@@ -55,10 +55,10 @@ const colorRange = {
 
 const padding = 48;
 const MIN_ANGLE = 3;
-const strokeWidth = 16;
+const strokeWidth = 20;
 // const padding = 10;
 // const MIN_ANGLE = 0.1; // Góc xoay tối thiểu nếu cần
-const effect = "Christmas";
+const effect = "None"; // "Christmas" | "None"
 
 const createStarPath = (
   cx: number,

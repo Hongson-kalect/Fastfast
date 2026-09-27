@@ -123,17 +123,19 @@ const HomeScreen = () => {
     console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
-  const toggleCounting = useCallback(() => {
+  const toggleCounting = useCallback(
     async (delay?: number) => {
       //Kết thúc đếm
+      console.log("toggleCounting", isCounting, startTime, currentFastSession);
       if (isCounting && startTime && currentFastSession) {
-        handleFinishFast(delay);
+        await handleFinishFast(delay);
       } else {
-        startFast(delay);
+        await startFast(delay);
       }
       // lấy dữ liệu fast lần này để xem ghi vào db
-    };
-  }, []);
+    },
+    [isCounting, startTime, currentFastSession],
+  );
 
   const [counter, setCounter] = useState(0);
   const handleCounter = () => {
