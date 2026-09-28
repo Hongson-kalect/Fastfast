@@ -1,7 +1,9 @@
 import HomeBodyProgress from "@/components/home/BodyProgress";
 import CircleCounter from "@/components/home/CircleCounter";
 import HomeHeader from "@/components/home/Header";
+import { RecentFastCard } from "@/components/home/LastFastLog";
 import { SwapButton } from "@/components/home/SwapButton";
+import { ThemedText } from "@/components/themed-text";
 import {
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
@@ -11,8 +13,9 @@ import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { finishFast } from "@/util/home/fast";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, StatusBar, View } from "react-native";
+import { ScrollView, StatusBar, TouchableOpacity, View } from "react-native";
 
 const rating = [
   {
@@ -27,6 +30,7 @@ const HomeScreen = () => {
   );
 
   const settings = useAppStore((state) => state.settings);
+  const theme = useAppStore((state) => state.theme);
 
   const currentFastSession = useAppStore((state) => state.currentFastSession);
   const [startTime, setStartTime] = useState<number | null>(
@@ -147,11 +151,11 @@ const HomeScreen = () => {
 
   useEffect(() => {
     let interval = undefined;
+    handleCounter();
     if (!isCounting) {
-      setCounter(0);
+      // setCounter(0);
       return;
     }
-    handleCounter();
 
     interval = setInterval(() => {
       handleCounter();
@@ -174,7 +178,7 @@ const HomeScreen = () => {
         className="h-full w-full"
       >
         <ScrollView keyboardShouldPersistTaps="handled">
-          <View className="px-3">
+          <View className="px-3 mb-12">
             <HomeHeader />
             {/* <View className="pb-2 mt-4">
               <HomeTimeCounter
@@ -201,6 +205,38 @@ const HomeScreen = () => {
                 variant="primary"
               />
             </View>
+
+            <View className="mt-6">
+              {currentFastSession && currentFastSession.end_time ? (
+                <ThemedText size="md" weight="bold" color="primary">
+                  Last fast
+                </ThemedText>
+              ) : (
+                <View className="flex-row items-center justify-between">
+                  <ThemedText size="md" weight="bold" color="primary">
+                    Estimated fasting phase
+                  </ThemedText>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    hitSlop={{ bottom: 10, top: 20, left: 40, right: 10 }}
+                    onPress={() => alert("pressed")}
+                  >
+                    <FontAwesome6
+                      name="question-circle"
+                      size={20}
+                      color={theme.primary + "AA"}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
+            {currentFastSession && currentFastSession.end_time && (
+              <View>
+                <RecentFastCard session={currentFastSession} />
+              </View>
+            )}
+
             <View className="mt-4">
               {/* These indicators reflect general biological stages based on fasting duration. Always listen to your body and consult a healthcare professional before attempting prolonged fasts */}
               <HomeBodyProgress counter={counter} />

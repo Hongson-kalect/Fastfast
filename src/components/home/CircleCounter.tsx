@@ -4,7 +4,7 @@ import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getRelativeTime } from "@/util/timer";
+import { getRelativeDate, getRelativeTime } from "@/util/timer";
 import {
   BlurMask,
   Canvas,
@@ -447,7 +447,7 @@ export const CircleCounter = ({
                     </ThemedText>
                   ) : (
                     <ThemedText size="xxs" color="text" opacity="half">
-                      Hoàn thành: {getRelativeTime(finishEstimate)}
+                      Hoàn thành: {getRelativeDate(finishEstimate)}
                     </ThemedText>
                   )
                 ) : (
@@ -530,7 +530,7 @@ export const CircleCounter = ({
 
                 {finishEstimate ? (
                   <ThemedText size="xxs" color="text" opacity="half">
-                    Dự kiến: {getRelativeTime(finishEstimate)}
+                    Dự kiến: {getRelativeDate(finishEstimate)}
                   </ThemedText>
                 ) : (
                   <ThemedText size="xxs" color="text" opacity="half">

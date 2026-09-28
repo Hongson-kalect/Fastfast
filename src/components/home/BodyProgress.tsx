@@ -2,12 +2,7 @@ import { getProcessLevelTitle, processData } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  LayoutChangeEvent,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { LayoutChangeEvent, useWindowDimensions, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
 
@@ -49,162 +44,143 @@ const HomeBodyProgress = ({ counter }: Props) => {
 
   return (
     <View>
-      <View className="flex-row items-center justify-between">
-        <ThemedText size="md" weight="bold" color="primary">
-          Estimated fasting phase
-        </ThemedText>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          hitSlop={{ bottom: 10, top: 20, left: 40, right: 10 }}
-          onPress={() => alert("pressed")}
-        >
-          <FontAwesome6
-            name="question-circle"
-            size={20}
-            color={theme.primary + "AA"}
-          />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <View className="mt-4 gap-1">
-          {processData.map(({ key, title, icon, color, process }) => {
-            let activeProcess = undefined;
-            let percentage = 0;
-            let startOn = 0;
-            const hours = counter / 3_600;
-            for (let i = 0; i < process.length; i++) {
-              const item = process[i];
-              if (hours < item.hours) {
-                startOn = item.hours * 3_600; // Số mili giây
-                activeProcess = null;
+      <View className="gap-1">
+        {processData.map(({ key, title, icon, color, process }) => {
+          let activeProcess = undefined;
+          let percentage = 0;
+          let startOn = 0;
+          const hours = counter / 3_600;
+          for (let i = 0; i < process.length; i++) {
+            const item = process[i];
+            if (hours < item.hours) {
+              startOn = item.hours * 3_600; // Số mili giây
+              activeProcess = null;
+              break;
+            } else {
+              const nextItem = process[i + 1];
+              if (!nextItem || nextItem.hours > hours) {
+                activeProcess = item;
+                if (!nextItem) percentage = 100;
+                else
+                  percentage =
+                    ((hours - item.hours) / (nextItem.hours - item.hours)) *
+                    100;
                 break;
-              } else {
-                const nextItem = process[i + 1];
-                if (!nextItem || nextItem.hours > hours) {
-                  activeProcess = item;
-                  if (!nextItem) percentage = 100;
-                  else
-                    percentage =
-                      ((hours - item.hours) / (nextItem.hours - item.hours)) *
-                      100;
-                  break;
-                }
               }
             }
+          }
 
-            if (activeProcess === undefined)
-              activeProcess = process[process.length - 1];
+          if (activeProcess === undefined)
+            activeProcess = process[process.length - 1];
 
-            // const percentage = activeProcess?.nextLevel
-            //   ? ((value.hours * 60 +
-            //       value.minutes -
-            //       activeProcess?.hours * 60) /
-            //       activeProcess?.nextLevel) *
-            //     100
-            //   : 100;
+          // const percentage = activeProcess?.nextLevel
+          //   ? ((value.hours * 60 +
+          //       value.minutes -
+          //       activeProcess?.hours * 60) /
+          //       activeProcess?.nextLevel) *
+          //     100
+          //   : 100;
 
-            return (
-              <View key={key} className="flex-row items-center gap-2 py-2">
-                {/* Khối Nhãn & Icon bên trái */}
-                <View className="flex-row items-center gap-2">
-                  <View className="w-5 items-center justify-center">
-                    <FontAwesome6
-                      style={{ opacity: activeProcess ? 1 : 0.6 }}
-                      name={icon}
-                      size={14}
-                      color={activeProcess ? color : theme.text}
-                    />
-                  </View>
-
-                  <ThemedText
-                    size="xs"
-                    weight="regular"
-                    color="text"
-                    opacity={activeProcess ? "half" : "low"}
-                    style={{
-                      width: labelWidth || "auto",
-                      marginRight: 4,
-                    }}
-                    onLayout={detectLabelWidth}
-                  >
-                    {title}
-                  </ThemedText>
+          return (
+            <View key={key} className="flex-row items-center gap-2 py-2">
+              {/* Khối Nhãn & Icon bên trái */}
+              <View className="flex-row items-center gap-2">
+                <View className="w-5 items-center justify-center">
+                  <FontAwesome6
+                    style={{ opacity: activeProcess ? 1 : 0.6 }}
+                    name={icon}
+                    size={14}
+                    color={activeProcess ? color : theme.text}
+                  />
                 </View>
 
-                {/* Khối Thanh Progress + Ô trạng thái động */}
-                {activeProcess ? (
-                  <View className="flex-1 flex-row items-center gap-1">
-                    {/* Thanh Progress */}
-                    {Array.from({ length: 5 }).map((_, index) => {
-                      if (index < activeProcess.level) {
-                        return (
-                          <View
-                            key={index}
-                            style={{
-                              backgroundColor: color,
-                              opacity: 0.5 + (index + 1) * 0.1,
-                            }}
-                            className="h-2 flex-1 rounded-full"
-                          />
-                        );
-                      }
+                <ThemedText
+                  size="xs"
+                  weight="regular"
+                  color="text"
+                  opacity={activeProcess ? "half" : "low"}
+                  style={{
+                    width: labelWidth || "auto",
+                    marginRight: 4,
+                  }}
+                  onLayout={detectLabelWidth}
+                >
+                  {title}
+                </ThemedText>
+              </View>
 
-                      if (percentage && index === activeProcess.level) {
-                        return (
-                          <View
-                            key={index}
-                            className="h-2 flex-1 overflow-hidden rounded-full bg-text-base/30"
-                          >
-                            <View
-                              style={{
-                                width: `${percentage}%`,
-                                backgroundColor: color,
-                              }}
-                              className="h-full rounded-full"
-                            />
-                          </View>
-                        );
-                      }
-
+              {/* Khối Thanh Progress + Ô trạng thái động */}
+              {activeProcess ? (
+                <View className="flex-1 flex-row items-center gap-1">
+                  {/* Thanh Progress */}
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    if (index < activeProcess.level) {
                       return (
                         <View
                           key={index}
-                          className="h-2 flex-1 rounded-full bg-text-base/40"
+                          style={{
+                            backgroundColor: color,
+                            opacity: 0.5 + (index + 1) * 0.1,
+                          }}
+                          className="h-2 flex-1 rounded-full"
                         />
                       );
-                    })}
+                    }
 
-                    {/* Trạng thái */}
-                    <View className="w-16 items-end">
-                      <ThemedText
-                        size="xs"
-                        weight="semibold"
-                        colorHex={color}
-                        opacity="full"
-                        numberOfLines={1}
-                        style={{ letterSpacing: 0.5 }}
-                      >
-                        {getProcessLevelTitle(key, activeProcess.level) || ""}
-                      </ThemedText>
-                    </View>
-                  </View>
-                ) : (
-                  <View className="flex-1 flex-row items-center justify-start gap-1 opacity-40">
-                    <ThemedText size="xs">Start after</ThemedText>
+                    if (percentage && index === activeProcess.level) {
+                      return (
+                        <View
+                          key={index}
+                          className="h-2 flex-1 overflow-hidden rounded-full bg-text-base/30"
+                        >
+                          <View
+                            style={{
+                              width: `${percentage}%`,
+                              backgroundColor: color,
+                            }}
+                            className="h-full rounded-full"
+                          />
+                        </View>
+                      );
+                    }
 
-                    <Counter
-                      counter={counter}
-                      countTo={startOn}
-                      type="small"
-                      itemClassName="text-xs!"
-                    />
+                    return (
+                      <View
+                        key={index}
+                        className="h-2 flex-1 rounded-full bg-text-base/40"
+                      />
+                    );
+                  })}
+
+                  {/* Trạng thái */}
+                  <View className="w-16 items-end">
+                    <ThemedText
+                      size="xs"
+                      weight="semibold"
+                      colorHex={color}
+                      opacity="full"
+                      numberOfLines={1}
+                      style={{ letterSpacing: 0.5 }}
+                    >
+                      {getProcessLevelTitle(key, activeProcess.level) || ""}
+                    </ThemedText>
                   </View>
-                )}
-              </View>
-            );
-          })}
-        </View>
+                </View>
+              ) : (
+                <View className="flex-1 flex-row items-center justify-start gap-1 opacity-30">
+                  <ThemedText size="xs">Available after</ThemedText>
+
+                  <Counter
+                    counter={counter}
+                    countTo={startOn}
+                    type="small"
+                    itemClassName="text-xs!"
+                  />
+                </View>
+              )}
+            </View>
+          );
+        })}
       </View>
     </View>
   );

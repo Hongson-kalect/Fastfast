@@ -1,6 +1,9 @@
 import { CHART_RANGES, ChartRangeKey } from "@/constants/data";
 import {
   differenceInCalendarDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
   format,
   isToday,
   isTomorrow,
@@ -13,7 +16,7 @@ import {
 } from "date-fns";
 
 export const timeString = (time: number) => {
-  const timeCheck = time
+  const timeCheck = time;
   const seconds = timeCheck % 60;
   const minutes = Math.floor(timeCheck / 60) % 60;
   const hours = Math.floor(timeCheck / 60 / 60);
@@ -77,7 +80,7 @@ export const getWeek = (date: Date) => {
   return week;
 };
 
-export const getRelativeTime = (targetDate: Date, showHour = true): string => {
+export const getRelativeDate = (targetDate: Date, showHour = true): string => {
   const timeStr = format(targetDate, "HH:mm");
   const diffDays = differenceInCalendarDays(targetDate, new Date());
   if (isToday(targetDate)) {
@@ -99,6 +102,66 @@ export const getRelativeTime = (targetDate: Date, showHour = true): string => {
     return `${showHour ? timeStr + " " : ""}${diffDays} ngày sau`;
   }
   return `${showHour ? timeStr + " " : ""}${Math.abs(diffDays)} ngày trước`;
+};
+
+export const getRelativeTime = (targetDate: Date, showHour = true): string => {
+  const now = new Date();
+  const timeStr = format(targetDate, "HH:mm");
+
+  const diffSeconds = differenceInSeconds(now, targetDate);
+  const diffMinutes = differenceInMinutes(now, targetDate);
+  const diffHours = differenceInHours(now, targetDate);
+  const diffDays = differenceInCalendarDays(targetDate, now);
+
+  const prefix = showHour ? `${timeStr} ` : "";
+
+  // Trong khoảng 24 giờ: hiển thị thời gian tương đối
+  if (Math.abs(diffSeconds) < 60) {
+    if (diffSeconds === 0) return "Vừa xong";
+
+    return diffSeconds > 0
+      ? `${diffSeconds} giây trước`
+      : `Sau ${Math.abs(diffSeconds)} giây`;
+  }
+
+  if (Math.abs(diffMinutes) < 60) {
+    return diffMinutes > 0
+      ? `${diffMinutes} phút trước`
+      : `Sau ${Math.abs(diffMinutes)} phút`;
+  }
+
+  if (Math.abs(diffHours) < 24) {
+    return diffHours > 0
+      ? `${diffHours} giờ trước`
+      : `Sau ${Math.abs(diffHours)} giờ`;
+  }
+
+  // Từ đây trở đi dùng ngày
+  if (isToday(targetDate)) {
+    return `${prefix}Hôm nay`;
+  }
+
+  if (isTomorrow(targetDate)) {
+    return `${prefix}Ngày mai`;
+  }
+
+  if (isYesterday(targetDate)) {
+    return `${prefix}Hôm qua`;
+  }
+
+  if (diffDays === 2) {
+    return `${prefix}Ngày kia`;
+  }
+
+  if (diffDays === -2) {
+    return `${prefix}2 ngày trước`;
+  }
+
+  if (diffDays > 0) {
+    return `${prefix}${diffDays} ngày sau`;
+  }
+
+  return `${prefix}${Math.abs(diffDays)} ngày trước`;
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");

@@ -1,3 +1,4 @@
+import { AchievementInput, UserStats } from "@/constants/achievements";
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { fixed, numberLimit } from "@/util/numberLimit";
@@ -26,7 +27,6 @@ import {
   SHIELD_LIMIT,
 } from "./habit_logs";
 import { clearStreak, getUserProfile, shield_rewards } from "./user";
-import { AchievementInput, checkAchievements, UserStats } from "@/constants/achievements";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -139,7 +139,7 @@ export const getLastFastSession = async (
 ): Promise<FastSession | null> => {
   try {
     const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions where is_deleted = 0 AND status <> 'failed' ORDER BY updated_at DESC LIMIT 1;`,
+      `SELECT * FROM fast_sessions where is_deleted = 0  ORDER BY updated_at DESC LIMIT 1;`,
     );
     return row;
   } catch (e) {
@@ -220,7 +220,7 @@ export const finishLastSession = async ({
   db: SQLiteDatabase;
   id: string;
   endTime: number;
-}): Promise<{result:FinishFastResult, achievement?:UserStats}> => {
+}): Promise<{ result: FinishFastResult; achievement?: UserStats }> => {
   let achievementObj = undefined;
   let result: {
     lastSession: FastSession | null;
@@ -313,7 +313,7 @@ export const finishLastSession = async ({
       await saveStreakContext(db, streak);
 
       result = {
-        lastSession: returnLastFast,
+        lastSession: await getLastFastSession(db),
         profile: streak.profile,
         habitLog: streak.habitLog,
         streak: streak.stats,
@@ -325,15 +325,13 @@ export const finishLastSession = async ({
     // 6. Completed
     // --------------------------------------------------
 
-    const { lastSession, habitLog: returnHabitLog, achievement } = await handleCompletedFast(
-      db,
-      lastFast,
-      endTime,
-      duration,
-      streak,
-    );
+    const {
+      lastSession,
+      habitLog: returnHabitLog,
+      achievement,
+    } = await handleCompletedFast(db, lastFast, endTime, duration, streak);
 
-    achievementObj = achievement
+    achievementObj = achievement;
 
     result = {
       lastSession: lastSession,
@@ -343,7 +341,7 @@ export const finishLastSession = async ({
     };
   });
 
-  return {result, achievement:achievementObj};
+  return { result, achievement: achievementObj };
 };
 
 const getFastFinishStatus = (duration: number) => {
@@ -408,14 +406,14 @@ const handleCompletedFast = async (
 ) => {
   const reward = calculateFastReward(duration, streak.profile, streak.habitLog);
 
-const achievement: Partial<Record<AchievementInput, number>> = {
-  fastCompletedCount:1,
-  duration: duration,
-  habitGain: reward.habitDelta,
-  habitMax: reward.newHabitScore,
-  shieldGain: reward.totalShieldGain,
-  retainCircleGain: reward.retainCircle,
-};
+  const achievement: Partial<Record<AchievementInput, number>> = {
+    fastCompletedCount: 1,
+    duration: duration,
+    habitGain: reward.habitDelta,
+    habitMax: reward.newHabitScore,
+    shieldGain: reward.totalShieldGain,
+    retainCircleGain: reward.retainCircle,
+  };
 
   // ----------------------------------------
   // Update FastSession
@@ -454,14 +452,14 @@ const achievement: Partial<Record<AchievementInput, number>> = {
 
   applyShieldReward(streak, reward);
 
-  const {streakGain, currentStreak} = applyStreakReward(streak, endTime);
+  const { streakGain, currentStreak } = applyStreakReward(streak, endTime);
   achievement.streakGain = streakGain;
   achievement.streakMax = currentStreak;
 
   return {
     lastSession: sessionUpdated,
     habitLog: lastLog,
-    achievement
+    achievement,
   };
 };
 
@@ -492,7 +490,7 @@ export const calculateFastReward = (
   let newHabitScore = oldHabitScore;
 
   let retainDelta = 0;
-  let retainCircle = 0
+  let retainCircle = 0;
   let newRetain = oldRetain;
 
   let bonusShieldGain = 0;
@@ -510,7 +508,7 @@ export const calculateFastReward = (
     // Retain đủ một vòng
     if (newRetain >= RETAIN_LIMIT) {
       newRetain = 1;
-      retainCircle=1
+      retainCircle = 1;
       bonusShieldGain = 1;
     }
   } else {
