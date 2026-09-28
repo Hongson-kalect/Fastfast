@@ -43,6 +43,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         type: "error",
         text1: "Thời gian không hợp lệ",
         text2: "Trùng thời gian với phiên trước đó!",
+        useModal: true,
       });
       return false;
     }
@@ -51,6 +52,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         type: "error",
         text1: "Thời gian không hợp lệ",
         text2: "Chỉ được phép bắt đầu sớm tối đa 24 giờ!",
+        useModal: true,
       });
       return false;
     }
@@ -60,6 +62,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         type: "error",
         text1: "Thời gian không hợp lệ",
         text2: "Không thể chọn thời gian ở tương lai!",
+        useModal: true,
       });
       return false;
     }

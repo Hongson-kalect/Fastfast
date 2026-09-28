@@ -1,4 +1,6 @@
+import { createDBService } from "@/database";
 import { UserAchievement } from "@/interfaces/db.type";
+import { SQLiteDatabase } from "expo-sqlite";
 
 export type AchievementItem = {
   id: string;
@@ -33,11 +35,14 @@ export type AchievementInput =
   | "streakMax";
 
 export type AchievementProgressUpdate = {
+  userId: string;
+  input:string
   achievementId: string;
   currentValue: number;
 };
 
 export type AchievementMilestoneUnlock = {
+  userId: string;
   achievementId: string;
   achievementItemId: string;
   value: number | null;
@@ -51,13 +56,15 @@ export type CheckAchievementsResult = {
 // Payload chứa giá trị thực tế của user
 export type UserStats = Record<AchievementInput, number>;
 
-export const checkAchievements = (
+export const checkAchievements = async (
+  dbService: ReturnType<typeof createDBService>,
+  userId:string,
   userStats: UserStats,
-  userAchievements: UserAchievement[],
-  unlockedIds: Set<string>,
-): CheckAchievementsResult => {
+): Promise<CheckAchievementsResult> => {
   const progresses: AchievementProgressUpdate[] = [];
   const milestones: AchievementMilestoneUnlock[] = [];
+
+  const {userAchievements, unlockedIds} = await getUserAchievements(dbService,userId, Object.keys(userStats));
 
   // ---------------------------------------------------------
   // 1. Group ACHIEVEMENTS by input
@@ -103,7 +110,6 @@ export const checkAchievements = (
 
     for (const achievement of ACHIEVEMENTS) {
       const current = currentMap.get(achievement.id);
-
       const currentValue = current?.current_value ?? 0;
 
       let newValue: number | null = null;
@@ -173,6 +179,8 @@ export const checkAchievements = (
       // -----------------------------------------------------
 
       progresses.push({
+        userId,
+        input:achievement.input,
         achievementId: achievement.id,
         currentValue: newValue,
       });
@@ -195,6 +203,7 @@ export const checkAchievements = (
         if (typeof item.target === "number") {
           if (newValue >= item.target) {
             milestones.push({
+              userId,
               achievementId: achievement.id,
               achievementItemId: item.id,
               value: newValue,
@@ -206,6 +215,7 @@ export const checkAchievements = (
         else if (typeof item.target === "boolean") {
           if (item.target === true && newValue === 1) {
             milestones.push({
+              userId,
               achievementId: achievement.id,
               achievementItemId: item.id,
               value: null,
@@ -216,9 +226,32 @@ export const checkAchievements = (
     }
   }
 
+  console.log("progresses", progresses, "milestones", milestones);
+
   return {
     progresses,
     milestones,
+  };
+};
+
+export const getUserAchievements = async (
+ dbService: ReturnType<typeof createDBService>,
+  userId: string,
+  inputString: AchievementInput[]
+): Promise<{
+  userAchievements: UserAchievement[];
+  unlockedIds: Set<string>;
+}> => {
+  const userAchievements = await dbService.getUserAchievements(userId, inputString);
+
+  const milestones = await dbService.getUserMilestones(userId);
+  const unlockedIds = new Set(
+    milestones.map((item) => item.achievement_item_id),
+  );
+
+  return {
+    userAchievements,
+    unlockedIds,
   };
 };
 

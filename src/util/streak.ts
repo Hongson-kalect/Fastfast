@@ -182,7 +182,7 @@ export const applyShieldReward = (
   stats.shield.current = Math.min(reward.newShieldScore, SHIELD_LIMIT);
 };
 
-export const applyStreakReward = async (
+export const applyStreakReward = (
   context: StreakContext,
   endTime: number,
 ) => {
@@ -202,6 +202,11 @@ export const applyStreakReward = async (
   );
 
   stats.streak.current = oldProfile.current_streak;
+
+  return {
+    streakGain,
+    currentStreak: oldProfile.current_streak,
+  }
 };
 
 export const applyHabitReward = (

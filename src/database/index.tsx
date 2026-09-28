@@ -2,6 +2,8 @@ import {
   FastSession,
   HabitLog,
   MoodLevel,
+  UserAchievement,
+  UserAchievementMilestone,
   UserAsset,
   UserProfile,
 } from "@/interfaces/db.type";
@@ -74,6 +76,10 @@ import {
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
 import {
+  getUserAchievements,
+  getUserMilestones,
+  updateMileStones,
+  updateUserAchievements,
   generateString as userAchievementsGenerateString,
   itemGenerateString as userArchivementsItemGenerateString,
 } from "./shema/user_achievements";
@@ -83,6 +89,7 @@ import {
   removeUserAsset,
   generateString as userAssetsGenerateString,
 } from "./shema/user_assets";
+import { AchievementInput, AchievementMilestoneUnlock, AchievementProgressUpdate } from "@/constants/achievements";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -180,6 +187,13 @@ export const createDBService = (db: SQLiteDatabase) => ({
       token: token,
       user_id: userId,
     }),
+  getUserAchievements: (userId: string, inputs?: AchievementInput[]) => getUserAchievements(db, userId,inputs),
+  getUserMilestones: (userId: string) => getUserMilestones(db, userId),
+
+  updateMileStones: (milestones: AchievementMilestoneUnlock[]) => updateMileStones(db, milestones),
+  updateUserAchievements: (userAchievements: AchievementProgressUpdate[]) => updateUserAchievements(db, userAchievements),
+
+
   unPurchasedTheme: (theme: string) => removeUserAsset(db, theme),
 
   togglePremium: (isPremium: boolean) => togglePremium(db, isPremium),

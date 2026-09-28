@@ -1,4 +1,4 @@
-import { Achievement, AchievementInput, AchievementItem } from "@/constants/achievements";
+import { Achievement, AchievementInput, AchievementItem, AchievementMilestoneUnlock, AchievementProgressUpdate } from "@/constants/achievements";
 import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
 import { uuidv7 } from "@/util/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS user_achievement_milestone (
 
     is_deleted INTEGER DEFAULT 0, 
     unlocked_at TEXT NOT NULL DEFAULT (DATETIME('now')),
+
+    is_confirmed INTEGER NOT NULL DEFAULT 0,
+    reward TEXT DEFAULT NULL, --JSON
 
     created_at TEXT NOT NULL DEFAULT (DATETIME('now')),
     updated_at TEXT NOT NULL DEFAULT (DATETIME('now'))
@@ -90,202 +93,90 @@ export const getUserArchievement = async (
   );
 };
 
-export type UpdateAchievementResult = {
-  achievement: UserAchievement|null;
-  milestones: UserAchievementMilestone[];
-};export const unlockMilestone = async (
-  db: SQLiteDatabase,
-  userId: string,
-  achievementItemId: string,
-  value: number | null
-): Promise<UserAchievementMilestone | null> => {
-  const id = uuidv7();
-
-  const result = await db.runAsync(
-    `
-      INSERT OR IGNORE INTO user_achievement_milestone (
-        id,
-        user_id,
-        achievement_item_id,
-        value
-      )
-      VALUES (?, ?, ?, ?)
-    `,
-    [id, userId, achievementItemId, value]
-  );
-
-  if (result.changes === 0) {
-    return null;
-  }
-
-  return await db.getFirstAsync<UserAchievementMilestone>(
+export const getUserMilestones = async (db: SQLiteDatabase, userId: string): Promise<UserAchievementMilestone[]> => {
+  return db.getAllAsync<UserAchievementMilestone>(
     `
       SELECT *
       FROM user_achievement_milestone
       WHERE user_id = ?
-        AND achievement_item_id = ?
         AND is_deleted = 0
-      LIMIT 1
     `,
-    [userId, achievementItemId]
+    [userId]
   );
 };
 
-export const updateUserAchievement = async (
+export const updateMileStones = async (
   db: SQLiteDatabase,
-  userId: string,
-  achievementId: string,
-  value: number | boolean,
-  milestonesFromJson: AchievementItem[]
-): Promise<UpdateAchievementResult> => {
-  let achievement!: UserAchievement | null;
-  let newMilestones: UserAchievementMilestone[] = [];
+  milestones: AchievementMilestoneUnlock[],
+) => {
+  if (!milestones.length) return;
 
   await db.withTransactionAsync(async () => {
-    const current = await db.getFirstAsync<UserAchievement>(
-      `
-        SELECT *
-        FROM user_achievement
-        WHERE user_id = ?
-          AND achievement_id = ?
-          AND is_deleted = 0
-        LIMIT 1
-      `,
-      [userId, achievementId]
-    );
-
-    const isBooleanAchievement =
-      typeof value === "boolean";
-
-    /*
-     * Boolean achievement:
-     * - đã hoàn thành -> không cần xử lý nữa
-     *
-     * Numeric achievement:
-     * - luôn update current_value vì nó còn được dùng
-     *   như một statistic hiện tại.
-     */
-    if (current && isBooleanAchievement && current.current_value >= 1) {
-      achievement = current;
-      return;
-    }
-
-    const dbValue =
-      typeof value === "boolean"
-        ? value
-          ? 1
-          : 0
-        : value;
-
-    /*
-     * Upsert achievement
-     */
-    await db.runAsync(
-      `
-        INSERT INTO user_achievement (
+    for (const milestone of milestones) {
+      await db.runAsync(
+        `INSERT INTO user_achievement_milestone (
           id,
           user_id,
           achievement_id,
-          current_value
+          achievement_item_id,
+          value,
+          unlocked_at
         )
-        VALUES (?, ?, ?, ?)
+        SELECT ?, ?, ?, ?, ?, DATETIME('now')
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM user_achievement_milestone
+          WHERE user_id = ?
+            AND achievement_item_id = ?
+            AND is_deleted = 0
+        );`,
+        [
+          uuidv7(),
+          milestone.userId,
+          milestone.achievementId,
+          milestone.achievementItemId,
+          milestone.value,
+          milestone.userId,
+          milestone.achievementItemId,
+        ],
+      );
+    }
+  });
+};
+
+export const updateUserAchievements = async (
+  db: SQLiteDatabase,
+  userAchievements: AchievementProgressUpdate[],
+) => {
+  if (!userAchievements.length) return;
+
+  await db.withTransactionAsync(async () => {
+    for (const achievement of userAchievements) {
+      await db.runAsync(
+        `INSERT INTO user_achievement (
+          id,
+          user_id,
+          achievement_id,
+          input,
+          current_value,
+          updated_at
+        )
+        VALUES (
+          ?, ?, ?, ?, ?, DATETIME('now')
+        )
         ON CONFLICT(user_id, achievement_id)
         DO UPDATE SET
           current_value = excluded.current_value,
-          updated_at = DATETIME('now')
-      `,
-      [
-        current?.id ?? uuidv7(),
-        userId,
-        achievementId,
-        dbValue,
-      ]
-    );
-
-    /*
-     * Lấy lại achievement sau khi update
-     */
-    achievement = await db.getFirstAsync<UserAchievement>(
-      `
-        SELECT *
-        FROM user_achievement
-        WHERE user_id = ?
-          AND achievement_id = ?
-          AND is_deleted = 0
-        LIMIT 1
-      `,
-      [userId, achievementId]
-    );
-
-    if (!achievement || milestonesFromJson.length === 0) {
-      return;
-    }
-
-    /*
-     * Lấy các milestone đã unlock.
-     */
-    const milestonesFromItem =
-      await db.getAllAsync<UserAchievementMilestone>(
-        `
-          SELECT *
-          FROM user_achievement_milestone
-          WHERE user_id = ?
-            AND achievement_item_id IN (
-              ${milestonesFromJson.map(() => "?").join(", ")}
-            )
-            AND is_deleted = 0
-        `,
+          updated_at = DATETIME('now');`,
         [
-          userId,
-          ...milestonesFromJson.map(item => item.id),
-        ]
+          uuidv7(),
+          achievement.userId,
+          achievement.achievementId,
+          // input cần lấy từ ACHIEVEMENTS
+          achievement.input,
+          achievement.currentValue,
+        ],
       );
-
-    const unlockedIds = new Set(
-      milestonesFromItem.map(item => item.achievement_item_id)
-    );
-
-    /*
-     * Kiểm tra milestone dựa trên giá trị MỚI.
-     */
-    for (const milestone of milestonesFromJson) {
-      if (unlockedIds.has(milestone.id)) {
-        continue;
-      }
-
-      let shouldUnlock = false;
-
-      if (typeof milestone.target === "number") {
-        if (typeof value === "number") {
-          shouldUnlock =
-            value >= milestone.target;
-        }
-      } else if (typeof milestone.target === "boolean") {
-        if (typeof value === "boolean") {
-          shouldUnlock =
-            value === milestone.target;
-        }
-      }
-
-      if (!shouldUnlock) {
-        continue;
-      }
-
-      const unlocked = await unlockMilestone(
-        db,
-        userId,
-        milestone.id,
-        typeof value === "number" ? value : null
-      );
-
-      if (unlocked) {
-        newMilestones.push(unlocked);
-      }
     }
   });
-
-  return {
-    achievement,
-    milestones: newMilestones,
-  };
 };

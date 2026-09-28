@@ -141,6 +141,7 @@ const FastEndTimeModal = ({
         type: "error",
         text1: "Thời gian không hợp lệ",
         text2: "Không thể chọn thời gian ở tương lai!",
+        useModal: true,
       });
       return;
     }
@@ -150,6 +151,7 @@ const FastEndTimeModal = ({
         type: "error",
         text1: "Thời gian không hợp lệ",
         text2: "Thời gian kết thúc phải sau thời gian bắt đầu!",
+        useModal: true,
       });
       return;
     }

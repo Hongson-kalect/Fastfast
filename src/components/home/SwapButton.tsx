@@ -63,7 +63,7 @@ export const SwapButton = React.memo(
         FASTING_TARGETS.find((item) => item.hours === settings?.target)?.colors
           .accent || theme.primary
       );
-    }, []);
+    }, [settings?.target, theme.primary]);
 
     const detectTodayNote = async () => {
       const todayNote = await dbService?.getDailyNote();
@@ -242,7 +242,7 @@ export const SwapButton = React.memo(
           <View className="rounded-full bg-background p-1">
             <Pressable
               onLongPress={showDelayModal}
-              onPress={() =>toggleCounting()}
+              onPress={() => toggleCounting()}
               activeOpacity={0.7}
               disabled={loading}
               style={{

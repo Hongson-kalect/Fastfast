@@ -11,6 +11,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { checkStreak } from "./checkStreak";
 import { splitSessionIntoDays } from "./timespliter";
+import { checkAchievements } from "@/constants/achievements";
 
 type FinishFastProps = {
   dbService: ReturnType<typeof createDBService>;
@@ -24,6 +25,8 @@ export const finishFast = async ({
 }: FinishFastProps) => {
   const { userProfile, updateProfile, setCurrentFastSession, updateHabit } =
     useAppStore.getState();
+
+  if(!userProfile) return
   const { addModal } = useModalStore.getState();
 
   const duration = Math.floor(
@@ -31,12 +34,13 @@ export const finishFast = async ({
   );
   const isTooFast = duration < TOO_QUICK_DURATION;
   const isValid = duration > MIN_FAST_DURATION;
-  const { lastSession, habitLog, profile, streak } =
+  const { result, achievement } =
     await dbService?.finishLastSession({
       id: currentFast?.id,
       endTime,
     });
   
+    const { lastSession, habitLog, profile, streak } = result
     console.log("finishFast", {profile,habitLog, streak,lastSession});
 
   // update zustand
@@ -49,6 +53,18 @@ export const finishFast = async ({
   }
 
   setCurrentFastSession(lastSession || null);
+  if(achievement){
+
+   const {milestones,progresses} = await checkAchievements(dbService, userProfile.id, achievement);
+
+   if(milestones.length){
+    dbService.updateMileStones(milestones);
+   }
+
+   if(progresses.length){
+    dbService.updateProgresses(progresses);
+   }
+  }
 
   // Nhập dữ liệu modal result: habit -> ok, lastSession -> duration, target -> ok
 

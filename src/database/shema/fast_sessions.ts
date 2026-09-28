@@ -26,6 +26,7 @@ import {
   SHIELD_LIMIT,
 } from "./habit_logs";
 import { clearStreak, getUserProfile, shield_rewards } from "./user";
+import { AchievementInput, checkAchievements, UserStats } from "@/constants/achievements";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -219,7 +220,8 @@ export const finishLastSession = async ({
   db: SQLiteDatabase;
   id: string;
   endTime: number;
-}): Promise<FinishFastResult> => {
+}): Promise<{result:FinishFastResult, achievement?:UserStats}> => {
+  let achievementObj = undefined;
   let result: {
     lastSession: FastSession | null;
     profile: UserProfile | null;
@@ -323,7 +325,7 @@ export const finishLastSession = async ({
     // 6. Completed
     // --------------------------------------------------
 
-    const { lastSession, habitLog: returnHabitLog } = await handleCompletedFast(
+    const { lastSession, habitLog: returnHabitLog, achievement } = await handleCompletedFast(
       db,
       lastFast,
       endTime,
@@ -331,16 +333,17 @@ export const finishLastSession = async ({
       streak,
     );
 
+    achievementObj = achievement
+
     result = {
       lastSession: lastSession,
       profile: streak.profile,
       habitLog: returnHabitLog,
       streak: streak.stats,
     };
-    return;
   });
 
-  return result;
+  return {result, achievement:achievementObj};
 };
 
 const getFastFinishStatus = (duration: number) => {
@@ -405,6 +408,15 @@ const handleCompletedFast = async (
 ) => {
   const reward = calculateFastReward(duration, streak.profile, streak.habitLog);
 
+const achievement: Partial<Record<AchievementInput, number>> = {
+  fastCompletedCount:1,
+  duration: duration,
+  habitGain: reward.habitDelta,
+  habitMax: reward.newHabitScore,
+  shieldGain: reward.totalShieldGain,
+  retainCircleGain: reward.retainCircle,
+};
+
   // ----------------------------------------
   // Update FastSession
   // ----------------------------------------
@@ -442,11 +454,14 @@ const handleCompletedFast = async (
 
   applyShieldReward(streak, reward);
 
-  applyStreakReward(streak, endTime);
+  const {streakGain, currentStreak} = applyStreakReward(streak, endTime);
+  achievement.streakGain = streakGain;
+  achievement.streakMax = currentStreak;
 
   return {
     lastSession: sessionUpdated,
     habitLog: lastLog,
+    achievement
   };
 };
 
@@ -477,6 +492,7 @@ export const calculateFastReward = (
   let newHabitScore = oldHabitScore;
 
   let retainDelta = 0;
+  let retainCircle = 0
   let newRetain = oldRetain;
 
   let bonusShieldGain = 0;
@@ -494,6 +510,7 @@ export const calculateFastReward = (
     // Retain đủ một vòng
     if (newRetain >= RETAIN_LIMIT) {
       newRetain = 1;
+      retainCircle=1
       bonusShieldGain = 1;
     }
   } else {
@@ -547,6 +564,7 @@ export const calculateFastReward = (
     // Retain
     retainDelta,
     newRetain,
+    retainCircle,
 
     // Shield
     sessionShieldGain,

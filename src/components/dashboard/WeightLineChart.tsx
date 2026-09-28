@@ -275,6 +275,11 @@ const WeightLineChart = ({
               labelColor: theme.text + "88",
               lineColor: theme.text + "44",
             }}
+            xAxis={{
+              font,
+              labelColor: theme.text + "88",
+              tickCount: data.length,
+            }}
             domainPadding={{
               top: 400 / 6,
               right: 25,

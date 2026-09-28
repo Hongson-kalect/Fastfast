@@ -6,7 +6,7 @@ import { ListModal } from "@/components/modals/OptionModal";
 import { Portal, Provider } from "react-native-paper";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GestureHandlerRootView, ScrollView, FlatList } from "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AppWrapper } from "@/components/AppWrapper";
 import { DATABASE_NAME, initDatabase } from "@/database";
@@ -14,6 +14,7 @@ import { BottomSheetProvider } from "@/provider/BottomSheet";
 import { LanguageProvider } from "@/provider/Language";
 import { GlobalModal } from "@/provider/Modal";
 import { ThemeProvider } from "@/provider/theme-provider";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { SQLiteProvider } from "expo-sqlite";
 import { Suspense } from "react";
 import { MenuProvider } from "react-native-popup-menu";
@@ -21,8 +22,7 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-import ToastManager, { Toast } from 'toastify-react-native'
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import ToastManager from "toastify-react-native";
 
 const queryClient = new QueryClient();
 
@@ -37,21 +37,20 @@ export default function TabLayout() {
                 <LanguageProvider>
                   <BottomSheetProvider>
                     <BottomSheetModalProvider>
-                    <Suspense>
-                      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-                        <AppWrapper>
-                          <Stack screenOptions={{ headerShown: false }}>
-                            <Stack.Screen
-                              name="(tabs)"
-                              options={{ title: "Home" }}
-                            />
-                            {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
-                          </Stack>
-                        </AppWrapper>
-                        <ToastManager />
-                      </SafeAreaProvider>
-                    </Suspense>
-
+                      <Suspense>
+                        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                          <AppWrapper>
+                            <Stack screenOptions={{ headerShown: false }}>
+                              <Stack.Screen
+                                name="(tabs)"
+                                options={{ title: "Home" }}
+                              />
+                              {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
+                            </Stack>
+                          </AppWrapper>
+                          <ToastManager useModal={false} />
+                        </SafeAreaProvider>
+                      </Suspense>
                     </BottomSheetModalProvider>
                   </BottomSheetProvider>
                   <Portal>
