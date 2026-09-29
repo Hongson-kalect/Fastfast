@@ -3,7 +3,7 @@ import {
   HabitLog,
   MoodLevel,
   UserAsset,
-  UserProfile
+  UserProfile,
 } from "@/interfaces/db.type";
 import * as SQLite from "expo-sqlite";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -235,16 +235,21 @@ ${userSeedData}
 
 export const initDatabase = async (db: SQLiteDatabase) => {
   try {
-    const DATABASE_VERSION = 1; // get from server
-    // let version = 0;
-    await clearDatabase(db);
+    // ⚡ 1. Tối ưu hiệu năng đọc/ghi cho SQLite (WAL mode)
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      PRAGMA synchronous = NORMAL;
+      PRAGMA foreign_keys = ON;
+    `);
+
+    const DATABASE_VERSION = 1;
     const version = await getDatabaseVersion(db);
 
-    console.log("db version", version);
-
-    await migrateDatabase(db, version, DATABASE_VERSION);
+    if (version < DATABASE_VERSION) {
+      await migrateDatabase(db, version, DATABASE_VERSION);
+    }
   } catch (error) {
-    console.error("Lỗi khi tạo DB:", error);
+    console.error("❌ Lỗi khởi tạo SQLite DB:", error);
   }
 };
 
@@ -264,59 +269,55 @@ export const getDatabaseVersion = async (
     return 0;
   }
 };
-
-export const clearDatabase = async (db: SQLite.SQLiteDatabase) => {
-  // 1. Tắt khóa ngoại tạm thời để xóa cho dễ
-  await db.execAsync(`PRAGMA user_version = 0;`);
-  await db.execAsync("PRAGMA foreign_keys = OFF;");
-
-  // 2. Lấy danh sách tất cả các bảng hiện có (trừ các bảng hệ thống của SQLite)
-  const tables = await db.getAllAsync<{ name: string }>(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';",
-  );
-
-  // 3. Xóa từng bảng
-  for (const table of tables) {
-    await db.execAsync(`DROP TABLE IF EXISTS ${table.name};`);
-  }
-
-  // 4. Reset version về 0 để hàm migrateDbIfNeeded chạy lại từ đầu
-  await db.execAsync(`PRAGMA user_version = 0;`);
-
-  console.log("Database cleared successfully!");
-};
-
 const migrateDatabase = async (
   db: SQLiteDatabase,
-  version: number,
-  DATABASE_VERSION: number,
+  currentVersion: number,
+  targetVersion: number
 ) => {
-  for (
-    let nextVersion = version + 1;
-    nextVersion <= DATABASE_VERSION;
-    nextVersion++
-  ) {
-    await handleMigrate(db, nextVersion);
+  for (let v = currentVersion + 1; v <= targetVersion; v++) {
+    await handleMigrate(db, v);
   }
 };
 
 const handleMigrate = async (db: SQLiteDatabase, version: number) => {
-  if (version === 1) {
-    await db.execAsync(generateSchema);
+  // ⚡ 2. Bọc toàn bộ migration trong Transaction để đảm bảo tính toàn vẹn dữ liệu
+  await db.withTransactionAsync(async () => {
+    if (version === 1) {
+      await db.execAsync(generateSchema);
+      console.log("✅ Schema generated successfully");
 
-    console.log("generateSchema completed");
-    await db.execAsync(generateSeedData);
+      if (generateSeedData.trim()) {
+        await db.execAsync(generateSeedData);
+        console.log("✅ Seed data inserted successfully");
+      }
+    }
+
+    // Cập nhật version trong cùng transaction
+    await db.execAsync(`PRAGMA user_version = ${version};`);
+  });
+};
+
+export const clearDatabase = async (db: SQLiteDatabase) => {
+  try {
+    await db.withTransactionAsync(async () => {
+      await db.execAsync("PRAGMA foreign_keys = OFF;");
+
+      const tables = await db.getAllAsync<{ name: string }>(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"
+      );
+
+      if (tables.length > 0) {
+        const dropStatements = tables
+          .map((t) => `DROP TABLE IF EXISTS ${t.name};`)
+          .join("\n");
+        await db.execAsync(dropStatements);
+      }
+
+      await db.execAsync(`PRAGMA user_version = 0;`);
+      await db.execAsync("PRAGMA foreign_keys = ON;");
+    });
+    console.log("🧹 Clear Database thành công!");
+  } catch (error) {
+    console.error("Lỗi clear Database:", error);
   }
-
-  // if(version === 2) {
-  //   await db.execAsync(`
-  //   ${userAssetsGenerateString}
-  //   ${userAchievementsGenerateString}
-  //   ${userArchivementsItemGenerateString}
-  // `);
-
-  //   console.log('migrateDB completed to version 2');
-  // }
-
-  await db.execAsync(`PRAGMA user_version = ${version};`);
 };

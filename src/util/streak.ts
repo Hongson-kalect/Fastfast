@@ -133,7 +133,7 @@ export const saveStreakContext = async (
   db: SQLiteDatabase,
   context: StreakContext,
 ) => {
-  const { profile, habitLog } = context;
+  const { profile } = context;
 
   await db.runAsync(
     `UPDATE user_profile

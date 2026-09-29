@@ -2,7 +2,10 @@ import { ChartRangeConfig, MONTHS } from "@/constants/data";
 import { getMonth, getWeek } from "date-fns";
 import { getLocalTodayStr, getStartDateFromRange } from "../timer";
 
-export const getBucketKey = (date: Date, unit: ChartRangeConfig["unit"]) => {
+export const getBucketKey = (
+  date: Date,
+  unit: ChartRangeConfig["unit"],
+) => {
   switch (unit) {
     case "day":
       return getLocalTodayStr(date);
@@ -15,48 +18,53 @@ export const getBucketKey = (date: Date, unit: ChartRangeConfig["unit"]) => {
   }
 };
 
-export const initChartData = (chart_range: ChartRangeConfig) => {
-  const start = getStartDateFromRange(chart_range.key);
-  const dayPointer = start;
+export const initChartData = (chartRange: ChartRangeConfig) => {
+  const start = getStartDateFromRange(chartRange.key);
+  const dayPointer = new Date(start);
+
   const res = [];
 
-  if (chart_range.unit === "day") {
-    for (let i = 0; i < chart_range.value; i++) {
-      const day = getLocalTodayStr(dayPointer);
-      res.push({
-        key: getBucketKey(dayPointer, chart_range.unit),
-        x: day.slice(5),
-        weight: 0,
-        fast: 0,
-        date: getLocalTodayStr(dayPointer),
-      });
-      dayPointer.setDate(dayPointer.getDate() + 1);
-    }
-    return res;
-  }
+  for (let i = 0; i < chartRange.value; i++) {
+    const date = getLocalTodayStr(dayPointer);
 
-  if (chart_range.unit === "week") {
-    for (let i = 0; i < chart_range.value; i++) {
+    if (chartRange.unit === "day") {
       res.push({
-        key: getBucketKey(dayPointer, chart_range.unit),
-        x: "Week " + getWeek(dayPointer),
+        key: getBucketKey(dayPointer, "day"),
+        x: date.slice(5),
         weight: 0,
         fast: 0,
-        date: getLocalTodayStr(dayPointer),
+        date,
       });
-      dayPointer.setDate(dayPointer.getDate() + 7);
+
+      dayPointer.setDate(dayPointer.getDate() + 1);
+      continue;
     }
-    return res;
-  }
-  for (let i = 0; i < chart_range.value; i++) {
+
+    if (chartRange.unit === "week") {
+      res.push({
+        key: getBucketKey(dayPointer, "week"),
+        x: `Week ${getWeek(dayPointer)}`,
+        weight: 0,
+        fast: 0,
+        date,
+      });
+
+      dayPointer.setDate(dayPointer.getDate() + 7);
+      continue;
+    }
+
     res.push({
-      key: getBucketKey(dayPointer, chart_range.unit),
+      key: getBucketKey(dayPointer, "month"),
       x: MONTHS[getMonth(dayPointer)],
       weight: 0,
       fast: 0,
-      date: getLocalTodayStr(dayPointer),
+      date,
     });
+
+    // Tránh Jan 31 -> Mar 03 khi chuyển tháng.
+    dayPointer.setDate(1);
     dayPointer.setMonth(dayPointer.getMonth() + 1);
   }
+
   return res;
 };

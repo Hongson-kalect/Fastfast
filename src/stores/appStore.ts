@@ -1,183 +1,220 @@
 // src/store/appStore.ts
-import { defaultDark, extractTheme, ThemeType } from "@/constants/themes";
-import { createDBService } from "@/database";
+
+import { defaultDark, ThemeType } from "@/constants/themes";
 import {
   AppSettings,
   FastSession,
   HabitLog,
   UserProfile,
 } from "@/interfaces/db.type";
-import { StreakCheckResult } from "@/interfaces/home.type";
-import { handleLogin } from "@/util/login";
-import * as Localization from "expo-localization";
-import { SQLiteDatabase } from "expo-sqlite";
 import { create } from "zustand";
 
 interface AppState {
+  // User
   userProfile: UserProfile | null;
   habit: HabitLog | null;
-
-  settings: AppSettings | null;
   weight: number | null;
+
+  // Fast
   currentFastSession: FastSession | null;
-  // configs: SystemConfigObj | null;
+
+  // Settings
+  settings: AppSettings | null;
+
+  // Appearance / Locale
   theme: ThemeType;
-  isLoadingData: boolean;
   language: string;
+
+  // App lifecycle
+  isLoadingData: boolean;
   isHydrated: boolean;
 
-  // Hàm cốt lõi để nạp dữ liệu từ local DB lên RAM Zustand
-  init: (db: SQLiteDatabase) => Promise<{
-    streak: StreakCheckResult | null;
-    modal?: { type: string; closable: boolean };
-    lastFast?: FastSession | null;
-  }>;
-  updateProfile: (val: { [K in keyof UserProfile]: any }) => void;
-  updateHabit: (val: { [K in keyof HabitLog]: any }) => void;
-  updateSetting: (val: { [K in keyof AppSettings]: any }) => void;
-  updateWeight: (weight: number) => void;
+  // Hydration
+  hydrate: (data: {
+    userProfile: UserProfile | null;
+    habit: HabitLog | null;
+    settings: AppSettings | null;
+    weight: number | null;
+    currentFastSession: FastSession | null;
+    theme: ThemeType;
+    language: string;
+  }) => void;
+
+  // Simple state setters
+  updateProfile: (patch: Partial<UserProfile>) => void;
+  updateHabit: (patch: Partial<HabitLog>) => void;
+  updateSetting: (patch: Partial<AppSettings>) => void;
+  updateWeight: (weight: number | null) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
-  updateTheme: (db: ReturnType<typeof createDBService>, theme: string) => void;
-  toggleDarkMode: (db: ReturnType<typeof createDBService>) => void;
+  setTheme: (theme: ThemeType) => void;
+  setLanguage: (language: string) => void;
+
+  // App lifecycle
+  setLoading: (isLoading: boolean) => void;
+  setHydrated: (isHydrated: boolean) => void;
+
+  // Reset
+  reset: () => void;
 }
 
-const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
+const initialState = {
+  userProfile: null,
+  habit: null,
+  weight: null,
+  currentFastSession: null,
+  settings: null,
 
-export const useAppStore = create<AppState>((set, get) => {
-  return {
-    userProfile: null,
-    habit: null,
-    settings: {},
-    currentFastSession: null,
-    weight: null,
-    setCurrentFastSession: (fastSession) =>
-      set({ currentFastSession: fastSession }),
-    theme: defaultDark,
-    isLoadingData: true, // Mặc định là true để giữ màn hình Loading/Splash
-    language: "en",
-    isHydrated: false, // Kiểm tra đã nạp xong data từ SecureStore chưa
-    init: async (db: SQLiteDatabase) => {
-      const start = Date.now();
-      set({ isLoadingData: true });
-      try {
-        const dbService = createDBService(db);
-        // next_expected_streak_date < now => streak = 0
-        // streak cal: Nếu ngày lấy streak < now => streak + = 1 max_streak = Math.max(streak, max_streak)
-        // next_expected_streak_date < tomorow => next_expected_streak_date = tomorrow,
+  theme: defaultDark,
+  language: "en",
 
-        const currentFast = await dbService.getLastFastSession();
-        const weightObj = await dbService.getCurrentWeight();
-        const currentProfile = await dbService.getUserProfile();
-        const dbSettings = await dbService.getUserSettings();
-        const currentHabitLog = await dbService.getLastHabitLog();
-        const { lastFast, profile, habitLog, streak, modal } =
-          await handleLogin({
-            db,
-            lastFast: currentFast,
-            profile: currentProfile,
-            habitLog: currentHabitLog,
-          });
+  isLoadingData: true,
+  isHydrated: false,
+};
 
-        const theme = extractTheme({
-          theme: dbSettings?.theme,
-          isDarkMode: dbSettings?.is_dark_mode,
-        });
+export const useAppStore = create<AppState>((set) => ({
+  ...initialState,
 
-        let locale =
-          dbSettings?.language ||
-          Localization.getLocales()[0]?.languageCode ||
-          "vi";
-        if (!SUPPORTED_LANGUAGES.includes(locale.toString())) {
-          locale = "en";
-        }
+  /**
+   * Load toàn bộ dữ liệu app vào Zustand.
+   *
+   * DB/business logic nằm ở appActions.ts.
+   * Store chỉ nhận kết quả và lưu vào RAM.
+   */
+  hydrate: (data) => {
+    set({
+      userProfile: data.userProfile,
+      habit: data.habit,
+      settings: data.settings,
+      weight: data.weight,
+      currentFastSession: data.currentFastSession,
 
-        // 2. Lấy trạng thái dark mode lưu trong settings (hoặc fallback mặc định)
-        // Giả sử Sơn lưu flag dark mode ở bảng app_settings với key là 'is_dark_mode'
+      theme: data.theme,
+      language: data.language,
 
-        // 3. Bốc palette màu tương ứng từ cái themeObj vừa băm từ AsyncStorage ra
+      isLoadingData: false,
+      isHydrated: true,
+    });
+  },
 
-        set({
-          currentFastSession: lastFast || null,
-          weight: weightObj?.weight,
-          userProfile: profile,
-          habit: habitLog,
-          settings: dbSettings,
-          theme: theme,
-          isLoadingData: false,
-          language: locale.toString(),
-        });
-        console.log(
-          "=> [Zustand] Khởi tạo dữ liệu Local DB thành công!",
-          Date.now() - start,
-        );
-        return {
-          streak,
-          modal,
-          lastFast,
-        };
-      } catch (error) {
-        console.error("=> [Zustand] Khởi tạo dữ liệu thất bại:", error);
-        set({ isLoadingData: false });
-        return {
-          streak: null,
-        };
+  /**
+   * Update một phần UserProfile trong RAM.
+   *
+   * Không ghi DB ở đây.
+   * Nếu cần ghi DB, dùng action tương ứng trong appActions.ts.
+   */
+  updateProfile: (patch) => {
+    set((state) => {
+      if (!state.userProfile) {
+        return state;
       }
-    },
 
-    updateProfile: (val: { [K in keyof UserProfile]: any }) => {
-      const profile = get().userProfile;
-      if (profile) {
-        set({ userProfile: { ...profile, ...val } });
+      return {
+        userProfile: {
+          ...state.userProfile,
+          ...patch,
+        },
+      };
+    });
+  },
+
+  /**
+   * Update một phần HabitLog trong RAM.
+   */
+  updateHabit: (patch) => {
+    set((state) => {
+      if (!state.habit) {
+        return state;
       }
-    },
-    updateHabit: (val: { [K in keyof HabitLog]: any }) => {
-      const habit = get().habit;
-      if (habit) {
-        set({ habit: { ...habit, ...val } });
+
+      return {
+        habit: {
+          ...state.habit,
+          ...patch,
+        },
+      };
+    });
+  },
+
+  /**
+   * Update một phần AppSettings trong RAM.
+   */
+  updateSetting: (patch) => {
+    set((state) => {
+      if (!state.settings) {
+        return state;
       }
-    },
-    updateSetting: (obj: object) =>
-      set((state) => ({
+
+      return {
         settings: {
           ...state.settings,
-          ...obj,
+          ...patch,
         },
-      })),
-    updateWeight: (weight: number) => set({ weight: weight }),
-    updateTheme: async (
-      dbService: ReturnType<typeof createDBService>,
-      themeId: string,
-    ) => {
-      const { settings } = get();
-      const currentMode = settings?.is_dark_mode ?? true;
-      await dbService?.changeTheme(themeId);
+      };
+    });
+  },
 
-      const theme = extractTheme({ theme: themeId, isDarkMode: currentMode });
-      set((state) => ({
-        settings: {
-          ...settings,
-          theme: themeId,
-        },
-        theme: theme,
-      }));
-    },
+  /**
+   * Update cân nặng trong RAM.
+   */
+  updateWeight: (weight) => {
+    set({
+      weight,
+    });
+  },
 
-    toggleDarkMode: async (dbService: ReturnType<typeof createDBService>) => {
-      const { settings } = get();
-      const currentMode = settings?.is_dark_mode ?? true;
-      await dbService?.toggleTheme(!currentMode);
-      const newTheme = extractTheme({
-        theme: settings?.theme,
-        isDarkMode: !currentMode,
-      });
+  /**
+   * Update fast session hiện tại trong RAM.
+   */
+  setCurrentFastSession: (fastSession) => {
+    set({
+      currentFastSession: fastSession,
+    });
+  },
 
-      set((state) => ({
-        settings: {
-          ...state.settings,
-          is_dark_mode: !currentMode,
-        },
-        theme: newTheme,
-      }));
-    },
-  };
-});
+  /**
+   * Update theme trong RAM.
+   */
+  setTheme: (theme) => {
+    set({
+      theme,
+    });
+  },
+
+  /**
+   * Update language trong RAM.
+   */
+  setLanguage: (language) => {
+    set({
+      language,
+    });
+  },
+
+  /**
+   * Bật/tắt loading state.
+   */
+  setLoading: (isLoading) => {
+    set({
+      isLoadingData: isLoading,
+    });
+  },
+
+  /**
+   * Đánh dấu app đã hydrate.
+   */
+  setHydrated: (isHydrated) => {
+    set({
+      isHydrated,
+    });
+  },
+
+  /**
+   * Reset toàn bộ app state về trạng thái ban đầu.
+   *
+   * Hữu ích cho logout / clear local data.
+   */
+  reset: () => {
+    set({
+      ...initialState,
+    });
+  },
+}));

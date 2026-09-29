@@ -6,12 +6,7 @@ import { View } from "react-native";
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useAppStore();
-  const { setColorScheme } = useColorScheme();
-
-  // useEffect(() => {
-  //   setColorScheme(theme.mode);
-  // }, [theme.mode]);
-
+  
   return (
     <VariableContextProvider
       value={{

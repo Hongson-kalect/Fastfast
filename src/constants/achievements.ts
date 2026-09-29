@@ -65,8 +65,9 @@ export const checkAchievements = async (
   const milestones: AchievementMilestoneUnlock[] = [];
 
   const {userAchievements, currentMilestones} = await getUserAchievements(dbService,userId, Object.keys(userStats));
-  const unlockedIds = new Set<string>(); 
-  currentMilestones.map((milestone) => unlockedIds.add(milestone.achievement_item_id));
+  const unlockedIds = new Set(
+  currentMilestones.map((milestone) => milestone.achievement_item_id),
+);
 
   // ---------------------------------------------------------
   // 1. Group ACHIEVEMENTS by input
@@ -100,17 +101,17 @@ export const checkAchievements = async (
       continue;
     }
 
-    const ACHIEVEMENTS = achievementsByInput.get(input as AchievementInput);
+    const matchingAchievements = achievementsByInput.get(input as AchievementInput);
 
-    if (!ACHIEVEMENTS?.length) {
+    if (!matchingAchievements?.length) {
       continue;
     }
 
     // -------------------------------------------------------
-    // 4. Process all ACHIEVEMENTS using this input
+    // 4. Process all matchingAchievements using this input
     // -------------------------------------------------------
 
-    for (const achievement of ACHIEVEMENTS) {
+    for (const achievement of matchingAchievements) {
       const current = currentMap.get(achievement.id);
       const currentValue = current?.current_value ?? 0;
 

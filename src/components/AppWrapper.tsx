@@ -1,7 +1,6 @@
 import { fonts } from "@/configs/fonts";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { isColorDark } from "@/util/color";
 import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
@@ -9,6 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import { StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
+import { initializeAppState } from "@/stores/appAction";
+import { isColorDark } from "@/util/color";
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { theme, settings } = useAppStore();
@@ -23,13 +24,17 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [theme]);
 
   const db = useSQLiteContext();
-  const { init, isLoadingData, userProfile } = useAppStore();
+  const { isLoadingData, userProfile } = useAppStore();
+
+  const isDarkMode = useAppStore(
+    (state) => state.settings?.is_dark_mode ?? true,
+  );
 
   useEffect(() => {
     if (!db) return;
 
     const load = async () => {
-      const result = await init(db);
+      const result = await initializeAppState(db);
       setDBReady(true);
 
       const { streak: streakObj, modal, lastFast } = result;
@@ -138,7 +143,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       <StatusBar
         translucent
         backgroundColor={"transparent"}
-        barStyle={settings?.is_dark_mode===false ? "light-content" : "dark-content"}
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
       />
       {children}
     </View>

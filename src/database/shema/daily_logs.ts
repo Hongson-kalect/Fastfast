@@ -85,8 +85,8 @@ export const addDailyLogs = async (
       ],
     );
 
-    const res = await db.runAsync(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?;`, [data.log_date, data.fast_id]);
-    return res;
+    // const res = await db.getFirstAsync<DailyLog>(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?;`, [data.log_date, data.fast_id]);
+    // return res;
   }catch(e){
     console.log('error on addDailyLogs', e);
 

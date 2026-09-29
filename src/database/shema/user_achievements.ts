@@ -144,30 +144,6 @@ export const updateMileStones = async (
   });
 };
 
-export const confirmAchievementMilestone = async (
-  db: any,
-  userId: string,
-  achievementId: string,
-  milestoneItemId: string
-) => {
-  const now = new Date().toISOString();
-
-  // Cập nhật trạng thái is_confirmed = 1
-  await db.runAsync(
-    /*sql*/ `
-    UPDATE user_achievement_milestone
-    SET is_confirmed = 1,
-        updated_at = ?
-    WHERE user_id = ? 
-      AND achievement_id = ? 
-      AND achievement_item_id = ?;
-  `,
-    [now, userId, achievementId, milestoneItemId]
-  );
-
-  // Thêm logic cộng reward/shield point cho user ở đây (nếu có)
-};
-
 export const updateUserAchievements = async (
   db: SQLiteDatabase,
   userAchievements: AchievementProgressUpdate[],
@@ -203,4 +179,28 @@ export const updateUserAchievements = async (
       );
     }
   });
+};
+
+export const confirmAchievementMilestone = async (
+  db: any,
+  userId: string,
+  achievementId: string,
+  milestoneItemId: string
+) => {
+  const now = new Date().toISOString();
+
+  // Cập nhật trạng thái is_confirmed = 1
+  await db.runAsync(
+    /*sql*/ `
+    UPDATE user_achievement_milestone
+    SET is_confirmed = 1,
+        updated_at = ?
+    WHERE user_id = ? 
+      AND achievement_id = ? 
+      AND achievement_item_id = ?;
+  `,
+    [now, userId, achievementId, milestoneItemId]
+  );
+
+  // Thêm logic cộng reward/shield point cho user ở đây (nếu có)
 };

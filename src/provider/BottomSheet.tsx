@@ -20,6 +20,7 @@ import {
   BackHandler,
   ListRenderItem,
   StyleProp,
+  StyleSheet,
   ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,36 +28,31 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type BottomSheetListOptions<T> = {
   data: T[];
   renderItem: ListRenderItem<T>;
-
   keyExtractor?: (item: T, index: number) => string;
-
   footer?: React.ReactElement;
   empty?: React.ReactElement;
-
   ItemSeparatorComponent?: React.ComponentType<any>;
-
   contentContainerStyle?: StyleProp<ViewStyle>;
-
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
-
   refreshing?: boolean;
   onRefresh?: () => void;
 };
 
-type ShowOptions<T = any> = {
+export type ShowOptions<T = any> = {
   snapPoints?: string[];
   enablePanDownToClose?: boolean;
   enableContentPanningGesture?: boolean;
   onClose?: () => void;
-  isRaw?: boolean; // Dùng để khi mà giả sử dùng flatlist thi khóa scroll của provider
-
+  isRaw?: boolean;
   list?: BottomSheetListOptions<T>;
 };
 
 type BottomSheetContextType = {
-  present: <T>(content: React.ReactElement, options?: ShowOptions<T>) => void;
-
+  present: <T = any>(
+    content: React.ReactElement,
+    options?: ShowOptions<T>,
+  ) => void;
   hide: () => void;
 };
 
@@ -72,18 +68,17 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   const [content, setContent] = useState<React.ReactElement | null>(null);
   const [snapPoints, setSnapPoints] = useState<string[] | undefined>();
   const [enablePanDownToClose, setEnablePanDownToClose] = useState(true);
-  const [onClose, setOnClose] = useState<(() => void) | null>(null);
   const [isRaw, setIsRaw] = useState(false);
   const [enableContentPanningGesture, setEnableContentPanningGesture] =
     useState(true);
-
   const [listOptions, setListOptions] =
     useState<BottomSheetListOptions<any> | null>(null);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const onCloseRef = useRef<(() => void) | null>(null);
 
   const present = useCallback(
-    (node: React.ReactElement, options?: ShowOptions) => {
+    <T,>(node: React.ReactElement, options?: ShowOptions<T>) => {
       setContent(node);
       setSnapPoints(options?.snapPoints);
       setEnableContentPanningGesture(
@@ -91,11 +86,12 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
       );
       setListOptions(options?.list ?? null);
       setEnablePanDownToClose(options?.enablePanDownToClose ?? true);
-      setOnClose(() => options?.onClose ?? null);
+      setIsRaw(options?.isRaw ?? false);
+
+      // Lưu callback vào Ref để tránh Stale Closure
+      onCloseRef.current = options?.onClose ?? null;
+
       setIsShowing(true);
-      if (options?.isRaw) {
-        setIsRaw(true);
-      }
 
       requestAnimationFrame(() => {
         bottomSheetModalRef.current?.present();
@@ -105,31 +101,23 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const hide = useCallback(() => {
-    console.log("isShowing", isShowing);
-    if (isShowing) {
-      setContent(null);
-      setIsShowing(false);
-      bottomSheetModalRef.current?.dismiss();
-    }
-  }, [isShowing]);
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
 
+  // Xử lý phím Back cứng trên Android
   useEffect(() => {
-    if (!isShowing) {
-      return;
-    }
+    if (!isShowing) return;
 
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        bottomSheetModalRef.current?.dismiss();
+        hide();
         return true;
       },
     );
 
-    return () => {
-      subscription.remove();
-    };
-  }, [isShowing]);
+    return () => subscription.remove();
+  }, [isShowing, hide]);
 
   const handleDismiss = useCallback(() => {
     setIsShowing(false);
@@ -139,13 +127,12 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
     setEnablePanDownToClose(true);
     setIsRaw(false);
 
-    // Callback được gọi SAU khi sheet dismiss,
-    // không gọi trong render.
-    const callback = onClose;
-    setOnClose(null);
-
-    callback?.();
-  }, [onClose]);
+    // Trigger callback an toàn từ Ref
+    if (onCloseRef.current) {
+      onCloseRef.current();
+      onCloseRef.current = null;
+    }
+  }, []);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -160,9 +147,8 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const renderContent = () => {
-    if (isRaw) {
-      return content;
-    }
+    if (isRaw) return content;
+
     if (listOptions) {
       return (
         <BottomSheetFlatList
@@ -194,25 +180,19 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           ref={bottomSheetModalRef}
           snapPoints={snapPoints}
           enableDynamicSizing={!snapPoints}
-          maxDynamicContentSize={
-            // tùy bạn đặt constant hay tính theo window height
-            undefined
-          }
           topInset={top + 64}
           enablePanDownToClose={enablePanDownToClose}
           backdropComponent={renderBackdrop}
           onDismiss={handleDismiss}
           enableContentPanningGesture={enableContentPanningGesture}
           keyboardBehavior="fillParent"
-          backgroundStyle={{
-            backgroundColor: theme.background,
-            boxShadow: [
-              "-0.5px 0px 0.5px " + theme.text + "aa",
-              "0.5px 0px 0.5px " + theme.text + "aa",
-            ].join(","),
-            borderTopWidth: 0.5,
-            borderTopColor: theme.text + "55",
-          }}
+          backgroundStyle={[
+            styles.background,
+            {
+              backgroundColor: theme.background,
+              borderTopColor: theme.text + "33",
+            },
+          ]}
           handleIndicatorStyle={{
             backgroundColor: theme.text,
           }}
@@ -226,10 +206,20 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
 
 export const useBottomSheet = () => {
   const context = useContext(BottomSheetContext);
-
   if (!context) {
     throw new Error("useBottomSheet must be used inside BottomSheetProvider");
   }
-
   return context;
 };
+
+const styles = StyleSheet.create({
+  background: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    // Cross-platform shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});

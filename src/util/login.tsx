@@ -4,7 +4,7 @@ import {
 } from "@/database/shema/fast_sessions";
 import {
   addHabitLogs,
-  calculatePenaltyEffect
+  calculatePenaltyEffect,
 } from "@/database/shema/habit_logs";
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import {
@@ -89,8 +89,11 @@ export const handleLogin = async ({
 
   // Hiện tại không có phiên nhịn nào
   if (!lastFast || lastFast.end_time) {
-    const { gap, overRestDays, isStreakSavedByShield, ...data } =
-      calculatePenaltyEffect(profile.streak_date, profile, habitLog);
+    const { gap, isStreakSavedByShield, ...data } = calculatePenaltyEffect(
+      profile.streak_date,
+      profile,
+      habitLog,
+    );
     applyLastLoginDate(streak, todayStr);
     // Không sao cả
     if (gap <= 1) {
@@ -152,7 +155,6 @@ export const handleLogin = async ({
       "handleLogin: no fast, penalty applied",
       {
         gap,
-        overRestDays,
         isStreakSavedByShield,
         ...data,
       },
@@ -201,8 +203,6 @@ export const handleLogin = async ({
   // 2. Fast fail
   // --------------------------------------------------
 
-  let returnLastFast = lastFast;
-
   if (isFastFail && lastFast) {
     const duration = Date.now() - lastFast.start_time;
     modal = {
@@ -220,7 +220,7 @@ export const handleLogin = async ({
   console.log("handleLogin: fast failed");
 
   return {
-    lastFast: returnLastFast,
+    lastFast,
     profile: streak.profile,
     habitLog: streak.habitLog,
     streak: streak.stats,

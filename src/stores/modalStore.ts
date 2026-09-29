@@ -1,26 +1,34 @@
 import { GlobalModalOptions, ListModalOptions } from "@/provider/Modal";
 import { create } from "zustand";
 
-interface ModalProps {
+const MODAL_TRANSITION_DELAY = 500;
+
+interface ModalState {
   currentModal: GlobalModalOptions | null;
   modalQueue: GlobalModalOptions[];
 
-  addModal: (modal: GlobalModalOptions | null) => void;
+  listModal: ListModalOptions | null;
+
+  addModal: (modal: GlobalModalOptions) => void;
   closeCurrentModal: () => void;
   clearModalQueue: () => void;
 
-  listModal: ListModalOptions | null;
   setListModal: (modal: ListModalOptions | null) => void;
 }
 
-const useModalStore = create<ModalProps>((set, get) => ({
+const useModalStore = create<ModalState>((set, get) => ({
   currentModal: null,
   modalQueue: [],
 
-  addModal: (modal) => {
-    console.log("add modal ", Date.now());
-    if (!modal) return get().closeCurrentModal();
+  listModal: null,
 
+  /**
+   * Add a modal to the global modal system.
+   *
+   * If no modal is currently displayed, show it immediately.
+   * Otherwise, append it to the queue.
+   */
+  addModal: (modal) => {
     set((state) => {
       if (state.currentModal) {
         return {
@@ -32,34 +40,62 @@ const useModalStore = create<ModalProps>((set, get) => ({
         currentModal: modal,
       };
     });
-    console.log("add completed", Date.now());
   },
 
+  /**
+   * Close the currently displayed modal.
+   *
+   * The next modal is displayed after the close animation
+   * has had enough time to finish.
+   */
   closeCurrentModal: () => {
     const nextModal = get().modalQueue[0];
+
     set({
       currentModal: null,
     });
-    if (nextModal) {
-      setTimeout(() => {
-        set({
-          currentModal: nextModal,
-          modalQueue: get().modalQueue.slice(1),
-        });
-      }, 500);
+
+    if (!nextModal) {
+      return;
     }
+
+    setTimeout(() => {
+      set((state) => {
+        // Queue may have changed while the closing animation
+        // was running. Always consume the current first item.
+        const next = state.modalQueue[0];
+
+        if (!next) {
+          return {};
+        }
+
+        return {
+          currentModal: next,
+          modalQueue: state.modalQueue.slice(1),
+        };
+      });
+    }, MODAL_TRANSITION_DELAY);
   },
 
-  clearModalQueue: () =>
+  /**
+   * Immediately close the current modal and discard
+   * every queued modal.
+   */
+  clearModalQueue: () => {
     set({
       currentModal: null,
       modalQueue: [],
-    }),
+    });
+  },
 
-  listModal: null,
-  setListModal: (modal: ListModalOptions | null) => set({ listModal: modal }),
+  /**
+   * List modal is separate from the normal global modal queue.
+   */
+  setListModal: (modal) => {
+    set({
+      listModal: modal,
+    });
+  },
 }));
 
 export default useModalStore;
-
-

@@ -11,62 +11,58 @@ export interface DissectedDay {
 export const splitSessionIntoDays = (
   startTimeMs: number,
   endTimeMs: number,
-  fast_id: string
+  fast_id: string,
 ): DissectedDay[] => {
   const result: DissectedDay[] = [];
-  const hoursInFast = (endTimeMs - startTimeMs)/3600_000;
 
-  // Tận dụng chính đối tượng Date của hệ thống để tự động map theo cấu hình Múi giờ (Local Timezone) của thiết bị
+  if (endTimeMs <= startTimeMs) {
+    return result;
+  }
+
+  const hoursInFast = (endTimeMs - startTimeMs) / 3_600_000;
+
   let currentPtr = new Date(startTimeMs);
   const endLimit = new Date(endTimeMs);
-  let timeleap = 0;
 
   while (currentPtr < endLimit) {
-    // 1. Lấy chuỗi ngày YYYY-MM-DD của con trỏ hiện tại
     const year = currentPtr.getFullYear();
-    const month = String(currentPtr.getMonth() + 1).padStart(2, "0");
-    const day = String(currentPtr.getDate()).padStart(2, "0");
-    const dateStr = `${year}-${month}-${day}`;
+    const month = currentPtr.getMonth();
+    const day = currentPtr.getDate();
 
-    // 2. Tính mốc mốc thời gian cuối cùng của ngày hiện tại (23:59:59.999)
-    const endOfDay = new Date(
+    const dateStr = [
       year,
-      currentPtr.getMonth(),
-      currentPtr.getDate(),
-      23,
-      59,
-      59,
-      999,
+      String(month + 1).padStart(2, "0"),
+      String(day).padStart(2, "0"),
+    ].join("-");
+
+    // 00:00 của ngày kế tiếp
+    const nextDay = new Date(
+      year,
+      month,
+      day + 1,
+      0,
+      0,
+      0,
+      0,
     );
 
-    // 3. Xác định điểm kết thúc của khúc nhịn ăn trong ngày này
-    // Nếu điểm endLimit vượt quá ngày hôm nay -> Cắt ở cuối ngày. Nếu nằm trong ngày hôm nay -> Lấy endLimit.
-    const chunkEnd = endLimit < endOfDay ? endLimit : endOfDay;
+    const chunkEnd = endLimit < nextDay ? endLimit : nextDay;
 
-    // 4. Tính số giờ nhịn thực tế của khúc này (mili-giây -> giờ)
-    const diffMs = chunkEnd.getTime() - currentPtr.getTime();
-    const hoursInDay = Math.max(0, diffMs / (1000 * 60 * 60));
-    timeleap += hoursInDay;
+    const hoursInDay =
+      (chunkEnd.getTime() - currentPtr.getTime()) / 3_600_000;
 
-    // Đẩy kết quả của ngày này vào mảng
+    const elapsedHours =
+      (chunkEnd.getTime() - startTimeMs) / 3_600_000;
+
     result.push({
       fast_id,
       log_date: dateStr,
-      hours_in_day: fixed(hoursInDay), // Làm tròn 2 chữ số thập phân cho đẹp DB
-      elapsed_hours: fixed(timeleap),
+      hours_in_day: fixed(hoursInDay),
+      elapsed_hours: fixed(elapsedHours),
       hours_in_fast: fixed(hoursInFast),
     });
 
-    // 5. Nhảy con trỏ sang đúng 00:00:00 của ngày hôm sau để tiếp tục vòng lặp
-    currentPtr = new Date(
-      year,
-      currentPtr.getMonth(),
-      currentPtr.getDate() + 1,
-      0,
-      0,
-      0,
-      0,
-    );
+    currentPtr = nextDay;
   }
 
   return result;

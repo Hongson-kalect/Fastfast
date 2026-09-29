@@ -60,11 +60,11 @@ export const finishFast = async ({
     );
 
     if (milestones.length) {
-      dbService.updateMileStones(milestones);
+      await dbService.updateMileStones(milestones);
     }
 
     if (progresses.length) {
-      dbService.updateUserAchievements(progresses);
+      await dbService.updateUserAchievements(progresses);
     }
   }
 

@@ -278,48 +278,48 @@ export const finishLastSession = async ({
     // --------------------------------------------------
 
     if (status === "too_quick") {
-      const returnLastFast = await handleTooQuickFast(
-        db,
-        lastFast,
-        endTime,
-        duration,
-        streak,
-      );
+  const lastSession = await handleTooQuickFast(
+    db,
+    lastFast,
+    endTime,
+    duration,
+  );
 
-      await saveStreakContext(db, streak);
+  await saveStreakContext(db, streak);
 
-      result = {
-        lastSession: returnLastFast,
-        profile: streak.profile,
-        habitLog: streak.habitLog,
-        streak: streak.stats,
-      };
-      return;
-    }
+  result = {
+    lastSession,
+    profile: streak.profile,
+    habitLog: streak.habitLog,
+    streak: streak.stats,
+  };
+
+  return;
+}
 
     // --------------------------------------------------
     // 5. Failed
     // --------------------------------------------------
 
     if (status === "failed") {
-      const returnLastFast = await handleFailedFast(
-        db,
-        lastFast,
-        endTime,
-        duration,
-        streak,
-      );
+  const lastSession = await handleFailedFast(
+    db,
+    lastFast,
+    endTime,
+    duration,
+  );
 
-      await saveStreakContext(db, streak);
+  await saveStreakContext(db, streak);
 
-      result = {
-        lastSession: await getLastFastSession(db),
-        profile: streak.profile,
-        habitLog: streak.habitLog,
-        streak: streak.stats,
-      };
-      return;
-    }
+  result = {
+    lastSession,
+    profile: streak.profile,
+    habitLog: streak.habitLog,
+    streak: streak.stats,
+  };
+
+  return;
+}
 
     // --------------------------------------------------
     // 6. Completed
@@ -330,6 +330,7 @@ export const finishLastSession = async ({
       habitLog: returnHabitLog,
       achievement,
     } = await handleCompletedFast(db, lastFast, endTime, duration, streak);
+      await saveStreakContext(db, streak);
 
     achievementObj = achievement;
 
@@ -359,7 +360,6 @@ const handleTooQuickFast = async (
   session: FastSession,
   endTime: number,
   duration: number,
-  streak: StreakContext,
 ) => {
   await db.runAsync(
     `UPDATE fast_sessions
@@ -381,7 +381,6 @@ const handleFailedFast = async (
   session: FastSession,
   endTime: number,
   duration: number,
-  streak: StreakContext,
 ) => {
   await db.runAsync(
     `UPDATE fast_sessions
@@ -822,9 +821,7 @@ export const reconcileStreak = async (
   // 2. Calculate penalty
   // --------------------------------------------------
 
-  const currentShield = streak.habitLog?.shield_snap || 0;
-
-  const { gap, overRestDays, isStreakSavedByShield, ...data } =
+  const { gap, isStreakSavedByShield, ...data } =
     calculatePenaltyEffect(referenceDate, streak.profile, streak.habitLog);
 
   // --------------------------------------------------
