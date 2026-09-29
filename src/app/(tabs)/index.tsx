@@ -145,8 +145,13 @@ const HomeScreen = () => {
   const handleCounter = () => {
     if (!startTime) return;
 
+    if (currentFastSession?.end_time) {
+      return setCounter(
+        Math.floor(Math.abs(currentFastSession?.end_time - startTime) / 1000),
+      );
+    }
     const now = new Date().getTime();
-    setCounter(Math.floor(Math.abs(now - startTime) / 1000));
+    return setCounter(Math.floor(Math.abs(now - startTime) / 1000));
   };
 
   useEffect(() => {
@@ -163,13 +168,6 @@ const HomeScreen = () => {
 
     return () => clearInterval(interval);
   }, [startTime, isCounting]);
-
-  // if (1 === 1)
-  //   return (
-  //     <View>
-  //       <ThemedText>Home</ThemedText>
-  //     </View>
-  //   );
 
   return (
     <View className="flex-1 bg-background">
@@ -213,7 +211,7 @@ const HomeScreen = () => {
                 </ThemedText>
               ) : (
                 <View className="flex-row items-center justify-between">
-                  <ThemedText size="md" weight="bold" color="primary">
+                  <ThemedText size="md" weight="bold">
                     Estimated fasting phase
                   </ThemedText>
                   <TouchableOpacity
@@ -224,7 +222,7 @@ const HomeScreen = () => {
                     <FontAwesome6
                       name="question-circle"
                       size={20}
-                      color={theme.primary + "AA"}
+                      color={theme.text + "AA"}
                     />
                   </TouchableOpacity>
                 </View>

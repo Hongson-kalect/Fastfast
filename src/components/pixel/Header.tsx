@@ -4,6 +4,8 @@ import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import PixelStatistic from "./Statistic";
+import { useState } from "react";
+import { PackPickerBottomSheet } from "./IconPackSheet";
 
 type Props = {
   stats: { fastDays: number; fastHour: number; logDays: number };
@@ -12,6 +14,7 @@ type Props = {
 };
 const PixelHeader = ({ stats, viewMode, setViewMode }: Props) => {
   const { theme } = useAppStore();
+
   return (
     <>
       <View className="flex-row justify-between items-center">
@@ -42,6 +45,8 @@ const PixelHeader = ({ stats, viewMode, setViewMode }: Props) => {
           setTrackingType={setViewMode}
         />
       </View>
+
+      
     </>
   );
 };

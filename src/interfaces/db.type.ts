@@ -15,6 +15,8 @@ export interface AppSettings {
   is_dark_mode?: boolean;
   pixel_view_mode?: "fasting" | "mood";
   theme?: string;
+  emotion_pack?: string;
+  target_pack?: string;
   language?: string;
 }
 
@@ -210,4 +212,7 @@ export type UserAchievementMilestone = {
   is_deleted: number;
   created_at: string;
   updated_at: string;
+    is_confirmed: number,
+    reward?: string
+
 };

@@ -1,8 +1,13 @@
+import { EMOTION_PACKS } from "@/constants/emotions";
+import { TARGET_PACKS } from "@/constants/fasting_targets";
+import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { fixed } from "@/util/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { PackPickerBottomSheet } from "./IconPackSheet";
 
 const moodCount = [102, 25, 5, 2, 0, 10, 10];
 
@@ -16,7 +21,23 @@ type Props = {
   };
 };
 const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
-  const { theme } = useAppStore();
+  const { theme, settings, updateSetting } = useAppStore();
+  const [iconPackVisible, setIconPackVisible] = useState(false);
+
+  const emotions = EMOTION_PACKS[settings?.emotion_pack || "default"].emotions;
+  const targets = TARGET_PACKS[settings?.target_pack || "default"].targets;
+
+  const { present } = useBottomSheet();
+
+  const openIconPackSelector = () => {
+    present(<PackPickerBottomSheet />);
+  };
+
+  const isDark = settings?.is_dark_mode ?? true;
+
+  const selectedEmotion = EMOTION_PACKS[settings?.emotion_pack || "default"];
+  const selectedFastTarget = TARGET_PACKS[settings?.target_pack || "default"];
+
   return (
     <View className="gap-4">
       <View className="flex-row items-center gap-4">
@@ -58,7 +79,7 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
       <View className="flex-row justify-between items-center mt-8">
         <Pressable
           hitSlop={10}
-          onPress={() => alert("Change emoji style")}
+          onPress={openIconPackSelector}
           style={{ borderWidth: 0.5, borderColor: theme.warning }}
           className="items-center flex-row px-3 py-1.5 rounded-lg gap-2"
         >
@@ -120,6 +141,48 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
       </View>
 
       {/* ...phần dưới giữ nguyên */}
+      {trackingType === "mood" && (
+        <View className="flex-row gap-4 mt-2">
+          {emotions.map((item, index) => (
+            <View
+              key={item.label}
+              style={{
+                backgroundColor: isDark ? item.color.dark : item.color.light,
+              }}
+              className="flex-1 px-2 py-1 rounded"
+            >
+              <View className="items-center justify-between">
+                <ThemedText>{item.icon}</ThemedText>
+                <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
+              </View>
+              {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">
+              {moodCount[index]}
+            </ThemedText> */}
+            </View>
+          ))}
+        </View>
+      )}
+      {trackingType === "fasting" && (
+        <View className="flex-row gap-2 mt-2">
+          {targets.map((item, index) => (
+            <View
+              key={item.label}
+              style={{
+                backgroundColor: isDark ? item.color.dark : item.color.light,
+              }}
+              className="flex-1 px-2 py-1 rounded"
+            >
+              <View className="items-center justify-between">
+                <ThemedText>{item.icon}</ThemedText>
+                <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
+              </View>
+              {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">
+              {moodCount[index]}
+            </ThemedText> */}
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 };

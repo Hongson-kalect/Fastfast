@@ -1,9 +1,10 @@
-import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
+import { FASTING_TARGETS } from "@/constants/data";
+import { EMOTION_PACKS } from "@/constants/emotions";
+import { TARGET_PACKS } from "@/constants/fasting_targets";
 import { DailyPixelData, DayItem, ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
-import { lighter } from "@/util/color";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { memo } from "react";
+import { memo, ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
@@ -22,10 +23,12 @@ const DayPixel = memo(
     onPress: (date: string) => void;
   }) => {
     const theme = useAppStore((state) => state.theme);
+    const settings = useAppStore((state) => state.settings);
+    const isDark = settings?.is_dark_mode ?? true;
 
     const isToday = day.dateString === todayStr;
 
-    let emoji: string | undefined;
+    let emoji: string | ReactNode;
     let backgroundColor = "transparent";
     let opacity = 1;
     let icon: React.ReactNode = null;
@@ -59,10 +62,11 @@ const DayPixel = memo(
      */
     if (viewMode === "mood") {
       if (pixelData.note) {
-        const mood = EMOTIONS[pixelData.note.mood_level || 0];
+        const emotionPack = EMOTION_PACKS[settings?.target_pack || "default"];
+        const mood = emotionPack.emotions[pixelData.note.mood_level || 0];
 
-        emoji = mood.emoji;
-        backgroundColor = mood.color;
+        emoji = mood.icon;
+        backgroundColor = isDark ? mood.color.dark : mood.color.light;
         pressable = true;
       }
     } else {
@@ -89,7 +93,9 @@ const DayPixel = memo(
           current.hours_in_fast > best.hours_in_fast ? current : best,
         );
 
-        const pixel = FASTING_TARGETS.find(
+        const targetPack = TARGET_PACKS[settings?.target_pack || "default"];
+
+        const pixel = FASTING_TARGETS.findIndex(
           (target) =>
             target.hours <= fast.hours_in_fast &&
             (!target.toHours || target.toHours >= fast.hours_in_fast),
@@ -98,10 +104,12 @@ const DayPixel = memo(
         if (pixel) {
           const progress = fast.elapsed_hours / fast.hours_in_fast;
 
+          const target = targetPack.targets[pixel];
+
           opacity = 0.5 + 0.5 * progress;
+          backgroundColor = isDark ? target.color.dark : target.color.light;
           // backgroundColor = darker(pixel.colors.accent, 0.5); //lighter(pixel.colors.accent, 0.8); // Chỗ này icon pack phải bao hàm cả light và dark, không dùng hàm random thế này
-          backgroundColor = lighter(pixel.colors.accent, 0.8); // Chỗ này icon pack phải bao hàm cả light và dark, không dùng hàm random thế này
-          emoji = pixel.emoji;
+          emoji = target.icon;
           pressable = true;
         }
       }

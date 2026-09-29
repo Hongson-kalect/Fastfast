@@ -460,6 +460,8 @@ const PixelScreen = () => {
         }
       });
 
+      console.log("yearMap", yearMap);
+
       setYearPixelData(yearMap);
       setStats(newStats);
       setIsLoading(false);
@@ -542,11 +544,13 @@ const PixelScreen = () => {
           })}
           sections={[{ key: "calendar", data: gridData }]}
           ListHeaderComponent={
-            <PixelHeader
-              stats={stats}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-            />
+            <>
+              <PixelHeader
+                stats={stats}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            </>
           }
           renderSectionHeader={() => (
             <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">

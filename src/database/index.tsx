@@ -2,10 +2,8 @@ import {
   FastSession,
   HabitLog,
   MoodLevel,
-  UserAchievement,
-  UserAchievementMilestone,
   UserAsset,
-  UserProfile,
+  UserProfile
 } from "@/interfaces/db.type";
 import * as SQLite from "expo-sqlite";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -69,6 +67,11 @@ import {
 } from "./shema/weight_tracker";
 
 import {
+  AchievementInput,
+  AchievementMilestoneUnlock,
+  AchievementProgressUpdate,
+} from "@/constants/achievements";
+import {
   getHabitLogs,
   getLastHabitLog,
   getPixelShielLog,
@@ -76,6 +79,7 @@ import {
   generateString as habit_logsGenerateString,
 } from "./shema/habit_logs";
 import {
+  confirmAchievementMilestone,
   getUserAchievements,
   getUserMilestones,
   updateMileStones,
@@ -89,7 +93,6 @@ import {
   removeUserAsset,
   generateString as userAssetsGenerateString,
 } from "./shema/user_assets";
-import { AchievementInput, AchievementMilestoneUnlock, AchievementProgressUpdate } from "@/constants/achievements";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -169,7 +172,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getPixelShielLog: (year: number) => getPixelShielLog(db, year),
   getFastSessionByIds: (ids: string[]) => getFastSessionByIds(db, ids),
 
-  getUserAssets: (userId: string, type?:UserAsset["type"]) => getUserAssets(db, userId,type),
+  getUserAssets: (userId: string, type?: UserAsset["type"]) =>
+    getUserAssets(db, userId, type),
 
   addPurchasedTheme: ({
     userId,
@@ -187,12 +191,23 @@ export const createDBService = (db: SQLiteDatabase) => ({
       token: token,
       user_id: userId,
     }),
-  getUserAchievements: (userId: string, inputs?: AchievementInput[]) => getUserAchievements(db, userId,inputs),
+  getUserAchievements: (userId: string, inputs?: AchievementInput[]) =>
+    getUserAchievements(db, userId, inputs),
   getUserMilestones: (userId: string) => getUserMilestones(db, userId),
 
-  updateMileStones: (milestones: AchievementMilestoneUnlock[]) => updateMileStones(db, milestones),
-  updateUserAchievements: (userAchievements: AchievementProgressUpdate[]) => updateUserAchievements(db, userAchievements),
-
+  updateMileStones: (milestones: AchievementMilestoneUnlock[]) =>
+    updateMileStones(db, milestones),
+  updateUserAchievements: (userAchievements: AchievementProgressUpdate[]) =>
+    updateUserAchievements(db, userAchievements),
+  confirmAchievementMilestone: ({
+    userId,
+    achievementId,
+    milestoneItemId,
+  }: {
+    userId: string;
+    achievementId: string;
+    milestoneItemId: string;
+  }) => confirmAchievementMilestone(db, userId, achievementId, milestoneItemId),
 
   unPurchasedTheme: (theme: string) => removeUserAsset(db, theme),
 
@@ -222,7 +237,7 @@ export const initDatabase = async (db: SQLiteDatabase) => {
   try {
     const DATABASE_VERSION = 1; // get from server
     // let version = 0;
-    // await clearDatabase(db);
+    await clearDatabase(db);
     const version = await getDatabaseVersion(db);
 
     console.log("db version", version);

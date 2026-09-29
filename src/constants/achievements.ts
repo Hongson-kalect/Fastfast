@@ -1,5 +1,5 @@
 import { createDBService } from "@/database";
-import { UserAchievement } from "@/interfaces/db.type";
+import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export type AchievementItem = {
@@ -64,7 +64,9 @@ export const checkAchievements = async (
   const progresses: AchievementProgressUpdate[] = [];
   const milestones: AchievementMilestoneUnlock[] = [];
 
-  const {userAchievements, unlockedIds} = await getUserAchievements(dbService,userId, Object.keys(userStats));
+  const {userAchievements, currentMilestones} = await getUserAchievements(dbService,userId, Object.keys(userStats));
+  const unlockedIds = new Set<string>(); 
+  currentMilestones.map((milestone) => unlockedIds.add(milestone.achievement_item_id));
 
   // ---------------------------------------------------------
   // 1. Group ACHIEVEMENTS by input
@@ -237,21 +239,18 @@ export const checkAchievements = async (
 export const getUserAchievements = async (
  dbService: ReturnType<typeof createDBService>,
   userId: string,
-  inputString: AchievementInput[]
+  inputString?: AchievementInput[]
 ): Promise<{
   userAchievements: UserAchievement[];
-  unlockedIds: Set<string>;
+  currentMilestones: UserAchievementMilestone[];
 }> => {
   const userAchievements = await dbService.getUserAchievements(userId, inputString);
 
-  const milestones = await dbService.getUserMilestones(userId);
-  const unlockedIds = new Set(
-    milestones.map((item) => item.achievement_item_id),
-  );
+  const currentMilestones = await dbService.getUserMilestones(userId);
 
   return {
     userAchievements,
-    unlockedIds,
+    currentMilestones,
   };
 };
 

@@ -80,7 +80,7 @@ export const RecentFastCard = ({ session }: Props) => {
       onPress={handlePress}
       className="my-2 w-full overflow-hidden rounded-3xl px-4 py-6"
       style={{
-        backgroundColor: theme.card,
+        backgroundColor: theme.background2,
       }}
     >
       {/* Target */}

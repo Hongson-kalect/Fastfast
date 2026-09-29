@@ -5,7 +5,10 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { AchievementBottomSheet } from "./AchievementBottomSheet";
 
-const DashboardHeader = () => {
+type Props = {
+  hasUnclamMilestones: boolean;
+};
+const DashboardHeader = (props: Props) => {
   const { theme } = useAppStore();
 
   const { present } = useBottomSheet();
@@ -16,6 +19,8 @@ const DashboardHeader = () => {
     });
   };
 
+  console.log("hasUnclamMilestones", props.hasUnclamMilestones);
+
   return (
     <View className="flex-row justify-between items-center">
       <View>
@@ -25,7 +30,9 @@ const DashboardHeader = () => {
       </View>
 
       <Pressable onPress={openAchievement} hitSlop={10}>
-        <View className="absolute top-0 -left-2 h-2 w-2 rounded-full bg-warning"></View>
+        {props.hasUnclamMilestones && (
+          <View className="absolute top-0 -right-2 h-2 w-2 rounded-full bg-warning"></View>
+        )}
         <Ionicons name="trophy-outline" size={26} color={theme.warning} />
       </Pressable>
     </View>

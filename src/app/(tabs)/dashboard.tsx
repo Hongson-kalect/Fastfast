@@ -4,6 +4,7 @@ import DashboardHeader from "@/components/dashboard/Header";
 import { StatisticsSection } from "@/components/dashboard/StatisticSession";
 import WeightLineChart from "@/components/dashboard/WeightLineChart";
 import { ThemedView } from "@/components/themed-view";
+import { getUserAchievements } from "@/constants/achievements";
 import {
   CHART_RANGES,
   ChartRangeConfig,
@@ -139,10 +140,28 @@ const DashboardScreen = () => {
     setFastStatistics(fastStatisticsDB);
   };
 
+  const { userProfile } = useAppStore();
+
+  const [hasUnclamMilestones, setHasUnclamMilestones] = useState(false);
+  const getUnClamMilestone = async () => {
+    if (!userProfile) return;
+    const { currentMilestones, userAchievements } = await getUserAchievements(
+      dbService,
+      userProfile.id,
+    );
+
+    const unClam = currentMilestones.find(
+      (milestone) => !milestone.is_confirmed,
+    );
+    console.log("milestones", currentMilestones, userAchievements, unClam);
+    setHasUnclamMilestones(!!unClam);
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const task = requestIdleCallback(() => {
-        refreshData();
+      const task = requestIdleCallback(async () => {
+        await refreshData();
+        await getUnClamMilestone();
       });
       return () => {
         cancelIdleCallback(task);
@@ -163,7 +182,7 @@ const DashboardScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <View className="px-3">
-            <DashboardHeader />
+            <DashboardHeader hasUnclamMilestones={hasUnclamMilestones} />
             <View className="mt-4">
               <GoalCard />
             </View>

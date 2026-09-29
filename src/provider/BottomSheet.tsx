@@ -105,6 +105,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const hide = useCallback(() => {
+    console.log("isShowing", isShowing);
     if (isShowing) {
       setContent(null);
       setIsShowing(false);
