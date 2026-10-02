@@ -1,20 +1,11 @@
-// @/components/Button.tsx
-import { ThemedText } from "@/components/themed-text";
-import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
+import { FASTING_TARGETS } from "@/constants/data";
+import { MoodLevel } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyNote, MoodLevel } from "@/interfaces/db.type";
+import { DailyNote } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -24,98 +15,75 @@ import FastEndTimeModal from "./FastEndTimeModal";
 import FastStartTimeModal from "./FastStartTimeModal";
 import { PhotoPickerModal } from "./ImageModal";
 import NoteModal from "./NoteModal";
+import { SwapFastButton } from "./SwapButton/SwapFastButton";
+import { SwapImageButton } from "./SwapButton/SwapImageButton";
+import { SwapMoodButton } from "./SwapButton/SwapMoodButton";
 
-interface ButtonProps extends TouchableOpacityProps {
+type SwapButtonProps = {
   isCounting: boolean;
-  toggleCounting: (time?: number) => void;
-  variant?: "primary" | "secondary";
-  target?: number;
+  toggleCounting: (delayTime?: number) => void;
   loading?: boolean;
   className?: string;
-  data?: {
-    note?: string;
-    mood: 0 | 1 | 2 | 3 | 4;
-    image?: string;
-  };
-}
+};
 
 export const SwapButton = React.memo(
   ({
     isCounting,
     toggleCounting,
-    variant = "primary",
     loading = false,
     className = "",
     ...props
-  }: ButtonProps) => {
+  }: SwapButtonProps) => {
     const dbService = useDBService();
+
     const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
+
     const { updateWeight, weight, currentFastSession, theme, settings } =
       useAppStore();
-    const target = useAppStore((state) => state.settings?.target);
-
-    console.log("Re render swap button ", Math.floor(Date.now() / 1000));
-
-    const color = useMemo(() => {
-      if (!settings?.target) return theme.primary;
-
-      return (
-        FASTING_TARGETS.find((item) => item.hours === settings?.target)?.colors
-          .accent || theme.primary
-      );
-    }, [settings?.target, theme.primary]);
-
-    const detectTodayNote = async () => {
-      const todayNote = await dbService?.getDailyNote();
-      console.log("todayNote", todayNote);
-      setTodayNote(todayNote || null);
-    };
-
-    const getCurrrentWeight = async () => {
-      const weightObj = await dbService?.getCurrentWeight();
-      console.log("weight", weight);
-      updateWeight(weightObj?.weight || 0);
-    };
 
     const [todayData, setTodayData] = useState<{
       note?: string;
       mood?: MoodLevel;
       image?: string;
-    }>(() => {
-      return {
-        note: todayNote?.note,
-        image: todayNote?.image_uri,
-        mood: todayNote?.mood_level,
-      };
-    });
-
-    const baseStyle =
-      "h-28 w-28 rounded-full flex-row items-center justify-center px-6";
-    const variantStyle = isCounting
-      ? "bg-gray-700 border-2 border-gray-500 shadow-inner shadow-gray-200 "
-      : "bg-primary shadow-md shadow-primary";
+    }>({});
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [noteModalVisible, setNoteModalVisible] = useState(false);
+    const [imageOptionVisible, setImageOptionVisible] = useState(false);
+    const [tempImage, setTempImage] = useState<string | undefined>();
 
-    // Shared Value chỉ thuần túy phục vụ vẽ hiệu ứng ở UI Thread (0: Đóng, 1: Mở)
     const animationProgress = useSharedValue(0);
 
-    // Animation cho lớp Overlay nền mờ
-    const overlayStyle = useAnimatedStyle(() => {
-      return {
-        opacity: withTiming(animationProgress.value, { duration: 200 }),
-      };
-    });
+    const overlayStyle = useAnimatedStyle(() => ({
+      opacity: withTiming(animationProgress.value, {
+        duration: 200,
+      }),
+    }));
 
-    // Xử lý bật/tắt Menu điều hướng nhịp nhàng cả 2 luồng
+    const color = settings?.target
+      ? (FASTING_TARGETS.find((item) => item.hours === settings.target)?.colors
+          .accent ?? theme.primary)
+      : theme.primary;
+
+    const detectTodayNote = async () => {
+      const note = await dbService?.getDailyNote();
+      setTodayNote(note || null);
+    };
+
+    const getCurrentWeight = async () => {
+      const weightObj = await dbService?.getCurrentWeight();
+      updateWeight(weightObj?.weight || 0);
+    };
+
     const toggleMenu = () => {
       if (isMenuOpen) {
-        animationProgress.value = 0; // Thu hồi animation về 0
+        animationProgress.value = 0;
         setIsMenuOpen(false);
-      } else {
-        setIsMenuOpen(true);
-        animationProgress.value = 1; // Bung animation lên 1
+        return;
       }
+
+      setIsMenuOpen(true);
+      animationProgress.value = 1;
     };
 
     const handleSelectMood = async (
@@ -124,60 +92,65 @@ export const SwapButton = React.memo(
       newWeight?: number,
     ) => {
       if (!dbService) return console.log("db not ready");
-      console.log("Selected Mood:", mood);
-      // Lưu vào database local của bạn tại đây...
 
-      // Đóng menu an toàn
       animationProgress.value = 0;
       setIsMenuOpen(false);
-      setTodayData({ ...todayData, note: note, mood: mood });
 
-      await dbService.setDailyNote(mood, note, todayData?.image);
+      setTodayData((prev) => ({
+        ...prev,
+        note,
+        mood,
+      }));
+
+      await dbService.setDailyNote(mood, note, todayData.image);
 
       if (newWeight && weight !== newWeight) {
         await dbService.updateWeight(newWeight);
         updateWeight(newWeight);
       }
-      // Thêm emoji và node(nếu có vào trong db)
     };
-
-    const [noteModalVisible, setNoteModalVisible] = useState(false);
-    const [imageOptionVisible, setImageOptionVisible] = useState(false);
-
-    const [tempImage, setTempImage] = useState<string | undefined>(undefined);
 
     const handleUpdateImage = async (uri: string | undefined) => {
       if (!dbService) return console.log("db not ready");
-      setTodayData({ ...todayData, image: uri });
+
+      setTodayData((prev) => ({
+        ...prev,
+        image: uri,
+      }));
 
       await dbService.setDailyNote(todayNote?.mood_level, todayNote?.note, uri);
-      console.log(uri);
+
       setTempImage(uri);
     };
 
-    const { addModal } = useModalStore();
+    const { addModal, closeCurrentModal } = useModalStore();
+
     const handleDelaySubmit = (selectedTime: number) => {
-      addModal(null);
+      closeCurrentModal();
       toggleCounting(selectedTime);
     };
 
     const showDelayModal = () => {
       if (isCounting && currentFastSession) {
-        const finishTime = currentFastSession?.target_duration
+        const finishTime = currentFastSession.target_duration
           ? currentFastSession.start_time +
             currentFastSession.target_duration * 60 * 1000
           : null;
-        return addModal({
+
+        addModal({
           type: "custom",
           render: (
             <FastEndTimeModal
-              startTime={currentFastSession?.start_time}
+              startTime={currentFastSession.start_time}
               targetFinishTime={finishTime}
               currentFast={currentFastSession}
             />
           ),
         });
+
+        return;
       }
+
       addModal({
         type: "custom",
         render: (
@@ -188,122 +161,64 @@ export const SwapButton = React.memo(
         ),
       });
     };
+
     useEffect(() => {
       if (!dbService) return;
+
       detectTodayNote();
-      getCurrrentWeight();
+      getCurrentWeight();
     }, [dbService]);
 
     useEffect(() => {
       if (!todayNote) return;
+
       setTodayData({
-        note: todayNote?.note || undefined,
-        image: todayNote?.image_uri || undefined,
-        mood: todayNote?.mood_level || undefined,
+        note: todayNote.note || undefined,
+        image: todayNote.image_uri || undefined,
+        mood: todayNote.mood_level || undefined,
       });
     }, [todayNote]);
 
     return (
-      <View className="flex-row items-end justify-center gap-4 h-28">
+      <View className="h-28 flex-row items-end justify-center gap-4">
         <Animated.View
-          style={[overlayStyle]}
+          style={overlayStyle}
           pointerEvents={isMenuOpen ? "auto" : "none"}
-          className="absolute h-screen w-screen inset-0 bg-red-200/60 z-10"
+          className="absolute inset-0 z-10 h-screen w-screen bg-red-200/60"
         >
           <Pressable className="flex-1" onPress={toggleMenu} />
         </Animated.View>
 
-        <View className="flex-row gap-7 items-center justify-center z-20 relative w-full">
-          <View className="p-1 mt-4 rounded-full">
-            <TouchableOpacity
-              activeOpacity={0.7}
+        <View className="relative z-20 w-full flex-row items-center justify-center gap-7">
+          <View className="mt-4 rounded-full p-1">
+            <SwapImageButton
+              image={todayData.image}
+              loading={loading}
+              className={className}
               onPress={() => setImageOptionVisible(true)}
-              disabled={loading}
-              className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
-                todayData.image
-                  ? "shadow-primary border-primary"
-                  : "shadow-text-base/40 border-text-base/40"
-              } ${loading ? "opacity-60" : ""} ${className}`}
               {...props}
-            >
-              {loading ? (
-                <ActivityIndicator color={theme.primary} />
-              ) : todayData.image ? (
-                <Image
-                  source={{ uri: todayData.image }}
-                  className="w-18 h-18 rounded-full"
-                />
-              ) : (
-                <Feather name="image" size={28} color={theme.text} />
-              )}
-            </TouchableOpacity>
+            />
           </View>
 
-          <View className="rounded-full bg-background p-1">
-            <Pressable
-              onLongPress={showDelayModal}
-              onPress={() => toggleCounting()}
-              activeOpacity={0.7}
-              disabled={loading}
-              style={{
-                borderWidth: 4,
-                borderColor: color,
-                backgroundColor: isCounting ? "transparent" : color,
-                boxShadow: isCounting ? "none" : `1px 2px 4px ${color}`,
-              }}
-              className={`h-28 w-28 flex-row items-center justify-center rounded-full px-6 ${loading ? "opacity-60" : ""} ${className}`}
-              {...props}
-            >
-              {loading ? (
-                <ActivityIndicator color={theme.primary} />
-              ) : isCounting ? (
-                <FontAwesome6 name="stop" size={52} color={color} />
-              ) : (
-                <FontAwesome6
-                  name="play"
-                  size={52}
-                  color={"white"}
-                  style={{ marginLeft: 8 }}
-                />
-              )}
-            </Pressable>
-          </View>
+          <SwapFastButton
+            isCounting={isCounting}
+            loading={loading}
+            color={color}
+            className={className}
+            onPress={() => toggleCounting()}
+            onLongPress={showDelayModal}
+          />
 
-          <View className="p-1 mt-4 rounded-full">
-            <TouchableOpacity
+          <View className="mt-4 rounded-full p-1">
+            <SwapMoodButton
+              mood={todayData.mood}
+              note={todayData.note}
+              loading={loading}
+              className={className}
               onPress={() => setNoteModalVisible(true)}
-              activeOpacity={0.7}
-              disabled={loading}
-              className={`h-18 w-18 rounded-full flex-row items-center justify-center border shadow-md ${
-                todayData.mood
-                  ? "shadow-primary border-primary"
-                  : "shadow-text-base/40 border-text-base/40"
-              } ${loading ? "opacity-60" : ""} ${className}`}
-              {...props}
-            >
-              {loading ? (
-                <ActivityIndicator color={theme.primary} />
-              ) : (
-                <View className="flex-1 items-center justify-center">
-                  {todayData?.mood ? (
-                    <ThemedText size="lg">
-                      {EMOTIONS[todayData.mood].emoji}
-                    </ThemedText>
-                  ) : (
-                    <Feather name="edit-2" size={28} color={theme.text} />
-                  )}
-
-                  {todayData.note && (
-                    <View className="absolute -top-4 right-0">
-                      <Ionicons name="chatbox" size={24} color={theme.text} />
-                    </View>
-                  )}
-                </View>
-              )}
-            </TouchableOpacity>
+            />
           </View>
 
-          {/* Note modal */}
           <NoteModal
             visible={noteModalVisible}
             setVisible={setNoteModalVisible}
@@ -312,6 +227,7 @@ export const SwapButton = React.memo(
             weight={weight}
             onSelectMood={handleSelectMood}
           />
+
           <PhotoPickerModal
             visible={imageOptionVisible}
             setVisible={setImageOptionVisible}

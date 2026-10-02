@@ -33,23 +33,12 @@ const HomeScreen = () => {
   const theme = useAppStore((state) => state.theme);
 
   const currentFastSession = useAppStore((state) => state.currentFastSession);
-  const [startTime, setStartTime] = useState<number | null>(
-    currentFastSession?.start_time || null,
-  );
-
+  const startTime = currentFastSession?.start_time ?? null;
   const { addModal, modalQueue } = useModalStore();
   const { hide } = useBottomSheet();
   const dbService = useDBService();
 
-  const prevSession = useRef(currentFastSession);
-
-  prevSession.current = currentFastSession;
-
-  const isCounting = useMemo(() => {
-    console.log("isCounting reset");
-    if (!currentFastSession) return false;
-    return currentFastSession.end_time ? false : true;
-  }, [currentFastSession]);
+  const isCounting = !!currentFastSession && !currentFastSession.end_time;
 
   const handleFinishFast = async (now: number = Date.now()) => {
     if (!(isCounting && startTime && currentFastSession))
@@ -67,13 +56,7 @@ const HomeScreen = () => {
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
     const isTooFast = duration < TOO_QUICK_DURATION;
     const isValid = duration > MIN_FAST_DURATION;
-    // const isValid = true;
-    console.log(
-      "target",
-      currentFastSession?.target_duration,
-      duration,
-      duration / 3600,
-    );
+    
     const isReachTarget = currentFastSession?.target_duration
       ? duration / 3600 > currentFastSession.target_duration
       : null;
@@ -121,38 +104,38 @@ const HomeScreen = () => {
     // Bắt đầu đếm
     // const now = new Date().getTime();
     setCounter(0);
-    setStartTime(now);
 
     const newSession = await dbService?.startNewSession(now, settings?.target);
     console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
+  
   const toggleCounting = useCallback(
-    async (delay?: number) => {
-      //Kết thúc đếm
-      console.log("toggleCounting", isCounting, startTime, currentFastSession);
-      if (isCounting && startTime && currentFastSession) {
-        await handleFinishFast(delay);
-      } else {
-        await startFast(delay);
-      }
-      // lấy dữ liệu fast lần này để xem ghi vào db
-    },
-    [isCounting, startTime, currentFastSession],
-  );
+  async (delay?: number) => {
+    if (isCounting && startTime && currentFastSession) {
+      await handleFinishFast(delay);
+    } else {
+      await startFast(delay);
+    }
+  },
+  [
+    isCounting,
+    startTime,
+    currentFastSession,
+    handleFinishFast,
+    startFast,
+  ],
+);
 
   const [counter, setCounter] = useState(0);
-  const handleCounter = () => {
-    if (!startTime) return;
+    const handleCounter = () => {
+  if (!startTime) return;
 
-    if (currentFastSession?.end_time) {
-      return setCounter(
-        Math.floor(Math.abs(currentFastSession?.end_time - startTime) / 1000),
-      );
-    }
-    const now = new Date().getTime();
-    return setCounter(Math.floor(Math.abs(now - startTime) / 1000));
-  };
+  const endTime = currentFastSession?.end_time ?? Date.now();
+
+  setCounter(Math.floor((endTime - startTime) / 1000));
+};
+  
 
   useEffect(() => {
     let interval = undefined;
@@ -200,7 +183,6 @@ const HomeScreen = () => {
               <SwapButton
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
-                variant="primary"
               />
             </View>
 

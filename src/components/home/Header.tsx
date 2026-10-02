@@ -14,64 +14,14 @@ import { HabitDetailModal } from "./HabitDetailModal";
 const radius = 50;
 
 const HomeHeader = () => {
-  const { theme, settings, userProfile, habit } = useAppStore();
+  const {  habit } = useAppStore();
   const { present } = useBottomSheet();
-
-  const maxHeight = useMemo(
-    () => Dimensions.get("window").height * 0.5,
-    [0.3, 0.8],
-  );
-
-  const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
-  const dbService = useDBService();
-
-  const getHabitLogs = async () => {
-    const res = await dbService?.getHabitLogs();
-    setHabitLogs(res);
-  };
-
-  useEffect(() => {
-    getHabitLogs();
-  }, []);
-
-  const { addModal } = useModalStore();
-  const handleSelectHabit = (
-    log: HabitLog & FastSession,
-    target?: (typeof FASTING_TARGETS)[0],
-  ) => {
-    console.log("log", log, target);
-    addModal({
-      type: "custom",
-      render: <HabitDetailModal log={log} targetInfo={target} />,
-    });
-  };
 
   const openHabitModal = () => {
       return present(<HabitBottomSheet />, {
         isRaw: true,
         snapPoints: ["100%"],
       });
-    
-    // present(<HabitBottomSheet />, {
-    //   list: {
-    //     data: habitLogs,
-    //     renderItem: ({ item }) => (
-    //       <View className="px-4">
-    //         <HabitLogComponent onPress={handleSelectHabit} log={item} />
-    //       </View>
-    //     ),
-    //     keyExtractor(item, index) {
-    //       return String(index);
-    //     },
-    //     empty: (
-    //       <View className="mt-8 gap-3 items-center">
-    //         <Text className="italic text-text-base/40">
-    //           Chưa có lịch sử phiên gần đây
-    //         </Text>
-    //       </View>
-    //     ),
-    //   },
-    // });
   };
 
   return (

@@ -1,5 +1,6 @@
 import { getProcessLevelTitle, processData } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
+import { getProcessProgress } from "@/util/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useState } from "react";
 import { LayoutChangeEvent, useWindowDimensions, View } from "react-native";
@@ -14,7 +15,6 @@ const HomeBodyProgress = ({ counter }: Props) => {
   const [labelWidth, setLabelWidth] = useState(0);
   const { width: screenWidth } = useWindowDimensions();
   const { theme } = useAppStore();
-  const [circle, setCircle] = useState(0);
 
   const detectLabelWidth = (e: LayoutChangeEvent) => {
     // 🌟 Bốc width ra ngay lập tức
@@ -29,57 +29,14 @@ const HomeBodyProgress = ({ counter }: Props) => {
     // }
   };
 
-  const getStatusLabel = (val: number, steps: string[]) => {
-    if (val === 0) return "Locked";
-    const index = Math.min(
-      Math.floor((val / 100) * steps.length),
-      steps.length - 1,
-    );
-    return steps[index];
-  };
-
-  const reRender = () => {
-    setCircle((prev) => prev + 1);
-  };
-
   return (
     <View>
       <View className="gap-1">
         {processData.map(({ key, title, icon, color, process }) => {
-          let activeProcess = undefined;
-          let percentage = 0;
-          let startOn = 0;
-          const hours = counter / 3_600;
-          for (let i = 0; i < process.length; i++) {
-            const item = process[i];
-            if (hours < item.hours) {
-              startOn = item.hours * 3_600; // Số mili giây
-              activeProcess = null;
-              break;
-            } else {
-              const nextItem = process[i + 1];
-              if (!nextItem || nextItem.hours > hours) {
-                activeProcess = item;
-                if (!nextItem) percentage = 100;
-                else
-                  percentage =
-                    ((hours - item.hours) / (nextItem.hours - item.hours)) *
-                    100;
-                break;
-              }
-            }
-          }
-
-          if (activeProcess === undefined)
-            activeProcess = process[process.length - 1];
-
-          // const percentage = activeProcess?.nextLevel
-          //   ? ((value.hours * 60 +
-          //       value.minutes -
-          //       activeProcess?.hours * 60) /
-          //       activeProcess?.nextLevel) *
-          //     100
-          //   : 100;
+          const { activeProcess, percentage, startOn } = getProcessProgress(
+            counter,
+            process,
+          );
 
           return (
             <View key={key} className="flex-row items-center gap-2 py-2">

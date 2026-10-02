@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import { Pressable, View } from "react-native";
 import { FastDetail } from "../fast_detail";
 import { ThemedText } from "../themed-text";
+import { getTargetInfo } from "@/util/home/fast";
+import { MIN_FAST_DURATION } from "@/database/shema/fast_sessions";
 
 interface Props {
   session: FastSession;
@@ -30,7 +32,7 @@ export const getSessionSummary = (session: FastSession) => {
     statusText = "Completed";
     statusColor = theme.success;
     isSuccess = true;
-  } else if (actualSeconds >= 16 * 3600) {
+  } else if (actualSeconds >= MIN_FAST_DURATION) {
     statusText = "Ended early";
     statusColor = theme.warning;
   }
@@ -54,9 +56,7 @@ export const RecentFastCard = ({ session }: Props) => {
 
   const summary = getSessionSummary(session);
 
-  const target = FASTING_TARGETS.find(
-    (item) => item.hours === session.target_duration,
-  );
+  const target = getTargetInfo(session.target_duration)
 
   const accent = target?.colors.accent ?? theme.primary;
   const badgeBg = target?.colors.badgeBg ?? `${theme.primary}15`;

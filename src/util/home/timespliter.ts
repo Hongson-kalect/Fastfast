@@ -67,3 +67,13 @@ export const splitSessionIntoDays = (
 
   return result;
 };
+
+export  const getMotivationalText = (percent: number) => {
+    if (percent >= 100)
+      return "👑 Bậc thầy kỷ luật! Bạn đã duy trì phong độ hoàn hảo.";
+    if (percent >= 70)
+      return "🔥 Thói quen cực kỳ vững chắc, tiếp tục phát huy nhé!";
+    if (percent >= 35) return "🌱 Bạn đang hình thành thói quen rất tốt!";
+    return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
+  };
+

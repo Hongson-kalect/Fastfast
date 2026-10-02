@@ -12,6 +12,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { checkStreak } from "./checkStreak";
 import { splitSessionIntoDays } from "./timespliter";
+import { FASTING_TARGETS, processData } from "@/constants/data";
 
 type FinishFastProps = {
   dbService: ReturnType<typeof createDBService>;
@@ -150,3 +151,55 @@ export const finishFast = async ({
 
   finalStreak && checkStreak(finalStreak);
 };
+
+export const getProcessProgress = (
+  counter: number,
+  process: typeof processData[number]["process"],
+) => {
+  const hours = counter / 3_600;
+
+  for (let i = 0; i < process.length; i++) {
+    const item = process[i];
+
+    if (hours < item.hours) {
+      return {
+        activeProcess: null,
+        percentage: 0,
+        startOn: item.hours * 3_600,
+      };
+    }
+
+    const nextItem = process[i + 1];
+
+    if (!nextItem || nextItem.hours > hours) {
+      return {
+        activeProcess: item,
+        percentage: nextItem
+          ? ((hours - item.hours) /
+              (nextItem.hours - item.hours)) *
+            100
+          : 100,
+        startOn: 0,
+      };
+    }
+  }
+
+  return {
+    activeProcess: process[process.length - 1],
+    percentage: 100,
+    startOn: 0,
+  };
+};
+
+export const getTargetInfo = (hour?: number) => {
+  if (!hour || FASTING_TARGETS.length === 0) return null;
+
+  const index = FASTING_TARGETS.findIndex(
+    (item) => item.hours > hour,
+  );
+
+  if (index === -1) return FASTING_TARGETS.at(-1);
+  if (index === 0) return FASTING_TARGETS[0];
+
+  return FASTING_TARGETS[index - 1];
+}

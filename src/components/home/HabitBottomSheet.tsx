@@ -12,6 +12,10 @@ import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { HabitDetailModal } from "./HabitDetailModal";
 import Waterball from "./Waterball";
+import { getMotivationalText } from "@/util/home/timespliter";
+import HabitMilestone from "./HabitMilestone";
+import { getTargetInfo } from "@/util/home/fast";
+import { fixed } from "@/util/numberLimit";
 
 interface HabitBottomSheetProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -63,18 +67,13 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
 };
 
 const HabitBottomSheetHeader: React.FC<
-  HabitBottomSheetProps & { habitCount: number }
+   { habitCount: number }
 > = ({ habitCount }) => {
-  const { addModal } = useModalStore();
   const { theme, userProfile, habit } = useAppStore();
 
-  const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
-    return [
-      habit?.habit_snap || 0,
-      habit?.shield_snap || 0,
-      habit?.habit_retain || 0,
-    ];
-  }, [habit]);
+  const habitPercent = habit?.habit_snap || 0;
+const shieldCount = habit?.shield_snap || 0;
+const habitRetain = habit?.habit_retain || 0;
 
   // Trạng thái mốc (Đã đạt hay chưa)
   const isMilestone35Reached = !!userProfile?.low_shield_clamable;
@@ -82,14 +81,6 @@ const HabitBottomSheetHeader: React.FC<
   const isMilestone100Reached = !!userProfile?.full_shield_clamable;
 
   // Đánh giá động dựa trên % Habit
-  const getMotivationalText = (percent: number) => {
-    if (percent >= 100)
-      return "👑 Bậc thầy kỷ luật! Bạn đã duy trì phong độ hoàn hảo.";
-    if (percent >= 70)
-      return "🔥 Thói quen cực kỳ vững chắc, tiếp tục phát huy nhé!";
-    if (percent >= 35) return "🌱 Bạn đang hình thành thói quen rất tốt!";
-    return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
-  };
 
   return (
     <View className="px-2 py-4 rounded-t-4xl w-full">
@@ -139,114 +130,14 @@ const HabitBottomSheetHeader: React.FC<
       </TouchableOpacity>
 
       {/* 3. MILESTONE & SHIELD TRACK */}
-      <View className="bg-background2/80 p-4 rounded-2xl border border-text-base/5 my-4">
-        <View className="flex-row justify-between items-center mb-4">
-          <ThemedText size="xs" weight="semibold" color="text" opacity="medium">
-            Tiến trình
-          </ThemedText>
-        </View>
-
-        <View className="relative h-3 bg-text-base/20 rounded-full w-full overflow-hidden">
-          <View
-            className="h-full bg-primary rounded-full"
-            style={{ width: `${Math.min(habitPercent, 100)}%` }}
-          />
-        </View>
-
-        <View className="relative h-12 w-full flex-row justify-between px-1">
-          {/* 0% */}
-          <View className="items-center -ml-2 opacity-0">
-            <View className="w-0.5 h-2 bg-text-base/20 mb-1" />
-            <ThemedText size="xxs" color="text" opacity="low">
-              0%
-            </ThemedText>
-          </View>
-
-          {/* 35% */}
-          <View className="absolute left-[35%] -translate-x-1/2 items-center">
-            <View className="w-0.5 h-2 bg-text-base/20 mb-1" />
-
-            <View
-              className={`p-1 rounded-full ${
-                isMilestone35Reached
-                  ? "bg-primary/20 border border-primary/50"
-                  : "bg-background2 opacity-40"
-              }`}
-            >
-              <FontAwesome5
-                name="shield-alt"
-                size={10}
-                color={isMilestone35Reached ? theme.primary : theme.text}
-              />
-            </View>
-
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-              style={{ marginTop: 2 }}
-            >
-              35%
-            </ThemedText>
-          </View>
-
-          {/* 70% */}
-          <View className="absolute left-[70%] -translate-x-1/2 items-center">
-            <View className="w-0.5 h-2 bg-text-base/20 mb-1" />
-
-            <View
-              className={`p-1 rounded-full ${
-                isMilestone70Reached
-                  ? "bg-primary/20 border border-primary/50"
-                  : "bg-background2 opacity-40"
-              }`}
-            >
-              <FontAwesome5
-                name="shield-alt"
-                size={10}
-                color={isMilestone70Reached ? theme.primary : theme.text}
-              />
-            </View>
-
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-              style={{ marginTop: 2 }}
-            >
-              70%
-            </ThemedText>
-          </View>
-
-          {/* 100% */}
-          <View className="items-center -mr-2">
-            <View className="w-0.5 h-2 bg-text-base/20 mb-1" />
-
-            <View
-              className={`p-1 rounded-full ${
-                isMilestone100Reached
-                  ? "bg-amber-500/20 border border-amber-500/50"
-                  : "bg-background2 opacity-40"
-              }`}
-            >
-              <FontAwesome5
-                name="crown"
-                size={10}
-                color={isMilestone100Reached ? "#FBBF24" : theme.text}
-              />
-            </View>
-
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-              style={{ marginTop: 2 }}
-            >
-              100%
-            </ThemedText>
-          </View>
-        </View>
-      </View>
+     <HabitMilestone
+  habitPercent={habitPercent}
+  isMilestone35Reached={isMilestone35Reached}
+  isMilestone70Reached={isMilestone70Reached}
+  isMilestone100Reached={isMilestone100Reached}
+  primaryColor={theme.primary}
+  textColor={theme.text}
+/>
 
       {/* 4. HISTORY */}
       <View className="flex-1">
@@ -271,137 +162,84 @@ export const HabitLogComponent = ({ log }: HabitLogComProps) => {
   const { theme } = useAppStore();
   const { addModal } = useModalStore();
 
+  if (!log) return null;
+
+  // 1. Tính toán Target mục tiêu (Chỉ recalculate khi log.target_duration hoặc log.duration đổi)
+  const target = log.target_duration && getTargetInfo(log.target_duration) || null;
+  // 2. Bọc toàn bộ logic trạng thái & hiển thị vào useMemo để tối ưu FlatList scroll
+  const habitDelta = Number(log.habit_delta ?? log.retain_delta ?? 0);
+const shieldDelta = Number(log.shield_delta ?? 0);
+
+const isFastSuccess =
+  habitDelta > 0 ? true : habitDelta < 0 ? false : null;
+
+const isShieldIncrease =
+  shieldDelta > 0 ? true : shieldDelta < 0 ? false : null;
+
+const isTargetSuccess =
+  log.target_duration && log.target_duration > 0
+    ? log.duration / 3600 >= log.target_duration
+    : false;
+
+const state =
+  habitDelta > 0
+    ? 1
+    : habitDelta < 0
+      ? 4
+      : shieldDelta > 0
+        ? 2
+        : shieldDelta < 0
+          ? 3
+          : 0;
+
+let labelColor = "#F4F4F5";
+
+switch (state) {
+  case 1:
+    labelColor = target?.colors.accent ?? theme.primary;
+    break;
+  case 2:
+    labelColor = theme.primary;
+    break;
+  case 3:
+    labelColor = theme.success;
+    break;
+  case 4:
+    labelColor = theme.error;
+    break;
+}
+
+const isShieldEvent = habitDelta === 0 && shieldDelta !== 0;
+const isPositiveHabit = habitDelta > 0;
+
+const overrestDays = log.overest ?? 0;
+
+const title =
+  isFastSuccess !== null
+    ? isFastSuccess
+      ? (target?.label ?? log.description ?? "Fasting session")
+      : `You over rest ${overrestDays} day(s)`
+    : isShieldIncrease
+      ? (log.description ?? "Shield increase")
+      : `Rest ${Math.abs(shieldDelta)} days`;
+
+const dateLabel = log.end_time
+  ? getLocalTodayStr(new Date(log.end_time))
+  : "--:--";
+  
   const handleSelectHabit = (
-    log: HabitLog & FastSession,
-    target?: (typeof FASTING_TARGETS)[0],
   ) => {
-    console.log("log", log, target);
     addModal({
       type: "custom",
       render: <HabitDetailModal log={log} targetInfo={target} />,
     });
   };
 
-  if (!log) return null;
-
-  // 1. Tính toán Target mục tiêu (Chỉ recalculate khi log.target_duration hoặc log.duration đổi)
-  const target = useMemo(() => {
-    if (log.target_duration && log.target_duration > 0) {
-      const targetHours = Math.round(log.target_duration);
-      return FASTING_TARGETS.find((item) => item.hours === targetHours);
-    }
-
-    if (!log.duration) return undefined;
-
-    const durationHours = log.duration / 3600;
-    const index = FASTING_TARGETS.findIndex(
-      (item) => item.hours >= durationHours,
-    );
-
-    if (index === -1) return FASTING_TARGETS.at(-1);
-    if (index === 0) return FASTING_TARGETS[0];
-
-    return FASTING_TARGETS[index - 1];
-  }, [log.target_duration, log.duration]);
-
-  // 2. Bọc toàn bộ logic trạng thái & hiển thị vào useMemo để tối ưu FlatList scroll
-  const {
-    dateLabel,
-    habitDelta,
-    isPositiveHabit,
-    isShieldEvent,
-    isTargetSuccess,
-    labelColor,
-    shieldDelta,
-    title,
-  } = useMemo(() => {
-    const habitDelta = Number(log.habit_delta ?? log.retain_delta ?? 0);
-    const shieldDelta = Number(log.shield_delta ?? 0);
-
-    const isFastSuccess = habitDelta > 0 ? true : habitDelta < 0 ? false : null;
-    const isShieldIncrease =
-      shieldDelta > 0 ? true : shieldDelta < 0 ? false : null;
-
-    const isTargetSuccess =
-      log.target_duration && log.target_duration > 0
-        ? log.duration / 3600 >= log.target_duration
-        : false;
-
-    /**
-     * 1 = Fasting success
-     * 2 = Shield increase
-     * 3 = Rest
-     * 4 = Over rest
-     * 0 = Unknown
-     */
-    const state =
-      habitDelta > 0
-        ? 1
-        : habitDelta < 0
-          ? 4
-          : shieldDelta > 0
-            ? 2
-            : shieldDelta < 0
-              ? 3
-              : 0;
-
-    // Label Text Color
-    let labelColor = "#F4F4F5"; // Mã kẽm sáng chuẩn dark mode
-    switch (state) {
-      case 1:
-        labelColor = target?.colors.accent ?? theme.primary;
-        break;
-      case 2:
-        labelColor = theme.primary;
-        break;
-      case 3:
-        labelColor = theme.success;
-        break;
-      case 4:
-        labelColor = theme.error;
-        break;
-    }
-
-    const isShieldEvent = habitDelta === 0 && shieldDelta !== 0;
-    const isPositiveHabit = habitDelta > 0;
-
-    // Title hiển thị
-    const overrestDays = log.overest ?? log.overest ?? 0;
-    const title =
-      isFastSuccess !== null
-        ? isFastSuccess
-          ? (target?.label ?? log.description ?? "Fasting session")
-          : `You over rest ${overrestDays} day(s)`
-        : isShieldIncrease
-          ? (log.description ?? "Shield increase")
-          : `Rest ${Math.abs(shieldDelta)} days`;
-
-    // Date Label
-    const dateLabel = log.end_time
-      ? getLocalTodayStr(new Date(log.end_time))
-      : "--:--";
-
-    return {
-      target,
-      habitDelta,
-      shieldDelta,
-      isTargetSuccess,
-      isShieldEvent,
-      isPositiveHabit,
-      labelColor,
-      title,
-      dateLabel,
-    };
-  }, [log, target, theme]);
-
-  // Format Helper
-  const fixed = (val: number) =>
-    val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
   return (
     <View className="mb-3 overflow-hidden rounded-xl border border-text-base/20 bg-background2">
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => handleSelectHabit(log, target)}
+        onPress={handleSelectHabit}
         className="flex-row items-center justify-between p-3.5"
       >
         {/* Left Section */}
