@@ -24,30 +24,7 @@ type Props = {
   totalDuration?: number;
   size?: number;
   strokeWidth?: number;
-
-  /**
-
-* true:
-* Sweep toàn bộ timeline 24h.
-*
-* false:
-* Hiển thị ngay lập tức.
-  */
   animated?: boolean;
-
-  /**
-
-* Tổng thời gian animation cho toàn bộ 24h sweep.
-*
-* Ví dụ:
-* 2400ms
-*
-* 0h  -> 0ms
-* 6h  -> 600ms
-* 12h -> 1200ms
-* 18h -> 1800ms
-* 24h -> 2400ms
-  */
   animationDuration?: number;
 
   isLoading?: boolean;
@@ -68,20 +45,9 @@ type SegmentItemProps = {
   animated: boolean;
 };
 
-/* ================================================================
-DEFAULTS
-================================================================ */
-
 const DEFAULT_SIZE = 260;
 const DEFAULT_STROKE_WIDTH = 12;
 
-/**
-
-* Tạm thời dùng màu khác nhau để debug.
-*
-* Sau khi geometry ổn định có thể bỏ và dùng
-* một màu duy nhất.
-  */
 export const DEBUG_COLORS = [
   "#34D399", // emerald
   "#60A5FA", // blue
@@ -91,35 +57,7 @@ export const DEBUG_COLORS = [
   "#FB7185", // rose
 ];
 
-/**
-
-* Khoảng hở giữa các segment.
-*
-* Đây là GAP MỖI PHÍA.
-*
-* Ví dụ:
-*
-* 20 -> 24
-*
-* sẽ thực tế render:
-*
-* 20 + GAP -> 24 - GAP
-*
-* Và:
-*
-* 0 -> 16
-*
-* sẽ render:
-*
-* 0 + GAP -> 16 - GAP
-*
-* Vì vậy tại boundary 24/0 sẽ luôn có khoảng hở.
-  */
 const ARC_GAP_DEG = 5.5;
-
-/* ================================================================
-UTILS
-================================================================ */
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -138,20 +76,6 @@ const polarToCartesian = (
     y: cy + radius * Math.sin(angleInRadians),
   };
 };
-
-/**
-
-* Tạo một SVG Arc độc lập.
-*
-* Không dùng Circle + strokeDasharray cho geometry nữa.
-*
-* Điều này rất quan trọng vì mỗi fasting session
-* thực sự là một path riêng biệt:
-*
-* (=========)
-*
-* thay vì một Circle bị cắt dash.
-  */
 
 const describeArcPath = (
   cx: number,
@@ -174,10 +98,6 @@ const describeArcPath = (
   ].join(" ");
 };
 
-/* ================================================================
-SEGMENT COMPONENT
-================================================================ */
-
 const TimelineSegmentItem = React.memo(
   ({
     index,
@@ -188,11 +108,6 @@ const TimelineSegmentItem = React.memo(
     animationDuration,
     animated,
   }: SegmentItemProps) => {
-    /**
-     * ------------------------------------------------------------
-     * ANGLES
-     * ------------------------------------------------------------
-     */
     const { theme } = useAppStore();
     const colors = [theme.primary, theme.warning];
 
@@ -202,32 +117,9 @@ const TimelineSegmentItem = React.memo(
 
     const rawSegmentAngle = rawEndAngle - rawStartAngle;
 
-    /**
-     * Segment quá ngắn thì không đủ chỗ cho
-     * gap ở cả hai đầu.
-     */
     if (rawSegmentAngle <= ARC_GAP_DEG * 2) {
       return null;
     }
-
-    /**
-     * ------------------------------------------------------------
-     * GAP
-     * ------------------------------------------------------------
-     *
-     * Mỗi segment bị inset vào hai đầu.
-     *
-     * Ví dụ:
-     *
-     * raw:
-     * 20 ---------------------- 24
-     *
-     * render:
-     *       20 + gap ------ 24 - gap
-     *
-     * Nhờ vậy round cap không thể chạm
-     * segment bên cạnh.
-     */
     const startAngle = rawStartAngle + ARC_GAP_DEG;
 
     const endAngle = rawEndAngle - ARC_GAP_DEG;
@@ -237,13 +129,6 @@ const TimelineSegmentItem = React.memo(
     if (arcAngle <= 0) {
       return null;
     }
-
-    /**
-     * ------------------------------------------------------------
-     * ARC GEOMETRY
-     * ------------------------------------------------------------
-     */
-
     const circumference = 2 * Math.PI * ringRadius;
 
     const arcLength = (arcAngle / 360) * circumference;
@@ -256,37 +141,6 @@ const TimelineSegmentItem = React.memo(
       endAngle,
     );
 
-    /**
-     * ------------------------------------------------------------
-     * 24H SWEEP ANIMATION
-     * ------------------------------------------------------------
-     *
-     * animationDuration đại diện cho toàn bộ:
-     *
-     * 0h ----------------------------> 24h
-     *
-     * Ví dụ animationDuration = 2400ms:
-     *
-     * startHour = 0
-     *   delay = 0ms
-     *
-     * startHour = 6
-     *   delay = 600ms
-     *
-     * startHour = 12
-     *   delay = 1200ms
-     *
-     * startHour = 18
-     *   delay = 1800ms
-     *
-     * duration quyết định arc xuất hiện trong bao lâu.
-     *
-     * duration = 16h
-     *   16 / 24 * 2400 = 1600ms
-     *
-     * duration = 4h
-     *   4 / 24 * 2400 = 400ms
-     */
     const animationProgress = useSharedValue(animated ? 0 : 1);
 
     useEffect(() => {
@@ -303,14 +157,6 @@ const TimelineSegmentItem = React.memo(
        * Reset trước mỗi lần data thay đổi.
        */
       animationProgress.value = 0;
-
-      /**
-       * Segment xuất hiện đúng thời điểm
-       * sweep đi tới startHour.
-       *
-       * Sau đó nó draw trong thời gian
-       * tương ứng với duration của session.
-       */
       animationProgress.value = withDelay(
         delay,
         withTiming(1, {
@@ -326,21 +172,6 @@ const TimelineSegmentItem = React.memo(
       animationProgress,
     ]);
 
-    /**
-     * ------------------------------------------------------------
-     * DASH ANIMATION
-     * ------------------------------------------------------------
-     *
-     * Chỉ có đúng một dash = arcLength.
-     *
-     * Không dùng:
-     *
-     *   arcLength + circumference
-     *
-     * như implementation cũ.
-     *
-     * Điều này tránh dash pattern wrap qua 0/24.
-     */
     const animatedProps = useAnimatedProps(() => {
       return {
         strokeDashoffset: arcLength * (1 - animationProgress.value),
@@ -366,10 +197,6 @@ const TimelineSegmentItem = React.memo(
 
 TimelineSegmentItem.displayName = "TimelineSegmentItem";
 
-/* ================================================================
-MAIN COMPONENT
-================================================================ */
-
 export default function Circular24hTimeline({
   segments,
   totalDuration = 0,
@@ -379,115 +206,37 @@ export default function Circular24hTimeline({
   animationDuration = 1000,
   isLoading = false,
 }: Props) {
+  const { theme } = useAppStore();
+
   const center = size / 2;
-
-  /**
-
-* ---
-* RADII
-* ---
-
-*/
-
-  /**
-
-* Vòng ngoài chứa anchor.
-  */
   const anchorRadius = size * 0.4;
-
-  /**
-
-* Ring fasting.
-  */
   const ringRadius = size * 0.31;
 
-  /**
-
-* ---
-* NORMALIZE SEGMENTS
-* ---
-
-*/
   const normalizedSegments = useMemo(() => {
     return segments
-      .map((segment, index) => {
+      .map((segment) => {
         const start = clamp(segment.startHour, 0, 24);
-
         const duration = clamp(segment.duration, 0, 24 - start);
 
         return {
           ...segment,
-
           startHour: start,
-
           duration,
-
-          /**
-           * 0h  = 0°
-           * 6h  = 90°
-           * 12h = 180°
-           * 18h = 270°
-           * 24h = 360°
-           */
           startAngle: (start / 24) * 360,
-
           endAngle: ((start + duration) / 24) * 360,
-
-          /**
-           * DEBUG:
-           *
-           * Nếu caller không truyền màu,
-           * mỗi session có màu khác nhau.
-           */
-          color: segment.color ?? DEBUG_COLORS[index % DEBUG_COLORS.length],
+          color: segment.color ?? theme.primary,
         };
       })
       .filter((segment) => segment.duration > 0);
-  }, [segments]);
-
-  /**
-
-* ---
-* TIME ANCHORS
-* ---
-
-*/
+  }, [segments, theme.primary]);
 
   const anchors = [
-    {
-      hour: 0,
-      label: "24 - 00",
-    },
-    {
-      hour: 6,
-      label: "06",
-    },
-    {
-      hour: 12,
-      label: "12",
-    },
-    {
-      hour: 18,
-      label: "18",
-    },
+    { hour: 0, label: "24 - 00" },
+    { hour: 6, label: "06" },
+    { hour: 12, label: "12" },
+    { hour: 18, label: "18" },
   ];
 
-  /**
-
-* ---
-* 0H / 24H BOUNDARY
-* ---
-*
-* Đây là đường cắt vật lý của vòng.
-*
-* Nó giúp:
-*
-* 20 → 24
-*
-* không visually merge với:
-*
-* 0 → 16
-  */
   const boundaryOuter = polarToCartesian(
     center,
     center,
@@ -502,16 +251,6 @@ export default function Circular24hTimeline({
     0,
   );
 
-  /**
-
-* ---
-* RENDER
-* ---
-
-*/
-
-  const { theme } = useAppStore();
-
   return (
     <View
       style={{
@@ -521,6 +260,7 @@ export default function Circular24hTimeline({
       }}
     >
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {/* Outer guide */}
         <Circle
           cx={center}
           cy={center}
@@ -530,13 +270,16 @@ export default function Circular24hTimeline({
           strokeWidth={1}
         />
 
-        {/* =====================================================
-        TIME ANCHORS
-    ===================================================== */}
+        {/* Time anchors */}
         {anchors.map((anchor) => {
           const angle = (anchor.hour / 24) * 360;
 
-          const outer = polarToCartesian(center, center, anchorRadius, angle);
+          const outer = polarToCartesian(
+            center,
+            center,
+            anchorRadius,
+            angle,
+          );
 
           const inner = polarToCartesian(
             center,
@@ -545,10 +288,6 @@ export default function Circular24hTimeline({
             angle,
           );
 
-          /**
-           * Label nằm hơi bên ngoài tick,
-           * nhưng vẫn nằm trong SVG viewport.
-           */
           const labelPos = polarToCartesian(
             center,
             center,
@@ -558,7 +297,6 @@ export default function Circular24hTimeline({
 
           return (
             <G key={anchor.hour}>
-              {/* Tick */}
               <Line
                 x1={inner.x}
                 y1={inner.y}
@@ -569,7 +307,6 @@ export default function Circular24hTimeline({
                 strokeLinecap="round"
               />
 
-              {/* Label */}
               <SvgText
                 x={labelPos.x}
                 y={labelPos.y}
@@ -585,9 +322,7 @@ export default function Circular24hTimeline({
           );
         })}
 
-        {/* =====================================================
-        FASTING BASE TRACK
-    ===================================================== */}
+        {/* Timeline background */}
         <Circle
           cx={center}
           cy={center}
@@ -597,13 +332,11 @@ export default function Circular24hTimeline({
           strokeWidth={strokeWidth}
         />
 
-        {/* =====================================================
-        FASTING SEGMENTS
-    ===================================================== */}
+        {/* Fast segments */}
         {normalizedSegments.map((segment, index) => (
           <TimelineSegmentItem
-            index={index}
             key={segment.id}
+            index={index}
             segment={segment}
             center={center}
             ringRadius={ringRadius}
@@ -613,17 +346,7 @@ export default function Circular24hTimeline({
           />
         ))}
 
-        {/* =====================================================
-        0H / 24H CUT
-    ===================================================== */}
-        {/**
-         * Vạch cắt được đặt TRÊN arc.
-         *
-         * Điều này cực kỳ quan trọng:
-         *
-         * Nếu đặt dưới arc thì segment 20→24
-         * vẫn có thể visually merge với 0→16.
-         */}
+        {/* 0H / 24H boundary */}
         <Line
           x1={boundaryInner.x}
           y1={boundaryInner.y}
@@ -634,7 +357,6 @@ export default function Circular24hTimeline({
           strokeLinecap="round"
         />
 
-        {/* Boundary dot */}
         <Circle
           cx={boundaryOuter.x}
           cy={boundaryOuter.y}
@@ -642,13 +364,11 @@ export default function Circular24hTimeline({
           fill={theme.error}
         />
 
-        {/* =====================================================
-        CENTER VALUE
-    ===================================================== */}
+        {/* Total */}
         <SvgText
           x={center}
           y={center - 8}
-          fill={theme.text}
+          fill={theme.title}
           fontSize={30}
           fontWeight="700"
           textAnchor="middle"
@@ -671,13 +391,13 @@ export default function Circular24hTimeline({
         </SvgText>
       </Svg>
 
-      {/* =======================================================
-      LOADING
-  ======================================================= */}
       {isLoading && (
         <View className="absolute inset-0 items-center justify-center">
           <View className="h-10 w-10 items-center justify-center rounded-full bg-background/90">
-            <ActivityIndicator size="small" color={theme.success} />
+            <ActivityIndicator
+              size="small"
+              color={theme.primary}
+            />
           </View>
         </View>
       )}

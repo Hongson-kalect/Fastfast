@@ -132,7 +132,7 @@ const FastEndTimeModal = ({
   const finishStatus = getFinishStatus();
 
   const dbService = useDBService();
-  const { addModal } = useModalStore();
+  const { closeCurrentModal } = useModalStore();
   const handleSubmit = async () => {
     const finalTime = selectedTimeRef.current;
 
@@ -155,7 +155,7 @@ const FastEndTimeModal = ({
       });
       return;
     }
-    addModal(null);
+    closeCurrentModal()
     await finishFast({ dbService, currentFast, endTime: finalTime });
   };
 

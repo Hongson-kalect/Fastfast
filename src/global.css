@@ -7,13 +7,19 @@
 @theme {
   --color-primary: var(--dynamic-primary);
   --color-secondary: var(--dynamic-secondary);
+  --color-tertiary: var(--dynamic-tertiary);
+
   --color-text-base: var(--dynamic-text-base);
+  --color-title: var(--dynamic-title);
+
   --color-background: var(--dynamic-background);
   --color-background2: var(--dynamic-background2);
-  --color-title: var(--dynamic-title);
+  --color-card: var(--dynamic-card);
+
   --color-error: var(--dynamic-error);
   --color-warning: var(--dynamic-warning);
   --color-success: var(--dynamic-success);
+  --color-info: var(--dynamic-info);
 
   --radius-card: 16px;
   --spacing-18: 4.5rem;

@@ -10,7 +10,6 @@ type Props = {
   minTime?: number | null;
   onSubmit: (startTime: number) => void;
 };
-
 const MAX_DELAY_MS = 24 * 60 * 60 * 1000;
 
 const START_PRESETS = [
@@ -29,41 +28,37 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const [showPicker, setShowPicker] = useState(false);
 
   const selectedDate = new Date(startTime);
+
   const today = getLocalTodayStr(now);
-  const date = getLocalTodayStr(selectedDate);
+  const selectedDay = getLocalTodayStr(selectedDate);
 
   const hours = selectedDate.getHours();
   const minutes = selectedDate.getMinutes();
 
   const minAllowedTime = now.getTime() - MAX_DELAY_MS;
 
-  const validateTime = (time: number): boolean => {
+  const showError = (text2: string) => {
+    Toast.show({
+      type: "error",
+      text1: "Thời gian không hợp lệ",
+      text2,
+      useModal: true,
+    });
+  };
+
+  const validateTime = (time: number) => {
     if (minTime && time < minTime) {
-      Toast.show({
-        type: "error",
-        text1: "Thời gian không hợp lệ",
-        text2: "Trùng thời gian với phiên trước đó!",
-        useModal: true,
-      });
+      showError("Trùng thời gian với phiên trước đó!");
       return false;
     }
+
     if (time < minAllowedTime) {
-      Toast.show({
-        type: "error",
-        text1: "Thời gian không hợp lệ",
-        text2: "Chỉ được phép bắt đầu sớm tối đa 24 giờ!",
-        useModal: true,
-      });
+      showError("Chỉ được phép bắt đầu sớm tối đa 24 giờ!");
       return false;
     }
 
     if (time > now.getTime()) {
-      Toast.show({
-        type: "error",
-        text1: "Thời gian không hợp lệ",
-        text2: "Không thể chọn thời gian ở tương lai!",
-        useModal: true,
-      });
+      showError("Không thể chọn thời gian ở tương lai!");
       return false;
     }
 
@@ -84,13 +79,13 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
     applyTime(startTime + delta * 60 * 1000);
   };
 
-  const handlePickerChange = (_: any, selectedDate?: Date) => {
+  const handlePickerChange = (_event: any, value?: Date) => {
     if (Platform.OS === "android") {
       setShowPicker(false);
     }
 
-    if (selectedDate) {
-      applyTime(selectedDate.getTime());
+    if (value) {
+      applyTime(value.getTime());
     }
   };
 
@@ -103,8 +98,8 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   return (
     <View className="pb-6 pt-4">
       {/* Header */}
-      <View className="mb-4">
-        <ThemedText size="md" weight="bold">
+      <View className="mb-5">
+        <ThemedText size="md" weight="bold" color="title">
           Chọn thời gian bắt đầu Fast
         </ThemedText>
 
@@ -112,65 +107,79 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           size="xs"
           color="text"
           opacity="medium"
-          style={{ marginTop: 4 }}
+          className="mt-1"
         >
           Có thể bắt đầu sớm hơn hiện tại tối đa 24 giờ
         </ThemedText>
       </View>
 
-      {/* Quick Presets */}
-      <ThemedText
-        size="xxs"
-        weight="bold"
-        color="text"
-        opacity="medium"
-        style={{
-          marginBottom: 8,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-        }}
-      >
-        Bắt đầu sớm
-      </ThemedText>
+      {/* Quick presets */}
+      <View className="mb-5">
+        <ThemedText
+          size="xxs"
+          weight="bold"
+          color="text"
+          opacity="medium"
+          className="mb-2"
+          style={{
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
+          Bắt đầu sớm
+        </ThemedText>
 
-      <View className="mb-6 flex-row gap-x-2">
-        {START_PRESETS.map((preset) => (
-          <TouchableOpacity
-            key={preset.label}
-            activeOpacity={0.7}
-            onPress={() => handleQuickPreset(preset.minutes)}
-            className="flex-1 items-center justify-center rounded-xl border border-text-base/10 bg-background2/80 py-2.5 active:border-primary/50 active:bg-primary/20"
-          >
-            <ThemedText size="xs" weight="bold" color="primary">
-              -{preset.label}
-            </ThemedText>
-          </TouchableOpacity>
-        ))}
+        <View className="flex-row gap-2">
+          {START_PRESETS.map((preset) => (
+            <TouchableOpacity
+              key={preset.label}
+              activeOpacity={0.7}
+              onPress={() => handleQuickPreset(preset.minutes)}
+              className="flex-1 items-center justify-center rounded-xl border border-text-base/10 bg-background2 py-2.5"
+            >
+              <ThemedText
+                size="xs"
+                weight="bold"
+                color="primary"
+              >
+                -{preset.label}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      {/* Time */}
-      <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background/60 p-4">
-        <View className="flex-row items-center justify-center gap-x-4">
+      {/* Time selector */}
+      <View className="items-center rounded-2xl border border-text-base/10 bg-background2/60 px-4 py-4">
+        <View className="flex-row items-center gap-3">
           <TouchableOpacity
             activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10 }}
+            hitSlop={10}
             onPress={() => adjustMinutes(-5)}
-            className="h-12 w-12 items-center justify-center rounded-full border border-text-base/10 bg-background2 active:bg-background2/70"
+            className="h-11 w-11 items-center justify-center rounded-full border border-text-base/10 bg-background"
           >
-            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
-              -5
+            <ThemedText
+              size="sm"
+              weight="bold"
+              color="text"
+              opacity="medium"
+            >
+              −5
             </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => setShowPicker(true)}
-            className="w-36 items-center justify-center rounded-xl border border-text-base/20 bg-background2/80 py-3"
+            className="min-w-36 items-center justify-center rounded-xl border border-primary/20 bg-primary/5 px-5 py-3"
           >
             <ThemedText
               size="xxxl"
               weight="bold"
-              style={{ fontVariant: ["tabular-nums"] }}
+              color="title"
+              style={{
+                fontVariant: ["tabular-nums"],
+              }}
             >
               {hours.toString().padStart(2, "0")}:
               {minutes.toString().padStart(2, "0")}
@@ -179,34 +188,39 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, right: 10 }}
+            hitSlop={10}
             onPress={() => adjustMinutes(5)}
-            className="h-12 w-12 items-center justify-center rounded-full border border-text-base/10 bg-background2 active:bg-background2/70"
+            className="h-11 w-11 items-center justify-center rounded-full border border-text-base/10 bg-background"
           >
-            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
+            <ThemedText
+              size="sm"
+              weight="bold"
+              color="text"
+              opacity="medium"
+            >
               +5
             </ThemedText>
           </TouchableOpacity>
         </View>
 
         {/* Date */}
-        <View className="mt-3 flex-row items-center justify-center">
+        <View className="mt-3">
           <ThemedText
             size="xs"
             weight="medium"
-            color={date !== today ? "warning" : "text"}
-            opacity={date !== today ? "full" : "medium"}
+            color={selectedDay !== today ? "warning" : "text"}
+            opacity={selectedDay !== today ? "full" : "medium"}
           >
-            {date !== today && "⚠️ "}
-            {date === today ? "Hôm nay" : date}
+            {selectedDay !== today && "⚠️ "}
+            {selectedDay === today ? "Hôm nay" : selectedDay}
           </ThemedText>
         </View>
       </View>
 
-      {/* Native Picker */}
+      {/* Native picker */}
       {showPicker && (
         <DateTimePicker
-          value={new Date(startTime)}
+          value={selectedDate}
           mode="time"
           is24Hour
           display={Platform.OS === "ios" ? "spinner" : "default"}
@@ -218,17 +232,20 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={handleSubmit}
-        style={{
-          boxShadow: `0px 4px 8px ${theme.primary}`,
-        }}
         className="mt-5 items-center justify-center rounded-2xl bg-primary py-3.5"
+        style={{
+          boxShadow: `0px 4px 8px ${theme.primary}40`,
+        }}
       >
-        <ThemedText size="sm" weight="bold" colorHex="#FFFFFF">
+        <ThemedText
+          size="sm"
+          weight="bold"
+          color="background"
+        >
           Xác nhận bắt đầu Fast
         </ThemedText>
       </TouchableOpacity>
     </View>
   );
 };
-
 export default FastStartTimeModal;

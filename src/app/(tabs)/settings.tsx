@@ -13,22 +13,26 @@ import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { capitalize } from "@/util/text";
 import { useState } from "react";
+import { toggleDarkMode, updateTheme } from "@/stores/appAction";
+import { useSQLiteContext } from "expo-sqlite";
+import { extractTheme, ThemeKey, ThemeType } from "@/constants/themes";
 
 export default function SettingsScreen() {
-  const { theme, settings, updateSetting, toggleDarkMode, updateTheme } =
+  const { theme, settings, updateSetting, setDarkMode, setTheme } =
     useAppStore();
   const { present } = useBottomSheet();
 
-  const [darkMode, setDarkMode] = useState(settings?.is_dark_mode ?? true);
+  const [isDarkMode, setIsDarkMode] = useState(settings?.is_dark_mode ?? true);
   const dbService = useDBService();
+  const db = useSQLiteContext()
 
   const openThemeModal = () => {
     present(
       <ThemeBottomSheet
         currentThemeId={settings?.theme || "default"}
-        isDarkMode={darkMode}
-        onSelect={(themeId: string) => {
-          updateTheme(dbService, themeId);
+        isDarkMode={isDarkMode}
+        onSelect={(themeId: ThemeKey) => {
+          updateTheme(db, themeId);
         }}
       />,
       {
@@ -76,10 +80,10 @@ export default function SettingsScreen() {
             icon="moon"
             title="Dark mode"
             description="Use dark appearance throughout the app"
-            value={darkMode}
+            value={isDarkMode}
             onChange={(value) => {
               setDarkMode(value);
-              toggleDarkMode(dbService);
+              toggleDarkMode(db);
             }}
           />
 

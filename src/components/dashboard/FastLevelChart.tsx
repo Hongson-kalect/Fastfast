@@ -1,6 +1,6 @@
 import { useAppStore } from "@/stores/appStore";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, {
   Easing,
@@ -33,7 +33,7 @@ const LEVEL_COLORS = [
   ["#A78BFA", "#8B5CF6"],
 ] as const;
 
-const FastLevelItem = ({
+const FastLevelItem = React.memo(({
   label,
   count,
   maxCount,
@@ -55,11 +55,7 @@ const FastLevelItem = ({
 
   const progress = useSharedValue(0);
 
-  const percentage = useMemo(() => {
-    if (maxCount === 0) return 0;
-    return count / maxCount;
-  }, [count, maxCount]);
-
+  const percentage = maxCount === 0 ? 0 : count / maxCount;
   useEffect(() => {
     progress.value = 0;
 
@@ -70,7 +66,7 @@ const FastLevelItem = ({
         easing: Easing.out(Easing.cubic),
       }),
     );
-  }, [percentage]);
+  }, [percentage, index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     width: trackWidth * progress.value,
@@ -129,7 +125,7 @@ const FastLevelItem = ({
 
       {/* Track */}
       <View
-        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width - 4)}
+        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
         className="h-4 overflow-hidden rounded-full bg-background2 p-0.5"
       >
         {trackWidth > 0 && (
@@ -157,7 +153,7 @@ const FastLevelItem = ({
       </View>
     </View>
   );
-};
+});
 
 export const FastLevelBarChart = ({ fastStatistics }: Props) => {
   const { theme } = useAppStore();
@@ -193,7 +189,6 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
   ];
 
   const maxCount = Math.max(...levels.map((i) => i.count), 1);
-  const allCount = levels.reduce((sum, item) => sum + item.count, 0);
 
   const total = levels.reduce((sum, item) => sum + item.count, 0);
 
@@ -248,7 +243,7 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
             label={item.label}
             count={item.count}
             maxCount={maxCount}
-            allCount={allCount}
+            allCount={total}
             // badge={item?.badge}
             colors={LEVEL_COLORS[index]}
           />

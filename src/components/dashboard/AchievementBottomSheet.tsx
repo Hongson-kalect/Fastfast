@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
@@ -43,28 +43,27 @@ type AchievementBottomSheetProps = {
 };
 // Giả định props truyền vào đã được join hoặc map thêm trạng thái từ DB
 interface Props {
-  achievement: any;
-  userAchievement: any;
+  achievement: Achievement;
+  userAchievement?: UserAchievement;
   userMilestone?: UserAchievementMilestone[]; // Danh sách milestone chưa confirm (is_confirmed === 0)
   onPress?: () => void;
   onClaim?: (milestoneId: string) => void; // Callback xử lý claim trực tiếp
 }
 
-export const AchievementCard: React.FC<Props> = ({
+export const AchievementCard = ({
   achievement,
   userAchievement,
   userMilestone = [],
   onPress,
   onClaim,
-}) => {
-  const { theme } = useAppStore();
+}:Props) => {
 
   if (!achievement?.items.length) return null;
 
   const currentValue = userAchievement?.current_value ?? 0;
 
   const numericItems = achievement.items.filter(
-    (item: any) => typeof item.target === "number",
+    (item) => typeof item.target === "number",
   );
 
   // Đếm số item đã ĐẠT MỤC TIÊU (kể cả đã claim hay chưa)
@@ -76,33 +75,33 @@ export const AchievementCard: React.FC<Props> = ({
   }).length;
 
   const totalCount = achievement.items.length;
-  const isCompleted = totalCount > 0 && completedCount === totalCount;
+const isCompleted = completedCount === totalCount;
   const unconfirmedMilestones = userMilestone.filter(
-    (item: any) => item.is_confirmed === 0,
-  );
+  (item: any) => item.is_confirmed === 0,
+);
 
-  // 🌟 KIỂM TRA TRẠNG THÁI CẦN XÁC NHẬN (UNCLAIMED)
-  const hasUnclaimed = unconfirmedMilestones.length > 0;
-  // Lấy milestone đầu tiên chưa claim để làm target cho nút bấm nhận nhanh
-  const unclaimedItem = unconfirmedMilestones[0];
+const unclaimedItem = userMilestone.find(
+  (item) => item.is_confirmed === 0,
+);
+
+const hasUnclaimed = !!unclaimedItem;
 
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
-  const dbService = useDBService();
-  const { userProfile } = useAppStore();
+ const { theme, userProfile } = useAppStore();
+const dbService = useDBService();
 
   const handleCardPress = async () => {
-    if (onClaim && unclaimedItem && userProfile) {
-      // Ưu tiên trigger claim nếu user bấm vào card đang có thưởng chờ
-      await dbService?.confirmAchievementMilestone({
-        userId: userProfile?.id,
-        achievementId: unclaimedItem.achievement_item_id,
-        milestoneItemId: unclaimedItem.id,
-      });
-      onClaim(unclaimedItem.achievement_item_id);
-    } else {
-      onPress?.();
-    }
-  };
+  if (onClaim && unclaimedItem && userProfile) {
+    await dbService?.confirmAchievementMilestone({
+      userId: userProfile?.id,
+      achievementId: unclaimedItem.achievement_item_id,
+      milestoneItemId: unclaimedItem.id,
+    });
+    onClaim(unclaimedItem.achievement_item_id);
+  } else {
+    onPress?.();
+  }
+};
 
   return (
     <View className="mb-2 overflow-hidden rounded-xl border border-text-base/20 bg-background2">
@@ -236,9 +235,9 @@ const formatAchievementValue = (value: number) => {
   return value.toFixed(1);
 };
 
-export const AchievementBottomSheet: React.FC<AchievementBottomSheetProps> = ({
+export const AchievementBottomSheet = ({
   onSelect,
-}) => {
+}: AchievementBottomSheetProps) => {
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>(
     [],
   );
@@ -247,11 +246,11 @@ export const AchievementBottomSheet: React.FC<AchievementBottomSheetProps> = ({
   >([]);
 
   const { userProfile } = useAppStore();
-
   const dbService = useDBService();
 
-  if (!userProfile) return null;
-  const getAchievements = async () => {
+  const loadAchievements = useCallback(async () => {
+    if (!userProfile) return;
+
     const { currentMilestones, userAchievements } = await getUserAchievements(
       dbService,
       userProfile.id,
@@ -259,27 +258,38 @@ export const AchievementBottomSheet: React.FC<AchievementBottomSheetProps> = ({
 
     setUserAchievements(userAchievements ?? []);
     setUserMilestones(currentMilestones ?? []);
-  };
-
-  const handleClaimMilestone = (milestoneItemId: string) => {
-    console.log("claim milestone", milestoneItemId);
-    const confirmMileStone = userMilestones.find(
-      (milestone) =>
-        milestone.id === milestoneItemId && !milestone.is_confirmed,
-    );
-    if (!confirmMileStone) return;
-    confirmMileStone.is_confirmed = 1;
-    setUserMilestones(
-      userMilestones.map((milestone) => {
-        if (milestone.id !== milestoneItemId) return milestone;
-        return confirmMileStone;
-      }),
-    );
-  };
+  }, [dbService, userProfile]);
 
   useEffect(() => {
-    getAchievements();
-  }, []);
+    loadAchievements();
+  }, [loadAchievements]);
+
+  const handleClaimMilestone = useCallback(
+    async (milestoneId: string) => {
+      if (!userProfile) return;
+
+      const milestone = userMilestones.find(
+        (item) => item.id === milestoneId,
+      );
+
+      if (!milestone || milestone.is_confirmed) return;
+
+      await dbService?.confirmAchievementMilestone({
+        userId: userProfile.id,
+        achievementId: milestone.achievement_item_id,
+        milestoneItemId: milestone.id,
+      });
+
+      setUserMilestones((prev) =>
+        prev.map((item) =>
+          item.id === milestoneId
+            ? { ...item, is_confirmed: 1 }
+            : item,
+        ),
+      );
+    },
+    [dbService, userProfile, userMilestones],
+  );
 
   const userAchievementMap = useMemo(() => {
     const map = new Map<string, UserAchievement>();
@@ -291,47 +301,64 @@ export const AchievementBottomSheet: React.FC<AchievementBottomSheetProps> = ({
     return map;
   }, [userAchievements]);
 
+  const userMilestoneMap = useMemo(() => {
+    const map = new Map<string, UserAchievementMilestone[]>();
+
+    for (const milestone of userMilestones) {
+      const list = map.get(milestone.achievement_item_id) ?? [];
+      list.push(milestone);
+      map.set(milestone.achievement_item_id, list);
+    }
+
+    return map;
+  }, [userMilestones]);
+
+  const total = ACHIEVEMENTS.filter(
+    (achievement) => achievement?.items?.length,
+  ).length;
+
+  const unlocked = ACHIEVEMENTS.filter((achievement) => {
+    const userAchievement = userAchievementMap.get(achievement.id);
+
+    if (!userAchievement) return false;
+
+    return achievement.items.every((item) => {
+      if (typeof item.target === "boolean") {
+        return item.target && userAchievement.current_value >= 1;
+      }
+
+      return userAchievement.current_value >= item.target;
+    });
+  }).length;
+
   return (
     <BottomSheetFlatList
       data={ACHIEVEMENTS}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View className="px-3">
-          <AchievementCard
-            achievement={item}
-            userAchievement={userAchievementMap.get(item.id)}
-            userMilestone={userMilestones.filter(
-              (milestone) => milestone.achievement_item_id === item.id,
-            )}
-            onPress={() => onSelect?.(item, userAchievementMap.get(item.id))}
-            onClaim={() => handleClaimMilestone(item.id)}
-          />
-        </View>
-      )}
+      renderItem={({ item }) => {
+        const userAchievement = userAchievementMap.get(item.id);
+        const milestones = userMilestoneMap.get(item.id) ?? [];
+
+        return (
+          <View className="px-3">
+            <AchievementCard
+              achievement={item}
+              userAchievement={userAchievement}
+              userMilestone={milestones}
+              onPress={() => onSelect?.(item, userAchievement)}
+              onClaim={handleClaimMilestone}
+            />
+          </View>
+        );
+      }}
       contentContainerStyle={{
         gap: 2,
         paddingBottom: 40,
       }}
       ListHeaderComponent={
         <AchievementBottomSheetHeader
-          total={
-            ACHIEVEMENTS.filter((achievement) => achievement?.items?.length)
-              .length
-          }
-          unlocked={
-            ACHIEVEMENTS.filter((achievement) => {
-              const user = userAchievementMap.get(achievement.id);
-              if (!user) return false;
-
-              return achievement.items.every((item) => {
-                if (typeof item.target === "boolean") {
-                  return item.target === true && user.current_value >= 1;
-                }
-
-                return user.current_value >= item.target;
-              });
-            }).length
-          }
+          total={total}
+          unlocked={unlocked}
         />
       }
       ListEmptyComponent={
@@ -359,46 +386,57 @@ export const AchievementBottomSheetHeader = ({
   unlocked,
 }: AchievementBottomSheetHeaderProps) => {
   const progress = total > 0 ? unlocked / total : 0;
+  const percentage = Math.round(progress * 100);
 
   return (
-    <View className="px-3 pb-3">
-      <View className="rounded-2xl border border-background2 bg-background2 px-4 py-3">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1">
-            <ThemedText color="success" size="xxl" weight="bold">
-              Achievements
-            </ThemedText>
+    <View className="px-3 pb-4">
+      <View className="flex-row items-end justify-between px-1">
+        <View>
+          <ThemedText
+            color="title"
+            size="xxl"
+            weight="bold"
+          >
+            Achievements
+          </ThemedText>
 
-            <ThemedText
-              color="text"
-              opacity="medium"
-              size="sm"
-              className="mt-0.5"
-            >
-              {unlocked}/{total} unlocked
-            </ThemedText>
-          </View>
-
-          <View className="ml-3 h-14 w-14 items-center justify-center rounded-full bg-primary/15">
-            <ThemedText color="primary" weight="bold" size="xl">
-              {Math.round(progress * 100)}
-            </ThemedText>
-            <View className="absolute bottom-1 right-1/2 translate-x-1/2">
-              <ThemedText color="primary" className="" size="xxs">
-                %
-              </ThemedText>
-            </View>
-          </View>
+          <ThemedText
+            color="text"
+            opacity="medium"
+            size="xs"
+            className="mt-0.5"
+          >
+            {unlocked} / {total} unlocked
+          </ThemedText>
         </View>
 
-        <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-background">
-          <View
-            className="h-full rounded-full bg-primary"
-            style={{
-              width: `${progress * 100}%`,
-            }}
-          />
+        <View className="flex-row items-baseline">
+          <ThemedText
+            color="primary"
+            size="xxl"
+            weight="bold"
+          >
+            {percentage}
+          </ThemedText>
+
+          <ThemedText
+            color="primary"
+            size="xs"
+            weight="bold"
+            className="ml-0.5"
+          >
+            %
+          </ThemedText>
         </View>
+      </View>
+
+      <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-text-base/10">
+        <View
+          className="h-full rounded-full bg-primary"
+          style={{
+            width: `${percentage}%`,
+          }}
+        />
       </View>
     </View>
   );

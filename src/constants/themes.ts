@@ -49,6 +49,7 @@ export const themes: { [key: string]: ThemeItem } = {
   // ─────────────────────────────────────────────
   // SKY
   // ─────────────────────────────────────────────
+  
   default: {
     type: "normal",
     light: {
@@ -199,13 +200,15 @@ export const themes: { [key: string]: ThemeItem } = {
       card: "#2A1B20",
     },
   },
-} as const;
+} satisfies Record<string, ThemeItem>;
+
+export type ThemeKey = keyof typeof themes;
 
 export const extractTheme = ({
   theme,
   isDarkMode,
 }: {
-  theme?: string;
+  theme?: ThemeKey;
   isDarkMode?: boolean;
 }): ThemeType => {
   const themeId = theme || "default";

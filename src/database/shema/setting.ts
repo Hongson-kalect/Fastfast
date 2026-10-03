@@ -1,3 +1,4 @@
+import { ThemeKey } from "@/constants/themes";
 import { AppSettings } from "@/interfaces/db.type";
 import { SQLiteDatabase } from "expo-sqlite";
 
@@ -43,14 +44,14 @@ export const getUserSettings = async (
   }
 };
 
-export const changeTheme = async (db: SQLiteDatabase, theme: string) => {
+export const changeTheme = async (db: SQLiteDatabase, theme: ThemeKey) => {
   await db.runAsync(
     `INSERT INTO app_settings (key, value, updated_at)
        VALUES (?, ?, strftime('%s', 'now'))
        ON CONFLICT(key) DO UPDATE SET
          value = excluded.value,
          updated_at = strftime('%s', 'now')`,
-    ["theme", theme],
+    ["theme", theme.toString()],
   );
   return await getUserSettings(db);
 };

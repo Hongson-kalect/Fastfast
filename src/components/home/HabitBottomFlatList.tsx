@@ -25,8 +25,6 @@ const HabitBottomFlatList: React.FC<HabitBottomFlatListProps> = () => {
 
   const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
 
-  const [showAllHistory, setShowAllHistory] = useState(false);
-
   const [habitPercent, shieldCount, habitRetain] = useMemo(() => {
     return [
       habit?.habit_snap || 0,

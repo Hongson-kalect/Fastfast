@@ -80,16 +80,14 @@ function FastHistorySheet() {
 /* -------------------------------------------------------------------------- */
 /* Header                                                                     */
 /* -------------------------------------------------------------------------- */
-
 export const FastHistoryHeader = ({ data }: HeaderProps) => {
   const { theme } = useAppStore();
 
   const stats = useMemo(() => {
     const sessions = data.filter((item) => !item.is_deleted);
-
-    const completed = sessions.filter((item) => item.status === "completed");
-
-    const active = sessions.filter((item) => item.status === "active");
+    const completed = sessions.filter(
+      (item) => item.status === "completed",
+    );
 
     const durations = completed
       .map((item) => Number(item.duration ?? 0))
@@ -103,39 +101,46 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
     const averageDuration =
       durations.length > 0 ? totalDuration / durations.length : 0;
 
-    let haveTarget = 0;
-    let targetReached = 0;
-    completed.forEach((item) => {
-      if (item.target_duration) {
-        haveTarget++;
-        if (item.duration / S_PER_HOUR >= item.target_duration) {
-          targetReached++;
-        }
-      }
-    });
+    const targetSessions = completed.filter(
+      (item) => item.target_duration > 0,
+    );
+
+    const targetReached = targetSessions.filter(
+      (item) =>
+        Number(item.duration ?? 0) / S_PER_HOUR >= item.target_duration,
+    ).length;
 
     const successRate =
-      completed.length > 0 ? Math.round((targetReached / haveTarget) * 100) : 0;
+      targetSessions.length > 0
+        ? Math.round((targetReached / targetSessions.length) * 100)
+        : 0;
 
     return {
       total: sessions.length,
       completed: completed.length,
-      active: active.length,
-      totalDuration: totalDuration,
-      averageDuration: averageDuration,
+      totalDuration,
+      averageDuration,
       successRate,
     };
   }, [data]);
 
   return (
-    <View className="px-4 pb-4 pt-1">
-      {/* Title */}
-      <View className="mb-3 flex-row items-end justify-between">
-        <View>
+    <View className="px-4 pb-4 pt-2">
+      {/* Header */}
+      <View className="mb-4 flex-row items-end justify-between">
+        <View className="flex-1">
           <View className="flex-row items-center gap-2">
-            <FontAwesome5 name="history" size={20} color={theme.primary} />
+            <FontAwesome5
+              name="history"
+              size={18}
+              color={theme.primary}
+            />
 
-            <ThemedText size="xl" weight="bold" color="text">
+            <ThemedText
+              size="xl"
+              weight="bold"
+              color="title"
+            >
               Fasts history
             </ThemedText>
           </View>
@@ -144,26 +149,34 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
             size="xs"
             color="text"
             opacity="medium"
-            style={{ marginTop: 2 }}
+            style={{ marginTop: 3 }}
           >
-            Tổng quan các phiên nhịn
+            {stats.total} phiên nhịn · {stats.completed} hoàn thành
           </ThemedText>
         </View>
 
-        <View
-          className="flex-row items-center rounded-full py-1 px-4"
-          style={{
-            backgroundColor: `${theme.success}15`,
-          }}
-        >
-          <ThemedText size="xxl" weight="semibold" color="primary">
-            {stats.total} Fasts
+        <View className="ml-3 items-end">
+          <ThemedText
+            size="xxl"
+            weight="bold"
+            color="primary"
+          >
+            {stats.total}
+          </ThemedText>
+
+          <ThemedText
+            size="xxs"
+            weight="medium"
+            color="text"
+            opacity="low"
+          >
+            Fasts
           </ThemedText>
         </View>
       </View>
 
       {/* Stats */}
-      <View className="flex-row items-center justify-between gap-2 mt-2">
+      <View className="flex-row gap-2">
         <StatCard
           value={formatTime(stats.totalDuration)}
           label="Total"
@@ -183,18 +196,20 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
         />
       </View>
 
-      <View className="mt-5 items-end px-2">
-        <ThemedText size="xs" weight="medium" color="text" opacity="low">
+      {/* Section label */}
+      <View className="mt-5 px-1">
+        <ThemedText
+          size="xs"
+          weight="medium"
+          color="text"
+          opacity="low"
+        >
           Recent fasts
         </ThemedText>
       </View>
     </View>
   );
 };
-
-/* -------------------------------------------------------------------------- */
-/* Stat Card                                                                  */
-/* -------------------------------------------------------------------------- */
 
 type StatCardProps = {
   value: string;
@@ -205,119 +220,144 @@ type StatCardProps = {
 const StatCard = ({ value, label, color }: StatCardProps) => {
   return (
     <View
-      className="flex-1 rounded-xl py-2.5 items-center justify-center"
+      className="flex-1 items-center justify-center rounded-xl py-2.5"
       style={{
         backgroundColor: `${color}11`,
         borderWidth: 1,
         borderColor: `${color}22`,
       }}
     >
-      <Text className="text-base font-semibold" style={{ color }}>
+      <ThemedText
+        size="sm"
+        weight="bold"
+        style={{ color }}
+      >
         {value}
-      </Text>
+      </ThemedText>
 
-      <Text className="text-zinc-600 text-xs mt-1">{label}</Text>
+      <ThemedText
+        size="xxs"
+        weight="medium"
+        color="text"
+        opacity="low"
+        className="mt-1"
+      >
+        {label}
+      </ThemedText>
     </View>
   );
 };
-
 /* -------------------------------------------------------------------------- */
 /* Item                                                                       */
 /* -------------------------------------------------------------------------- */
-
 export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const { theme } = useAppStore();
+  const { addModal, closeCurrentModal } = useModalStore();
 
   const durationHours = Number(item.duration ?? 0) / S_PER_HOUR;
-  const target = getTarget(item.target_duration || durationHours);
+  const targetHours = Number(item.target_duration ?? 0);
+
+  const target = getTarget(targetHours || durationHours);
+
   const isActive = item.status === "active";
   const isFailed = item.status === "failed";
-  const reached =
-    item.target_duration > 0 && durationHours >= item.target_duration;
+  const hasTarget = targetHours > 0;
 
-  if (isActive)
-    console.log(
-      Date.now(),
-      item.start_time,
-      item.target_duration,
-      (Date.now() - item.start_time) / item.target_duration / 36000,
-    );
+  const activeDurationHours = isActive
+    ? Math.max(0, Date.now() - item.start_time) / S_PER_HOUR
+    : durationHours;
 
-  // Tính phần trăm tiến độ (giới hạn tối đa 100% cho thanh progress UI)
-  const rawProgress =
-    item.target_duration > 0
-      ? isActive
-        ? (Date.now() - item.start_time) / item.target_duration / 36000
-        : (durationHours / item.target_duration) * 100
-      : 100;
-  const progressPercent = Math.min(Math.round(rawProgress), 100);
+  const progressPercent = hasTarget
+    ? Math.min(Math.round((activeDurationHours / targetHours) * 100), 100)
+    : 100;
 
-  // Status Meta Config
-  const getStatusMeta = () => {
-    if (!item.target_duration) {
-      return { label: "Tự do", color: theme.success };
-    }
+  const reached = hasTarget && durationHours >= targetHours;
+
+  const status = (() => {
     if (isFailed) {
-      return { label: "Bị hủy", color: theme.error };
+      return {
+        label: "Bị hủy",
+        color: theme.error,
+      };
     }
+
     if (isActive) {
       return {
-        label: `Đang nhịn (${item.target_duration}h)`,
+        label: `Đang nhịn · ${targetHours}h`,
         color: theme.primary,
       };
     }
-    if (reached) {
+
+    if (!hasTarget) {
       return {
-        label: `Mục tiêu ${item.target_duration}h`,
+        label: "Tự do",
         color: theme.success,
       };
     }
+
+    if (reached) {
+      return {
+        label: `Đạt mục tiêu · ${targetHours}h`,
+        color: theme.success,
+      };
+    }
+
     return {
-      label: `Chưa đạt (${item.target_duration}h)`,
+      label: `Chưa đạt · ${targetHours}h`,
       color: theme.warning,
     };
-  };
+  })();
 
-  const { label: statusLabel, color: statusColor } = getStatusMeta();
-
-  // Date Formatting
   const startDate = new Date(item.start_time);
   const endDate = item.end_time ? new Date(item.end_time) : null;
-  const { addModal } = useModalStore();
-  const handleLongPress = () => {
-    addModal({
-      type: "menu",
-      menuOptions: [
-        {
-          label: "Delete",
-          onPress: () => {
-            onDelete(item.id);
-            addModal(null);
-          },
-          icon: <Feather name="trash-2" size={20} color={"white"} />,
-          rightContent: (
-            <Feather name="chevron-right" size={20} color={"white"} />
-          ),
-          backgroundColor: theme.error,
-        },
-      ],
-      title: "Fast actions",
+
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
     });
-  };
 
-  const formatDate = (d: Date) =>
-    d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
-
-  const formatTimeStr = (d: Date) =>
-    d.toLocaleTimeString("vi-VN", {
+  const formatTime = (date: Date) =>
+    date.toLocaleTimeString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
     });
 
   const dateRangeLabel = endDate
-    ? `${formatTimeStr(startDate)} ${formatDate(startDate)} - ${formatTimeStr(endDate)} ${formatDate(endDate)}`
-    : `${formatTimeStr(startDate)} ${formatDate(startDate)}`;
+    ? `${formatTime(startDate)} ${formatDate(startDate)} → ${formatTime(endDate)} ${formatDate(endDate)}`
+    : `${formatTime(startDate)} ${formatDate(startDate)}`;
+
+  const handleLongPress = () => {
+    addModal({
+      type: "menu",
+      title: "Fast actions",
+      menuOptions: [
+        {
+          label: "Delete",
+          onPress: () => {
+            onDelete(item.id);
+            closeCurrentModal();
+          },
+          icon: (
+            <Feather
+              name="trash-2"
+              size={20}
+              color={theme.background}
+            />
+          ),
+          rightContent: (
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.background}
+            />
+          ),
+          backgroundColor: theme.error,
+        },
+      ],
+    });
+  };
 
   const showDetail = () => {
     addModal({
@@ -326,87 +366,97 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
     });
   };
 
+  const durationLabel = isFailed
+    ? "--:--"
+    : isActive
+      ? "Fasting"
+      : Number(item.duration ?? 0) > 0
+        ? formatTime(new Date(item.duration))
+        : "0h";
+
   return (
     <TouchableOpacity
       onLongPress={handleLongPress}
-      activeOpacity={0.7}
       onPress={showDetail}
-      className="relative mb-2.5 overflow-hidden rounded-xl border border-text-base/10 bg-background2"
+      activeOpacity={0.7}
+      className="relative mb-2.5 overflow-hidden rounded-2xl border border-text-base/10 bg-background2"
     >
-      <View className="flex-row items-center justify-between p-3.5">
-        {/* Left Section: Emoji Icon & Titles */}
-        <View className="mr-3 flex-1 flex-row items-center">
-          {/* Target Emoji Badge */}
-          <View className="mr-3 h-9 w-9 items-center justify-center rounded-full border border-text-base/5 bg-background2/80">
-            <Text className="text-sm">{target?.emoji || "⚡"}</Text>
-          </View>
-
-          <View className="flex-1">
-            {/* Status & Badge */}
-            <View className="flex-row items-center gap-2">
-              <ThemedText
-                size="xs"
-                weight="semibold"
-                color="text"
-                numberOfLines={1}
-              >
-                {statusLabel}
-              </ThemedText>
-
-              {/* Dot chỉ thị trạng thái */}
-              <View
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: statusColor }}
-              />
-            </View>
-
-            {/* Time range label */}
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-              numberOfLines={1}
-              style={{ marginTop: 2 }}
-            >
-              {dateRangeLabel}
-            </ThemedText>
-          </View>
+      <View className="flex-row items-center px-3.5 py-3">
+        {/* Target */}
+        <View
+          className="mr-3 h-10 w-10 items-center justify-center rounded-xl"
+          style={{
+            backgroundColor: `${status.color}12`,
+          }}
+        >
+          <ThemedText size="lg">
+            {target?.emoji || "⚡"}
+          </ThemedText>
         </View>
 
-        {/* Right Section: Duration & Percentage */}
+        {/* Main Info */}
+        <View className="flex-1 pr-3">
+          <View className="flex-row items-center">
+            <View
+              className="mr-1.5 h-1.5 w-1.5 rounded-full"
+              style={{
+                backgroundColor: status.color,
+              }}
+            />
+
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color="title"
+              numberOfLines={1}
+            >
+              {status.label}
+            </ThemedText>
+          </View>
+
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="medium"
+            numberOfLines={1}
+            className="mt-1"
+          >
+            {dateRangeLabel}
+          </ThemedText>
+        </View>
+
+        {/* Duration */}
         <View className="items-end">
-          <ThemedText size="sm" weight="semibold" color="text">
-            {isFailed
-              ? "--:--"
-              : isActive
-                ? "Fasting"
-                : item.duration > 0
-                  ? formatTime(item.duration)
-                  : "0h"}
+          <ThemedText
+            size="sm"
+            weight="bold"
+            color={isFailed ? "error" : "title"}
+          >
+            {durationLabel}
           </ThemedText>
 
-          {item.target_duration > 0 && !isFailed && (
+          {hasTarget && !isFailed && (
             <ThemedText
               size="xxs"
               weight="medium"
               color="text"
-              opacity="medium"
-              style={{ marginTop: 2 }}
+              opacity="low"
+              className="mt-0.5"
             >
-              {Math.round(rawProgress)}%
+              {progressPercent}%
             </ThemedText>
           )}
         </View>
       </View>
 
-      {/* Subtle Bottom Progress Bar */}
-      {item.target_duration > 0 && (
-        <View className="h-[3px] w-full bg-background/60">
+      {/* Progress */}
+      {hasTarget && (
+        <View className="h-1 w-full bg-text-base/5">
           <View
+            className="h-full"
             style={{
-              height: "100%",
               width: `${progressPercent}%`,
-              backgroundColor: isFailed ? theme.error : statusColor,
+              backgroundColor: status.color,
             }}
           />
         </View>

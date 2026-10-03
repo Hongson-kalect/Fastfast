@@ -9,7 +9,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -26,23 +26,26 @@ export const GoalCard = () => {
   const { addModal } = useModalStore();
   const [activeTarget, setActiveTarget] = useState<WeightTarget | null>(null);
 
-  const [startWeight, targetWeight] = useMemo(() => {
-    if (!activeTarget) return [];
-    return [activeTarget?.start_weight, activeTarget?.target_weight];
-  }, [activeTarget]);
+ const startWeight = activeTarget?.start_weight;
+const targetWeight = activeTarget?.target_weight;
 
-  const percentage = useMemo(() => {
-    if (!activeTarget || !weight) return 0;
-    return Math.max(
-      Math.min(
-        ((activeTarget?.start_weight - weight) /
-          (activeTarget?.start_weight - activeTarget?.target_weight)) *
+  const percentage =
+  activeTarget && weight && activeTarget.start_weight !== activeTarget.target_weight
+    ? Math.max(
+        Math.min(
+          ((activeTarget.start_weight - weight) /
+            (activeTarget.start_weight - activeTarget.target_weight)) *
+            100,
           100,
-        100,
-      ),
-      0,
-    );
-  }, []);
+        ),
+        0,
+      )
+    : 0;
+
+const remaining =
+  activeTarget && weight
+    ? (weight - activeTarget.target_weight).toFixed(1)
+    : "0";
 
   const progress = useSharedValue(0);
 
@@ -58,11 +61,6 @@ export const GoalCard = () => {
   const animatedStyle = useAnimatedStyle(() => ({
     width: `${progress.value}%`,
   }));
-
-  const remaining = useMemo(() => {
-    if (!activeTarget || !weight) return 0;
-    return (weight - activeTarget.target_weight).toFixed(1);
-  }, []);
 
   const openSetWeightModal = () => {
     addModal({
@@ -94,33 +92,34 @@ export const GoalCard = () => {
           targetWeight: target,
         });
         updateSetting({ weight_target: target });
-        await getActiveWeightTarget();
+        await refreshActiveTarget();
       },
     });
   };
 
-  const handleSetWeight = () => {
-    openSetWeightModal();
-  };
+  const refreshActiveTarget = useCallback(async () => {
+  const res = await dbService?.getActiveWeightTarget();
+  setActiveTarget(res ?? null);
+}, [dbService]);
 
-  const handleSetTarget = () => {
-    openWeightTargetModal();
-  };
-
-  const getActiveWeightTarget = async () => {
-    const res = await dbService?.getActiveWeightTarget();
-    if (res) setActiveTarget(res);
-  };
+useEffect(() => {
+  refreshActiveTarget();
+}, [refreshActiveTarget]);
 
   useEffect(() => {
-    getActiveWeightTarget();
-  }, []);
+  const loadActiveTarget = async () => {
+    const res = await dbService?.getActiveWeightTarget();
+    setActiveTarget(res ?? null);
+  };
+
+  loadActiveTarget();
+}, [dbService]);
 
   if (!weight)
     return (
       <View className="mb-4 items-end">
         <Pressable
-          onPress={handleSetWeight}
+          onPress={openSetWeightModal}
           className="flex-row items-center gap-1 rounded-lg bg-success px-2 py-3"
         >
           <Feather name="plus" size={16} color="#FFFFFF" />
@@ -145,7 +144,7 @@ export const GoalCard = () => {
       <View className="flex-row items-center justify-between">
         {activeTarget ? (
           <Pressable
-            onPress={handleSetTarget}
+            onPress={openWeightTargetModal}
             className="flex-row items-center gap-2.5"
           >
             <View
@@ -173,7 +172,7 @@ export const GoalCard = () => {
           </Pressable>
         ) : (
           <Pressable
-            onPress={handleSetTarget}
+            onPress={openWeightTargetModal}
             className="rounded-lg bg-warning px-2 py-3"
           >
             <ThemedText size="xs" weight="medium" colorHex="#FFFFFF">
@@ -183,7 +182,7 @@ export const GoalCard = () => {
         )}
 
         <Pressable
-          onPress={handleSetWeight}
+          onPress={openSetWeightModal}
           className="items-end rounded-lg border p-1.5"
           style={{
             borderStyle: "dashed",

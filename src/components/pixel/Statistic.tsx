@@ -4,7 +4,7 @@ import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { fixed } from "@/util/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
@@ -20,12 +20,17 @@ type Props = {
     logDays: number;
   };
 };
-const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
-  const { theme, settings, updateSetting } = useAppStore();
-  const [iconPackVisible, setIconPackVisible] = useState(false);
+const PixelStatistic = React.memo(({ setTrackingType, trackingType, stats }: Props) => {
+  const { theme, settings } = useAppStore();
 
-  const emotions = EMOTION_PACKS[settings?.emotion_pack || "default"].emotions;
-  const targets = TARGET_PACKS[settings?.target_pack || "default"].targets;
+ const emotionPack =
+  EMOTION_PACKS[settings?.emotion_pack ?? "default"];
+
+const targetPack =
+  TARGET_PACKS[settings?.target_pack ?? "default"];
+
+const emotions = emotionPack.emotions;
+const targets = targetPack.targets;
 
   const { present } = useBottomSheet();
 
@@ -34,9 +39,6 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
   };
 
   const isDark = settings?.is_dark_mode ?? true;
-
-  const selectedEmotion = EMOTION_PACKS[settings?.emotion_pack || "default"];
-  const selectedFastTarget = TARGET_PACKS[settings?.target_pack || "default"];
 
   return (
     <View className="gap-4">
@@ -140,7 +142,6 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
         </View>
       </View>
 
-      {/* ...phần dưới giữ nguyên */}
       {trackingType === "mood" && (
         <View className="flex-row gap-4 mt-2">
           {emotions.map((item, index) => (
@@ -155,9 +156,6 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
                 <ThemedText>{item.icon}</ThemedText>
                 <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
               </View>
-              {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">
-              {moodCount[index]}
-            </ThemedText> */}
             </View>
           ))}
         </View>
@@ -176,15 +174,12 @@ const PixelStatistic = ({ setTrackingType, trackingType, stats }: Props) => {
                 <ThemedText>{item.icon}</ThemedText>
                 <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
               </View>
-              {/* <ThemedText className="text-white! text-xl! font-semibold! text-center mt-1 mb-0.5">
-              {moodCount[index]}
-            </ThemedText> */}
             </View>
           ))}
         </View>
       )}
     </View>
   );
-};
+})
 
 export default PixelStatistic;

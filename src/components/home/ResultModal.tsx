@@ -7,6 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
+import { ThemedText } from "../themed-text";
 
 export type FastResultStatus = "COMPLETED" | "ENDED_EARLY" | "OVERACHIEVED";
 
@@ -73,188 +74,301 @@ const STATUS_CONFIG = {
 };
 
 export const ResultModal = ({ data = testData }: Props) => {
-  //   if (!data) return null;
-  console.log("vào đc đây");
-
-  const { addModal } = useModalStore();
-
-  const { fastingTime, status } = useMemo<{
-    fastingTime: string;
-    status: FastResultStatus;
-  }>(() => {
-    const returnData: { fastingTime: string; status: FastResultStatus } = {
-      fastingTime: hourFormat(data.fastingTime),
-      status: "COMPLETED",
-    };
-    const fastingHour = data.fastingTime / 3600;
-    if (!data.targetHours || fastingHour > data.targetHours) {
-      returnData.status = "COMPLETED";
-    } else returnData.status = "ENDED_EARLY";
-    return returnData;
-  }, [data]);
-
-  const config = STATUS_CONFIG[status];
-  const progressRatio = data.targetHours
-    ? Math.min(1, data.fastingTime / 3600 / data.targetHours)
-    : 1;
+  const { closeCurrentModal } = useModalStore();
   const { theme } = useAppStore();
+
+  const fastingHours = data.fastingTime / 3600;
+  const isCompleted =
+    !data.targetHours || fastingHours >= data.targetHours;
+
+  const status: FastResultStatus = isCompleted
+    ? "COMPLETED"
+    : "ENDED_EARLY";
+
+  const fastingTime = hourFormat(data.fastingTime);
+  const config = STATUS_CONFIG[status];
+
+  const progressRatio = data.targetHours
+    ? Math.min(1, fastingHours / data.targetHours)
+    : 1;
+
+  const progressPercent = Math.floor(progressRatio * 100);
+
+  const shieldDetails = data.shields.detail ?? [];
 
   return (
     <View>
-      {/* Header Icon */}
+      {/* Header */}
       <Animated.View
         entering={ZoomIn.delay(100)}
-        className="align-center items-center"
+        className="items-center"
       >
-        <View className="mb-3 h-16 w-16 items-center justify-center rounded-2xl bg-zinc-800/80 border border-white/10">
-          <Text className="text-3xl">{config.icon}</Text>
+        <View className="mb-3 h-16 w-16 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10">
+          <Text className="text-3xl">
+            {config.icon}
+          </Text>
         </View>
 
-        <Text className="text-center text-xl font-bold text-white">
+        <ThemedText
+          size="xl"
+          weight="bold"
+          color="title"
+          style={{ textAlign: "center" }}
+        >
           {config.title}
-        </Text>
-        <Text className="mt-1 text-center text-xs text-zinc-400">
+        </ThemedText>
+
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="medium"
+          className="mt-1"
+          style={{ textAlign: "center" }}
+        >
           {config.subtitle}
-        </Text>
+        </ThemedText>
       </Animated.View>
 
-      {/* Fasting Time & Progress */}
+      {/* Fasting Time */}
       <Animated.View
         entering={FadeInUp.delay(200)}
-        className="mt-5 rounded-2xl bg-zinc-950/60 p-4 border border-zinc-800/60"
+        className="mt-5 rounded-2xl border border-text-base/10 bg-background2/60 p-4"
       >
-        <View className="flex-row items-baseline justify-between mb-2">
-          <Text className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-            Fasting Time
-          </Text>
-          <Text className="text-2xl font-black text-white">{fastingTime}</Text>
+        <View className="mb-2 flex-row items-end justify-between">
+          <ThemedText
+            size="xxs"
+            weight="semibold"
+            color="text"
+            opacity="medium"
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: 1,
+            }}
+          >
+            Fasting time
+          </ThemedText>
+
+          <ThemedText
+            size="xxl"
+            weight="bold"
+            color="title"
+          >
+            {fastingTime}
+          </ThemedText>
         </View>
 
-        {/* Progress Bar */}
-        <View className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-800">
+        <View className="h-2 overflow-hidden rounded-full bg-text-base/10">
           <LinearGradient
             colors={config.barColor}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={{
-              width: `${progressRatio * 100}%`,
+              width: `${progressPercent}%`,
               height: "100%",
               borderRadius: 999,
             }}
           />
         </View>
-        {data.targetHours && (
-          <Text className="mt-1.5 text-right text-[11px] text-zinc-500">
-            Target: {data.targetHours}h ({Math.floor(progressRatio * 100)}%)
-          </Text>
-        )}
+
+        {data.targetHours ? (
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="low"
+            className="mt-1.5"
+            style={{ textAlign: "right" }}
+          >
+            Target {data.targetHours}h · {progressPercent}%
+          </ThemedText>
+        ) : null}
       </Animated.View>
 
-      {/* Metrics Grid */}
+      {/* Metrics */}
       <Animated.View
         entering={FadeInUp.delay(300)}
-        className="mt-4 flex-row gap-2"
+        className="mt-3 flex-row gap-2"
       >
-        {/* Habit Score */}
-        <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
-          <Text className="text-[11px] text-zinc-400">Habit</Text>
-          <Text className="mt-1 text-base font-bold text-white">
+        {/* Habit */}
+        <View className="flex-1 items-center rounded-2xl border border-text-base/10 bg-background2/60 p-3">
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="medium"
+          >
+            Habit
+          </ThemedText>
+
+          <ThemedText
+            size="md"
+            weight="bold"
+            color="title"
+            className="mt-1"
+          >
             {fixed(data.habitPercent)}%
-          </Text>
-          {data.habitDiff > 0 && (
-            <Text className="text-[10px] text-success font-semibold">
+          </ThemedText>
+
+          {data.habitDiff > 0 ? (
+            <ThemedText
+              size="xxs"
+              weight="semibold"
+              color="success"
+            >
               +{fixed(data.habitDiff)}%
-            </Text>
-          )}
+            </ThemedText>
+          ) : null}
         </View>
 
         {/* Shield */}
-        <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
-          <Text className="text-[11px] text-zinc-400">Shield</Text>
-          <Text className="mt-1 text-base font-bold text-white">
-            <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />{" "}
-            {data.shields.current}/{data.shields.max}
-          </Text>
+        <View className="flex-1 items-center rounded-2xl border border-text-base/10 bg-background2/60 p-3">
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="medium"
+          >
+            Shield
+          </ThemedText>
+
+          <View className="mt-1 flex-row items-center">
+            <FontAwesome5
+              name="shield-alt"
+              size={13}
+              color={theme.primary}
+            />
+
+            <ThemedText
+              size="md"
+              weight="bold"
+              color="title"
+              className="ml-1"
+            >
+              {data.shields.current}/{data.shields.max}
+            </ThemedText>
+          </View>
+
           {data.shields.gained > 0 ? (
-            <Text className="text-[10px] text-success font-semibold">
+            <ThemedText
+              size="xxs"
+              weight="semibold"
+              color="success"
+            >
               +{data.shields.gained}
-            </Text>
+            </ThemedText>
           ) : null}
         </View>
 
         {/* Retain */}
-        <View className="flex-1 rounded-2xl bg-zinc-950/60 p-3 border border-zinc-800/60 items-center">
-          <Text className="text-[11px] text-zinc-400">Retain</Text>
-          <Text className="mt-1 text-base font-bold text-white">
+        <View className="flex-1 items-center rounded-2xl border border-text-base/10 bg-background2/60 p-3">
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="medium"
+          >
+            Retain
+          </ThemedText>
+
+          <ThemedText
+            size="md"
+            weight="bold"
+            color="title"
+            className="mt-1"
+          >
             {data.retainCount}/25
-          </Text>
-          {data.retainDiff > 0 && (
-            <Text className="text-[10px] text-success font-semibold">
+          </ThemedText>
+
+          {data.retainDiff > 0 ? (
+            <ThemedText
+              size="xxs"
+              weight="semibold"
+              color="success"
+            >
               +{data.retainDiff}%
-            </Text>
-          )}
+            </ThemedText>
+          ) : null}
         </View>
       </Animated.View>
 
-      {/* Note / Reward Banner */}
-      {!!data.shields.detail && (
-        <View className="mt-4 rounded-xl items-center bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 gap-2">
-          {!!data.shields.detail[0] && (
-            <View className="flex-row items-center gap-1">
-              <Text className="text-xs text-success font-bold">
-                +{data.shields.detail[0]}
-              </Text>
-              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
-              <Text className="ml-2 text-xs text-text-base/60">
-                For long fast. Use it for rest correctly 🎉
-              </Text>
-            </View>
-          )}
-          {!!data.shields.detail[1] && (
-            <View className="flex-row items-center gap-1">
-              <Text className="text-xs text-success font-bold">
-                +{data.shields.detail[1]}
-              </Text>
-              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
-              <Text className="ml-2 text-xs  text-text-base/60">
-                For retain habit. Keep it amazing 🎉
-              </Text>
-            </View>
-          )}
-          {!!data.shields.detail[2] && (
-            <View className="flex-row items-center gap-1">
-              <Text className="text-xs text-success font-bold">
-                +{data.shields.detail[2]}
-              </Text>
-              <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
-              <Text className="ml-2 text-xs  text-text-base/60">
-                For for milestone reached 🎉
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
+      {/* Shield rewards */}
+      {shieldDetails.length > 0 ? (
+        <View className="mt-4 rounded-2xl border border-primary/10 bg-primary/5 px-3 py-2.5">
+          {shieldDetails.map((amount, index) => {
+            if (!amount) return null;
 
-      {/* Note / Reward Banner */}
-      {data.note && (
+            const labels = [
+              "Fast dài",
+              "Duy trì Habit",
+              "Đạt milestone",
+            ];
+
+            return (
+              <View
+                key={`${index}-${amount}`}
+                className="flex-row items-center py-1"
+              >
+                <View className="w-12 flex-row items-center">
+                  <ThemedText
+                    size="xs"
+                    weight="bold"
+                    color="success"
+                  >
+                    +{amount}
+                  </ThemedText>
+
+                  <FontAwesome5
+                    name="shield-alt"
+                    size={11}
+                    color={theme.primary}
+                    style={{ marginLeft: 4 }}
+                  />
+                </View>
+
+                <ThemedText
+                  size="xxs"
+                  color="text"
+                  opacity="medium"
+                  className="ml-2"
+                >
+                  {labels[index]}
+                </ThemedText>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
+
+      {/* Note */}
+      {data.note ? (
         <Animated.View
           entering={FadeInUp.delay(400)}
-          className="mt-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 flex-row items-center"
+          className="mt-3 flex-row items-center rounded-xl border border-warning/10 bg-warning/5 px-3 py-2.5"
         >
-          <Text className="mr-2 text-xs">💡</Text>
-          <Text className="flex-1 text-xs text-indigo-300 font-medium">
-            {data.note}
-          </Text>
-        </Animated.View>
-      )}
+          <ThemedText size="sm">
+            💡
+          </ThemedText>
 
-      {/* Confirm Button */}
+          <ThemedText
+            size="xs"
+            weight="medium"
+            color="text"
+            className="ml-2 flex-1"
+          >
+            {data.note}
+          </ThemedText>
+        </Animated.View>
+      ) : null}
+
+      {/* Confirm */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => addModal(null)}
-        className="mt-6 rounded-2xl bg-primary py-3.5 items-center justify-center"
+        onPress={() => closeCurrentModal()}
+        className="mt-5 items-center justify-center rounded-2xl bg-primary py-3.5"
       >
-        <Text className="font-bold text-white">OK</Text>
+        <ThemedText
+          size="sm"
+          weight="bold"
+          color="background"
+        >
+          OK
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );

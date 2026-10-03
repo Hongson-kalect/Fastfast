@@ -11,6 +11,7 @@ import {
 import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
+import { ThemedText } from "../themed-text";
 
 interface Props {
   data: StreakCheckResult | null;
@@ -23,124 +24,146 @@ const MODAL_THEME = {
     icon: "🎉",
     title: "Streak Milestone Hit!",
     subtitle: "You're building an unstoppable fasting habit!",
-    bgColor: "from-orange-500/20 to-amber-500/10",
-    borderColor: "border-orange-500/30",
+    bgColor: "from-success/20 to-success",
+    borderColor: "border-success/30",
     btnText: "Keep It Up! 🔥",
   },
   SHIELD_USED: {
     icon: "🛡️",
     title: "Rest Day Active!",
     subtitle: "Recovery is part of the journey. Your streak stays strong!",
-    bgColor: "from-indigo-500/20 to-blue-500/10",
-    borderColor: "border-indigo-500/30",
+    bgColor: "from-primary/20 to-primary/10",
+    borderColor: "border-primary/30",
     btnText: "Keep going! 🌿",
   },
   STREAK_LOST: {
     icon: "💪",
     title: "Fresh Start Ahead",
     subtitle: "Every master failed before succeeding. Let's rebuild today!",
-    bgColor: "from-red-500/20 to-zinc-900",
-    borderColor: "border-red-500/30",
+    bgColor: "from-error/20 to-error",
+    borderColor: "border-error/30",
     btnText: "Start Fresh Now 🚀",
   },
 };
 export const StreakCheckModal = ({ data }: Props) => {
-  if (!data) return null;
   const { theme } = useAppStore();
-  const { addModal } = useModalStore();
+  const { closeCurrentModal } = useModalStore();
 
-  const onClose = () => addModal(null);
+  if (!data) return null;
 
-  // 1. Xác định Status chính xác
-  const status = useMemo<keyof typeof MODAL_THEME>(() => {
-    if (data.streak.current < data.streak.previous) {
-      return "STREAK_LOST";
-    }
-    if (data.shield.current < data.shield.previous) {
-      return "SHIELD_USED";
-    }
-    return "STREAK_MILESTONE";
-  }, [data]);
+  const onClose = () => closeCurrentModal();
 
-  const milestone = useMemo(() => {
-    return MILESTONES.find(
-      (milestone) =>
-        data.streak.previous < milestone && milestone <= data.streak.current,
-    );
-  }, [data]);
+  const status: keyof typeof MODAL_THEME =
+    data.streak.current < data.streak.previous
+      ? "STREAK_LOST"
+      : data.shield.current < data.shield.previous
+        ? "SHIELD_USED"
+        : "STREAK_MILESTONE";
 
-  // 2. Check phá kỷ lục
-  const isBestRecord = useMemo(() => {
-    return (
-      data.streak.current > 1 &&
-      data.streak.current >= (data.streak.max || 0) &&
-      status !== "STREAK_LOST"
-    );
-  }, [data, status]);
+  const milestone = MILESTONES.find(
+    (value) =>
+      data.streak.previous < value &&
+      value <= data.streak.current,
+  );
 
-  // 3. Tính toán nhảy Streak
-  const streakDiff = data.streak.current - data.streak.previous;
-  const isStreakJump = streakDiff > 1 && status !== "STREAK_LOST";
+  const isBestRecord =
+    data.streak.current > 1 &&
+    data.streak.current >= (data.streak.max || 0) &&
+    status !== "STREAK_LOST";
 
-  // 4. Tính toán biến động Shield
-  const shieldDiff = data.shield.previous - data.shield.current;
-  const isShieldDecreased = shieldDiff > 0;
+  const streakDiff =
+    data.streak.current - data.streak.previous;
+
+  const isStreakJump =
+    streakDiff > 1 && status !== "STREAK_LOST";
+
+  const habitDiff =
+    data.habit.currentPercent -
+    data.habit.previousPercent;
+
+  const retainDiff =
+    data.retain.current - data.retain.previous;
+
+  const color =
+    status === "STREAK_LOST"
+      ? theme.error
+      : status === "SHIELD_USED"
+        ? theme.secondary
+        : theme.primary;
 
   const config = MODAL_THEME[status];
 
-  // 5. Dynamic Color
-  const color = useMemo(() => {
-    if (status === "STREAK_LOST") return theme.error || "#ef4444";
-    if (status === "SHIELD_USED") return theme.secondary || "#6366f1";
-    return theme.primary || "#f97316";
-  }, [status, theme]);
-
   return (
-    <View className="relative py-2">
-      {/* 🛡️ TOP RIGHT: SHIELD STATUS */}
-      <View className="absolute top-0 right-0 z-10">
-        <View className="flex-row items-center rounded-full border border-indigo-400/15 bg-indigo-500/10 px-2.5 py-1 gap-1">
-          <FontAwesome5 name="shield-alt" size={12} color={theme.primary} />
-          <View className="flex-row">
-            <Text className="font-bold text-[10px] text-primary">
-              {data.shield.current}
-            </Text>
-            {data.shield.previous != data.shield.current && (
-              <Text className="font-light text-[10px] text-error">
-                (-{data.shield.previous - data.shield.current})
-              </Text>
-            )}
-            <Text className="ml-1 text-[10px] font-bold text-primary">/3</Text>
-          </View>
+    <View className="py-2">
+      {/* Shield status */}
+      <View className="absolute right-0 top-0 z-10">
+        <View className="flex-row items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-2.5 py-1">
+          <FontAwesome5
+            name="shield-alt"
+            size={11}
+            color={theme.primary}
+          />
+
+          <ThemedText
+            size="xxs"
+            weight="bold"
+            color="primary"
+          >
+            {data.shield.current}
+          </ThemedText>
+
+          {data.shield.previous !== data.shield.current ? (
+            <ThemedText
+              size="xxs"
+              weight="medium"
+              color="error"
+            >
+              -{data.shield.previous - data.shield.current}
+            </ThemedText>
+          ) : null}
+
+          <ThemedText
+            size="xxs"
+            weight="bold"
+            color="primary"
+          >
+            /3
+          </ThemedText>
         </View>
       </View>
 
-      {/* --- HERO SECTION --- */}
+      {/* Hero */}
       <Animated.View
         entering={ZoomIn.delay(100).springify()}
         className="mt-7 items-center"
       >
-        {/* STREAK DISPLAY */}
         <View className="w-full items-center">
-          {data.streak.current - data.streak.previous > 1 && (
-            <View className="absolute left-4 bottom-4 flex-row items-center gap-1 opacity-70">
-              <Text className="text-white font-bold text-lg">
-                {data.streak.previous}
-              </Text>
-              <View
-                style={{ transform: [{ rotate: "-15deg" }], marginBottom: 3 }}
+          {isStreakJump ? (
+            <View className="absolute bottom-4 left-4 flex-row items-center gap-1 opacity-60">
+              <ThemedText
+                size="lg"
+                weight="bold"
+                color="text"
               >
-                <Feather name="arrow-right" size={24} color={theme.white} />
-              </View>
-            </View>
-          )}
+                {data.streak.previous}
+              </ThemedText>
 
-          <View className="relative items-center justify-center px-8">
-            {/* BEST STAMP */}
-            {isBestRecord && (
+              <Feather
+                name="arrow-right"
+                size={22}
+                color={theme.text}
+              />
+            </View>
+          ) : null}
+
+          <View className="relative items-center px-8">
+            {/* Best */}
+            {isBestRecord ? (
               <View
                 className="absolute right-0 top-0 z-10"
-                style={{ transform: [{ rotate: "30deg" }] }}
+                style={{
+                  transform: [{ rotate: "30deg" }],
+                }}
               >
                 <Animated.View
                   entering={ZoomIn.delay(280)
@@ -149,130 +172,220 @@ export const StreakCheckModal = ({ data }: Props) => {
                     .stiffness(180)
                     .mass(1)}
                 >
-                  <View className="h-10 w-10 items-center justify-center rounded-full border-2 border-amber-400/80 bg-amber-500/15">
-                    <View className="absolute inset-1 rounded-full border border-amber-400/40" />
-                    <Text className="text-[7px] font-black tracking-widest text-amber-300">
+                  <View className="h-10 w-10 items-center justify-center rounded-full border-2 border-warning/60 bg-warning/10">
+                    <View className="absolute inset-1 rounded-full border border-warning/30" />
+
+                    <ThemedText
+                      size="tiny"
+                      weight="bold"
+                      color="warning"
+                    >
                       BEST
-                    </Text>
+                    </ThemedText>
                   </View>
                 </Animated.View>
               </View>
-            )}
+            ) : null}
 
-            {/* Main Streak Number */}
-            <Text className="text-8xl font-black leading-[0.9] tracking-tighter text-white">
+            <ThemedText
+              size="displayLarge"
+              weight="bold"
+              color="title"
+              style={{
+                lineHeight: 88,
+                letterSpacing: -4,
+              }}
+            >
               {data.streak.current}
-            </Text>
-
-            {/* Identity Label */}
+            </ThemedText>
           </View>
         </View>
-        <View className="items-center">
-          <Text className="mt-1 text-[9px] font-bold uppercase tracking-[0.28em] text-orange-400/80">
-            DAYS STREAK
-          </Text>
-        </View>
 
-        {/* TITLE */}
+        <ThemedText
+          size="tiny"
+          weight="bold"
+          color="primary"
+          className="mt-1"
+          style={{
+            textTransform: "uppercase",
+            letterSpacing: 2.5,
+            opacity: 0.8,
+          }}
+        >
+          Days streak
+        </ThemedText>
+
+        {/* Title */}
         <View className="mt-5 flex-row items-center justify-center">
-          <Text className="text-base">{config.icon}</Text>
-          <Text className="mx-2 text-center text-lg font-black text-white">
-            {milestone ? "Streak over " + milestone + " Hits!" : config.title}
-          </Text>
-          <Text className="text-base" style={{ transform: [{ scaleX: -1 }] }}>
+          <ThemedText size="sm">
             {config.icon}
-          </Text>
+          </ThemedText>
+
+          <ThemedText
+            size="lg"
+            weight="bold"
+            color="title"
+            className="mx-2"
+            style={{ textAlign: "center" }}
+          >
+            {milestone
+              ? `Streak over ${milestone} hits!`
+              : config.title}
+          </ThemedText>
+
+          <ThemedText
+            size="sm"
+            style={{
+              transform: [{ scaleX: -1 }],
+            }}
+          >
+            {config.icon}
+          </ThemedText>
         </View>
 
-        {/* SUBTITLE */}
-        <Text className="mt-1.5 px-8 text-center text-xs leading-5 text-zinc-400">
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="medium"
+          className="mt-1.5 px-8"
+          style={{
+            lineHeight: 20,
+            textAlign: "center",
+          }}
+        >
           {data.message?.subtitle || config.subtitle}
-        </Text>
+        </ThemedText>
       </Animated.View>
 
-      {/* --- STATS SECTION --- */}
+      {/* Stats */}
       <Animated.View
         entering={FadeInUp.delay(200)}
-        className="mt-7 flex-row gap-x-3"
+        className="mt-7 flex-row gap-2.5"
       >
-        {/* HABIT PANEL */}
-        <View className="flex-1 items-center justify-between rounded-2xl border border-white/5 bg-zinc-800/50 px-3 py-3">
+        {/* Habit */}
+        <View className="flex-1 items-center rounded-2xl border border-text-base/10 bg-background2/60 px-3 py-3">
           <View className="mb-1.5 flex-row items-center self-start">
-            <Foundation name="graph-trend" size={14} color={theme.success} />
-            <Text className="ml-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
-              Habit
-            </Text>
-          </View>
+            <Foundation
+              name="graph-trend"
+              size={14}
+              color={theme.success}
+            />
 
-          <View className="my-1 items-center">
-            <Text className="text-2xl font-black text-success">
-              {fixed(data.habit.currentPercent)}%
-            </Text>
-          </View>
-
-          {data.habit.currentPercent !== data.habit.previousPercent ? (
-            <Text
-              className={`mt-0.5 text-[9px] font-medium ${
-                data.habit.currentPercent >= data.habit.previousPercent
-                  ? "text-success/80"
-                  : "text-error/80"
-              }`}
+            <ThemedText
+              size="tiny"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+              className="ml-1"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
             >
-              {data.habit.currentPercent >= data.habit.previousPercent
-                ? "▲"
-                : "▼"}{" "}
-              {fixed(Math.abs(data.habit.currentPercent - data.habit.previousPercent))}
-              %
-            </Text>
+              Habit
+            </ThemedText>
+          </View>
+
+          <ThemedText
+            size="xl"
+            weight="bold"
+            color="success"
+          >
+            {fixed(data.habit.currentPercent)}%
+          </ThemedText>
+
+          {habitDiff !== 0 ? (
+            <ThemedText
+              size="tiny"
+              weight="medium"
+              color={habitDiff > 0 ? "success" : "error"}
+            >
+              {habitDiff > 0 ? "▲" : "▼"}{" "}
+              {fixed(Math.abs(habitDiff))}%
+            </ThemedText>
           ) : (
-            <Text className="mt-0.5 text-[8px] uppercase tracking-wide text-zinc-600">
+            <ThemedText
+              size="tiny"
+              color="text"
+              opacity="low"
+              className="mt-0.5"
+            >
               Consistency
-            </Text>
+            </ThemedText>
           )}
         </View>
 
-        {/* RETAIN PANEL */}
-        <View className="flex-1 items-center justify-between rounded-2xl border border-white/5 bg-zinc-800/50 px-3 py-3">
+        {/* Retain */}
+        <View className="flex-1 items-center rounded-2xl border border-text-base/10 bg-background2/60 px-3 py-3">
           <View className="mb-1.5 flex-row items-center self-start">
-            <Ionicons name="water" size={20} color={theme.primary} />
-            <Text className="ml-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
-              Retain
-            </Text>
-          </View>
+            <Ionicons
+              name="water"
+              size={17}
+              color={theme.primary}
+            />
 
-          <View className="my-1 items-center">
-            <Text className="text-2xl font-black text-primary">
-              {data.retain.current}
-            </Text>
-          </View>
-
-          {data.retain.current !== data.retain.previous ? (
-            <Text
-              className={`text-[9px] font-medium ${
-                data.retain.current >= data.retain.previous
-                  ? "text-success/80"
-                  : "text-error/80"
-              }`}
+            <ThemedText
+              size="tiny"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+              className="ml-1"
+              style={{
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
             >
-              {data.retain.current >= data.retain.previous ? "+" : "-"}
-              {fixed(Math.abs(data.retain.current - data.retain.previous))} pts
-            </Text>
+              Retain
+            </ThemedText>
+          </View>
+
+          <ThemedText
+            size="xl"
+            weight="bold"
+            color="primary"
+          >
+            {data.retain.current}
+          </ThemedText>
+
+          {retainDiff !== 0 ? (
+            <ThemedText
+              size="tiny"
+              weight="medium"
+              color={retainDiff > 0 ? "success" : "error"}
+            >
+              {retainDiff > 0 ? "+" : "-"}
+              {fixed(Math.abs(retainDiff))} pts
+            </ThemedText>
           ) : (
-            <Text className="mt-0.5 text-[8px] uppercase tracking-wide text-zinc-600">
+            <ThemedText
+              size="tiny"
+              color="text"
+              opacity="low"
+              className="mt-0.5"
+            >
               Points
-            </Text>
+            </ThemedText>
           )}
         </View>
       </Animated.View>
 
-      {/* --- ACTION BUTTON --- */}
+      {/* Action */}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onClose}
-        style={{ backgroundColor: color, boxShadow: "0px 4px 8px " + color }}
         className="mt-6 items-center justify-center rounded-2xl py-3.5"
+        style={{
+          backgroundColor: color,
+          boxShadow: `0px 3px 6px ${color}40`,
+        }}
       >
-        <Text className="text-sm font-bold text-white">{config.btnText}</Text>
+        <ThemedText
+          size="sm"
+          weight="bold"
+          color="background"
+        >
+          {config.btnText}
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );

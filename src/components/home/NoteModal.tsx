@@ -17,6 +17,32 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 
+const checkWeightError = (text: string): string => {
+  if (!text) return "";
+
+  if (!/^[\d.]*$/.test(text)) {
+    return "Chỉ được nhập số.";
+  }
+
+  const dots = (text.match(/\./g) || []).length;
+
+  if (dots > 1) {
+    return "Chỉ được nhập một dấu thập phân.";
+  }
+
+  const [integer = "", decimal = ""] = text.split(".");
+
+  if (integer.length > 4) {
+    return "Phần nguyên tối đa 4 chữ số.";
+  }
+
+  if (decimal.length > 1) {
+    return "Phần thập phân tối đa 1 chữ số.";
+  }
+
+  return "";
+};
+
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
@@ -25,7 +51,6 @@ type Props = {
   weight: number | null;
   onSelectMood: (mood?: MoodLevel, note?: string, weight?: number) => void;
 };
-
 const NoteModal = ({
   visible,
   setVisible,
@@ -35,53 +60,34 @@ const NoteModal = ({
   onSelectMood,
 }: Props) => {
   const { theme } = useAppStore();
-  const inputRef = useRef<TextInput>(null);
-  const [tempText, setTempText] = useState(note || "");
-  const [tempWeight, setTempWeight] = useState(weight?.toString());
-  const [weightError, setWeightError] = useState("");
 
-  const [selection, setSelection] = useState({
-    start: 0,
-    end: 0,
-  });
-  const checkWeightError = (text: string): string => {
-    if (text === "") return "";
+  const [tempText, setTempText] = useState(note ?? "");
+  const [tempWeight, setTempWeight] = useState(
+    weight?.toString() ?? "",
+  );
 
-    // Chỉ cho phép số và dấu .
-    if (!/^[\d.]*$/.test(text)) {
-      return "Chỉ được nhập số.";
-    }
-
-    const dots = (text.match(/\./g) || []).length;
-    if (dots > 1) {
-      return "Chỉ được nhập một dấu thập phân.";
-    }
-
-    const [integer = "", decimal = ""] = text.split(".");
-
-    if (integer.length > 4) {
-      return "Phần nguyên tối đa 4 chữ số.";
-    }
-
-    if (decimal.length > 1) {
-      return "Phần thập phân tối đa 1 chữ số.";
-    }
-
-    return "";
-  };
+  const parsedWeight = tempWeight
+  ? Number(tempWeight)
+  : undefined;
 
   useEffect(() => {
-    setTempText(note || "");
+    setTempText(note ?? "");
   }, [note]);
 
   useEffect(() => {
-    setTempWeight(weight?.toString());
+    setTempWeight(weight?.toString() ?? "");
   }, [weight]);
 
-  useEffect(() => {
-    const error = checkWeightError(tempWeight || "");
-    setWeightError(error);
-  }, [tempWeight]);
+  const weightError = checkWeightError(tempWeight);
+
+  const handleSelectMood = (level: MoodLevel) => {
+    onSelectMood(
+      level,
+      tempText,
+      parsedWeight,
+    );
+    setVisible(false);
+  };
 
   return (
     <Modal
@@ -90,147 +96,185 @@ const NoteModal = ({
       animationType="fade"
       onRequestClose={() => setVisible(false)}
     >
-      {/* Overlay */}
       <Pressable
-        className="flex-1 bg-gray-900/70"
+        className="flex-1 bg-background/80"
         onPress={() => setVisible(false)}
       >
-        {/* Thanh reaction */}
-        <View className="absolute bottom-8 left-4 right-4">
+        <View className="absolute bottom-6 left-4 right-4">
           <Animated.View
-            layout={LinearTransition.springify().duration(100).damping(80)}
+            layout={LinearTransition.springify()
+              .duration(100)
+              .damping(80)}
           >
-            <Pressable className="p-2" onPress={(e) => e.stopPropagation()}>
-              {/* <View className="items-end mb-2">
-                <TouchableOpacity
-                  disabled={!(note || mood)}
-                  activeOpacity={0.7}
-                  onPress={() => {
-                    onSelectMood();
-                    setVisible(false);
-                  }}
-                  className={`${note || mood ? "" : "opacity-20"} bg-error flex-row items-center gap-2 rounded-lg px-2 py-1`}
-                >
-                  <MaterialIcons name="delete" size={20} color={"white"} />
-                  <Text className="text-white! font-bold">Clear</Text>
-                </TouchableOpacity>
-              </View> */}
-              <View className="mb-1 flex-row items-center justify-between">
-                <ThemedText size="xs">Weight</ThemedText>
-
+            <Pressable
+              className="rounded-3xl bg-background2 p-4"
+              onPress={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <View className="mb-4 flex-row items-center justify-between">
                 <View>
-                  <ThemedText size="xs" weight="medium" color="error">
-                    {weightError ? weightError : " "}
-                  </ThemedText>
-                </View>
-
-                <View className="items-end">
-                  <ThemedText size="xs" color="primary">
+                  <ThemedText
+                    size="md"
+                    weight="bold"
+                    color="title"
+                  >
                     Daily note
                   </ThemedText>
+
+                  <ThemedText
+                    size="xxs"
+                    color="text"
+                    opacity="medium"
+                    className="mt-0.5"
+                  >
+                    Hôm nay bạn cảm thấy thế nào?
+                  </ThemedText>
                 </View>
+
+                <TouchableOpacity
+                  hitSlop={10}
+                  activeOpacity={0.7}
+                  onPress={() => setVisible(false)}
+                  className="h-8 w-8 items-center justify-center rounded-full bg-text-base/5"
+                >
+                  <ThemedText
+                    size="sm"
+                    weight="bold"
+                    color="text"
+                    opacity="medium"
+                  >
+                    ×
+                  </ThemedText>
+                </TouchableOpacity>
               </View>
 
-              <View className="mb-4 flex-row items-center justify-between gap-2">
-                <View
-                  className={`h-20 w-20 items-center justify-center rounded-xl shadow ${
-                    weightError
-                      ? "shadow-error bg-error"
-                      : "shadow-primary bg-primary"
-                  }`}
-                >
-                  <TextInput
-                    ref={inputRef}
-                    value={tempWeight}
-                    placeholder={weight?.toString() || "0"}
-                    placeholderTextColor={theme.text + "DD"}
-                    onChangeText={setTempWeight}
-                    maxLength={6}
-                    selection={selection}
-                    hitSlop={10}
-                    keyboardType="numeric"
-                    className="text-text-base! text-xl! font-bold!"
-                    onSelectionChange={(e) =>
-                      setSelection(e.nativeEvent.selection)
-                    }
-                    onFocus={() => {
-                      requestAnimationFrame(() => {
-                        setSelection({
-                          start: 0,
-                          end: tempWeight?.length || 0,
-                        });
-                      });
-                    }}
-                  />
+              {/* Weight + Note */}
+              <View className="mb-5 flex-row gap-2">
+                {/* Weight */}
+                <View className="w-20">
+                  <ThemedText
+                    size="xxs"
+                    weight="semibold"
+                    color="text"
+                    opacity="medium"
+                    className="mb-1.5"
+                  >
+                    Weight
+                  </ThemedText>
 
-                  <View className="absolute bottom-1.5 right-1.5">
+                  <View
+                    className={`h-20 rounded-2xl border ${
+                      weightError
+                        ? "border-error bg-error/10"
+                        : "border-primary/20 bg-primary/10"
+                    }`}
+                  >
+                    <TextInput
+                      value={tempWeight}
+                      placeholder={weight?.toString() || "0"}
+                      placeholderTextColor={`${theme.text}66`}
+                      onChangeText={setTempWeight}
+                      maxLength={6}
+                      keyboardType="decimal-pad"
+                      className="flex-1 px-2 pb-3 pt-2 text-center text-xl font-bold text-text-base"
+                      style={{
+                        fontVariant: ["tabular-nums"],
+                      }}
+                    />
+
                     <ThemedText
-                      size="xs"
+                      size="xxs"
                       color="text"
                       opacity="medium"
-                      style={{ fontStyle: "italic" }}
+                      className="absolute bottom-1.5 right-2"
                     >
                       kg
                     </ThemedText>
                   </View>
+
+                  {weightError ? (
+                    <ThemedText
+                      size="xxs"
+                      color="error"
+                      className="mt-1"
+                      numberOfLines={2}
+                    >
+                      {weightError}
+                    </ThemedText>
+                  ) : null}
                 </View>
 
+                {/* Note */}
                 <View className="flex-1">
+                  <ThemedText
+                    size="xxs"
+                    weight="semibold"
+                    color="text"
+                    opacity="medium"
+                    className="mb-1.5"
+                  >
+                    Note
+                  </ThemedText>
+
                   <TextInput
-                    textAlignVertical="top"
-                    cursorColor={theme.text}
-                    style={{ fontSize: 12 }}
                     value={tempText}
                     onChangeText={setTempText}
                     multiline
-                    placeholder="What are you feeling today?"
-                    placeholderTextColor={theme.text + "99"}
                     numberOfLines={3}
-                    className="h-20 rounded-xl border border-solid border-text-base/50 bg-background p-2 text-text-base"
+                    textAlignVertical="top"
+                    cursorColor={theme.text}
+                    placeholder="What are you feeling today?"
+                    placeholderTextColor={`${theme.text}66`}
+                    className="h-20 rounded-2xl border border-text-base/10 bg-background px-3 py-2 text-xs text-text-base"
                   />
                 </View>
               </View>
 
-              <View className={"flex-row items-center justify-center gap-2"}>
-                {EMOTIONS.map((item, index) => {
-                  const isSelected = item.level === mood;
-                  return (
-                    <Animated.View
-                      key={item.emoji}
-                      entering={SlideInDown.springify()
-                        .damping(18)
-                        .stiffness(180)
-                        .mass(1)
-                        .delay(index * 50)}
-                      exiting={SlideOutDown.duration(100)}
-                    >
-                      <TouchableOpacity
-                        style={{
-                          width: 56,
-                          height: 56,
-                          borderRadius: 999,
-                          borderColor: "gray",
-                          borderWidth: 1,
-                        }}
-                        className={`items-center justify-center ${isSelected ? "bg-primary shadow-primary shadow-lg" : "bg-white flex-1"}`}
-                        key={index}
-                        onPress={() => {
-                          (onSelectMood(
-                            item.level,
-                            tempText,
-                            Number(tempWeight),
-                          ),
-                            console.log(item.emoji),
-                            setVisible(false));
-                        }}
+              {/* Mood */}
+              <View>
+                <ThemedText
+                  size="xxs"
+                  weight="semibold"
+                  color="text"
+                  opacity="medium"
+                  className="mb-2"
+                >
+                  Mood
+                </ThemedText>
+
+                <View className="flex-row justify-between">
+                  {EMOTIONS.map((item, index) => {
+                    const isSelected = item.level === mood;
+
+                    return (
+                      <Animated.View
+                        key={item.emoji}
+                        entering={SlideInDown.springify()
+                          .damping(18)
+                          .stiffness(180)
+                          .mass(1)
+                          .delay(index * 50)}
+                        exiting={SlideOutDown.duration(100)}
                       >
-                        <Text style={{ fontSize: 28 }} key={item.level}>
-                          {item.emoji}
-                        </Text>
-                      </TouchableOpacity>
-                    </Animated.View>
-                  );
-                })}
+                        <TouchableOpacity
+                          activeOpacity={0.75}
+                          onPress={() =>
+                            handleSelectMood(item.level)
+                          }
+                          className={`h-12 w-12 items-center justify-center rounded-full border ${
+                            isSelected
+                              ? "border-primary bg-primary"
+                              : "border-text-base/10 bg-background"
+                          }`}
+                        >
+                          <Text style={{ fontSize: 25 }}>
+                            {item.emoji}
+                          </Text>
+                        </TouchableOpacity>
+                      </Animated.View>
+                    );
+                  })}
+                </View>
               </View>
             </Pressable>
           </Animated.View>

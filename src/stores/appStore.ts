@@ -1,6 +1,6 @@
 // src/store/appStore.ts
 
-import { defaultDark, ThemeType } from "@/constants/themes";
+import { defaultDark, extractTheme, ThemeType } from "@/constants/themes";
 import {
   AppSettings,
   FastSession,
@@ -47,6 +47,7 @@ interface AppState {
   updateWeight: (weight: number | null) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
   setTheme: (theme: ThemeType) => void;
+  setDarkMode: (isDark: boolean) => void;
   setLanguage: (language: string) => void;
 
   // App lifecycle
@@ -177,6 +178,15 @@ export const useAppStore = create<AppState>((set) => ({
   setTheme: (theme) => {
     set({
       theme,
+    });
+  },
+
+  setDarkMode: (isDarkMode:boolean) => {
+    const { settings } = useAppStore.getState();
+    const theme = extractTheme({ theme: settings?.theme, isDarkMode });
+    set({
+      theme: theme,
+      settings: { ...settings, is_dark_mode: isDarkMode },
     });
   },
 

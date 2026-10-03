@@ -19,78 +19,76 @@ import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StatusBar, useWindowDimensions, View } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 const DashboardScreen = () => {
   const { width } = useWindowDimensions();
-  const { theme, currentFastSession, weight, settings } = useAppStore();
+  const { currentFastSession, settings } = useAppStore();
+  const { userProfile } = useAppStore();
+
   const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
 
-  const chartRange = useMemo<ChartRangeKey>(() => {
-    return settings?.chart_range || "7d";
-  }, [settings?.chart_range]);
+  const chartRange: ChartRangeKey = settings?.chart_range || "7d";
 
-  const chartType = useMemo<ChartRangeConfig>(
-    () => CHART_RANGES.find((r) => r.key === chartRange) || CHART_RANGES[0],
-    [chartRange],
+  const chartType =
+    CHART_RANGES.find((item) => item.key === chartRange) ||
+    CHART_RANGES[0];
+
+  const chartDayRange = Math.ceil(
+    (new Date(getLocalTodayStr()).getTime() -
+      new Date(getStartDateFromRange(chartRange)).getTime()) /
+      86400000,
   );
-  const chartDayRange = useMemo<number>(() => {
-    return Math.ceil(
-      (new Date(getLocalTodayStr()).getTime() -
-        new Date(getStartDateFromRange(chartRange)).getTime()) /
-        86400000,
-    );
-  }, [chartRange]);
 
   const [weightData, setWeightData] = useState<
     { key: string; x: string; fast: number; weight: number | null }[]
   >(initChartData(chartType));
 
-  const getWeightData = async () => {
-    return dbService?.getWeightLogs(chartDayRange);
-  };
+  const [fastStatistics, setFastStatistics] =
+    useState<FastStatsSummary>({
+      above_16: 0,
+      above_20: 0,
+      above_24: 0,
+      above_36: 0,
+      above_48: 0,
+      above_72: 0,
+      avg_hours: 0,
+      max_hours: 0,
+      total_hours: 0,
+      total_sessions: 0,
+    });
 
-  const getDayFastData = async () => {
-    return dbService?.getDailyLogs(chartDayRange);
-  };
+  const [hasUnclamMilestones, setHasUnclamMilestones] =
+    useState(false);
 
-  const [fastStatistics, setFastStatistics] = useState<FastStatsSummary>({
-    above_16: 0,
-    above_20: 0,
-    above_24: 0,
-    above_36: 0,
-    above_48: 0,
-    above_72: 0,
-    avg_hours: 0,
-    max_hours: 0,
-    total_hours: 0,
-    total_sessions: 0,
-  });
-
-  const getFastStatsSummary = async () => {
-    return dbService?.getFastStatsSummary();
-  };
-
-  const refreshData = async () => {
-    const dayPointer = new Date(getStartDateFromRange(chartRange)).getTime(); // Bao gồm ngày hôm nay
-
+  const refreshData = useCallback(async () => {
     const [weights, dayFasts, fastStatisticsDB] = await Promise.all([
-      getWeightData(),
-      getDayFastData(),
-      getFastStatsSummary(),
+      dbService?.getWeightLogs(chartDayRange),
+      dbService?.getDailyLogs(chartDayRange),
+      dbService?.getFastStatsSummary(),
     ]);
 
     const weightMap: Record<string, number> = {};
     const fastMap: Record<string, number> = {};
 
     weights.forEach((item) => {
-      const key = getBucketKey(new Date(item.log_date), chartType.unit);
-      weightMap[key] = item.weight; // hoặc lấy latest nếu có nhiều record
+      const key = getBucketKey(
+        new Date(item.log_date),
+        chartType.unit,
+      );
+
+      weightMap[key] = item.weight;
     });
 
     dayFasts.forEach((item) => {
-      const key = getBucketKey(new Date(item.log_date), chartType.unit);
-      fastMap[key] = (fastMap[key] ?? 0) + item.hours_in_day;
+      const key = getBucketKey(
+        new Date(item.log_date),
+        chartType.unit,
+      );
+
+      fastMap[key] =
+        (fastMap[key] ?? 0) + item.hours_in_day;
     });
 
     if (currentFastSession) {
@@ -101,26 +99,36 @@ const DashboardScreen = () => {
       );
 
       fasts.forEach((fast) => {
-        const key = getBucketKey(new Date(fast.log_date), chartType.unit);
-        fastMap[key] = (fastMap[key] ?? 0) + fast.hours_in_day;
+        const key = getBucketKey(
+          new Date(fast.log_date),
+          chartType.unit,
+        );
+
+        fastMap[key] =
+          (fastMap[key] ?? 0) + fast.hours_in_day;
       });
     }
-    let weightsArr: {
+
+    const weightsArr: {
       key: string;
       x: string;
       fast: number;
       weight: number | null;
     }[] = [];
 
-    initChartData(chartType).map((item, index, arr) => {
-      // case ngày ko có data => lấy data ngày trước đó
+    initChartData(chartType).forEach((item, index) => {
       let weight =
-        (weightMap[item.key] ?? weightsArr[index - 1]?.weight) || null;
+        weightMap[item.key] ??
+        weightsArr[index - 1]?.weight ??
+        null;
 
-      // case ngày có data nằm ngoài range => ngày đầu sẽ lấy last weight
-      if (!weight && weights?.[0]?.log_date <= item.date) {
-        weight = weights?.[0].weight;
+      if (
+        !weight &&
+        weights?.[0]?.log_date <= item.date
+      ) {
+        weight = weights[0].weight;
       }
+
       weightsArr.push({
         key: item.key,
         x: item.x,
@@ -129,44 +137,44 @@ const DashboardScreen = () => {
       });
     });
 
-    for (let i = weightsArr.length - 1; i < 0; i--) {
-      const item = weightsArr[i];
-      if (item.weight === 0) {
-        item.weight = weightsArr[i + 1]?.weight ?? 0;
-      }
-    }
-
     setWeightData(weightsArr);
     setFastStatistics(fastStatisticsDB);
-  };
+  }, [
+    dbService,
+    chartDayRange,
+    chartType,
+    currentFastSession,
+  ]);
 
-  const { userProfile } = useAppStore();
+  const refreshMilestones = useCallback(async () => {
+    if (!userProfile) {
+      setHasUnclamMilestones(false);
+      return;
+    }
 
-  const [hasUnclamMilestones, setHasUnclamMilestones] = useState(false);
-  const getUnClamMilestone = async () => {
-    if (!userProfile) return;
-    const { currentMilestones, userAchievements } = await getUserAchievements(
+    const { currentMilestones } = await getUserAchievements(
       dbService,
       userProfile.id,
     );
 
-    const unClam = currentMilestones.find(
+    const hasUnclaimed = currentMilestones.some(
       (milestone) => !milestone.is_confirmed,
     );
-    console.log("milestones", currentMilestones, userAchievements, unClam);
-    setHasUnclamMilestones(!!unClam);
-  };
+
+    setHasUnclamMilestones(hasUnclaimed);
+  }, [dbService, userProfile]);
 
   useFocusEffect(
     useCallback(() => {
       const task = requestIdleCallback(async () => {
         await refreshData();
-        await getUnClamMilestone();
+        await refreshMilestones();
       });
+
       return () => {
         cancelIdleCallback(task);
       };
-    }, [chartRange, currentFastSession, weight]),
+    }, [refreshData, refreshMilestones]),
   );
 
   return (
@@ -182,28 +190,27 @@ const DashboardScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <View className="px-3">
-            <DashboardHeader hasUnclamMilestones={hasUnclamMilestones} />
-            <View className="mt-4">
-              <GoalCard />
-            </View>
+            <DashboardHeader
+              hasUnclamMilestones={hasUnclamMilestones}
+            />
 
-            {/* 4. BIỂU ĐỒ 2: XU HƯỚNG CÂN NẶNG (LINE CHART PLACEHOLDER) */}
-            {/* <DashboardOptions /> */}
+            <Animated.View className="mt-3" layout={LinearTransition.duration(300)}>
+              <GoalCard />
+            </Animated.View>
 
             <WeightLineChart
               onInteractionStart={() => setEnableScroll(false)}
               onInteractionEnd={() => setEnableScroll(true)}
-              layout={{ width: width - 24, height: 200 }}
               data={weightData}
             />
 
-            <FastLevelBarChart fastStatistics={fastStatistics} />
+            <FastLevelBarChart
+              fastStatistics={fastStatistics}
+            />
 
-            {/* 3. BIỂU ĐỒ 1: TỔNG SỐ GIỜ NHỊN (BAR CHART PLACEHOLDER) */}
-            {/*  */}
-
-            {/* 2. QUICK STATS (Thống kê nhanh dạng số) */}
-            <StatisticsSection fastStatistics={fastStatistics} />
+            <StatisticsSection
+              fastStatistics={fastStatistics}
+            />
           </View>
         </ScrollView>
       </View>

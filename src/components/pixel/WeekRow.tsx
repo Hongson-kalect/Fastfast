@@ -43,7 +43,7 @@ const WeekRow = React.memo(
         <View className="flex-1 flex-row justify-between gap-x-1">
           {week.days.map((day, dIdx) => (
             <DayPixel
-              key={dIdx}
+              key={day.dateString}
               day={day}
               todayStr={todayStr}
               viewMode={viewMode}

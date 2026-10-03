@@ -140,7 +140,6 @@ const PixelGridManager = (props: Props) => {
   const [renderedYear, setRenderedYear] = useState<number>(
     new Date().getFullYear(),
   );
-  const flatListRef = useRef(FlatList);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const gridData = useMemo(() => {
@@ -150,13 +149,6 @@ const PixelGridManager = (props: Props) => {
   const todayStr = useMemo(() => {
     return getLocalTodayStr();
   }, []);
-
-  const handleRender = () => {
-    const yearNum = parseInt(inputYear, 10);
-    if (!isNaN(yearNum) && yearNum > 1900 && yearNum < 2100) {
-      setRenderedYear(yearNum);
-    }
-  };
 
   const { present, hide } = useBottomSheet();
   useEffect(() => {

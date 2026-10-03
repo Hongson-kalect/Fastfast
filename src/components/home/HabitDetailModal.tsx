@@ -16,43 +16,32 @@ interface HabitDetailModalProps {
   // Helper format do bạn định nghĩa
   targetInfo?: (typeof FASTING_TARGETS)[0] | null;
 }
-
-export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
+export const HabitDetailModal = ({
   log,
   onClose,
   targetInfo,
-}) => {
-  if (!log) {
-    console.log("nhảy modal", Date.now());
-    return null;
-  }
-
+}: HabitDetailModalProps) => {
   const { theme } = useAppStore();
 
+  if (!log) return null;
+
   const isPositiveHabit = Number(log.habit_delta) >= 0;
+  const isPositiveRetain = Number(log.retain_delta) >= 0;
+  const isPositiveShield = Number(log.shield_delta) >= 0;
+
   const isShieldEvent =
     log.shield_delta !== undefined && log.shield_delta !== 0;
-  const hasFastDetail = Boolean(log.duration || log.target_duration);
 
-  // Tính trạng thái hoàn thành target
-  const actualHours = log.duration ? log.duration / 3600 : 0;
-  const targetHours = log.target_duration ?? 0;
-  const isTargetSuccess = targetHours > 0 ? actualHours >= targetHours : null;
-
-  const { currentModal } = useModalStore();
-
-  useEffect(() => {
-    console.log("Nhảy trong effect", Date.now());
-  }, [currentModal]);
+  const hasFastDetail = Boolean(
+    log.duration || log.target_duration,
+  );
 
   return (
     <View className="w-full">
       <Pressable onPress={(e) => e.stopPropagation()}>
-        {/* ---------------------------------------------------- */}
-        {/* PHẦN 1: THÔNG SỐ HABIT                               */}
-        {/* ---------------------------------------------------- */}
+        {/* Habit log */}
         <View className="gap-y-2">
-          <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center justify-between">
             <ThemedText
               size="xs"
               weight="semibold"
@@ -76,14 +65,21 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                 letterSpacing: 1,
               }}
             >
-              {log.log_date ? getLocalTodayStr(new Date(log.log_date)) : "N/A"}
+              {log.log_date
+                ? getLocalTodayStr(new Date(log.log_date))
+                : "N/A"}
             </ThemedText>
           </View>
 
-          {/* Lưới Trạng thái Tích lũy */}
-          <View className="flex-row justify-between items-center bg-background2/40 p-3 rounded-xl border border-text-base/5">
-            <View className="items-center flex-1">
-              <ThemedText size="xxs" color="text" opacity="medium">
+          {/* Habit / Retain / Shield */}
+          <View className="flex-row items-center justify-between rounded-xl border border-text-base/5 bg-background2/40 p-3">
+            {/* Habit */}
+            <View className="flex-1 items-center">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+              >
                 Điểm Habit
               </ThemedText>
 
@@ -91,7 +87,7 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                 size="sm"
                 weight="bold"
                 color="success"
-                style={{ marginTop: 4 }}
+                className="mt-1"
               >
                 {fixed(log.habit_snap ?? 0)}%
               </ThemedText>
@@ -102,15 +98,21 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                   weight="medium"
                   color={isPositiveHabit ? "success" : "error"}
                 >
-                  {isPositiveHabit ? "▲" : "▼"} {fixed(log.habit_delta)}
+                  {isPositiveHabit ? "▲" : "▼"}{" "}
+                  {fixed(log.habit_delta)}
                 </ThemedText>
               ) : null}
             </View>
 
-            <View className="w-[1px] h-6 bg-text-base/10" />
+            <View className="h-6 w-px bg-text-base/10" />
 
-            <View className="items-center flex-1">
-              <ThemedText size="xxs" color="text" opacity="medium">
+            {/* Retain */}
+            <View className="flex-1 items-center">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+              >
                 Retain
               </ThemedText>
 
@@ -118,7 +120,7 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                 size="sm"
                 weight="bold"
                 color="primary"
-                style={{ marginTop: 4 }}
+                className="mt-1"
               >
                 {fixed(log.habit_retain ?? 0)}%
               </ThemedText>
@@ -127,28 +129,38 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                 <ThemedText
                   size="xs"
                   weight="medium"
-                  color={isPositiveHabit ? "success" : "error"}
+                  color={isPositiveRetain ? "success" : "error"}
                 >
-                  {log.retain_delta > 0 ? "▲" : "▼"} {fixed(log.retain_delta)}
+                  {isPositiveRetain ? "▲" : "▼"}{" "}
+                  {fixed(log.retain_delta)}
                 </ThemedText>
               ) : null}
             </View>
 
-            <View className="w-[1px] h-6 bg-text-base/10" />
+            <View className="h-6 w-px bg-text-base/10" />
 
-            <View className="items-center flex-1">
-              <ThemedText size="xxs" color="text" opacity="medium">
+            {/* Shield */}
+            <View className="flex-1 items-center">
+              <ThemedText
+                size="xxs"
+                color="text"
+                opacity="medium"
+              >
                 Số Khiên
               </ThemedText>
 
-              <View className="flex-row items-center gap-1 mt-1">
+              <View className="mt-1 flex-row items-center gap-1">
                 <FontAwesome5
                   name="shield-alt"
                   size={11}
                   color={theme.primary}
                 />
 
-                <ThemedText size="sm" weight="bold" color="primary">
+                <ThemedText
+                  size="sm"
+                  weight="bold"
+                  color="primary"
+                >
                   {log.shield_snap ?? 0}
                 </ThemedText>
               </View>
@@ -157,20 +169,19 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
                 <ThemedText
                   size="xs"
                   weight="medium"
-                  color={isPositiveHabit ? "success" : "error"}
+                  color={isPositiveShield ? "success" : "error"}
                 >
-                  {log.shield_delta > 0 ? "▲" : "▼"} {fixed(log.shield_delta)}
+                  {isPositiveShield ? "▲" : "▼"}{" "}
+                  {fixed(log.shield_delta)}
                 </ThemedText>
               ) : null}
             </View>
           </View>
         </View>
 
-        {/* ---------------------------------------------------- */}
-        {/* PHẦN 2: CHI TIẾT FAST / EXCEPTION                    */}
-        {/* ---------------------------------------------------- */}
+        {/* Fast / Exception */}
         {hasFastDetail ? (
-          <View className="gap-y-2 mt-5">
+          <View className="mt-5 gap-y-2">
             <ThemedText
               size="xs"
               weight="semibold"
@@ -187,14 +198,22 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
             <FastDetail fast={log} />
           </View>
         ) : log.shield_delta && log.shield_delta < 0 ? (
-          <View className="mt-6 py-4 items-center">
-            <ThemedText size="sm" color="text" opacity="medium">
+          <View className="mt-6 items-center py-4">
+            <ThemedText
+              size="sm"
+              color="text"
+              opacity="medium"
+            >
               Ngày nghỉ
             </ThemedText>
           </View>
         ) : log.habit_delta && log.habit_delta < 0 ? (
-          <View className="mt-6 py-4 items-center">
-            <ThemedText size="sm" color="text" opacity="medium">
+          <View className="mt-6 items-center py-4">
+            <ThemedText
+              size="sm"
+              color="text"
+              opacity="medium"
+            >
               Quá đà
             </ThemedText>
           </View>

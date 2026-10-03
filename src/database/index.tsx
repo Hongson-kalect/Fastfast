@@ -93,6 +93,7 @@ import {
   removeUserAsset,
   generateString as userAssetsGenerateString,
 } from "./shema/user_assets";
+import { ThemeKey } from "@/constants/themes";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -143,7 +144,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
 
   getActiveTheme: () => getActiveTheme(db),
   getThemes: () => getThemes(db),
-  changeTheme: (theme: string) => changeTheme(db, theme),
+  changeTheme: (theme: ThemeKey) => changeTheme(db, theme),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
   getCurrentWeight: (date?: string) => getCurrentWeight(db, date),

@@ -13,7 +13,7 @@ import {
 } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { handleLogin } from "@/util/login";
-import { defaultDark, extractTheme, ThemeType } from "@/constants/themes";
+import { defaultDark, extractTheme, ThemeKey, ThemeType } from "@/constants/themes";
 import { useAppStore } from "./appStore";
 
 const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
@@ -235,7 +235,7 @@ export async function initializeAppState(
  */
 export async function updateTheme(
   db: SQLiteDatabase,
-  themeId: string,
+  themeId: ThemeKey,
 ): Promise<void> {
   const dbService = createDBService(db);
 
@@ -253,7 +253,7 @@ export async function updateTheme(
   useAppStore.setState({
     settings: {
       ...(settings ?? {}),
-      theme: themeId,
+      theme: themeId.toString(),
     },
     theme,
   });

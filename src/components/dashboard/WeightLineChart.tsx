@@ -1,5 +1,4 @@
 import { fonts } from "@/configs/fonts";
-import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
@@ -14,27 +13,20 @@ import {
   useFont,
   vec,
 } from "@shopify/react-native-skia";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useAnimatedReaction, useDerivedValue } from "react-native-reanimated";
-import { runOnJS } from "react-native-worklets";
+import { useDerivedValue } from "react-native-reanimated";
 import { Bar, CartesianChart, Line, useChartPressState } from "victory-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
 
 type Props = {
   data: { x: string; fast: number; weight: number | null }[];
-  layout?: {
-    width: number;
-    height: number;
-  };
   onInteractionStart?: () => void;
   onInteractionEnd?: () => void;
 };
 
 const WeightLineChart = ({
-  layout,
   data,
   onInteractionStart,
   onInteractionEnd,
@@ -43,94 +35,15 @@ const WeightLineChart = ({
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
   const font4 = useFont(fonts.MulishBold, 15);
-  const { theme, settings, updateWeight } = useAppStore();
+  const { theme, settings } = useAppStore();
   const { width } = useWindowDimensions();
-  const dbService = useDBService();
   const { present } = useBottomSheet();
 
   // 👇 1. Khởi tạo State để quản lý hành động Press/Hover trên Chart
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { state, isActive } = useChartPressState({
     x: "0",
     y: { fast: 0, weight: 0, weightRatio: 0, target: 0 },
   });
-
-  const [chartHeight, chartData, rightAxis] = useMemo(() => {
-    const arr: {
-      x: string;
-      fast: number;
-      weight: number | null;
-      weightRatio: number | null;
-      target: number | null;
-    }[] = [];
-    let max_weight = settings?.weight_target || 0;
-    let max_fast = 0;
-    let min_weight = settings?.weight_target || 9999;
-    let min_fast = 9999;
-    data.map((item) => {
-      if (item.fast > max_fast) max_fast = item.fast;
-      if (item.fast < min_fast) min_fast = item.fast;
-      if (item.weight && item.weight > max_weight) max_weight = item.weight;
-      if (item.weight && item.weight < min_weight) min_weight = item.weight;
-
-      arr.push({
-        x: item.x,
-        fast: item.fast || 0,
-        weight: item.weight,
-        weightRatio: 0,
-        target: Number(settings?.weight_target),
-      });
-    });
-    const weight_delta = max_weight - min_weight || 1;
-    const barChartRatio = 60;
-    const gap = 20;
-    const lineChartRatio = 100 - barChartRatio - gap;
-    const chartHeight = Math.ceil(
-      (Math.max(max_fast, 24) * 100) / barChartRatio,
-    );
-    let targetRatio = null;
-
-    if (settings?.weight_target) {
-      targetRatio =
-        Math.floor(
-          chartHeight *
-            ((barChartRatio + gap) / 100 +
-              (((settings?.weight_target - min_weight) / weight_delta) *
-                lineChartRatio) /
-                100) *
-            100,
-        ) / 100;
-    }
-    arr.forEach((item) => {
-      item.target = targetRatio;
-      if (!item.weight) return (item.weightRatio = null);
-
-      item.weightRatio =
-        Math.floor(
-          chartHeight *
-            ((barChartRatio + gap) / 100 +
-              (((item.weight - min_weight) / weight_delta) * lineChartRatio) /
-                100) *
-            100,
-        ) / 100;
-    });
-
-    const rightAxisData: number[] = [];
-    const axisGap = ((max_weight - min_weight || 1) / lineChartRatio) * 25;
-    for (let i = 0; i < 6; i++) {
-      const val = min_weight + (i - 4) * axisGap;
-      console.log(val);
-      rightAxisData.push(
-        Math.round((max_weight + (i - 4) * axisGap) * 10) / 10,
-      );
-    }
-
-    return [chartHeight, arr, rightAxisData];
-  }, [data, settings]);
-
-  const rightAxisReversed = useMemo(() => {
-    return rightAxis.reverse();
-  }, [rightAxis]);
 
   const openTimeRangeSheet = () => {
     present(<ChartRangeSheet />);
@@ -145,20 +58,96 @@ const WeightLineChart = ({
   const activeLineFont = isDenseData ? font : font2;
   const charWidthOffset = isDenseData ? 3 : 4;
 
-  useAnimatedReaction(
-    () => ({
-      isActive: state.isActive.value,
-      index: state.matchedIndex.value,
-    }),
-    (res) => {
-      if (res.isActive && res.index !== undefined) {
-        runOnJS(setActiveIndex)(res.index);
-      } else {
-        runOnJS(setActiveIndex)(null);
+  const weightTarget = settings?.weight_target ?? null;
+
+  const [chartHeight, chartData, rightAxis] = useMemo(() => {
+    const arr: {
+      x: string;
+      fast: number;
+      weight: number | null;
+      weightRatio: number | null;
+      target: number | null;
+    }[] = [];
+
+    let maxWeight = weightTarget ?? 0;
+    let minWeight = weightTarget ?? 9999;
+    let maxFast = 0;
+
+    data.forEach((item) => {
+      if (item.fast > maxFast) {
+        maxFast = item.fast;
       }
-    },
-    [state],
-  );
+
+      if (item.weight) {
+        if (item.weight > maxWeight) {
+          maxWeight = item.weight;
+        }
+
+        if (item.weight < minWeight) {
+          minWeight = item.weight;
+        }
+      }
+    });
+
+    const weightDelta = maxWeight - minWeight || 1;
+
+    const barChartRatio = 60;
+    const gap = 20;
+    const lineChartRatio = 100 - barChartRatio - gap;
+
+    const chartHeight = Math.ceil(
+      (Math.max(maxFast, 24) * 100) / barChartRatio,
+    );
+
+    let targetRatio: number | null = null;
+
+    if (weightTarget) {
+      targetRatio =
+        Math.floor(
+          chartHeight *
+            ((barChartRatio + gap) / 100 +
+              (((weightTarget - minWeight) / weightDelta) * lineChartRatio) /
+                100) *
+            100,
+        ) / 100;
+    }
+
+    data.forEach((item) => {
+      let weightRatio: number | null = null;
+
+      if (item.weight) {
+        weightRatio =
+          Math.floor(
+            chartHeight *
+              ((barChartRatio + gap) / 100 +
+                (((item.weight - minWeight) / weightDelta) * lineChartRatio) /
+                  100) *
+              100,
+          ) / 100;
+      }
+
+      arr.push({
+        x: item.x,
+        fast: item.fast || 0,
+        weight: item.weight,
+        weightRatio,
+        target: targetRatio,
+      });
+    });
+
+    const axisGap = ((maxWeight - minWeight || 1) / lineChartRatio) * 25;
+
+    const rightAxisData: number[] = [];
+
+    for (let i = 0; i < 6; i++) {
+      rightAxisData.push(Math.round((maxWeight + (i - 4) * axisGap) * 10) / 10);
+    }
+
+    return [chartHeight, arr, rightAxisData];
+  }, [data, weightTarget]);
+  const hasWeightData = data.some((item) => item.weight != null);
+
+  const rightAxisReversed = [...rightAxis].reverse();
 
   useEffect(() => {
     if (isActive) {
@@ -207,7 +196,7 @@ const WeightLineChart = ({
         }}
         className="rounded-lg px-2 py-4"
       >
-        <GestureHandlerRootView
+        <View
           style={{
             flex: 1,
             paddingRight: 17,
@@ -230,9 +219,9 @@ const WeightLineChart = ({
           </View>
 
           {/* Right axis */}
-          <View className="absolute -right-1 bottom-0 -top-4 justify-between">
-            {!!rightAxis[4] &&
-              rightAxisReversed.map((item, index) => {
+          {hasWeightData && (
+            <View className="absolute -right-1 bottom-0 -top-4 justify-between">
+              {rightAxisReversed.map((item, index) => {
                 if (index === 0) {
                   return (
                     <ThemedText
@@ -263,7 +252,8 @@ const WeightLineChart = ({
                   </ThemedText>
                 );
               })}
-          </View>
+            </View>
+          )}
 
           <CartesianChart
             data={chartData}
@@ -290,145 +280,141 @@ const WeightLineChart = ({
               y: [0, chartHeight],
             }}
           >
-            {({ points, chartBounds }) => {
-              return (
-                <>
-                  {/* Fast bars */}
-                  <Group opacity={isActive ? 0.5 : 1}>
-                    <Bar
-                      points={points.fast}
-                      chartBounds={chartBounds}
-                      color={theme.primary}
-                      roundedCorners={{
-                        topLeft: 2,
-                        topRight: 2,
-                      }}
-                      barWidth={(width - 64 - 80) / chartData.length}
-                      animate={{
-                        type: "timing",
-                        duration: 300,
-                      }}
-                    >
-                      <LinearGradient
-                        start={vec(0, 220)}
-                        end={vec(0, 400)}
-                        colors={[theme.primary, theme.primary + "50"]}
-                      />
-                    </Bar>
-
-                    {!isActive &&
-                      points.fast.map((point, index) => {
-                        const val = Number(chartData[index]?.fast);
-
-                        if (!val || val === 0) return null;
-
-                        const textStr = `${val}`;
-                        const textX =
-                          point.x - textStr.length * charWidthOffset;
-
-                        return (
-                          <Text
-                            key={index}
-                            x={textX}
-                            y={(point.y ?? 0) - 4}
-                            text={textStr}
-                            font={activeBarFont}
-                            color={theme.text + "DD"}
-                          />
-                        );
-                      })}
-                  </Group>
-
-                  {/* Target line */}
-                  {points.target && (
-                    <Line
-                      points={points.target}
-                      curveType="cardinal"
-                      color={theme.error + "80"}
-                      strokeWidth={1}
-                    >
-                      <DashPathEffect intervals={[6, 4]} />
-                    </Line>
-                  )}
-
-                  {/* Weight line */}
-                  <Line
-                    opacity={isActive ? 0.5 : 1}
-                    points={points.weightRatio}
-                    curveType="linear"
-                    color={theme.secondary}
-                    strokeWidth={2}
+            {({ points, chartBounds }) => (
+              <>
+                {/* Fast bars */}
+                <Group opacity={isActive ? 0.5 : 1}>
+                  <Bar
+                    points={points.fast}
+                    chartBounds={chartBounds}
+                    color={theme.primary}
+                    roundedCorners={{
+                      topLeft: 2,
+                      topRight: 2,
+                    }}
+                    barWidth={(width - 64 - 80) / chartData.length}
                     animate={{
                       type: "timing",
                       duration: 300,
                     }}
-                  />
+                  >
+                    <LinearGradient
+                      start={vec(0, 220)}
+                      end={vec(0, 400)}
+                      colors={[theme.primary, theme.primary + "50"]}
+                    />
+                  </Bar>
 
-                  {/* Static weight labels */}
                   {!isActive &&
-                    points.weightRatio.map((point, index) => {
-                      const val = chartData[index]?.weight;
-                      const prevVal = chartData[index - 1]?.weight;
-                      const nextVal = chartData[index + 1]?.weight;
+                    points.fast.map((point, index) => {
+                      const val = chartData[index]?.fast;
 
-                      if (!val || (val === prevVal && val === nextVal)) {
-                        return null;
-                      }
+                      if (!val) return null;
 
-                      if (index === chartData.length - 1) {
-                        return (
-                          <Group key={`weight-label-${index}`}>
-                            <Text
-                              x={point.x - `${val}`.length * 3}
-                              y={(point.y ?? 0) - 12}
-                              text={`${val}`}
-                              font={activeLineFont}
-                              color={theme.secondary}
-                            />
-
-                            <Circle
-                              cx={point.x}
-                              cy={point.y ?? 0}
-                              r={6}
-                              color={theme.secondary}
-                              opacity={0.3}
-                            />
-
-                            <Circle
-                              cx={point.x}
-                              cy={point.y ?? 0}
-                              r={3.5}
-                              color={theme.secondary}
-                            />
-                          </Group>
-                        );
-                      }
+                      const textStr = `${val}`;
 
                       return (
                         <Text
-                          key={`weight-label-${index}`}
-                          x={point.x - `${val}`.length * 3}
-                          y={(point.y ?? 0) - 12}
-                          text={`${val}`}
-                          font={activeLineFont}
-                          color={theme.secondary}
+                          key={index}
+                          x={point.x - textStr.length * charWidthOffset}
+                          y={(point.y ?? 0) - 4}
+                          text={textStr}
+                          font={activeBarFont}
+                          color={theme.text + "DD"}
                         />
                       );
                     })}
+                </Group>
 
-                  {/* Interactive tooltip */}
-                  {isActive && state.x.position && (
-                    <ActiveTooltip
-                      state={state}
-                      chartBounds={chartBounds}
-                      length={chartData.length}
-                    />
-                  )}
-                </>
-              );
-            }}
+                {/* Target line */}
+                {points.target && (
+                  <Line
+                    points={points.target}
+                    curveType="cardinal"
+                    color={theme.error + "80"}
+                    strokeWidth={1}
+                  >
+                    <DashPathEffect intervals={[6, 4]} />
+                  </Line>
+                )}
+
+                {/* Weight line */}
+                <Line
+                  opacity={isActive ? 0.5 : 1}
+                  points={points.weightRatio}
+                  curveType="linear"
+                  color={theme.secondary}
+                  strokeWidth={2}
+                  animate={{
+                    type: "timing",
+                    duration: 300,
+                  }}
+                />
+
+                {/* Static weight labels */}
+                {!isActive &&
+                  points.weightRatio.map((point, index) => {
+                    const val = chartData[index]?.weight;
+                    const prevVal = chartData[index - 1]?.weight;
+                    const nextVal = chartData[index + 1]?.weight;
+
+                    if (!val || (val === prevVal && val === nextVal)) {
+                      return null;
+                    }
+
+                    if (index === chartData.length - 1) {
+                      return (
+                        <Group key={`weight-label-${index}`}>
+                          <Text
+                            x={point.x - `${val}`.length * 3}
+                            y={(point.y ?? 0) - 12}
+                            text={`${val}`}
+                            font={activeLineFont}
+                            color={theme.secondary}
+                          />
+
+                          <Circle
+                            cx={point.x}
+                            cy={point.y ?? 0}
+                            r={6}
+                            color={theme.secondary}
+                            opacity={0.3}
+                          />
+
+                          <Circle
+                            cx={point.x}
+                            cy={point.y ?? 0}
+                            r={3.5}
+                            color={theme.secondary}
+                          />
+                        </Group>
+                      );
+                    }
+
+                    return (
+                      <Text
+                        key={`weight-label-${index}`}
+                        x={point.x - `${val}`.length * 3}
+                        y={(point.y ?? 0) - 12}
+                        text={`${val}`}
+                        font={activeLineFont}
+                        color={theme.secondary}
+                      />
+                    );
+                  })}
+
+                {/* Interactive tooltip */}
+                {isActive && (
+                  <ActiveTooltip
+                    state={state}
+                    chartBounds={chartBounds}
+                    length={chartData.length}
+                  />
+                )}
+              </>
+            )}
           </CartesianChart>
-        </GestureHandlerRootView>
+        </View>
       </View>
     </View>
   );
@@ -454,22 +440,34 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
     const val = state.x.value.value;
     return val + " :";
   });
+
   const weightText = useDerivedValue(() => {
-    const val = Math.round(state.y.weight.value.value * 10) / 10;
-    return val ? `- ${Math.round(val * 10) / 10} Kg` : "No Data";
+    const raw = state.y.weight.value.value;
+
+    if (raw == null) {
+      return "No Data";
+    }
+
+    const val = Math.round(raw * 10) / 10;
+    return `- ${val} Kg`;
   });
+
   const fastText = useDerivedValue(() => {
-    const val = Math.round(state.y.fast.value.value * 10) / 10;
-    return val != null ? `- ${Math.round(val * 10) / 10} Hours` : "No Data";
+    const raw = state.y.fast.value.value;
+
+    if (raw == null) {
+      return "No Data";
+    }
+
+    const val = Math.round(raw * 10) / 10;
+    return `- ${val} Hours`;
   });
 
-  const [barWidth] = useState((width - 64 - 80) / length);
+  const barWidth = (width - 64 - 80) / length;
 
-  const font = useFont(fonts.MulishRegular, 8);
+  const font = useFont(fonts.MulishBold, 9);
   const font2 = useFont(fonts.MulishBold, 12);
-  const font3 = useFont(fonts.MulishRegular, 11);
   const font4 = useFont(fonts.MulishBold, 15);
-  const activeFont = length > 15 ? font : font2;
 
   // 3. Tùy chọn Opacity cho Bar nếu bạn muốn animation ẩn/hiện mượt mà
   // 1. Tọa độ X trung tâm của cột active
@@ -521,31 +519,31 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
 
       {/* Tooltip */}
       <RoundedRect
-        x={4}
-        y={4}
-        width={170}
-        height={75}
-        r={10}
-        color={theme.background2 + "EE"}
+        x={6}
+        y={6}
+        width={150}
+        height={68}
+        r={8}
+        color={theme.background2 + "F2"}
       />
 
       <Text
-        x={20}
+        x={18}
         y={20}
         text={labelText}
-        font={font2}
-        color={theme.text + "CC"}
+        font={font}
+        color={theme.text + "99"}
       />
 
       <Text
-        x={24}
+        x={18}
         y={40}
         text={weightText}
-        font={font4}
+        font={font2}
         color={theme.secondary}
       />
 
-      <Text x={24} y={60} text={fastText} font={font4} color={theme.primary} />
+      <Text x={18} y={58} text={fastText} font={font2} color={theme.primary} />
     </Group>
   );
 };
