@@ -10,25 +10,23 @@ import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
 import { initializeAppState } from "@/stores/appAction";
 import { isColorDark } from "@/util/color";
+SplashScreen.preventAutoHideAsync();
 
-export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { theme, settings } = useAppStore();
+export const AppWrapper = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { addModal } = useModalStore();
+
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
-  SplashScreen.preventAutoHideAsync();
-
-  const barStyle = useMemo(() => {
-    if (isColorDark(theme.background)) return "light-content";
-    return "dark-content";
-  }, [theme]);
-
-  const db = useSQLiteContext();
-  const { isLoadingData, userProfile } = useAppStore();
 
   const isDarkMode = useAppStore(
     (state) => state.settings?.is_dark_mode ?? true,
   );
+
+  const db = useSQLiteContext();
 
   useEffect(() => {
     if (!db) return;
@@ -39,30 +37,27 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
       const { streak: streakObj, modal, lastFast } = result;
 
-      if (modal) {
-        if (modal.type === "finishFast" && lastFast) {
-          const targetFinishTime = lastFast?.target_duration
-            ? lastFast.start_time + lastFast.target_duration * 60 * 1000
-            : null;
-          addModal({
-            closable: modal.closable,
-            type: "custom",
-            render: (
-              <FastEndTimeModal
-                startTime={lastFast?.start_time}
-                targetFinishTime={targetFinishTime}
-                currentFast={lastFast}
-              />
-            ),
-          });
-        }
+      if (modal?.type === "finishFast" && lastFast) {
+        const targetFinishTime = lastFast.target_duration
+          ? lastFast.start_time + lastFast.target_duration * 60 * 1000
+          : null;
+
+        addModal({
+          closable: modal.closable,
+          type: "custom",
+          render: (
+            <FastEndTimeModal
+              startTime={lastFast.start_time}
+              targetFinishTime={targetFinishTime}
+              currentFast={lastFast}
+            />
+          ),
+        });
       }
+
       if (!streakObj) return;
 
       const { streak, habit, retain, shield } = streakObj;
-
-      // Login chỉ reconcile trạng thái streak.
-      // Không tăng streak ở đây nữa.
 
       const usedShield = shield.previous > shield.current;
       const lostStreak = streak.previous > streak.current;
@@ -100,51 +95,47 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     load();
-  }, [db]);
+  }, [db, addModal]);
 
   useEffect(() => {
-    // wordSocket.connect();
-    async function loadFonts() {
+    const loadFonts = async () => {
       try {
-        console.log("loading font...");
         await Font.loadAsync(fonts);
       } catch (err) {
-        console.log(err);
+        console.error("Failed to load fonts:", err);
       } finally {
         setFontReady(true);
       }
-    }
+    };
 
     loadFonts();
   }, []);
 
   useEffect(() => {
-    console.log(isDBReady, isFontReady);
     if (isDBReady && isFontReady) {
       SplashScreen.hideAsync();
     }
   }, [isDBReady, isFontReady]);
 
   if (!isDBReady || !isFontReady) {
-    // Async font loading only occurs in development.
     return null;
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: "transparent" }}>
-      {/* View giả lập vùng status bar */}
       <View
         style={{
-          // height: Platform.OS === "android" ? StatusBar.currentHeight : 40,
           height: 0,
           backgroundColor: "transparent",
         }}
       />
+
       <StatusBar
         translucent
-        backgroundColor={"transparent"}
+        backgroundColor="transparent"
         barStyle={isDarkMode ? "light-content" : "dark-content"}
       />
+
       {children}
     </View>
   );

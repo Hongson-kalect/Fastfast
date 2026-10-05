@@ -7,11 +7,18 @@ import { TouchableOpacity, View } from "react-native";
 type Props = ConfirmModalOptions & BasicModalOptions;
 
 const ConfirmModal = (modal: Props) => {
-  const { addModal } = useModalStore();
+  const { addModal, closeCurrentModal } = useModalStore();
   const { theme } = useAppStore();
+
+  const cancelText = modal.cancelText || "Cancel";
+  const okText = modal.okText || "OK";
   return (
     <View>
-      {modal.title && <ThemedText size='xxl' weight="semibold">{modal.title}</ThemedText>}
+      {modal.title && (
+        <ThemedText size="xxl" weight="semibold">
+          {modal.title}
+        </ThemedText>
+      )}
       <ThemedText className="mb-4">{modal.message}</ThemedText>
 
       {modal?.middle}
@@ -21,20 +28,31 @@ const ConfirmModal = (modal: Props) => {
           className="bg-gray-300 rounded-lg py-3 px-4"
           onPress={() => {
             modal.onCancel?.();
-            addModal(null);
+            closeCurrentModal();
           }}
         >
-          <ThemedText colorHex="white">{modal.cancelText || "Cancel"}</ThemedText>
+          {typeof cancelText === "string" ? (
+            <View>
+
+            <ThemedText colorHex="white">{cancelText}</ThemedText>
+            </View>
+          ) : (
+            cancelText
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={{ backgroundColor: theme.primary }}
           className=" rounded-lg py-3 items-center justify-center min-w-28"
           onPress={async () => {
             await modal.onOk?.();
-            addModal(null);
+            closeCurrentModal();
           }}
         >
-          <ThemedText colorHex="white">{modal.okText || "OK"}</ThemedText>
+          {typeof okText === "string" ? (
+            <ThemedText colorHex="white">{okText}</ThemedText>
+          ) : (
+            okText
+          )}
         </TouchableOpacity>
       </View>
     </View>

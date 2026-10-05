@@ -1,7 +1,9 @@
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -125,6 +127,49 @@ export const PhotoPickerModal = ({
     );
   };
 
+  const [previewVisible, setPreviewVisible] = useState(false);
+
+  const openImagePreview = () => {
+    if (!photoUri) return;
+    setPreviewVisible(true);
+  };
+
+  const closeImagePreview = () => {
+    setPreviewVisible(false);
+  };
+
+  const { addModal } = useModalStore();
+  const handleAddPhoto = () => {
+    addModal({
+      type: "confirm",
+      title: "Add Photo",
+      okText: (
+        <View className="flex-row items-center justify-center gap-2">
+          <MaterialIcons name="photo-library" size={25} color={theme.text} />
+
+          <ThemedText size="sm" weight="bold" color="text">
+            Gallery
+          </ThemedText>
+        </View>
+      ),
+      cancelText: (
+        <View className="flex-row items-center justify-center gap-2">
+          <MaterialIcons name="photo-camera" size={25} color={theme.text} />
+
+          <ThemedText size="sm" weight="bold" color="text">
+            Camera
+          </ThemedText>
+        </View>
+      ),
+      onOk: () => {
+        handleSelectPhoto();
+      },
+      onCancel: () => {
+        handleTakePhoto();
+      },
+    });
+  };
+
   return (
     <Modal
       visible={visible}
@@ -132,96 +177,153 @@ export const PhotoPickerModal = ({
       animationType="fade"
       onRequestClose={() => setVisible(false)}
     >
-      {/* Overlay nền mờ */}
       <Pressable
-        className="flex-1 bg-background/60 justify-end"
+        className="flex-1 justify-end bg-background/70"
         onPress={() => setVisible(false)}
       >
         <Animated.View
-          layout={LinearTransition.springify().duration(150).damping(80)}
-          className="w-full rounded-t-3xl bg-background2 p-4 pb-8"
+          layout={LinearTransition.springify().duration(180).damping(80)}
           entering={SlideInDown.springify().damping(18).stiffness(180).mass(1)}
           exiting={SlideOutDown.duration(150)}
+          className="w-full rounded-t-[32px] bg-background2 px-4 pb-8 pt-5"
         >
           <Pressable onPress={(e) => e.stopPropagation()}>
-            {/* ─── PREVIEW ẢNH ĐANG CÓ ─── */}
-            {photoUri && (
-              <Animated.View
-                entering={SlideInDown.duration(200)}
-                className="relative mb-4 aspect-2/3 overflow-hidden rounded-2xl border border-text-base/40 bg-background"
-              >
-                <Image
-                  source={{ uri: photoUri }}
-                  className="h-full w-full"
-                  resizeMode="contain"
-                />
+            {/* Header */}
+            <View className="mb-5 flex-row items-center justify-between">
+              <View className="flex-row items-center gap-3">
+                <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+                  <MaterialIcons
+                    name="photo-camera"
+                    size={21}
+                    color={theme.primary}
+                  />
+                </View>
 
-                <TouchableOpacity
-                  onPress={handleDeletePhoto}
-                  className="absolute right-2 top-2 rounded-full bg-error/80 p-3 active:bg-error"
-                >
-                  <MaterialIcons name="delete" size={24} color={theme.text} />
-                </TouchableOpacity>
-              </Animated.View>
-            )}
+                <View>
+                  <ThemedText size="lg" weight="bold" color="title">
+                    {photoUri ? "Your photo" : "Add a photo"}
+                  </ThemedText>
 
-            <ThemedText
-              size="sm"
-              weight="medium"
-              color="text"
-              opacity="medium"
-              style={{ textAlign: "center", marginBottom: 16 }}
-            >
-              {photoUri ? "Cập nhật ảnh" : "Thêm ảnh đáng nhớ hôm nay"}
-            </ThemedText>
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    Hôm nay
+                  </ThemedText>
+                </View>
+              </View>
 
-            {/* ─── HÀNH ĐỘNG CHỌN ─── */}
-            <View className="gap-3">
-              {/* Chụp ảnh */}
               <TouchableOpacity
-                onPress={handleTakePhoto}
-                className="h-14 flex-row items-center justify-center gap-2 rounded-xl bg-primary active:opacity-80"
-              >
-                <MaterialIcons
-                  name="photo-camera"
-                  size={22}
-                  color={theme.text}
-                />
-
-                <ThemedText size="md" weight="medium" color="text">
-                  Chụp ảnh mới
-                </ThemedText>
-              </TouchableOpacity>
-
-              {/* Chọn từ bộ sưu tập */}
-              <TouchableOpacity
-                onPress={handleSelectPhoto}
-                className="h-14 flex-row items-center justify-center gap-2 rounded-xl border border-text-base/40 bg-background active:bg-text-base/10"
-              >
-                <MaterialIcons
-                  name="photo-library"
-                  size={22}
-                  color={theme.text}
-                />
-
-                <ThemedText size="md" weight="medium" color="text">
-                  Chọn từ bộ sưu tập
-                </ThemedText>
-              </TouchableOpacity>
-
-              {/* Hủy đóng modal */}
-              <TouchableOpacity
+                hitSlop={10}
+                activeOpacity={0.7}
                 onPress={() => setVisible(false)}
-                className="h-14 flex-row items-center justify-center active:bg-text-base/10"
+                className="h-9 w-9 items-center justify-center rounded-full bg-text-base/5"
               >
                 <ThemedText
-                  className="underline"
                   size="md"
-                  weight="medium"
+                  weight="bold"
                   color="text"
                   opacity="medium"
                 >
-                  Hủy bỏ
+                  ×
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+
+            {/* Preview */}
+            {photoUri ? (
+              <Animated.View
+                entering={SlideInDown.duration(200)}
+                className="relative mb-5 aspect-[3/4] overflow-hidden rounded-[28px] bg-background"
+              >
+                {/* Image preview */}
+                <Pressable onPress={openImagePreview} className="h-full w-full">
+                  <Image
+                    source={{ uri: photoUri }}
+                    className="h-full w-full"
+                    resizeMode="cover"
+                  />
+
+                  {/* Zoom hint */}
+                  <View className="absolute bottom-3 left-3 h-9 w-9 items-center justify-center rounded-full bg-background/75">
+                    <MaterialIcons
+                      name="zoom-in"
+                      size={19}
+                      color={theme.text}
+                    />
+                  </View>
+                </Pressable>
+
+                {/* Delete */}
+                <TouchableOpacity
+                  hitSlop={8}
+                  activeOpacity={0.8}
+                  onPress={handleDeletePhoto}
+                  className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-full bg-background/80"
+                >
+                  <MaterialIcons
+                    name="delete-outline"
+                    size={23}
+                    color={theme.error}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            ) : (
+              <Pressable
+                onPress={handleAddPhoto}
+                className="mb-5 aspect-[3/4] items-center justify-center overflow-hidden rounded-[28px] border border-dashed border-text-base/15 bg-background active:bg-text-base/5"
+              >
+                {/* <View className="mb-3 h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <MaterialIcons
+                    name="add-a-photo"
+                    size={30}
+                    color={theme.primary}
+                  />
+                </View> */}
+
+                <ThemedText size="sm" weight="semibold" color="text">
+                  Capture the moment
+                </ThemedText>
+
+                <ThemedText
+                  size="xxs"
+                  color="text"
+                  opacity="low"
+                  className="mt-1"
+                >
+                  Chọn camera hoặc thư viện
+                </ThemedText>
+              </Pressable>
+            )}
+
+            {/* Actions */}
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleTakePhoto}
+                className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-text-base/10 bg-background"
+              >
+                <MaterialIcons
+                  name="photo-camera"
+                  size={25}
+                  color={theme.text}
+                />
+
+                <ThemedText size="sm" weight="bold" color="text">
+                  Camera
+                </ThemedText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleSelectPhoto}
+                className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
+              >
+                <MaterialIcons
+                  name="photo-library"
+                  size={25}
+                  color={theme.text}
+                />
+
+                <ThemedText size="sm" weight="bold" color="text">
+                  Gallery
                 </ThemedText>
               </TouchableOpacity>
             </View>

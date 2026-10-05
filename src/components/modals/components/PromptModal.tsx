@@ -8,7 +8,7 @@ import { Pressable, TextInput, TouchableOpacity, View } from "react-native";
 type Props = PromptModalOptions & BasicModalOptions;
 
 const PromptModal = (modal: Props) => {
-  const { addModal, currentModal } = useModalStore();
+  const { closeCurrentModal, currentModal } = useModalStore();
   const [value, setValue] = useState("");
   const textRef = useRef<TextInput>(null);
   const textFocus = () => textRef.current?.focus();
@@ -23,7 +23,11 @@ const PromptModal = (modal: Props) => {
   }, [modal.defaultValue]);
   return (
     <View>
-      {modal.title && <ThemedText size='xxl' weight="semibold">{modal.title}</ThemedText>}
+      {modal.title && (
+        <ThemedText size="xxl" weight="semibold">
+          {modal.title}
+        </ThemedText>
+      )}
       {modal.message && (
         <ThemedText className="mt-2" numberOfLines={2}>
           {modal.message}
@@ -69,10 +73,12 @@ const PromptModal = (modal: Props) => {
             className="bg-gray-300 rounded-lg py-3 px-4"
             onPress={() => {
               modal.onCancel?.();
-              addModal(null);
+              closeCurrentModal();
             }}
           >
-            <ThemedText colorHex="white">{modal.cancelText || "Close"}</ThemedText>
+            <ThemedText colorHex="white">
+              {modal.cancelText || "Close"}
+            </ThemedText>
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -84,7 +90,7 @@ const PromptModal = (modal: Props) => {
           }}
           onPress={() => {
             modal.onOk?.(value);
-            addModal(null);
+            closeCurrentModal();
           }}
         >
           <ThemedText colorHex="white">{modal.okText || "OK"}</ThemedText>

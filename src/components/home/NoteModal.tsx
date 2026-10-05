@@ -1,7 +1,8 @@
 import { EMOTIONS } from "@/constants/data";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import { useEffect, useRef, useState } from "react";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -62,13 +63,9 @@ const NoteModal = ({
   const { theme } = useAppStore();
 
   const [tempText, setTempText] = useState(note ?? "");
-  const [tempWeight, setTempWeight] = useState(
-    weight?.toString() ?? "",
-  );
+  const [tempWeight, setTempWeight] = useState(weight?.toString() ?? "");
 
-  const parsedWeight = tempWeight
-  ? Number(tempWeight)
-  : undefined;
+  const parsedWeight = tempWeight ? Number(tempWeight) : undefined;
 
   useEffect(() => {
     setTempText(note ?? "");
@@ -81,11 +78,7 @@ const NoteModal = ({
   const weightError = checkWeightError(tempWeight);
 
   const handleSelectMood = (level: MoodLevel) => {
-    onSelectMood(
-      level,
-      tempText,
-      parsedWeight,
-    );
+    onSelectMood(level, tempText, parsedWeight);
     setVisible(false);
   };
 
@@ -97,188 +90,204 @@ const NoteModal = ({
       onRequestClose={() => setVisible(false)}
     >
       <Pressable
-        className="flex-1 bg-background/80"
+        className="flex-1 justify-end bg-background/80"
         onPress={() => setVisible(false)}
       >
-        <View className="absolute bottom-6 left-4 right-4">
-          <Animated.View
-            layout={LinearTransition.springify()
-              .duration(100)
-              .damping(80)}
+        <Animated.View
+          layout={LinearTransition.springify().duration(180).damping(80)}
+        >
+          <Pressable
+            className="mx-3 mb-3 rounded-[32px] bg-background2 px-5 pb-5 pt-6"
+            onPress={(e) => e.stopPropagation()}
           >
-            <Pressable
-              className="rounded-3xl bg-background2 p-4"
-              onPress={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <View className="mb-4 flex-row items-center justify-between">
-                <View>
-                  <ThemedText
-                    size="md"
-                    weight="bold"
-                    color="title"
-                  >
-                    Daily note
-                  </ThemedText>
-
-                  <ThemedText
-                    size="xxs"
-                    color="text"
-                    opacity="medium"
-                    className="mt-0.5"
-                  >
-                    Hôm nay bạn cảm thấy thế nào?
-                  </ThemedText>
+            {/* Header */}
+            <View className="mb-6 flex-row items-center justify-between">
+              <View className="flex-row items-center gap-3">
+                <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+                  <FontAwesome6 name="pen" size={17} color={theme.primary} />
                 </View>
 
-                <TouchableOpacity
-                  hitSlop={10}
-                  activeOpacity={0.7}
-                  onPress={() => setVisible(false)}
-                  className="h-8 w-8 items-center justify-center rounded-full bg-text-base/5"
-                >
-                  <ThemedText
-                    size="sm"
-                    weight="bold"
-                    color="text"
-                    opacity="medium"
-                  >
-                    ×
-                  </ThemedText>
-                </TouchableOpacity>
+                <ThemedText size="xl" weight="bold" color="title">
+                  Daily note
+                </ThemedText>
               </View>
 
-              {/* Weight + Note */}
-              <View className="mb-5 flex-row gap-2">
-                {/* Weight */}
-                <View className="w-20">
+              <TouchableOpacity
+                hitSlop={10}
+                activeOpacity={0.7}
+                onPress={() => setVisible(false)}
+                className="h-9 w-9 items-center justify-center rounded-full bg-text-base/5"
+              >
+                <ThemedText
+                  size="md"
+                  weight="bold"
+                  color="text"
+                  opacity="medium"
+                >
+                  ×
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+
+            {/* Weight + Note */}
+            <View className="mb-6 flex-row gap-3">
+              {/* Weight */}
+              <View className="w-[88px]">
+                <View className="mb-2 ml-1 flex-row items-center gap-1.5">
+                  <FontAwesome6
+                    name="weight-scale"
+                    size={11}
+                    color={theme.text}
+                    style={{ opacity: 0.55 }}
+                  />
+
                   <ThemedText
                     size="xxs"
                     weight="semibold"
                     color="text"
-                    opacity="medium"
-                    className="mb-1.5"
+                    opacity="half"
                   >
                     Weight
                   </ThemedText>
-
-                  <View
-                    className={`h-20 rounded-2xl border ${
-                      weightError
-                        ? "border-error bg-error/10"
-                        : "border-primary/20 bg-primary/10"
-                    }`}
-                  >
-                    <TextInput
-                      value={tempWeight}
-                      placeholder={weight?.toString() || "0"}
-                      placeholderTextColor={`${theme.text}66`}
-                      onChangeText={setTempWeight}
-                      maxLength={6}
-                      keyboardType="decimal-pad"
-                      className="flex-1 px-2 pb-3 pt-2 text-center text-xl font-bold text-text-base"
-                      style={{
-                        fontVariant: ["tabular-nums"],
-                      }}
-                    />
-
-                    <ThemedText
-                      size="xxs"
-                      color="text"
-                      opacity="medium"
-                      className="absolute bottom-1.5 right-2"
-                    >
-                      kg
-                    </ThemedText>
-                  </View>
-
-                  {weightError ? (
-                    <ThemedText
-                      size="xxs"
-                      color="error"
-                      className="mt-1"
-                      numberOfLines={2}
-                    >
-                      {weightError}
-                    </ThemedText>
-                  ) : null}
                 </View>
 
-                {/* Note */}
-                <View className="flex-1">
+                <View
+                  className={`h-24 overflow-hidden rounded-3xl ${
+                    weightError
+                      ? "border border-error bg-error/10"
+                      : "border border-primary/20 bg-primary/10"
+                  }`}
+                >
+                  <TextInput
+                    value={tempWeight}
+                    placeholder={weight?.toString() || "0"}
+                    placeholderTextColor={`${theme.text}55`}
+                    onChangeText={setTempWeight}
+                    maxLength={6}
+                    keyboardType="decimal-pad"
+                    style={{
+                      textAlign: "center",
+                      fontVariant: ["tabular-nums"],
+                    }}
+                    className="flex-1 px-2 pt-2 text-2xl font-bold text-text-base"
+                  />
+
                   <ThemedText
                     size="xxs"
                     weight="semibold"
                     color="text"
                     opacity="medium"
-                    className="mb-1.5"
+                    className="absolute bottom-2 right-2"
+                  >
+                    kg
+                  </ThemedText>
+                </View>
+
+                {weightError ? (
+                  <ThemedText
+                    size="xxs"
+                    color="error"
+                    className="mt-1"
+                    numberOfLines={2}
+                  >
+                    {weightError}
+                  </ThemedText>
+                ) : null}
+              </View>
+
+              {/* Note */}
+              <View className="flex-1">
+                <View className="mb-2 ml-1 flex-row items-center gap-1.5">
+                  <FontAwesome6
+                    name="message"
+                    size={11}
+                    color={theme.text}
+                    style={{ opacity: 0.55 }}
+                  />
+
+                  <ThemedText
+                    size="xxs"
+                    weight="semibold"
+                    color="text"
+                    opacity="half"
                   >
                     Note
                   </ThemedText>
-
-                  <TextInput
-                    value={tempText}
-                    onChangeText={setTempText}
-                    multiline
-                    numberOfLines={3}
-                    textAlignVertical="top"
-                    cursorColor={theme.text}
-                    placeholder="What are you feeling today?"
-                    placeholderTextColor={`${theme.text}66`}
-                    className="h-20 rounded-2xl border border-text-base/10 bg-background px-3 py-2 text-xs text-text-base"
-                  />
                 </View>
-              </View>
 
-              {/* Mood */}
-              <View>
+                <TextInput
+                  value={tempText}
+                  onChangeText={setTempText}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  cursorColor={theme.text}
+                  placeholder="How did you feel today?"
+                  placeholderTextColor={`${theme.text}55`}
+                  className="h-24 rounded-3xl border border-text-base/10 bg-background px-4 py-3 text-sm text-text-base"
+                />
+              </View>
+            </View>
+
+            {/* Mood */}
+            <View>
+              <View className="mb-3 flex-row items-center gap-1.5">
+                <FontAwesome6
+                  name="face-smile"
+                  size={11}
+                  color={theme.text}
+                  style={{ opacity: 0.55 }}
+                />
+
                 <ThemedText
                   size="xxs"
                   weight="semibold"
                   color="text"
                   opacity="medium"
-                  className="mb-2"
                 >
                   Mood
                 </ThemedText>
-
-                <View className="flex-row justify-between">
-                  {EMOTIONS.map((item, index) => {
-                    const isSelected = item.level === mood;
-
-                    return (
-                      <Animated.View
-                        key={item.emoji}
-                        entering={SlideInDown.springify()
-                          .damping(18)
-                          .stiffness(180)
-                          .mass(1)
-                          .delay(index * 50)}
-                        exiting={SlideOutDown.duration(100)}
-                      >
-                        <TouchableOpacity
-                          activeOpacity={0.75}
-                          onPress={() =>
-                            handleSelectMood(item.level)
-                          }
-                          className={`h-12 w-12 items-center justify-center rounded-full border ${
-                            isSelected
-                              ? "border-primary bg-primary"
-                              : "border-text-base/10 bg-background"
-                          }`}
-                        >
-                          <Text style={{ fontSize: 25 }}>
-                            {item.emoji}
-                          </Text>
-                        </TouchableOpacity>
-                      </Animated.View>
-                    );
-                  })}
-                </View>
               </View>
-            </Pressable>
-          </Animated.View>
-        </View>
+
+              <View className="flex-row justify-between">
+                {EMOTIONS.map((item, index) => {
+                  const isSelected = item.level === mood;
+
+                  return (
+                    <Animated.View
+                      key={item.emoji}
+                      entering={SlideInDown.springify()
+                        .damping(18)
+                        .stiffness(180)
+                        .mass(1)
+                        .delay(index * 40)}
+                      exiting={SlideOutDown.duration(100)}
+                    >
+                      <TouchableOpacity
+                        activeOpacity={0.75}
+                        onPress={() => handleSelectMood(item.level)}
+                        className={`h-14 w-14 items-center justify-center rounded-full border-2 ${
+                          isSelected
+                            ? "border-primary bg-primary/15"
+                            : "border-text-base/10 bg-background"
+                        }`}
+                        style={
+                          isSelected
+                            ? {
+                                transform: [{ scale: 1.08 }],
+                              }
+                            : undefined
+                        }
+                      >
+                        <Text style={{ fontSize: 28 }}>{item.emoji}</Text>
+                      </TouchableOpacity>
+                    </Animated.View>
+                  );
+                })}
+              </View>
+            </View>
+          </Pressable>
+        </Animated.View>
       </Pressable>
     </Modal>
   );

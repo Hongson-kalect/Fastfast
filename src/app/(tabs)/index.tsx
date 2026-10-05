@@ -14,8 +14,9 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { finishFast } from "@/util/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, StatusBar, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const rating = [
   {
@@ -56,7 +57,7 @@ const HomeScreen = () => {
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
     const isTooFast = duration < TOO_QUICK_DURATION;
     const isValid = duration > MIN_FAST_DURATION;
-    
+
     const isReachTarget = currentFastSession?.target_duration
       ? duration / 3600 > currentFastSession.target_duration
       : null;
@@ -109,33 +110,28 @@ const HomeScreen = () => {
     console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
-  
+
   const toggleCounting = useCallback(
-  async (delay?: number) => {
-    if (isCounting && startTime && currentFastSession) {
-      await handleFinishFast(delay);
-    } else {
-      await startFast(delay);
-    }
-  },
-  [
-    isCounting,
-    startTime,
-    currentFastSession,
-    handleFinishFast,
-    startFast,
-  ],
-);
+    async (delay?: number) => {
+      if (isCounting && startTime && currentFastSession) {
+        await handleFinishFast(delay);
+      } else {
+        await startFast(delay);
+      }
+    },
+    [isCounting, startTime, currentFastSession, handleFinishFast, startFast],
+  );
 
   const [counter, setCounter] = useState(0);
-    const handleCounter = () => {
-  if (!startTime) return;
+  const handleCounter = () => {
+    if (!startTime) return;
 
-  const endTime = currentFastSession?.end_time ?? Date.now();
+    const endTime = currentFastSession?.end_time ?? Date.now();
 
-  setCounter(Math.floor((endTime - startTime) / 1000));
-};
-  
+    setCounter(Math.floor((endTime - startTime) / 1000));
+  };
+
+  const isFastingActive = isCounting && !currentFastSession?.end_time;
 
   useEffect(() => {
     let interval = undefined;
@@ -154,76 +150,71 @@ const HomeScreen = () => {
 
   return (
     <View className="flex-1 bg-background">
-      <View
-        style={{ paddingTop: StatusBar.currentHeight || 0 }}
-        className="h-full w-full"
-      >
-        <ScrollView keyboardShouldPersistTaps="handled">
-          <View className="px-3 mb-12">
-            <HomeHeader />
-            {/* <View className="pb-2 mt-4">
-              <HomeTimeCounter
-                finishFasting={handleFinishFast}
-                isCounting={isCounting}
-                counter={counter}
-                currentFast={currentFastSession}
-              />
-            </View> */}
+      {/* Tối ưu StatusBar bằng SafeAreaView chuẩn xác */}
+      <SafeAreaView className="flex-1">
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header chứa Profile + Streak Badge */}
+          <HomeHeader />
 
-            <View className="">
-              <CircleCounter
-                finishFasting={handleFinishFast}
-                isCounting={isCounting}
-                counter={counter}
-                currentFast={currentFastSession}
-              />
-            </View>
-
-            <View className="-mt-26 items-center justify-center">
+          {/* Hero Section: Circle Counter & Floating Action Button */}
+          <View className="items-center justify-center my-4 relative">
+            <CircleCounter
+              finishFasting={handleFinishFast}
+              isCounting={isCounting}
+              counter={counter}
+              currentFast={currentFastSession}
+            />
+            {/* Tận dụng absolute positioning để cân bằng chính xác center */}
+            <View className="absolute -bottom-2 align-center">
               <SwapButton
                 isCounting={isCounting}
                 toggleCounting={toggleCounting}
               />
             </View>
+          </View>
 
-            <View className="mt-6">
-              {currentFastSession && currentFastSession.end_time ? (
-                <ThemedText size="md" weight="bold" color="primary">
-                  Last fast
-                </ThemedText>
-              ) : (
-                <View className="flex-row items-center justify-between">
-                  <ThemedText size="md" weight="bold">
-                    Estimated fasting phase
-                  </ThemedText>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    hitSlop={{ bottom: 10, top: 20, left: 40, right: 10 }}
-                    onPress={() => alert("pressed")}
-                  >
-                    <FontAwesome6
-                      name="question-circle"
-                      size={20}
-                      color={theme.text + "AA"}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
+          {/* Gamified Body Phase Progress (Đưa lên vị trí cao hơn để tăng Dopamine) */}
+          <View className="mt-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <ThemedText
+                size="lg"
+                weight="bold"
+                color="primary"
+                className="tracking-tight"
+              >
+                {isFastingActive
+                  ? "Giai đoạn cơ thể "
+                  : currentFastSession?.end_time
+                    ? "Lần nhịn gần nhất"
+                    : "Chuẩn bị nhịn ăn"}
+              </ThemedText>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                // onPress={() => handleOpenPhaseInfoModal()}
+              >
+                <FontAwesome6
+                  name="circle-question"
+                  size={18}
+                  color={theme.text + "80"}
+                />
+              </TouchableOpacity>
             </View>
 
-            {currentFastSession && currentFastSession.end_time && (
-              <View>
-                <RecentFastCard session={currentFastSession} />
-              </View>
+            {/* Historical / Recent Activity Card */}
+            {!isFastingActive && currentFastSession?.end_time && (
+              <RecentFastCard session={currentFastSession} />
             )}
 
-            <View className="mt-4">
-              {/* These indicators reflect general biological stages based on fasting duration. Always listen to your body and consult a healthcare professional before attempting prolonged fasts */}
-              <HomeBodyProgress counter={counter} />
-            </View>
+            <HomeBodyProgress counter={counter} />
           </View>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     </View>
   );
 };

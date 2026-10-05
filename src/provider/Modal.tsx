@@ -8,7 +8,7 @@ import TabsModal from "@/components/modals/components/TabModal";
 import ModalWrapper from "@/components/modals/ModalWrapper";
 import "@/global.css";
 import useModalStore from "@/stores/modalStore";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Toast } from "toastify-react-native";
 
@@ -26,8 +26,8 @@ export type ConfirmModalOptions = {
   title?: string;
   message?: string;
   subMessage?: string;
-  okText?: string;
-  cancelText?: string;
+  okText?: ReactNode;
+  cancelText?: ReactNode;
   onOk?: () => void;
   onCancel?: () => void;
 };

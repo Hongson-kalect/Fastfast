@@ -1,9 +1,14 @@
 import { FASTING_TARGETS } from "@/constants/data";
-import { ThemeItem, ThemeType } from "@/constants/themes";
+import { ThemeType } from "@/constants/themes";
 import { AppSettings, FastSession } from "@/interfaces/db.type";
-import { Pressable, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { ThemedText } from "../themed-text";
 import { getRelativeDate, getRelativeTime } from "@/util/timer";
+import {
+  Pressable,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
 
 type Props = {
@@ -31,9 +36,9 @@ export const CircleCounterContent = ({
   openTargetSheet,
   showHistory,
 }: Props) => {
-    const strokeWidth = 20;
-    const padding = 48;
-    const {width} = useWindowDimensions();
+  const strokeWidth = 20;
+  const padding = 48;
+  const { width } = useWindowDimensions();
   return (
     <View
       className="absolute bg-background rounded-full justify-center items-center overflow-hidden"
@@ -46,46 +51,51 @@ export const CircleCounterContent = ({
         <Pressable
           onPress={openFastingSheet}
           hitSlop={10}
-          className="items-center justify-between h-full pt-8 pb-14"
+          className="items-center justify-between h-full pt-8 pb-10"
         >
           {/* Top */}
           <View className="items-center gap-1">
             {currentTarget ? (
               <>
-                <TouchableOpacity hitSlop={10} onPress={openTargetSheet}>
+                <TouchableOpacity
+                  className="items-center pt-1"
+                  hitSlop={10}
+                  onPress={openTargetSheet}
+                >
                   <ThemedText
                     weight="bold"
-                    size="sm"
+                    // size="sm"
                     colorHex={currentTarget.colors.accent}
-                    className="uppercase underline"
+                    className="uppercase"
                   >
                     {currentTarget.label} {settings?.target || 16}h
                   </ThemedText>
                 </TouchableOpacity>
 
                 <ThemedText opacity="half" size="xs">
-                  Bắt đầu:{" "}
-                  {getRelativeTime(new Date(currentFast.start_time))}
+                  Bắt đầu: {getRelativeTime(new Date(currentFast.start_time))}
                 </ThemedText>
               </>
             ) : (
-              <TouchableOpacity
-                onPress={openTargetSheet}
-                className="items-center"
-              >
-                <ThemedText
-                  weight="bold"
-                  size="sm"
-                  colorHex={theme.primary}
-                  className="uppercase underline"
+              <>
+                <TouchableOpacity
+                  onPress={openTargetSheet}
+                  hitSlop={10}
+                  className="items-center pt-1"
                 >
-                  Choose a target
-                </ThemedText>
-
+                  <ThemedText
+                    weight="bold"
+                    // size="sm"
+                    colorHex={theme.primary}
+                    className="uppercase"
+                  >
+                    Choose a target
+                  </ThemedText>
+                </TouchableOpacity>
                 <ThemedText opacity="half" size="xs">
-                  No target had been selected
+                  Bắt đầu: {getRelativeTime(new Date(currentFast.start_time))}
                 </ThemedText>
-              </TouchableOpacity>
+              </>
             )}
           </View>
 
@@ -116,13 +126,12 @@ export const CircleCounterContent = ({
 
           {/* Bottom */}
           <View className="items-center gap-1">
-            <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="half"
-                style={{ textDecorationLine: "underline" }}
-              >
+            <Pressable
+              onPress={showHistory}
+              hitSlop={8}
+              className="mt-1 px-3 py-1.5 bg-text-base/20 rounded-xl flex-row gap-2"
+            >
+              <ThemedText size="xs" color="text" opacity="half">
                 Fasts history
               </ThemedText>
             </Pressable>
@@ -132,7 +141,7 @@ export const CircleCounterContent = ({
         <Pressable
           onPress={openTargetSheet}
           hitSlop={10}
-          className="items-center justify-between h-full pt-8 pb-14"
+          className="items-center justify-between h-full pt-8 pb-10"
         >
           {/* Top */}
           <View className="items-center gap-1">
@@ -179,9 +188,7 @@ export const CircleCounterContent = ({
           <View className="my-auto items-center justify-center">
             <Counter
               itemClassName="text-white font-bold text-2xl"
-              counter={
-                settings?.target ? Number(settings.target) * 3_600 : 0
-              }
+              counter={settings?.target ? Number(settings.target) * 3_600 : 0}
               type="large"
             />
 
@@ -198,13 +205,12 @@ export const CircleCounterContent = ({
 
           {/* Bottom */}
           <View className="items-center gap-1">
-            <Pressable onPress={showHistory} hitSlop={8} className="mt-1">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-                style={{ textDecorationLine: "underline" }}
-              >
+            <Pressable
+              onPress={showHistory}
+              hitSlop={8}
+              className="mt-1 px-3 py-1.5 bg-text-base/20 rounded-xl flex-row gap-2"
+            >
+              <ThemedText size="xs" color="text" opacity="medium">
                 Fasts history
               </ThemedText>
             </Pressable>

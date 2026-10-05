@@ -7,14 +7,18 @@ import { ScrollView, TouchableOpacity, View } from "react-native";
 type Props = MenuModalOptions & BasicModalOptions;
 
 const MenuModal = (modal: Props) => {
-  const { addModal } = useModalStore();
+  const { closeCurrentModal } = useModalStore();
   const menuType = modal.menuOptions.some((item) => item.rightContent)
     ? "space-between"
     : "center";
 
   return (
     <View>
-     {modal.title && <ThemedText size='xxl' weight="semibold" className='mb-4'>{modal.title}</ThemedText>}
+      {modal.title && (
+        <ThemedText size="xxl" weight="semibold" className="mb-4">
+          {modal.title}
+        </ThemedText>
+      )}
       <ScrollView>
         {modal.menuOptions.map((menu, idx) => (
           <AppMenu
@@ -29,7 +33,7 @@ const MenuModal = (modal: Props) => {
             }
             onPress={() => {
               menu.onPress?.();
-              if (menu.isCloseAfterPress !== false) addModal(null);
+              if (menu.isCloseAfterPress !== false) closeCurrentModal();
             }}
             icon={menu.icon}
             label={menu.label}
@@ -41,7 +45,7 @@ const MenuModal = (modal: Props) => {
         <TouchableOpacity
           className="mt-4 py-2"
           onPress={() => {
-            addModal(null);
+            closeCurrentModal();
           }}
         >
           <ThemedText className="text-center text-gray-500 text-base">

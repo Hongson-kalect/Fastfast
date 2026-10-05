@@ -1,12 +1,3 @@
-import { useEffect } from "react";
-import {
-  cancelAnimation,
-  Easing,
-  useDerivedValue,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
 import {
   BlurMask,
   Canvas,
@@ -16,6 +7,15 @@ import {
   SweepGradient,
   vec,
 } from "@shopify/react-native-skia";
+import { useEffect } from "react";
+import {
+  cancelAnimation,
+  Easing,
+  useDerivedValue,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 type Props = {
   width: number;
@@ -42,9 +42,7 @@ export const FastingCircle = ({
 }: Props) => {
   const rotation = useSharedValue(0);
   const circlePath =
-  radius > 0
-    ? Skia.Path.Circle(centerX, centerY, radius)
-    : null;
+    radius > 0 ? Skia.Path.Circle(centerX, centerY, radius) : null;
 
   useEffect(() => {
     if (!isCounting) {
@@ -132,17 +130,7 @@ export const FastingCircle = ({
                     color + "30",
                     color + "10",
                   ]}
-                  positions={[
-                    0,
-                    0.45,
-                    0.75,
-                    0.86,
-                    0.9,
-                    0.94,
-                    0.97,
-                    0.99,
-                    1,
-                  ]}
+                  positions={[0, 0.45, 0.75, 0.86, 0.9, 0.94, 0.97, 0.99, 1]}
                 />
                 <BlurMask blur={10} style="solid" />
               </Path>

@@ -4,6 +4,14 @@ import { getProcessProgress } from "@/util/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useState } from "react";
 import { LayoutChangeEvent, useWindowDimensions, View } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+  FadeOutDown,
+  FadeOutUp,
+  LinearTransition,
+} from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
 
@@ -30,102 +38,87 @@ const HomeBodyProgress = ({ counter }: Props) => {
   };
 
   return (
-    <View>
-      <View className="gap-1">
-        {processData.map(({ key, title, icon, color, process }) => {
-          const { activeProcess, percentage, startOn } = getProcessProgress(
-            counter,
-            process,
-          );
+    <View className="gap-3">
+      {processData.map(({ key, title, icon, color, process }) => {
+        const { activeProcess, percentage, startOn } = getProcessProgress(
+          counter,
+          process,
+        );
 
-          return (
-            <View key={key} className="flex-row items-center gap-2 py-2">
-              {/* Khối Nhãn & Icon bên trái */}
+        const level = activeProcess?.level ?? 0;
+        const totalPercentage = Math.min(
+          100,
+          level * 20 + (percentage ?? 0) / 5,
+        );
+
+        return (
+          <View key={key} className="gap-1">
+            {/* Header */}
+            <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
-                <View className="w-5 items-center justify-center">
+                <View
+                  className="h-8 w-8 items-center justify-center rounded-full"
+                  style={{
+                    backgroundColor: activeProcess
+                      ? color + "20"
+                      : theme.text + "10",
+                  }}
+                >
                   <FontAwesome6
-                    style={{ opacity: activeProcess ? 1 : 0.6 }}
                     name={icon}
-                    size={14}
+                    size={13}
                     color={activeProcess ? color : theme.text}
+                    style={{
+                      opacity: activeProcess ? 1 : 0.5,
+                    }}
                   />
                 </View>
 
-                <ThemedText
-                  size="xs"
-                  weight="regular"
-                  color="text"
-                  opacity={activeProcess ? "half" : "low"}
-                  style={{
-                    width: labelWidth || "auto",
-                    marginRight: 4,
-                  }}
-                  onLayout={detectLabelWidth}
-                >
-                  {title}
-                </ThemedText>
+                <View className="flex-row gap-2 items-center">
+                  <ThemedText
+                    size="sm"
+                    weight="semibold"
+                    color="text"
+                    opacity={activeProcess ? "full" : "half"}
+                  >
+                    {title}
+                  </ThemedText>
+
+                  {activeProcess && (
+                    <View
+                      style={{ backgroundColor: color + "20" }}
+                      className="px-2 py-1 rounded-full"
+                    >
+                      <ThemedText size="xs" colorHex={color} opacity="half">
+                        {getProcessLevelTitle(key, level)}
+                      </ThemedText>
+                    </View>
+                  )}
+                </View>
               </View>
 
-              {/* Khối Thanh Progress + Ô trạng thái động */}
-              {activeProcess ? (
-                <View className="flex-1 flex-row items-center gap-1">
-                  {/* Thanh Progress */}
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    if (index < activeProcess.level) {
-                      return (
-                        <View
-                          key={index}
-                          style={{
-                            backgroundColor: color,
-                            opacity: 0.5 + (index + 1) * 0.1,
-                          }}
-                          className="h-2 flex-1 rounded-full"
-                        />
-                      );
-                    }
+              {activeProcess && (
+                <ThemedText size="xs" weight="semibold" colorHex={color}>
+                  {Math.round(totalPercentage)}%
+                </ThemedText>
+              )}
+            </View>
 
-                    if (percentage && index === activeProcess.level) {
-                      return (
-                        <View
-                          key={index}
-                          className="h-2 flex-1 overflow-hidden rounded-full bg-text-base/30"
-                        >
-                          <View
-                            style={{
-                              width: `${percentage}%`,
-                              backgroundColor: color,
-                            }}
-                            className="h-full rounded-full"
-                          />
-                        </View>
-                      );
-                    }
-
-                    return (
-                      <View
-                        key={index}
-                        className="h-2 flex-1 rounded-full bg-text-base/40"
-                      />
-                    );
-                  })}
-
-                  {/* Trạng thái */}
-                  <View className="w-16 items-end">
-                    <ThemedText
-                      size="xs"
-                      weight="semibold"
-                      colorHex={color}
-                      opacity="full"
-                      numberOfLines={1}
-                      style={{ letterSpacing: 0.5 }}
-                    >
-                      {getProcessLevelTitle(key, activeProcess.level) || ""}
-                    </ThemedText>
-                  </View>
-                </View>
-              ) : (
-                <View className="flex-1 flex-row items-center justify-start gap-1 opacity-30">
-                  <ThemedText size="xs">Available after</ThemedText>
+            {/* Progress / Available after */}
+            <Animated.View
+              layout={LinearTransition.springify().duration(300)}
+              className="ml-10 h-4"
+            >
+              {!activeProcess ? (
+                <Animated.View
+                  key="available"
+                  entering={FadeInDown.duration(250)}
+                  exiting={FadeOutUp.duration(180)}
+                  className="flex-row items-center justify-between"
+                >
+                  <ThemedText size="xs" opacity="low">
+                    Available after
+                  </ThemedText>
 
                   <Counter
                     counter={counter}
@@ -133,12 +126,48 @@ const HomeBodyProgress = ({ counter }: Props) => {
                     type="small"
                     itemClassName="text-xs!"
                   />
-                </View>
+                </Animated.View>
+              ) : (
+                <Animated.View
+                  key="progress"
+                  entering={FadeInUp.duration(300).springify()}
+                  exiting={FadeOutDown.duration(150)}
+                  className="flex-row gap-1.5"
+                >
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const completed = index < level;
+                    const current = index === level;
+
+                    return (
+                      <Animated.View
+                        key={index}
+                        entering={FadeIn.duration(200).delay(index * 40)}
+                        className="h-2 flex-1 overflow-hidden rounded-full"
+                        style={{
+                          backgroundColor: completed
+                            ? color
+                            : theme.text + "18",
+                        }}
+                      >
+                        {current && percentage > 0 && (
+                          <View
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${percentage}%`,
+                              backgroundColor: color,
+                              opacity: completed ? 0.8 : 1,
+                            }}
+                          />
+                        )}
+                      </Animated.View>
+                    );
+                  })}
+                </Animated.View>
               )}
-            </View>
-          );
-        })}
-      </View>
+            </Animated.View>
+          </View>
+        );
+      })}
     </View>
   );
 };

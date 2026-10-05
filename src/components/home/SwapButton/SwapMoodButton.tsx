@@ -1,7 +1,6 @@
-import React from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS, MoodLevel } from "@/constants/emotions";
@@ -26,13 +25,14 @@ export const SwapMoodButton = ({
 
   return (
     <TouchableOpacity
-      onPress={onPress}
       activeOpacity={0.7}
+      hitSlop={8}
+      onPress={onPress}
       disabled={loading}
-      className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-md ${
+      className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-inner ${
         mood
           ? "shadow-primary border-primary"
-          : "shadow-text-base/40 border-text-base/40"
+          : "shadow-text-base/10 border-text-base/10"
       } ${loading ? "opacity-60" : ""} ${className}`}
     >
       {loading ? (
