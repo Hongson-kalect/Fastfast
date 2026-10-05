@@ -9,7 +9,9 @@ import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
+  ZoomIn,
 } from "react-native-reanimated";
 import FastEndTimeModal from "./FastEndTimeModal";
 import FastStartTimeModal from "./FastStartTimeModal";
@@ -179,46 +181,115 @@ export const SwapButton = React.memo(
       });
     }, [todayNote]);
 
+    const imageScale = useSharedValue(1);
+    const fastScale = useSharedValue(1);
+    const moodScale = useSharedValue(1);
+
+    const imageAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: imageScale.value }],
+    }));
+
+    const fastAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: fastScale.value }],
+    }));
+
+    const moodAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: moodScale.value }],
+    }));
+
+    const handlePressIn = (scale: typeof imageScale, value = 0.94) => {
+      scale.value = withSpring(value, {
+        damping: 16,
+        stiffness: 300,
+      });
+    };
+
+    const handlePressOut = (scale: typeof imageScale) => {
+      scale.value = withSpring(1, {
+        damping: 14,
+        stiffness: 260,
+      });
+    };
+
     return (
       <View className="h-28 flex-row items-end justify-center gap-4">
+        {/* Overlay */}
         <Animated.View
           style={overlayStyle}
           pointerEvents={isMenuOpen ? "auto" : "none"}
-          className="absolute inset-0 z-10 h-screen w-screen bg-red-200/60"
+          className="absolute inset-0 z-10 h-screen w-screen bg-background/60"
         >
           <Pressable className="flex-1" onPress={toggleMenu} />
         </Animated.View>
 
         <View className="relative z-20 w-full flex-row items-center justify-center gap-7">
-          <View className="mt-4 rounded-full p-1">
-            <SwapImageButton
-              image={todayData.image}
-              loading={loading}
-              className={className}
-              onPress={() => setImageOptionVisible(true)}
-              {...props}
-            />
-          </View>
+          {/* Image */}
+          <Animated.View entering={ZoomIn.delay(0).duration(180)}>
+            <Animated.View style={imageAnimatedStyle}>
+              <View className="rounded-full p-1 mt-4">
+                <SwapImageButton
+                  image={todayData.image}
+                  loading={loading}
+                  className={className}
+                  onPress={() => {
+                    setImageOptionVisible(true);
+                  }}
+                  onPressIn={() => {
+                    handlePressIn(imageScale, 0.95);
+                  }}
+                  onPressOut={() => {
+                    handlePressOut(imageScale);
+                  }}
+                  {...props}
+                />
+              </View>
+            </Animated.View>
+          </Animated.View>
 
-          <SwapFastButton
-            isCounting={isCounting}
-            loading={loading}
-            color={color}
-            className={className}
-            onPress={() => toggleCounting()}
-            onLongPress={showDelayModal}
-          />
+          {/* Fast */}
+          <Animated.View entering={ZoomIn.delay(50).duration(220)}>
+            <Animated.View style={fastAnimatedStyle}>
+              <SwapFastButton
+                isCounting={isCounting}
+                loading={loading}
+                color={color}
+                className={className}
+                onPress={() => toggleCounting()}
+                onLongPress={showDelayModal}
+                onPressIn={() => {
+                  handlePressIn(fastScale, 0.92);
+                }}
+                onPressOut={() => {
+                  handlePressOut(fastScale);
+                }}
+              />
+            </Animated.View>
+          </Animated.View>
 
-          <View className="mt-4 rounded-full p-1">
-            <SwapMoodButton
-              mood={todayData.mood}
-              note={todayData.note}
-              loading={loading}
-              className={className}
-              onPress={() => setNoteModalVisible(true)}
-            />
-          </View>
+          {/* Mood */}
+          <Animated.View entering={ZoomIn.delay(100).duration(180)}>
+            <Animated.View style={moodAnimatedStyle}>
+              <View className="rounded-full p-1 mt-4">
+                <SwapMoodButton
+                  mood={todayData.mood}
+                  note={todayData.note}
+                  loading={loading}
+                  className={className}
+                  onPress={() => {
+                    setNoteModalVisible(true);
+                  }}
+                  onPressIn={() => {
+                    handlePressIn(moodScale, 0.95);
+                  }}
+                  onPressOut={() => {
+                    handlePressOut(moodScale);
+                  }}
+                />
+              </View>
+            </Animated.View>
+          </Animated.View>
 
+          {/* Modals */}
           <NoteModal
             visible={noteModalVisible}
             setVisible={setNoteModalVisible}

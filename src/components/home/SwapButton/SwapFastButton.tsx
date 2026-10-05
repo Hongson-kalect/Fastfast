@@ -7,8 +7,10 @@ type SwapFastButtonProps = {
   loading?: boolean;
   color: string;
   className?: string;
-  onPress: () => void;
-  onLongPress: () => void;
+  onPress?: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
+  onLongPress?: () => void;
 };
 
 export const SwapFastButton = ({
@@ -17,6 +19,8 @@ export const SwapFastButton = ({
   color,
   className = "",
   onPress,
+  onPressIn,
+  onPressOut,
   onLongPress,
 }: SwapFastButtonProps) => {
   const { theme } = useAppStore();
@@ -29,6 +33,8 @@ export const SwapFastButton = ({
       <Pressable
         onLongPress={onLongPress}
         onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         disabled={loading}
         hitSlop={8}
         className={`h-24 w-24 items-center justify-center rounded-full border-4 ${

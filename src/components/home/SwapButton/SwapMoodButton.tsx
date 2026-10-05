@@ -12,6 +12,8 @@ type SwapMoodButtonProps = {
   loading?: boolean;
   className?: string;
   onPress: () => void;
+  onPressIn: () => void;
+  onPressOut: () => void;
 };
 
 export const SwapMoodButton = ({
@@ -20,6 +22,8 @@ export const SwapMoodButton = ({
   loading = false,
   className = "",
   onPress,
+  onPressIn,
+  onPressOut,
 }: SwapMoodButtonProps) => {
   const { theme } = useAppStore();
 
@@ -28,10 +32,12 @@ export const SwapMoodButton = ({
       activeOpacity={0.7}
       hitSlop={8}
       onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       disabled={loading}
       className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-inner ${
         mood
-          ? "shadow-primary border-primary"
+          ? "shadow-primary/50 border-primary/50"
           : "shadow-text-base/10 border-text-base/10"
       } ${loading ? "opacity-60" : ""} ${className}`}
     >

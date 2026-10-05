@@ -6,7 +6,9 @@ type SwapImageButtonProps = {
   image?: string;
   loading?: boolean;
   className?: string;
-  onPress: () => void;
+  onPress?: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
 };
 
 export const SwapImageButton = ({
@@ -14,6 +16,8 @@ export const SwapImageButton = ({
   loading = false,
   className = "",
   onPress,
+  onPressIn,
+  onPressOut,
 }: SwapImageButtonProps) => {
   const { theme } = useAppStore();
 
@@ -21,11 +25,13 @@ export const SwapImageButton = ({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       disabled={loading}
       hitSlop={8}
       className={`h-18 w-18 flex-row items-center justify-center rounded-full overflow-hidden border shadow-inner ${
         image
-          ? "shadow-primary border-primary"
+          ? "shadow-primary/50 border-primary/50"
           : "shadow-text-base/10 border-text-base/10"
       } ${loading ? "opacity-60" : ""} ${className}`}
     >
