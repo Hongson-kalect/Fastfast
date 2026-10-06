@@ -19,21 +19,28 @@ const DashboardHeader = (props: Props) => {
     });
   };
 
-  console.log("hasUnclamMilestones", props.hasUnclamMilestones);
-
   return (
-    <View className="flex-row justify-between items-center">
+    <View className="flex-row items-center justify-between">
       <View>
-        <ThemedText size="xxxl" weight="semibold">
+        <ThemedText size="xxxl" weight="bold" color="title">
           Dashboard
+        </ThemedText>
+
+        <ThemedText size="xs" color="text" opacity="medium" className="mt-0.5">
+          Theo dõi tiến trình của bạn
         </ThemedText>
       </View>
 
-      <Pressable onPress={openAchievement} hitSlop={10}>
-        {props.hasUnclamMilestones && (
-          <View className="absolute top-0 -right-2 h-2 w-2 rounded-full bg-warning"></View>
-        )}
+      <Pressable
+        onPress={openAchievement}
+        hitSlop={10}
+        className="relative h-14 w-14 items-center justify-center rounded-xl bg-warning/20"
+      >
         <Ionicons name="trophy-outline" size={26} color={theme.warning} />
+
+        {props.hasUnclamMilestones && (
+          <View className="absolute right-2 top-2 h-2 w-2 rounded-full bg-warning" />
+        )}
       </Pressable>
     </View>
   );

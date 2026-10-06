@@ -161,50 +161,39 @@ const WeightLineChart = ({
     <View className="my-4">
       {/* Header */}
       <View className="mb-3 flex-row items-center justify-between">
-        <ThemedText size="md" weight="bold" color="text">
-          Weight & Fast progress
-        </ThemedText>
+        <View>
+          <ThemedText size="md" weight="bold" color="title">
+            Weight & Fast progress
+          </ThemedText>
+
+          <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
+            Your progress over time
+          </ThemedText>
+        </View>
 
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={openTimeRangeSheet}
-          className="flex-row items-center justify-center gap-2"
+          className="flex-row items-center gap-1.5 rounded-full bg-background2 px-3 py-1.5"
         >
-          <View
-            className="h-8 flex-row items-center gap-1 rounded-lg px-2"
-            style={{
-              borderWidth: 1,
-              borderColor: theme.text + "AA",
-            }}
-          >
-            <ThemedText size="xs" color="text">
-              Last {settings?.chart_range || 7} days
-            </ThemedText>
+          <ThemedText size="xxs" weight="semibold" color="text">
+            {settings?.chart_range || 7} days
+          </ThemedText>
 
-            <Feather name="chevron-down" size={14} color={theme.text} />
-          </View>
+          <Feather name="chevron-down" size={13} color={theme.text} />
         </TouchableOpacity>
       </View>
 
-      <View
-        style={{
-          height: 400,
-          backgroundColor: theme.background2,
-          borderWidth: 1,
-          borderStyle: "dashed",
-          borderColor: theme.text + "15",
-        }}
-        className="rounded-lg px-2 py-4"
-      >
+      <View className="rounded-2xl bg-background2 px-2 py-4">
         <View
           style={{
-            flex: 1,
+            height: 360,
             paddingRight: 17,
             paddingLeft: 5,
           }}
         >
           {/* Left axis label */}
-          <View className="absolute left-0 -top-4 items-end">
+          <View className="absolute left-0 -top-2 items-end">
             <ThemedText
               size="xxs"
               color="text"
@@ -220,7 +209,7 @@ const WeightLineChart = ({
 
           {/* Right axis */}
           {hasWeightData && (
-            <View className="absolute -right-1 bottom-0 -top-4 justify-between">
+            <View className="absolute -right-1 bottom-2 -top-2 justify-between">
               {rightAxisReversed.map((item, index) => {
                 if (index === 0) {
                   return (
@@ -282,8 +271,8 @@ const WeightLineChart = ({
           >
             {({ points, chartBounds }) => (
               <>
-                {/* Fast bars */}
-                <Group opacity={isActive ? 0.5 : 1}>
+                {/* Fast bars */ console.log("point ", points.target)}
+                <Group opacity={isActive ? 0.5 : 0.75}>
                   <Bar
                     points={points.fast}
                     chartBounds={chartBounds}
@@ -327,11 +316,20 @@ const WeightLineChart = ({
                 </Group>
 
                 {/* Target line */}
-                {points.target && (
+                {points.target[0] && (
                   <Line
-                    points={points.target}
-                    curveType="cardinal"
-                    color={theme.error + "80"}
+                    points={[
+                      {
+                        ...points.target[0],
+                        x: 0,
+                      },
+                      {
+                        ...points.target[0],
+                        x: width,
+                      },
+                    ]}
+                    // curveType="cardinal"
+                    color={"#FF000080"}
                     strokeWidth={1}
                   >
                     <DashPathEffect intervals={[6, 4]} />
@@ -416,6 +414,43 @@ const WeightLineChart = ({
           </CartesianChart>
         </View>
       </View>
+      <View className="mt-2 flex-row items-center justify-center gap-4">
+        <View className="flex-row items-center gap-1.5">
+          <View
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: theme.secondary }}
+          />
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Weight
+          </ThemedText>
+        </View>
+
+        <View className="flex-row items-center gap-1.5">
+          <View
+            className="h-2 w-2 rounded-sm"
+            style={{ backgroundColor: theme.primary }}
+          />
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Fasting
+          </ThemedText>
+        </View>
+
+        {hasWeightData && (
+          <View className="flex-row items-center gap-1.5">
+            <View
+              className="w-3"
+              style={{
+                borderTopWidth: 1,
+                borderTopColor: theme.error + "70",
+                borderStyle: "dashed",
+              }}
+            />
+            <ThemedText size="xxs" color="text" opacity="medium">
+              Target
+            </ThemedText>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -449,16 +484,11 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
     }
 
     const val = Math.round(raw * 10) / 10;
-    return `- ${val} Kg`;
+    return val ? `- ${val} Kg` : "- No weight data";
   });
 
   const fastText = useDerivedValue(() => {
     const raw = state.y.fast.value.value;
-
-    if (raw == null) {
-      return "No Data";
-    }
-
     const val = Math.round(raw * 10) / 10;
     return `- ${val} Hours`;
   });

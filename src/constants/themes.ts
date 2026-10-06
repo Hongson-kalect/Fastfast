@@ -40,8 +40,8 @@ export const defaultDark = {
   title: "#E3F2FD",
   text: "#FFFFFF",
 
-  background: "#121212",
-  background2: "#18181B",
+  background: "#111111",
+  background2: "#282828",
   card: "#1E1E1E",
 };
 
@@ -49,7 +49,7 @@ export const themes: { [key: string]: ThemeItem } = {
   // ─────────────────────────────────────────────
   // SKY
   // ─────────────────────────────────────────────
-  
+
   default: {
     type: "normal",
     light: {

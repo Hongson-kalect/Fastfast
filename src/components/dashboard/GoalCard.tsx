@@ -9,8 +9,8 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -26,26 +26,25 @@ export const GoalCard = () => {
   const { addModal } = useModalStore();
   const [activeTarget, setActiveTarget] = useState<WeightTarget | null>(null);
 
- const startWeight = activeTarget?.start_weight;
-const targetWeight = activeTarget?.target_weight;
+  const targetWeight = activeTarget?.target_weight;
 
   const percentage =
-  activeTarget && weight && activeTarget.start_weight !== activeTarget.target_weight
-    ? Math.max(
-        Math.min(
-          ((activeTarget.start_weight - weight) /
-            (activeTarget.start_weight - activeTarget.target_weight)) *
+    activeTarget &&
+    weight &&
+    activeTarget.start_weight !== activeTarget.target_weight
+      ? Math.max(
+          Math.min(
+            ((activeTarget.start_weight - weight) /
+              (activeTarget.start_weight - activeTarget.target_weight)) *
+              100,
             100,
-          100,
-        ),
-        0,
-      )
-    : 0;
+          ),
+          0,
+        )
+      : 0;
 
-const remaining =
-  activeTarget && weight
-    ? (weight - activeTarget.target_weight).toFixed(1)
-    : "0";
+  const remaining =
+    activeTarget && weight ? fixed(weight - activeTarget.target_weight) : 0;
 
   const progress = useSharedValue(0);
 
@@ -98,106 +97,104 @@ const remaining =
   };
 
   const refreshActiveTarget = useCallback(async () => {
-  const res = await dbService?.getActiveWeightTarget();
-  setActiveTarget(res ?? null);
-}, [dbService]);
-
-useEffect(() => {
-  refreshActiveTarget();
-}, [refreshActiveTarget]);
-
-  useEffect(() => {
-  const loadActiveTarget = async () => {
     const res = await dbService?.getActiveWeightTarget();
     setActiveTarget(res ?? null);
-  };
+  }, [dbService]);
 
-  loadActiveTarget();
-}, [dbService]);
+  useEffect(() => {
+    refreshActiveTarget();
+  }, [refreshActiveTarget]);
 
-  if (!weight)
+  useEffect(() => {
+    const loadActiveTarget = async () => {
+      const res = await dbService?.getActiveWeightTarget();
+      setActiveTarget(res ?? null);
+    };
+
+    loadActiveTarget();
+  }, [dbService]);
+
+  if (!weight) {
     return (
-      <View className="mb-4 items-end">
-        <Pressable
-          onPress={openSetWeightModal}
-          className="flex-row items-center gap-1 rounded-lg bg-success px-2 py-3"
-        >
-          <Feather name="plus" size={16} color="#FFFFFF" />
-
-          <ThemedText size="sm" weight="medium" colorHex="#FFFFFF">
-            Add current Weight
-          </ThemedText>
-        </Pressable>
-      </View>
-    );
-
-  return (
-    <View
-      className="mb-4 h-36 rounded-2xl p-4"
-      style={{
-        backgroundColor: theme.primary + "40",
-        borderWidth: 1,
-        borderColor: theme.text + "12",
-      }}
-    >
-      {/* Header Goal */}
-      <View className="flex-row items-center justify-between">
-        {activeTarget ? (
-          <Pressable
-            onPress={openWeightTargetModal}
-            className="flex-row items-center gap-2.5"
-          >
-            <View
-              className="h-8 w-8 items-center justify-center rounded-lg"
-              style={{
-                backgroundColor: theme.primary + "50",
-              }}
-            >
-              <Text>🎯</Text>
-            </View>
-
-            <View>
-              <ThemedText size="xxs" color="text" opacity="medium">
-                Weight Target
-              </ThemedText>
-
-              <View className="flex-row items-center gap-1">
-                <ThemedText size="sm" weight="semibold" color="text">
-                  {targetWeight} kg
-                </ThemedText>
-
-                <MaterialIcons name="edit" size={14} color={theme.warning} />
-              </View>
-            </View>
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={openWeightTargetModal}
-            className="rounded-lg bg-warning px-2 py-3"
-          >
-            <ThemedText size="xs" weight="medium" colorHex="#FFFFFF">
-              Set Weight Target
-            </ThemedText>
-          </Pressable>
-        )}
-
-        <Pressable
-          onPress={openSetWeightModal}
-          className="items-end rounded-lg border p-1.5"
-          style={{
-            borderStyle: "dashed",
-            borderColor: theme.text + "20",
-            backgroundColor: theme.text + "10",
-          }}
-        >
-          <View className="flex-row items-baseline gap-0.5">
+      <View className="mb-4 rounded-2xl bg-background2 px-4 py-4">
+        <View className="flex-row items-center gap-3">
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-success/10">
             <MaterialCommunityIcons
               name="weight"
-              size={16}
-              color={theme.text}
+              size={20}
+              color={theme.success}
             />
+          </View>
 
-            <ThemedText size="lg" weight="bold" color="text">
+          <View className="flex-1">
+            <ThemedText size="sm" weight="semibold" color="title">
+              Set your current weight
+            </ThemedText>
+            <ThemedText
+              size="xxs"
+              color="text"
+              opacity="medium"
+              className="mt-0.5"
+            >
+              Add your weight to start tracking progress
+            </ThemedText>
+          </View>
+
+          <Pressable
+            onPress={openSetWeightModal}
+            className="h-10 w-10 items-center justify-center rounded-full bg-success"
+          >
+            <Feather name="plus" size={18} color={theme.background} />
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View className="mb-4 rounded-2xl bg-background2 px-4 py-4">
+      {/* Header */}
+      <View className="flex-row items-start justify-between">
+        <View>
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Weight goal
+          </ThemedText>
+
+          {activeTarget ? (
+            <Pressable
+              onPress={openWeightTargetModal}
+              className="mt-0.5 flex-row items-center gap-1.5"
+              hitSlop={6}
+            >
+              <ThemedText size="lg" weight="bold" color="title">
+                {targetWeight} kg
+              </ThemedText>
+
+              <MaterialIcons name="edit" size={14} color={theme.warning} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={openWeightTargetModal}
+              className="mt-1 flex-row items-center gap-1.5"
+              hitSlop={6}
+            >
+              <ThemedText size="sm" weight="semibold" color="warning">
+                Set weight target
+              </ThemedText>
+
+              <Feather name="arrow-right" size={14} color={theme.warning} />
+            </Pressable>
+          )}
+        </View>
+
+        {/* Current weight */}
+        <Pressable
+          onPress={openSetWeightModal}
+          className="items-end"
+          hitSlop={6}
+        >
+          <View className="flex-row items-baseline gap-1">
+            <ThemedText size="xxl" weight="bold" color="title">
               {fixed(weight)}
             </ThemedText>
 
@@ -206,24 +203,27 @@ useEffect(() => {
             </ThemedText>
           </View>
 
-          {targetWeight && (
-            <ThemedText size="xxs" weight="medium" color="success">
-              -{remaining} kg to go
-            </ThemedText>
-          )}
+          <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
+            Current weight
+          </ThemedText>
         </Pressable>
       </View>
 
       {/* Progress */}
-      {targetWeight ? (
-        <View className="mt-3.5">
-          <View className="h-2 w-full overflow-hidden rounded-full bg-background2">
+      {activeTarget ? (
+        <View className="mt-5">
+          <View className="h-2 overflow-hidden rounded-full bg-text-base/10">
             <Animated.View
-              className="h-full rounded-full bg-primary/80"
-              style={[animatedStyle]}
+              className="h-full rounded-full"
+              style={[
+                {
+                  backgroundColor: theme.primary,
+                },
+                animatedStyle,
+              ]}
             >
               <LinearGradient
-                colors={[theme.primary + "AA", theme.primary]}
+                colors={[theme.primary + "80", theme.primary]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 style={{
@@ -234,20 +234,46 @@ useEffect(() => {
             </Animated.View>
           </View>
 
-          <View className="mt-1.5 flex-row justify-between">
+          <View className="mt-2 flex-row items-center justify-between">
             <ThemedText size="xxs" color="text" opacity="medium">
-              Start: {startWeight}kg
+              {fixed(activeTarget.start_weight)} kg
             </ThemedText>
 
-            <ThemedText size="xxs" weight="semibold" color="primary">
+            <ThemedText size="xs" weight="bold" color="primary">
               {Math.round(percentage)}%
+            </ThemedText>
+
+            <ThemedText size="xxs" color="text" opacity="medium">
+              {fixed(activeTarget.target_weight)} kg
             </ThemedText>
           </View>
         </View>
       ) : (
-        <View className="flex-1 items-center justify-center">
-          <ThemedText size="xs" color="text" opacity="low">
-            Set target to measure your progress
+        <View className="mt-5 rounded-xl bg-text-base/5 px-3 py-2.5">
+          <ThemedText
+            size="xxs"
+            color="text"
+            opacity="medium"
+            style={{ textAlign: "center" }}
+          >
+            Set a target weight to track your progress
+          </ThemedText>
+        </View>
+      )}
+
+      {/* Remaining */}
+      {targetWeight && (
+        <View className="mt-3 flex-row items-center justify-between">
+          <ThemedText size="xxs" color="text" opacity="low">
+            Progress
+          </ThemedText>
+
+          <ThemedText
+            size="xs"
+            weight="semibold"
+            color={remaining > 0 ? "success" : "primary"}
+          >
+            {remaining > 0 ? `${fixed(remaining)} kg to go` : "Goal reached"}
           </ThemedText>
         </View>
       )}

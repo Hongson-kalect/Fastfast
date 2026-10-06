@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
@@ -56,8 +56,7 @@ export const AchievementCard = ({
   userMilestone = [],
   onPress,
   onClaim,
-}:Props) => {
-
+}: Props) => {
   if (!achievement?.items.length) return null;
 
   const currentValue = userAchievement?.current_value ?? 0;
@@ -75,151 +74,197 @@ export const AchievementCard = ({
   }).length;
 
   const totalCount = achievement.items.length;
-const isCompleted = completedCount === totalCount;
+  const isCompleted = completedCount === totalCount;
   const unconfirmedMilestones = userMilestone.filter(
-  (item: any) => item.is_confirmed === 0,
-);
+    (item: any) => item.is_confirmed === 0,
+  );
 
-const unclaimedItem = userMilestone.find(
-  (item) => item.is_confirmed === 0,
-);
+  const unclaimedItem = userMilestone.find((item) => item.is_confirmed === 0);
 
-const hasUnclaimed = !!unclaimedItem;
+  const hasUnclaimed = !!unclaimedItem;
 
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
- const { theme, userProfile } = useAppStore();
-const dbService = useDBService();
+  const { theme, userProfile } = useAppStore();
+  const dbService = useDBService();
 
   const handleCardPress = async () => {
-  if (onClaim && unclaimedItem && userProfile) {
-    await dbService?.confirmAchievementMilestone({
-      userId: userProfile?.id,
-      achievementId: unclaimedItem.achievement_item_id,
-      milestoneItemId: unclaimedItem.id,
-    });
-    onClaim(unclaimedItem.achievement_item_id);
-  } else {
-    onPress?.();
-  }
-};
+    if (onClaim && unclaimedItem && userProfile) {
+      await dbService?.confirmAchievementMilestone({
+        userId: userProfile?.id,
+        achievementId: unclaimedItem.achievement_item_id,
+        milestoneItemId: unclaimedItem.id,
+      });
+      onClaim(unclaimedItem.achievement_item_id);
+    } else {
+      onPress?.();
+    }
+  };
 
   return (
-    <View className="mb-2 overflow-hidden rounded-xl border border-text-base/20 bg-background2">
-      <Pressable
-        className="flex-row items-center justify-between p-3.5 active:opacity-80"
-        onPress={handleCardPress}
-      >
-        {/* Left Section */}
-        <View className="flex-1 flex-row items-center gap-3 pr-2">
-          {/* Icon Trophy / Gift */}
-          <View
-            className={`h-10 w-10 items-center justify-center rounded-xl border ${
-              hasUnclaimed
-                ? "border-amber-500/30 bg-amber-500/10"
-                : "border-text-base/5 bg-background2/80"
-            }`}
-          >
-            <Ionicons
-              name={
-                hasUnclaimed
-                  ? "gift"
-                  : isCompleted
-                    ? "trophy"
-                    : "trophy-outline"
-              }
-              size={18}
-              color={
-                hasUnclaimed
-                  ? "#F59E0B"
-                  : isCompleted
-                    ? theme.primary
-                    : theme.text
-              }
+    <View className="overflow-hidden rounded-2xl border border-text-base/5 bg-background2">
+      <Pressable onPress={handleCardPress} className="active:opacity-80">
+        <View className="px-4 py-3.5">
+          {/* Main row */}
+          <View className="flex-row items-center">
+            {/* Icon */}
+            <View
+              className="relative mr-3.5 h-11 w-11 items-center justify-center rounded-xl"
               style={{
-                opacity: isCompleted || hasUnclaimed ? 1 : 0.55,
+                backgroundColor: hasUnclaimed
+                  ? theme.warning + "15"
+                  : isCompleted
+                    ? theme.primary + "12"
+                    : theme.text + "0D",
               }}
-            />
-
-            {/* Dấu chấm đỏ báo hiệu có quà chưa nhận */}
-            {hasUnclaimed && (
-              <View className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border border-background2" />
-            )}
-          </View>
-
-          {/* Info */}
-          <View className="flex-1">
-            <View className="flex-row items-center gap-1.5">
-              <ThemedText
-                size="sm"
-                weight="bold"
-                color={
-                  hasUnclaimed ? "warning" : isCompleted ? "primary" : "title"
+            >
+              <Ionicons
+                name={
+                  hasUnclaimed
+                    ? "gift"
+                    : isCompleted
+                      ? "trophy"
+                      : "trophy-outline"
                 }
-                numberOfLines={1}
-              >
-                {achievement.name}
-              </ThemedText>
+                size={19}
+                color={
+                  hasUnclaimed
+                    ? theme.warning
+                    : isCompleted
+                      ? theme.primary
+                      : theme.text
+                }
+                style={{
+                  opacity: isCompleted || hasUnclaimed ? 1 : 0.45,
+                }}
+              />
 
-              {isCompleted && !hasUnclaimed && (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={12}
-                  color={theme.success}
+              {/* Unclaimed indicator */}
+              {hasUnclaimed && (
+                <View
+                  className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2"
+                  style={{
+                    backgroundColor: theme.warning,
+                    borderColor: theme.background2,
+                  }}
                 />
               )}
             </View>
 
-            <ThemedText
-              size="xxs"
-              weight="medium"
-              color="text"
-              opacity="medium"
-              numberOfLines={1}
-              style={{ marginTop: 2 }}
-            >
-              {hasUnclaimed
-                ? "Bạn có phần thưởng chưa xác nhận!"
-                : achievement.description}
-            </ThemedText>
-          </View>
-        </View>
+            {/* Info */}
+            <View className="min-w-0 flex-1">
+              <View className="flex-row items-center gap-1.5">
+                <ThemedText
+                  size="sm"
+                  weight="semibold"
+                  color={
+                    hasUnclaimed ? "warning" : isCompleted ? "primary" : "title"
+                  }
+                  numberOfLines={1}
+                  className="flex-1"
+                >
+                  {achievement.name}
+                </ThemedText>
 
-        {/* Right Section */}
-        <View className="items-end gap-1">
-          {/* 🌟 NẾU CÓ THƯỞNG CHƯA NHẬN -> HIỂN THỊ NÚT NHẬN */}
-          {hasUnclaimed ? (
-            <View className="flex-row items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1">
-              <Ionicons name="sparkles" size={10} color="#FFFFFF" />
-              <ThemedText size="xxs" weight="bold" style={{ color: "#FFFFFF" }}>
-                Nhận
+                {isCompleted && !hasUnclaimed && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={13}
+                    color={theme.success}
+                  />
+                )}
+              </View>
+
+              <ThemedText
+                size="xxs"
+                weight="medium"
+                color="text"
+                opacity="medium"
+                numberOfLines={1}
+                className="mt-1"
+              >
+                {hasUnclaimed
+                  ? "Bạn có phần thưởng chưa nhận!"
+                  : achievement.description}
               </ThemedText>
             </View>
-          ) : achievement.type === "boolean" ? (
-            <ThemedText
-              size="xxs"
-              weight="bold"
-              color={isCompleted ? "success" : "text"}
-              opacity={isCompleted ? undefined : "medium"}
-            >
-              {isCompleted ? "Đã đạt" : "Chưa đạt"}
-            </ThemedText>
-          ) : (
-            <>
-              <ThemedText
-                size="xs"
-                weight="bold"
-                color={isCompleted ? "success" : "title"}
-              >
-                {formatAchievementValue(currentValue)}
-                {nextItem
-                  ? ` / ${formatAchievementValue(nextItem.target as number)}`
-                  : ""}
-              </ThemedText>
 
-              <ThemedText size="xxs" weight="medium" color="text" opacity="low">
-                {completedCount}/{totalCount}
-              </ThemedText>
-            </>
+            {/* Right */}
+            <View className="ml-3 items-end">
+              {hasUnclaimed ? (
+                <Pressable
+                  // onPress={handleClam}
+                  // hitSlop={6}
+                  className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5"
+                  style={{
+                    backgroundColor: theme.warning,
+                  }}
+                >
+                  <Ionicons name="gift" size={11} color={theme.background} />
+
+                  <ThemedText size="xxs" weight="bold" color="background">
+                    Nhận
+                  </ThemedText>
+                </Pressable>
+              ) : achievement.type === "boolean" ? (
+                <ThemedText
+                  size="xxs"
+                  weight="semibold"
+                  color={isCompleted ? "success" : "text"}
+                  opacity={isCompleted ? "full" : "medium"}
+                >
+                  {isCompleted ? "Đã đạt" : "Chưa đạt"}
+                </ThemedText>
+              ) : (
+                <View className="items-end">
+                  <ThemedText
+                    size="sm"
+                    weight="bold"
+                    color={isCompleted ? "success" : "title"}
+                  >
+                    {formatAchievementValue(currentValue)}
+                    {nextItem
+                      ? ` / ${formatAchievementValue(
+                          nextItem.target as number,
+                        )}`
+                      : ""}
+                  </ThemedText>
+
+                  <ThemedText
+                    size="xxs"
+                    weight="medium"
+                    color="text"
+                    opacity="low"
+                    className="mt-0.5"
+                  >
+                    {completedCount}/{totalCount}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Milestone progress */}
+          {achievement.type !== "boolean" && (
+            <View className="mt-3">
+              <View className="h-1.5 overflow-hidden rounded-full bg-text-base/10">
+                <View
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(
+                      nextItem
+                        ? (currentValue / Number(nextItem.target)) * 100
+                        : 100,
+                      100,
+                    )}%`,
+                    backgroundColor: hasUnclaimed
+                      ? theme.warning
+                      : isCompleted
+                        ? theme.success
+                        : theme.primary,
+                  }}
+                />
+              </View>
+            </View>
           )}
         </View>
       </Pressable>
@@ -245,6 +290,12 @@ export const AchievementBottomSheet = ({
     UserAchievementMilestone[]
   >([]);
 
+  const achievementList = useMemo(() => {
+    return ACHIEVEMENTS.filter((item) => {
+      return item.items.length;
+    });
+  }, [ACHIEVEMENTS]);
+
   const { userProfile } = useAppStore();
   const dbService = useDBService();
 
@@ -268,9 +319,7 @@ export const AchievementBottomSheet = ({
     async (milestoneId: string) => {
       if (!userProfile) return;
 
-      const milestone = userMilestones.find(
-        (item) => item.id === milestoneId,
-      );
+      const milestone = userMilestones.find((item) => item.id === milestoneId);
 
       if (!milestone || milestone.is_confirmed) return;
 
@@ -282,9 +331,7 @@ export const AchievementBottomSheet = ({
 
       setUserMilestones((prev) =>
         prev.map((item) =>
-          item.id === milestoneId
-            ? { ...item, is_confirmed: 1 }
-            : item,
+          item.id === milestoneId ? { ...item, is_confirmed: 1 } : item,
         ),
       );
     },
@@ -313,11 +360,9 @@ export const AchievementBottomSheet = ({
     return map;
   }, [userMilestones]);
 
-  const total = ACHIEVEMENTS.filter(
-    (achievement) => achievement?.items?.length,
-  ).length;
+  const total = achievementList.length;
 
-  const unlocked = ACHIEVEMENTS.filter((achievement) => {
+  const unlocked = achievementList.filter((achievement) => {
     const userAchievement = userAchievementMap.get(achievement.id);
 
     if (!userAchievement) return false;
@@ -333,7 +378,7 @@ export const AchievementBottomSheet = ({
 
   return (
     <BottomSheetFlatList
-      data={ACHIEVEMENTS}
+      data={achievementList}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => {
         const userAchievement = userAchievementMap.get(item.id);
@@ -352,17 +397,14 @@ export const AchievementBottomSheet = ({
         );
       }}
       contentContainerStyle={{
-        gap: 2,
+        gap: 8,
         paddingBottom: 40,
       }}
       ListHeaderComponent={
-        <AchievementBottomSheetHeader
-          total={total}
-          unlocked={unlocked}
-        />
+        <AchievementBottomSheetHeader total={total} unlocked={unlocked} />
       }
       ListEmptyComponent={
-        <View className="items-center justify-center px-3">
+        <View className="items-center justify-center px-3 py-10">
           <ThemedText
             color="text"
             opacity="medium"
@@ -391,12 +433,8 @@ export const AchievementBottomSheetHeader = ({
   return (
     <View className="px-3 pb-4">
       <View className="flex-row items-end justify-between px-1">
-        <View>
-          <ThemedText
-            color="title"
-            size="xxl"
-            weight="bold"
-          >
+        <View className="flex-1">
+          <ThemedText color="title" size="xxl" weight="bold">
             Achievements
           </ThemedText>
 
@@ -411,11 +449,7 @@ export const AchievementBottomSheetHeader = ({
         </View>
 
         <View className="flex-row items-baseline">
-          <ThemedText
-            color="primary"
-            size="xxl"
-            weight="bold"
-          >
+          <ThemedText color="primary" size="xxl" weight="bold">
             {percentage}
           </ThemedText>
 
@@ -430,11 +464,11 @@ export const AchievementBottomSheetHeader = ({
         </View>
       </View>
 
-      <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-text-base/10">
+      <View className="mt-3 h-2 overflow-hidden rounded-full bg-text-base/10">
         <View
           className="h-full rounded-full bg-primary"
           style={{
-            width: `${percentage}%`,
+            width: `${Math.min(percentage, 100)}%`,
           }}
         />
       </View>

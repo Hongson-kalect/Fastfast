@@ -85,9 +85,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
 
   const stats = useMemo(() => {
     const sessions = data.filter((item) => !item.is_deleted);
-    const completed = sessions.filter(
-      (item) => item.status === "completed",
-    );
+    const completed = sessions.filter((item) => item.status === "completed");
 
     const durations = completed
       .map((item) => Number(item.duration ?? 0))
@@ -101,13 +99,10 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
     const averageDuration =
       durations.length > 0 ? totalDuration / durations.length : 0;
 
-    const targetSessions = completed.filter(
-      (item) => item.target_duration > 0,
-    );
+    const targetSessions = completed.filter((item) => item.target_duration > 0);
 
     const targetReached = targetSessions.filter(
-      (item) =>
-        Number(item.duration ?? 0) / S_PER_HOUR >= item.target_duration,
+      (item) => Number(item.duration ?? 0) / S_PER_HOUR >= item.target_duration,
     ).length;
 
     const successRate =
@@ -127,52 +122,23 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
   return (
     <View className="px-4 pb-4 pt-2">
       {/* Header */}
-      <View className="mb-4 flex-row items-end justify-between">
-        <View className="flex-1">
-          <View className="flex-row items-center gap-2">
-            <FontAwesome5
-              name="history"
-              size={18}
-              color={theme.primary}
-            />
+      <View className="mb-4">
+        <View className="flex-row items-center gap-2">
+          <FontAwesome5 name="history" size={18} color={theme.primary} />
 
-            <ThemedText
-              size="xl"
-              weight="bold"
-              color="title"
-            >
-              Fasts history
-            </ThemedText>
-          </View>
-
-          <ThemedText
-            size="xs"
-            color="text"
-            opacity="medium"
-            style={{ marginTop: 3 }}
-          >
-            {stats.total} phiên nhịn · {stats.completed} hoàn thành
+          <ThemedText size="xl" weight="bold" color="title">
+            Fasts history
           </ThemedText>
         </View>
 
-        <View className="ml-3 items-end">
-          <ThemedText
-            size="xxl"
-            weight="bold"
-            color="primary"
-          >
-            {stats.total}
-          </ThemedText>
-
-          <ThemedText
-            size="xxs"
-            weight="medium"
-            color="text"
-            opacity="low"
-          >
-            Fasts
-          </ThemedText>
-        </View>
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="medium"
+          style={{ marginTop: 4 }}
+        >
+          {stats.total} phiên nhịn · {stats.completed} hoàn thành
+        </ThemedText>
       </View>
 
       {/* Stats */}
@@ -198,12 +164,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
 
       {/* Section label */}
       <View className="mt-5 px-1">
-        <ThemedText
-          size="xs"
-          weight="medium"
-          color="text"
-          opacity="low"
-        >
+        <ThemedText size="xs" weight="medium" color="text" opacity="low">
           Recent fasts
         </ThemedText>
       </View>
@@ -227,11 +188,7 @@ const StatCard = ({ value, label, color }: StatCardProps) => {
         borderColor: `${color}22`,
       }}
     >
-      <ThemedText
-        size="sm"
-        weight="bold"
-        style={{ color }}
-      >
+      <ThemedText size="sm" weight="bold" style={{ color }}>
         {value}
       </ThemedText>
 
@@ -339,19 +296,9 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
             onDelete(item.id);
             closeCurrentModal();
           },
-          icon: (
-            <Feather
-              name="trash-2"
-              size={20}
-              color={theme.background}
-            />
-          ),
+          icon: <Feather name="trash-2" size={20} color={theme.background} />,
           rightContent: (
-            <Feather
-              name="chevron-right"
-              size={20}
-              color={theme.background}
-            />
+            <Feather name="chevron-right" size={20} color={theme.background} />
           ),
           backgroundColor: theme.error,
         },
@@ -378,84 +325,86 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
     <TouchableOpacity
       onLongPress={handleLongPress}
       onPress={showDetail}
-      activeOpacity={0.7}
-      className="relative mb-2.5 overflow-hidden rounded-2xl border border-text-base/10 bg-background2"
+      activeOpacity={0.75}
+      className="mb-3 overflow-hidden rounded-2xl bg-background2"
     >
-      <View className="flex-row items-center px-3.5 py-3">
-        {/* Target */}
-        <View
-          className="mr-3 h-10 w-10 items-center justify-center rounded-xl"
-          style={{
-            backgroundColor: `${status.color}12`,
-          }}
-        >
-          <ThemedText size="lg">
-            {target?.emoji || "⚡"}
-          </ThemedText>
-        </View>
+      <View className="px-4 py-3.5">
+        {/* Main row */}
+        <View className="flex-row items-center">
+          {/* Target */}
+          <View
+            className="mr-3.5 h-11 w-11 items-center justify-center rounded-xl"
+            style={{
+              backgroundColor: `${status.color}12`,
+            }}
+          >
+            <ThemedText size="lg">{target?.emoji || "⚡"}</ThemedText>
+          </View>
 
-        {/* Main Info */}
-        <View className="flex-1 pr-3">
-          <View className="flex-row items-center">
-            <View
-              className="mr-1.5 h-1.5 w-1.5 rounded-full"
-              style={{
-                backgroundColor: status.color,
-              }}
-            />
+          {/* Info */}
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-center gap-1.5">
+              <View
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  backgroundColor: status.color,
+                }}
+              />
+
+              <ThemedText
+                size="sm"
+                weight="semibold"
+                color="title"
+                numberOfLines={1}
+                className="flex-1"
+              >
+                {status.label}
+              </ThemedText>
+            </View>
 
             <ThemedText
-              size="xs"
-              weight="semibold"
-              color="title"
+              size="xxs"
+              color="text"
+              opacity="medium"
               numberOfLines={1}
+              className="mt-1"
             >
-              {status.label}
+              {dateRangeLabel}
             </ThemedText>
           </View>
 
-          <ThemedText
-            size="xxs"
-            color="text"
-            opacity="medium"
-            numberOfLines={1}
-            className="mt-1"
-          >
-            {dateRangeLabel}
-          </ThemedText>
-        </View>
-
-        {/* Duration */}
-        <View className="items-end">
-          <ThemedText
-            size="sm"
-            weight="bold"
-            color={isFailed ? "error" : "title"}
-          >
-            {durationLabel}
-          </ThemedText>
-
-          {hasTarget && !isFailed && (
+          {/* Duration */}
+          <View className="ml-3 items-end">
             <ThemedText
-              size="xxs"
-              weight="medium"
-              color="text"
-              opacity="low"
-              className="mt-0.5"
+              size="md"
+              weight="bold"
+              color={isFailed ? "error" : "title"}
             >
-              {progressPercent}%
+              {durationLabel}
             </ThemedText>
-          )}
+
+            {hasTarget && !isFailed && (
+              <ThemedText
+                size="xxs"
+                weight="semibold"
+                color={progressPercent >= 100 ? "success" : "text"}
+                opacity={progressPercent >= 100 ? "full" : "low"}
+                className="mt-0.5"
+              >
+                {progressPercent}%
+              </ThemedText>
+            )}
+          </View>
         </View>
       </View>
 
       {/* Progress */}
       {hasTarget && (
-        <View className="h-1 w-full bg-text-base/5">
+        <View className="h-1.5 bg-text-base/5">
           <View
-            className="h-full"
+            className="h-full rounded-r-full"
             style={{
-              width: `${progressPercent}%`,
+              width: `${Math.min(progressPercent, 100)}%`,
               backgroundColor: status.color,
             }}
           />

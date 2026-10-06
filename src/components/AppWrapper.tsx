@@ -1,22 +1,19 @@
 import { fonts } from "@/configs/fonts";
+import { CHART_RANGES } from "@/constants/data";
+import { initializeAppState } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
+import { initializeDashboard } from "@/stores/dashboardAction";
 import useModalStore from "@/stores/modalStore";
 import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
-import { initializeAppState } from "@/stores/appAction";
-import { isColorDark } from "@/util/color";
 SplashScreen.preventAutoHideAsync();
 
-export const AppWrapper = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { addModal } = useModalStore();
 
   const [isDBReady, setDBReady] = useState(false);
@@ -92,6 +89,20 @@ export const AppWrapper = ({
           ),
         });
       }, 1000);
+    };
+
+    load();
+  }, [db, addModal]);
+
+  useEffect(() => {
+    if (!db) return;
+
+    const load = async () => {
+      await initializeDashboard(db, CHART_RANGES[0]);
+
+      // setDBReady(true);
+      // Không block app startup
+      // initializeDashboard(db, CHART_RANGES[0]);
     };
 
     load();

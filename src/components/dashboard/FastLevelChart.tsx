@@ -1,6 +1,6 @@
 import { useAppStore } from "@/stores/appStore";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, {
   Easing,
@@ -33,127 +33,132 @@ const LEVEL_COLORS = [
   ["#A78BFA", "#8B5CF6"],
 ] as const;
 
-const FastLevelItem = React.memo(({
-  label,
-  count,
-  maxCount,
-  allCount,
-  badge,
-  colors,
-  index,
-}: {
-  label: string;
-  count: number;
-  maxCount: number;
-  allCount: number;
-  badge?: string;
-  colors: readonly [string, string];
-  index: number;
-}) => {
-  const [trackWidth, setTrackWidth] = useState(0);
-  const { theme } = useAppStore();
+const FastLevelItem = React.memo(
+  ({
+    label,
+    count,
+    maxCount,
+    allCount,
+    badge,
+    colors,
+    index,
+  }: {
+    label: string;
+    count: number;
+    maxCount: number;
+    allCount: number;
+    badge?: string;
+    colors: readonly [string, string];
+    index: number;
+  }) => {
+    const [trackWidth, setTrackWidth] = useState(0);
+    const { theme } = useAppStore();
 
-  const progress = useSharedValue(0);
+    const progress = useSharedValue(0);
 
-  const percentage = maxCount === 0 ? 0 : count / maxCount;
-  useEffect(() => {
-    progress.value = 0;
+    const percentage = maxCount === 0 ? 0 : count / maxCount;
+    useEffect(() => {
+      progress.value = 0;
 
-    progress.value = withDelay(
-      index * 90,
-      withTiming(percentage, {
-        duration: 700,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-  }, [percentage, index]);
+      progress.value = withDelay(
+        index * 90,
+        withTiming(percentage, {
+          duration: 700,
+          easing: Easing.out(Easing.cubic),
+        }),
+      );
+    }, [percentage, index]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    width: trackWidth * progress.value,
-  }));
+    const animatedStyle = useAnimatedStyle(() => ({
+      width: trackWidth * progress.value,
+    }));
 
-  return (
-    <View className="mb-4">
-      {/* Header */}
-      <View
-        style={{ opacity: count ? 1 : 0.5 }}
-        className="mb-1 flex-row items-center justify-between"
-      >
-        <View className="flex-row items-center">
-          <View
-            style={{ backgroundColor: colors[0] }}
-            className="mr-2 h-3 w-3 rounded-full"
-          />
+    return (
+      <View className="mb-4">
+        <View
+          style={{ opacity: count ? 1 : 0.6 }}
+          className="mb-1.5 flex-row items-center justify-between"
+        >
+          <View className="min-w-0 flex-1 flex-row items-center">
+            <View
+              className="mr-2 h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: colors[0] }}
+            />
 
-          <ThemedText size="sm" weight="bold" color="text">
-            {label}
-          </ThemedText>
-
-          {badge && (
-            <View className="ml-2 rounded-full bg-text-base/10 px-2 py-0.5">
-              <ThemedText size="xxs" color="text" opacity="medium">
-                {badge}
-              </ThemedText>
-            </View>
-          )}
-        </View>
-
-        <View className="flex-row items-center">
-          <ThemedText size="sm" weight="semibold" color="text">
-            {count}
             <ThemedText
-              size="xs"
-              weight="regular"
+              size="sm"
+              weight="semibold"
+              color="text"
+              numberOfLines={1}
+            >
+              {label}
+            </ThemedText>
+
+            {badge && (
+              <View className="ml-2 rounded-full bg-text-base/10 px-2 py-0.5">
+                <ThemedText size="xxs" color="text" opacity="medium">
+                  {badge}
+                </ThemedText>
+              </View>
+            )}
+          </View>
+
+          <View className="ml-3 flex-row items-center">
+            <ThemedText size="sm" weight="bold" color="title">
+              {count}
+            </ThemedText>
+
+            <ThemedText
+              size="xxs"
+              color="text"
+              opacity="low"
+              className="mx-1.5"
+            >
+              ·
+            </ThemedText>
+
+            <ThemedText
+              size="xxs"
+              weight="semibold"
               color="text"
               opacity="medium"
             >
-              {" "}
-              times
+              {allCount > 0 ? Math.round((count / allCount) * 100) : 0}%
             </ThemedText>
-          </ThemedText>
+          </View>
+        </View>
 
-          <ThemedText
-            size="xs"
-            color="text"
-            opacity="medium"
-            style={{ marginLeft: 8, width: 32, textAlign: "center" }}
-          >
-            {allCount > 0 ? Math.round((count / allCount) * 100) : 0}%
-          </ThemedText>
+        <View
+          onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+          className="h-2 overflow-hidden rounded-full bg-text-base/10"
+        >
+          {trackWidth > 0 && (
+            <Animated.View
+              style={[
+                animatedStyle,
+                {
+                  height: "100%",
+                  overflow: "hidden",
+                  borderRadius: 999,
+                },
+              ]}
+            >
+              <LinearGradient
+                colors={[theme.primary + "70", theme.primary]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={{
+                  flex: 1,
+                  borderRadius: 999,
+                }}
+              />
+            </Animated.View>
+          )}
         </View>
       </View>
-
-      {/* Track */}
-      <View
-        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
-        className="h-4 overflow-hidden rounded-full bg-background2 p-0.5"
-      >
-        {trackWidth > 0 && (
-          <Animated.View
-            style={[
-              animatedStyle,
-              {
-                height: "100%",
-                overflow: "hidden",
-                borderRadius: 999,
-              },
-            ]}
-          >
-            <LinearGradient
-              colors={[theme.primary + "AA", theme.primary]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={{
-                flex: 1,
-                borderRadius: 999,
-              }}
-            />
-          </Animated.View>
-        )}
-      </View>
-    </View>
-  );
-});
+    );
+  },
+);
 
 export const FastLevelBarChart = ({ fastStatistics }: Props) => {
   const { theme } = useAppStore();
@@ -196,46 +201,28 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
     <View className="mt-5">
       {/* Header */}
       <View className="mb-4 flex-row items-center justify-between">
-        <View className="flex-1 mr-3">
-          <ThemedText size="md" weight="bold" color="text">
+        <View className="flex-1">
+          <ThemedText size="md" weight="bold" color="title">
             Fast Distribution
           </ThemedText>
 
-          <ThemedText
-            size="xs"
-            color="text"
-            opacity="medium"
-            style={{ marginTop: 4 }}
-          >
+          <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
             Distribution of your fasting sessions
           </ThemedText>
         </View>
 
-        <View
-          className="rounded-xl px-3 py-1 items-center"
-          style={{
-            backgroundColor: theme.primary + "18",
-          }}
-        >
-          <ThemedText size="lg" weight="bold" color="primary">
+        <View className="ml-3 flex-row items-baseline gap-1">
+          <ThemedText size="xl" weight="bold" color="primary">
             {total}
           </ThemedText>
 
-          <ThemedText size="xxs" color="text" opacity="medium">
-            Total
+          <ThemedText size="xxs" color="text" opacity="half">
+            fasts
           </ThemedText>
         </View>
       </View>
 
-      {/* Card */}
-      <View
-        className="rounded-3xl p-5"
-        style={{
-          backgroundColor: theme.background2 + "B3",
-          borderWidth: 1,
-          borderColor: theme.text + "12",
-        }}
-      >
+      <View className="gap-1">
         {levels.map((item, index) => (
           <FastLevelItem
             key={item.label}
@@ -244,7 +231,6 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
             count={item.count}
             maxCount={maxCount}
             allCount={total}
-            // badge={item?.badge}
             colors={LEVEL_COLORS[index]}
           />
         ))}

@@ -1,13 +1,14 @@
-import { FastingTargetItem, getFastingStatus } from "@/constants/data";
+import { FastingTargetItem } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
 import { getRelativeTime, timeString } from "@/util/timer";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useMemo, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 
 interface FastingSheetProps {
@@ -52,10 +53,7 @@ const FastingSheet = ({
 
     return {
       habitGain: fixed(3 + (hours - 16) * 0.2),
-      shieldBonus: Math.min(
-        2,
-        Math.max(0, Math.floor(hours / 24 - 1)),
-      ),
+      shieldBonus: Math.min(2, Math.max(0, Math.floor(hours / 24 - 1))),
     };
   };
 
@@ -74,8 +72,7 @@ const FastingSheet = ({
     ? getRelativeTime(new Date(finishTime))
     : "--:--";
 
-  const isTargetReached =
-    hasTarget && fastCounter >= targetSeconds;
+  const isTargetReached = hasTarget && fastCounter >= targetSeconds;
 
   const accentColor = fastTarget?.colors.accent || theme.primary;
 
@@ -104,301 +101,267 @@ const FastingSheet = ({
   }, []);
 
   return (
-    <View className="gap-5 px-5 pb-12">
-      {/* Progress */}
-      <View className="mt-4 gap-3">
+    <View className="gap-6 px-5 pb-12">
+      {/* ==================== PROGRESS ==================== */}
+      <View className="mt-3 gap-3">
+        {/* Header */}
         <View className="flex-row items-end justify-between">
           <View className="flex-1">
             <ThemedText size="xxs" color="text" opacity="medium">
               Tiến độ
             </ThemedText>
 
-            <View className="mt-0.5 flex-row items-baseline gap-1">
+            <View className="mt-0.5 flex-row items-baseline gap-1.5">
               <ThemedText size="xxl" weight="bold">
                 {progressPercent}%
               </ThemedText>
 
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-              >
-                · {timeString(fastCounter)}
-                {fastTarget?.hours
-                  ? ` / ${fastTarget.hours}h`
-                  : ""}
+              <ThemedText size="xs" color="text" opacity="medium">
+                {timeString(fastCounter)}
+                {fastTarget?.hours ? ` / ${fastTarget.hours}h` : ""}
               </ThemedText>
             </View>
           </View>
 
-          <ThemedText
-            size="xs"
-            weight="semibold"
-            colorHex={accentColor}
-            style={{ textTransform: "uppercase" }}
-          >
-            {fastTarget?.label || "FREE MODE"}
-          </ThemedText>
-        </View>
-
-        <View className="h-3 overflow-hidden rounded-full bg-text-base/10">
-          <LinearGradient
-            className="h-full"
-            style={{
-              width: `${progressPercent}%`,
-              borderRadius: 100,
-            }}
-            colors={[
-              `${accentColor}50`,
-              accentColor,
-            ]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-        </View>
-
-        <View className="flex-row justify-between">
-          <ThemedText
-            size="xxs"
-            color="text"
-            opacity="medium"
-          >
-            Bắt đầu{" "}
-            {getRelativeTime(new Date(currentFast.start_time))}
-          </ThemedText>
-
-          {hasTarget && finishTime ? (
-            isTargetReached ? (
-              <ThemedText size="xxs" color="success">
-                Đã hoàn thành
-              </ThemedText>
-            ) : (
-              <ThemedText
-                size="xxs"
-                color="text"
-                opacity="medium"
-              >
-                Hoàn thành:{" "}
-                {getRelativeTime(new Date(finishTime))}
-              </ThemedText>
-            )
-          ) : (
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-            >
-              Free mode
-            </ThemedText>
-          )}
-        </View>
-      </View>
-
-      {/* Result */}
-      <View className="gap-3">
-        <ThemedText
-          size="sm"
-          weight="bold"
-          color="primary"
-        >
-          Kết quả
-        </ThemedText>
-
-        <View className="flex-row gap-3">
-          {/* Current */}
           <View
-            className="flex-1 gap-2 rounded-2xl border p-3.5"
+            className="rounded-full px-2.5 py-1"
             style={{
-              borderColor: `${theme.success}${Math.floor(
-                Math.min(
-                  fastCounter / (targetSeconds || 57_600),
-                  1,
-                ) * 99,
-              )
-                .toString(16)
-                .padStart(2, "0")}`,
-              backgroundColor: `${theme.success}${Math.floor(
-                Math.min(
-                  fastCounter / (targetSeconds || 57_600),
-                  1,
-                ) * 15,
-              )
-                .toString(16)
-                .padStart(2, "0")}`,
-            }}
-          >
-            <ThemedText
-              size="xxs"
-              weight="bold"
-              color="text"
-              opacity="medium"
-            >
-              HIỆN TẠI
-            </ThemedText>
-
-            <ThemedText
-              size="sm"
-              weight="semibold"
-              color={isTargetReached ? "success" : "text"}
-            >
-              {timeString(fastCounter)}
-            </ThemedText>
-
-            <View className="flex-row justify-between">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-              >
-                Habit
-              </ThemedText>
-
-              <ThemedText
-                size="xs"
-                weight="semibold"
-                color={
-                  currentReward.habitGain
-                    ? "success"
-                    : "text"
-                }
-                opacity={
-                  currentReward.habitGain
-                    ? "full"
-                    : "medium"
-                }
-              >
-                {currentReward.habitGain
-                  ? `+${currentReward.habitGain}%`
-                  : "—"}
-              </ThemedText>
-            </View>
-
-            <View className="flex-row justify-between">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-              >
-                Shield
-              </ThemedText>
-
-              <ThemedText
-                size="xs"
-                weight="semibold"
-                color={
-                  currentReward.shieldBonus
-                    ? "primary"
-                    : "text"
-                }
-                opacity={
-                  currentReward.shieldBonus
-                    ? "full"
-                    : "medium"
-                }
-              >
-                {currentReward.shieldBonus
-                  ? `+${currentReward.shieldBonus}`
-                  : "—"}
-              </ThemedText>
-            </View>
-          </View>
-
-          {/* Target */}
-          <View
-            className="flex-1 gap-2 rounded-2xl border p-3.5"
-            style={{
-              borderColor: accentColor,
-              backgroundColor: `${accentColor}20`,
+              backgroundColor: `${accentColor}15`,
             }}
           >
             <ThemedText
               size="xxs"
               weight="bold"
               colorHex={accentColor}
+              style={{ textTransform: "uppercase" }}
             >
-              HOÀN THÀNH
+              {fastTarget?.label || "FREE MODE"}
             </ThemedText>
-
-            <ThemedText
-              size="sm"
-              weight="semibold"
-            >
-              {targetFinishTime}
-            </ThemedText>
-
-            <View className="flex-row justify-between">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-              >
-                Habit
-              </ThemedText>
-
-              <ThemedText
-                size="xs"
-                weight="semibold"
-                color={
-                  targetReward.habitGain
-                    ? "success"
-                    : "text"
-                }
-                opacity={
-                  targetReward.habitGain
-                    ? "full"
-                    : "medium"
-                }
-              >
-                {targetReward.habitGain
-                  ? `+${targetReward.habitGain}%`
-                  : "—"}
-              </ThemedText>
-            </View>
-
-            <View className="flex-row justify-between">
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-              >
-                Shield
-              </ThemedText>
-
-              <ThemedText
-                size="xs"
-                weight="semibold"
-                color={
-                  targetReward.shieldBonus
-                    ? "primary"
-                    : "text"
-                }
-                opacity={
-                  targetReward.shieldBonus
-                    ? "full"
-                    : "medium"
-                }
-              >
-                {targetReward.shieldBonus
-                  ? `+${targetReward.shieldBonus}`
-                  : "—"}
-              </ThemedText>
-            </View>
           </View>
+        </View>
+
+        {/* Progress bar */}
+        <View className="h-3 overflow-hidden rounded-full bg-text-base/10">
+          <LinearGradient
+            className="h-full"
+            style={{
+              width: `${Math.min(progressPercent, 100)}%`,
+              borderRadius: 100,
+            }}
+            colors={[`${accentColor}50`, accentColor]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        </View>
+
+        {/* Timeline */}
+        <View className="flex-row justify-between">
+          <ThemedText size="xxs" color="text" opacity="medium">
+            Bắt đầu {getRelativeTime(new Date(currentFast.start_time))}
+          </ThemedText>
+
+          {hasTarget && finishTime ? (
+            isTargetReached ? (
+              <ThemedText size="xxs" weight="semibold" color="success">
+                Đã hoàn thành
+              </ThemedText>
+            ) : (
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Hoàn thành {getRelativeTime(new Date(finishTime))}
+              </ThemedText>
+            )
+          ) : (
+            <ThemedText size="xxs" color="text" opacity="medium">
+              Free mode
+            </ThemedText>
+          )}
         </View>
       </View>
 
-      {/* Action */}
-      <View className="mt-2">
+      {/* ==================== RESULT ==================== */}
+      <View className="gap-3">
+        <View className="flex-row items-center justify-between">
+          <ThemedText size="sm" weight="bold" color="primary">
+            Kết quả
+          </ThemedText>
+
+          {hasTarget && !isTargetReached && (
+            <ThemedText size="xxs" color="text" opacity="low">
+              Tiếp tục để đạt mục tiêu
+            </ThemedText>
+          )}
+        </View>
+
+        {/* Comparison */}
+        <View className="overflow-hidden rounded-2xl bg-background2">
+          {/* Current */}
+          <View className="px-4 py-4">
+            <View className="flex-row items-center justify-between h-7">
+              <View className="flex-row items-center gap-2">
+                <View
+                  className="h-2 w-2 rounded-full"
+                  style={{
+                    backgroundColor: isTargetReached
+                      ? theme.success
+                      : theme.text,
+                    opacity: isTargetReached ? 1 : 0.35,
+                  }}
+                />
+
+                <ThemedText
+                  size="xs"
+                  weight="semibold"
+                  color="text"
+                  opacity="medium"
+                >
+                  HIỆN TẠI
+                </ThemedText>
+              </View>
+
+              <ThemedText
+                size="md"
+                weight="bold"
+                color={isTargetReached ? "success" : "title"}
+              >
+                {timeString(fastCounter)}
+              </ThemedText>
+            </View>
+
+            <View className="mt-4 flex-row gap-3">
+              {/* Habit */}
+              <View className="flex-1">
+                <ThemedText size="xxs" color="text" opacity="medium">
+                  Habit
+                </ThemedText>
+
+                <ThemedText
+                  size="sm"
+                  weight="bold"
+                  color={currentReward.habitGain ? "success" : "text"}
+                  opacity={currentReward.habitGain ? "full" : "medium"}
+                  className="mt-0.5"
+                >
+                  {currentReward.habitGain
+                    ? `+${currentReward.habitGain}%`
+                    : "—"}
+                </ThemedText>
+              </View>
+
+              {/* Shield */}
+              <View className="flex-1">
+                <ThemedText size="xxs" color="text" opacity="medium">
+                  Shield
+                </ThemedText>
+
+                <ThemedText
+                  size="sm"
+                  weight="bold"
+                  color={currentReward.shieldBonus ? "primary" : "text"}
+                  opacity={currentReward.shieldBonus ? "full" : "medium"}
+                  className="mt-0.5"
+                >
+                  {currentReward.shieldBonus
+                    ? `+${currentReward.shieldBonus}`
+                    : "—"}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+
+          {/* Divider */}
+          {hasTarget && <View className="h-px bg-text-base/10" />}
+
+          {/* Target */}
+          {hasTarget && (
+            <View
+              className="px-4 py-4"
+              style={{
+                backgroundColor: `${accentColor}08`,
+              }}
+            >
+              <View className="flex-row items-center justify-between h-7">
+                <View className="flex-row items-center gap-2">
+                  <View
+                    className="h-2 w-2 rounded-full"
+                    style={{
+                      backgroundColor: accentColor,
+                    }}
+                  />
+
+                  <ThemedText
+                    size="xs"
+                    weight="semibold"
+                    colorHex={accentColor}
+                  >
+                    MỤC TIÊU
+                  </ThemedText>
+                </View>
+
+                {hasTarget && !isTargetReached ? (
+                  <ThemedText size="md" weight="bold" colorHex={accentColor}>
+                    {targetFinishTime}
+                  </ThemedText>
+                ) : (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={22}
+                    color={accentColor}
+                  />
+                )}
+              </View>
+
+              <View className="mt-4 flex-row gap-3">
+                {/* Habit */}
+                <View className="flex-1">
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    Habit
+                  </ThemedText>
+
+                  <ThemedText
+                    size="sm"
+                    weight="bold"
+                    color={targetReward.habitGain ? "success" : "text"}
+                    opacity={targetReward.habitGain ? "full" : "medium"}
+                    className="mt-0.5"
+                  >
+                    {targetReward.habitGain
+                      ? `+${targetReward.habitGain}%`
+                      : "—"}
+                  </ThemedText>
+                </View>
+
+                {/* Shield */}
+                <View className="flex-1">
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    Shield
+                  </ThemedText>
+
+                  <ThemedText
+                    size="sm"
+                    weight="bold"
+                    color={targetReward.shieldBonus ? "primary" : "text"}
+                    opacity={targetReward.shieldBonus ? "full" : "medium"}
+                    className="mt-0.5"
+                  >
+                    {targetReward.shieldBonus
+                      ? `+${targetReward.shieldBonus}`
+                      : "—"}
+                  </ThemedText>
+                </View>
+              </View>
+            </View>
+          )}
+        </View>
+      </View>
+
+      {/* ==================== ACTION ==================== */}
+      <View className="mt-1">
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={finishFasting}
           className="items-center rounded-2xl bg-error py-3.5"
         >
-          <ThemedText
-            size="md"
-            weight="bold"
-            color="background"
-          >
+          <ThemedText size="md" weight="bold" colorHex="white">
             Kết thúc Fasting
           </ThemedText>
         </TouchableOpacity>

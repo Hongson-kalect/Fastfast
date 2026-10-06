@@ -1,5 +1,6 @@
 import { FastStatsSummary } from "@/database/shema/fast_sessions";
 import { useAppStore } from "@/stores/appStore";
+import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 
@@ -21,39 +22,48 @@ const StatCard = ({
   color = "#7F92F8",
   isHero,
 }: StatCardProps) => {
+  const { theme } = useAppStore();
   if (isHero) {
     return (
-      <View className="mb-3 w-full flex-row items-center justify-between rounded-2xl border border-primary/30 bg-primary/10 p-4">
+      <View
+        className="mb-3 w-full flex-row items-center justify-between rounded-2xl p-4"
+        style={{
+          backgroundColor: theme.primary + "12",
+        }}
+      >
         <View className="flex-row items-center gap-3">
           <View
-            style={{ backgroundColor: color + "25" }}
-            className="h-11 w-11 items-center justify-center rounded-xl border border-primary/20"
+            className="h-11 w-11 items-center justify-center rounded-xl"
+            style={{
+              backgroundColor: color + "20",
+            }}
           >
-            <ThemedText size="xl">{icon}</ThemedText>
+            <Ionicons name="sparkles" size={24} color={color} />
+            {/* <ThemedText size="xl">{icon}</ThemedText> */}
           </View>
 
           <View>
             <ThemedText
-              size="xs"
-              weight="medium"
+              size="xxs"
+              weight="semibold"
               color="primary"
               style={{
                 textTransform: "uppercase",
-                letterSpacing: 1,
+                letterSpacing: 0.8,
               }}
             >
               {title}
             </ThemedText>
 
             <View className="flex-row items-baseline gap-1">
-              <ThemedText size="xxl" weight="bold" color="text">
+              <ThemedText size="xxl" weight="bold" color="title">
                 {value}
               </ThemedText>
 
               {unit && (
                 <ThemedText
                   size="xs"
-                  weight="semibold"
+                  weight="medium"
                   color="text"
                   opacity="medium"
                 >
@@ -63,46 +73,40 @@ const StatCard = ({
             </View>
           </View>
         </View>
-
-        <View className="rounded-full border border-primary/30 bg-primary/20 px-3 py-1">
-          <ThemedText size="xxs" weight="bold" color="primary">
-            Active 🔥
-          </ThemedText>
-        </View>
       </View>
     );
   }
-
   return (
-    <View
-      className="w-[48%] rounded-2xl border border-text-base/10 bg-background2/80 p-3.5"
-    >
+    <View className="w-[48%] rounded-2xl bg-background2 p-3.5">
       <View className="mb-2.5 flex-row items-center gap-2">
         <View
-          style={{ backgroundColor: color + "15" }}
           className="h-7 w-7 items-center justify-center rounded-lg"
+          style={{
+            backgroundColor: color + "15",
+          }}
         >
-          <ThemedText size="xs">{icon}</ThemedText>
+          <Ionicons name={icon} size={16} color={color} />
+          {/* <ThemedText size="xs">{icon}</ThemedText> */}
         </View>
 
         <ThemedText
           size="xs"
           weight="medium"
-          color="text"
           opacity="medium"
           numberOfLines={1}
+          className="flex-1"
         >
           {title}
         </ThemedText>
       </View>
 
       <View className="flex-row items-baseline gap-1">
-        <ThemedText size="lg" weight="bold" color="text">
+        <ThemedText size="lg" weight="bold" color="title">
           {value}
         </ThemedText>
 
         {unit && (
-          <ThemedText size="tiny" color="text" opacity="medium">
+          <ThemedText size="tiny" color="text" opacity="half">
             {unit}
           </ThemedText>
         )}
@@ -117,70 +121,74 @@ type Props = {
 
 export const StatisticsSection = ({ fastStatistics }: Props) => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
-  const { userProfile } = useAppStore();
+  const { userProfile, theme } = useAppStore();
   const heroStat = {
-    icon: "🔥",
+    icon: "flame",
     title: "Current streak",
     value: userProfile?.current_streak || 0,
     unit: "days",
-    color: "#FB923C", // Lửa Cam giữ nguyên vì mang tính biểu tượng
+    color: theme.warning,
   };
 
   const gridStats = [
     {
-      icon: "⏱",
+      icon: "timer-outline",
       title: "Total fasting",
       value: Math.round(fastStatistics.total_hours * 10) / 10,
       unit: "hours",
-      color: "#7F92F8",
+      color: theme.primary,
     },
     {
-      icon: "✅",
+      icon: "checkmark-circle-outline",
       title: "Completed",
       value: fastStatistics.total_sessions,
       unit: "times",
-      color: "#34D399",
+      color: theme.success,
     },
     {
-      icon: "⭐",
+      icon: "time-outline",
       title: "Average fast",
       value: Math.round(fastStatistics.avg_hours * 10) / 10,
       unit: "hours",
-      color: "#7F92F8",
+      color: theme.primary,
     },
     {
-      icon: "🏆",
+      icon: "trophy-outline",
       title: "Longest fast",
       value: Math.round(fastStatistics.max_hours * 10) / 10,
       unit: "hours",
-      color: "#FBBF24",
+      color: theme.warning,
     },
     {
-      icon: "📅",
+      icon: "calendar-outline",
       title: "Active days",
       value: userProfile?.active_days || 0,
       unit: "days",
-      color: "#7F92F8",
+      color: theme.primary,
     },
     {
-      icon: "📅",
+      icon: "flame-outline",
       title: "Max streak",
       value: userProfile?.max_streak || 0,
       unit: "days",
-      color: "#7F92F8",
+      color: theme.primary,
     },
   ];
 
   return (
     <View className="mt-5">
-      <ThemedText weight="bold" className="mb-3 text-text-base">
-        Statistics
-      </ThemedText>
+      <View className="mb-4">
+        <ThemedText size="md" weight="bold" color="title">
+          Statistics
+        </ThemedText>
 
-      {/* Streak Hero Card */}
+        <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
+          Your fasting and habit overview
+        </ThemedText>
+      </View>
+
       <StatCard {...heroStat} isHero />
 
-      {/* Remaining Stats Grid */}
       <View className="flex-row flex-wrap justify-between gap-y-2.5">
         {gridStats.map((item) => (
           <StatCard key={item.title} {...item} />

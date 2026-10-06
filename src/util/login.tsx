@@ -57,7 +57,7 @@ export const handleLogin = async ({
   if (!profile.streak_date) {
     console.log("handleLogin: no streak date");
     applyClearStreak(streak);
-
+    applyStreakDate(streak, todayStr);
     // Login date vẫn được cập nhật
     applyLastLoginDate(streak, todayStr);
 

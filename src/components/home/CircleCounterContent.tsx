@@ -55,11 +55,7 @@ export const CircleCounterContent = ({
       }}
     >
       {isCounting && currentFast ? (
-        <Pressable
-          onPress={openFastingSheet}
-          hitSlop={10}
-          className="h-full w-full items-center justify-between px-4 pb-10 pt-8"
-        >
+        <View className="h-full w-full items-center justify-between px-4 pb-10 pt-8">
           {/* Top */}
           <Animated.View
             key={`active-top-${currentTarget?.id ?? "free"}`}
@@ -89,7 +85,11 @@ export const CircleCounterContent = ({
           </Animated.View>
 
           {/* Center */}
-          <View className="my-auto items-center justify-center">
+          <Pressable
+            onPress={openFastingSheet}
+            hitSlop={10}
+            className="my-auto items-center justify-center"
+          >
             <Counter
               itemClassName="text-white font-bold text-2xl"
               counter={counter}
@@ -125,7 +125,7 @@ export const CircleCounterContent = ({
                 </Animated.View>
               )}
             </Animated.View>
-          </View>
+          </Pressable>
 
           {/* Bottom */}
           <Pressable
@@ -137,13 +137,9 @@ export const CircleCounterContent = ({
               Fasts history
             </ThemedText>
           </Pressable>
-        </Pressable>
+        </View>
       ) : (
-        <Pressable
-          onPress={openTargetSheet}
-          hitSlop={10}
-          className="h-full w-full items-center justify-between px-4 pb-10 pt-8"
-        >
+        <View className="h-full w-full items-center justify-between px-4 pb-10 pt-8">
           {/* Top */}
           <Animated.View
             key={`idle-top-${currentTarget?.id ?? "none"}`}
@@ -191,7 +187,11 @@ export const CircleCounterContent = ({
           </Animated.View>
 
           {/* Center */}
-          <View className="my-auto items-center justify-center">
+          <Pressable
+            onPress={openTargetSheet}
+            hitSlop={10}
+            className="my-auto items-center justify-center"
+          >
             <Counter
               itemClassName="text-white font-bold text-2xl"
               counter={settings?.target ? Number(settings.target) * 3_600 : 0}
@@ -213,7 +213,7 @@ export const CircleCounterContent = ({
                 </ThemedText>
               )}
             </Animated.View>
-          </View>
+          </Pressable>
 
           {/* Bottom */}
           <Pressable
@@ -225,7 +225,7 @@ export const CircleCounterContent = ({
               Fasts history
             </ThemedText>
           </Pressable>
-        </Pressable>
+        </View>
       )}
     </View>
   );
