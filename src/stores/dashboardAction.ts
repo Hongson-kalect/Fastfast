@@ -4,6 +4,7 @@ import {
   FastSession,
   UserAchievement,
   UserAchievementMilestone,
+  WeightTarget,
 } from "@/interfaces/db.type";
 import { getBucketKey, initChartData } from "@/util/dashboard/utils";
 import { splitSessionIntoDays } from "@/util/home/timespliter";
@@ -15,6 +16,9 @@ export type ChartType = {
   weight: number | null;
 };
 export interface DashboardState {
+  // GoalCard
+  weightTarget: WeightTarget | null;
+
   // Chart
   weightData: ChartType[];
   fastStatistics: FastStatsSummary | null;
@@ -30,6 +34,7 @@ export interface DashboardState {
   isHydrated: boolean;
 
   // Setters
+  setWeightTarget: (data: WeightTarget | null) => void;
   setWeightData: (data: ChartType[]) => void;
   setFastStatistics: (data: FastStatsSummary | null) => void;
   setHasUnclaimedMilestones: (value: boolean) => void;
@@ -59,6 +64,7 @@ import { useDashboardStore } from "./dashboardStore";
  * có thể render ngay khi người dùng mở tab.
  */
 export interface DashboardHydrationData {
+  weightTarget: WeightTarget | null;
   weightData: ChartType[];
   fastStatistics: FastStatsSummary | null;
   hasUnclaimedMilestones: boolean;
@@ -178,6 +184,11 @@ async function loadAchievementData(
     currentMilestones,
   };
 }
+export const loadActiveTarget = async (db: SQLiteDatabase) => {
+  const dbService = createDBService(db);
+  const activeTarget = await dbService?.getActiveWeightTarget();
+  return activeTarget;
+};
 
 /**
  * Load toàn bộ dữ liệu Dashboard.
@@ -200,22 +211,20 @@ export async function initializeDashboard(
 
   const { userProfile, currentFastSession } = useAppStore.getState();
 
-  const [chartData, mileStoneState] = await Promise.all([
+  const [chartData, mileStoneState, activeTarget] = await Promise.all([
     loadChartData(db, chartType, currentFastSession),
     loadAchievementData(db, userProfile?.id ?? null),
+    loadActiveTarget(db),
   ]);
 
   const data: DashboardHydrationData = {
+    weightTarget: activeTarget,
     weightData: chartData.weightData,
     fastStatistics: chartData.fastStatistics,
     ...mileStoneState,
   };
 
-  hydrateDashboard({
-    weightData: chartData.weightData,
-    fastStatistics: chartData.fastStatistics,
-    ...mileStoneState,
-  });
+  hydrateDashboard(data);
 
   console.log(
     "=> [Dashboard] Khởi tạo dữ liệu thành công!",
@@ -234,6 +243,7 @@ export async function initializeDashboard(
  */
 export function hydrateDashboard(data: DashboardHydrationData): void {
   useDashboardStore.setState({
+    weightTarget: data.weightTarget,
     weightData: data.weightData,
     fastStatistics: data.fastStatistics,
     hasUnclaimedMilestones: data.hasUnclaimedMilestones,

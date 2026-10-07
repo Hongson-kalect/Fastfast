@@ -7,49 +7,94 @@ import { TouchableOpacity, View } from "react-native";
 type Props = ConfirmModalOptions & BasicModalOptions;
 
 const ConfirmModal = (modal: Props) => {
-  const { addModal, closeCurrentModal } = useModalStore();
+  const { closeCurrentModal } = useModalStore();
   const { theme } = useAppStore();
 
   const cancelText = modal.cancelText || "Cancel";
   const okText = modal.okText || "OK";
+
+  const handleCancel = () => {
+    modal.onCancel?.();
+    closeCurrentModal();
+  };
+
+  const handleConfirm = async () => {
+    await modal.onOk?.();
+    closeCurrentModal();
+  };
+
   return (
-    <View>
+    <View className="px-1 pb-1">
+      {/* Header */}
       {modal.title && (
-        <ThemedText size="xxl" weight="semibold">
+        <ThemedText
+          size="xl"
+          weight="bold"
+          color="title"
+          className="mb-2"
+        >
           {modal.title}
         </ThemedText>
       )}
-      <ThemedText className="mb-4">{modal.message}</ThemedText>
 
-      {modal?.middle}
+      {/* Message */}
+      <ThemedText
+        size="sm"
+        color="text"
+        opacity="medium"
+        style={{
+          lineHeight: 21,
+        }}
+      >
+        {modal.message}
+      </ThemedText>
 
-      <View className="flex-row justify-between mt-4">
+      {/* Custom content */}
+      {modal.middle && (
+        <View className="mt-4">
+          {modal.middle}
+        </View>
+      )}
+
+      {/* Actions */}
+      <View className="mt-6 flex-row gap-2.5">
+        {/* Cancel */}
         <TouchableOpacity
-          className="bg-gray-300 rounded-lg py-3 px-4"
-          onPress={() => {
-            modal.onCancel?.();
-            closeCurrentModal();
-          }}
+          activeOpacity={0.7}
+          onPress={handleCancel}
+          className="h-12 flex-1 items-center justify-center rounded-2xl bg-text-base/10"
         >
           {typeof cancelText === "string" ? (
-            <View>
-
-            <ThemedText colorHex="white">{cancelText}</ThemedText>
-            </View>
+            <ThemedText
+              size="sm"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+            >
+              {cancelText}
+            </ThemedText>
           ) : (
             cancelText
           )}
         </TouchableOpacity>
+
+        {/* Confirm */}
         <TouchableOpacity
-          style={{ backgroundColor: theme.primary }}
-          className=" rounded-lg py-3 items-center justify-center min-w-28"
-          onPress={async () => {
-            await modal.onOk?.();
-            closeCurrentModal();
+          activeOpacity={0.8}
+          onPress={handleConfirm}
+          className="h-12 flex-1 items-center justify-center rounded-2xl"
+          style={{
+            backgroundColor: theme.primary,
           }}
         >
           {typeof okText === "string" ? (
-            <ThemedText colorHex="white">{okText}</ThemedText>
+            <ThemedText
+              size="sm"
+              weight="semibold"
+              colorHex={theme.background}
+            >
+              {okText}
+            </ThemedText>
           ) : (
             okText
           )}

@@ -1,84 +1,164 @@
 import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, TabsModalOptions } from "@/provider/Modal";
+import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 type Props = TabsModalOptions & BasicModalOptions;
-
 const TabsModal = (modal: Props) => {
   const [width, setWidth] = useState(0);
-  const { closeCurrentModal } = useModalStore();
   const [tabIndex, setTabIndex] = useState(0);
+  const { closeCurrentModal } = useModalStore();
+  const { theme } = useAppStore();
+
+  const showCancel = modal.isShowCancelButton !== false;
+
+  const handleCancel = () => {
+    modal.onCancel?.();
+    closeCurrentModal();
+  };
+
+  const handleOk = () => {
+    modal.onOk?.();
+    closeCurrentModal();
+  };
+
   return (
-    <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
+    <View
+      className="px-1 pb-1"
+      onLayout={(event) => {
+        setWidth(event.nativeEvent.layout.width);
+      }}
+    >
+      {/* Header */}
       {modal.title && (
-        <ThemedText size="xxl" weight="semibold">
+        <ThemedText
+          size="xl"
+          weight="bold"
+          color="title"
+          className="mb-2"
+        >
           {modal.title}
         </ThemedText>
       )}
-      <ThemedText className="text-gray-700">{modal.message}</ThemedText>
+
+      {modal.message && (
+        <ThemedText
+          size="sm"
+          color="text"
+          opacity={modal.subMessage ? "full" : "medium"}
+          style={{ lineHeight: 21 }}
+        >
+          {modal.message}
+        </ThemedText>
+      )}
+
       {modal.subMessage && (
-        <ThemedText className="text-sm mt-1.5 text-gray-500">
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="low"
+          className="mt-2"
+        >
           {modal.subMessage}
         </ThemedText>
       )}
-      {modal?.middle}
 
-      <View>
-        <ThemedText className="text-xs text-gray-600 text-right">
-          {tabIndex + 1}/{modal.tabs.length}
+      {modal.middle && (
+        <View className="mt-4">
+          {modal.middle}
+        </View>
+      )}
+
+      {/* Step indicator */}
+      <View className="mb-3 mt-5 flex-row items-center justify-between">
+        <View className="flex-row items-center gap-1.5">
+          {modal.tabs.map((_, index) => (
+            <View
+              key={index}
+              className="h-1.5 rounded-full"
+              style={{
+                width: index === tabIndex ? 20 : 6,
+                backgroundColor:
+                  index === tabIndex
+                    ? theme.primary
+                    : theme.text + "18",
+              }}
+            />
+          ))}
+        </View>
+
+        <ThemedText
+          size="xxs"
+          weight="semibold"
+          color="text"
+          opacity="low"
+        >
+          {tabIndex + 1} / {modal.tabs.length}
         </ThemedText>
       </View>
 
-      <FlatList
-        onMomentumScrollEnd={(event) => {
-          const newIndex = Math.round(
-            event.nativeEvent.contentOffset.x / width,
-          );
-          setTabIndex(newIndex);
-        }}
-        horizontal
-        pagingEnabled
-        data={modal.tabs}
-        renderItem={({ item }) => <View style={{ width }}>{item}</View>}
-        keyExtractor={(_, index) => index.toString()}
-      />
+      {/* Tabs */}
+      {width > 0 && (
+        <FlatList
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          data={modal.tabs}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={{ width }}>
+              {item}
+            </View>
+          )}
+          onMomentumScrollEnd={(event) => {
+            const newIndex = Math.round(
+              event.nativeEvent.contentOffset.x / width,
+            );
 
-      <View
-        style={{
-          justifyContent:
-            modal.isShowCancelButton !== false ? "space-between" : "center",
-        }}
-        className="flex-row items-center mt-4"
-      >
-        {modal.isShowCancelButton !== false && (
+            setTabIndex(newIndex);
+          }}
+        />
+      )}
+
+      {/* Actions */}
+      <View className="mt-6 flex-row gap-2.5">
+        {showCancel && (
           <TouchableOpacity
-            className="bg-gray-300 rounded-lg py-3 px-4"
-            onPress={() => {
-              modal.onCancel?.();
-              closeCurrentModal();
-            }}
+            activeOpacity={0.7}
+            onPress={handleCancel}
+            className="h-12 flex-1 items-center justify-center rounded-2xl bg-text-base/10"
           >
-            <ThemedText className="text-gray-600">
+            <ThemedText
+              size="sm"
+              weight="semibold"
+              color="text"
+              opacity="medium"
+            >
               {modal.cancelText || "Close"}
             </ThemedText>
           </TouchableOpacity>
         )}
+
         <TouchableOpacity
-          className={`bg-blue-600 rounded-lg py-3 items-center justify-center ${
-            modal.isShowCancelButton === false ? "w-full" : ""
-          } min-w-28`}
-          onPress={() => {
-            modal.onOk?.();
-            closeCurrentModal();
+          activeOpacity={0.8}
+          onPress={handleOk}
+          className="h-12 flex-1 items-center justify-center rounded-2xl"
+          style={{
+            backgroundColor: theme.primary,
           }}
         >
-          <ThemedText className="text-white">{modal.okText || "OK"}</ThemedText>
+          <ThemedText
+            size="sm"
+            weight="semibold"
+            colorHex={theme.background}
+          >
+            {modal.okText || "OK"}
+          </ThemedText>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
 export default TabsModal;

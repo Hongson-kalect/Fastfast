@@ -5,35 +5,42 @@ import useModalStore from "@/stores/modalStore";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
 type Props = MenuModalOptions & BasicModalOptions;
-
 const MenuModal = (modal: Props) => {
   const { closeCurrentModal } = useModalStore();
-  const menuType = modal.menuOptions.some((item) => item.rightContent)
-    ? "space-between"
-    : "center";
+
+  const hasRightContent = modal.menuOptions.some(
+    (item) => item.rightContent,
+  );
 
   return (
-    <View>
+    <View className="px-1 pb-1">
       {modal.title && (
-        <ThemedText size="xxl" weight="semibold" className="mb-4">
+        <ThemedText
+          size="xl"
+          weight="bold"
+          color="title"
+          className="mb-4"
+        >
           {modal.title}
         </ThemedText>
       )}
-      <ScrollView>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ gap: 6 }}
+      >
         {modal.menuOptions.map((menu, idx) => (
           <AppMenu
             key={idx}
-            justifyContent={menuType}
+            justifyContent={hasRightContent ? "space-between" : "center"}
             color={menu.color}
             backgroundColor={menu.backgroundColor}
-            borderColor={
-              idx === modal.menuOptions.length - 1
-                ? "transparent"
-                : "rgba(0, 0, 0, 0.1)"
-            }
             onPress={() => {
               menu.onPress?.();
-              if (menu.isCloseAfterPress !== false) closeCurrentModal();
+
+              if (menu.isCloseAfterPress !== false) {
+                closeCurrentModal();
+              }
             }}
             icon={menu.icon}
             label={menu.label}
@@ -41,15 +48,20 @@ const MenuModal = (modal: Props) => {
           />
         ))}
       </ScrollView>
+
       {modal.cancelText && (
         <TouchableOpacity
-          className="mt-4 py-2"
-          onPress={() => {
-            closeCurrentModal();
-          }}
+          activeOpacity={0.7}
+          onPress={closeCurrentModal}
+          className="mt-3 h-11 items-center justify-center rounded-2xl"
         >
-          <ThemedText className="text-center text-gray-500 text-base">
-            {modal.cancelText || "Cancel"}
+          <ThemedText
+            size="sm"
+            weight="semibold"
+            color="text"
+            opacity="medium"
+          >
+            {modal.cancelText}
           </ThemedText>
         </TouchableOpacity>
       )}
@@ -61,35 +73,40 @@ type AppMenuType = {
   justifyContent?: "center" | "space-between";
   color?: string;
   backgroundColor?: string;
-  borderColor?: string;
   onPress?: () => void;
   icon?: React.ReactNode;
   label?: string | React.ReactNode;
   rightContent?: React.ReactNode;
 };
+
 export const AppMenu = (props: AppMenuType) => {
   const { theme } = useAppStore();
+
   return (
     <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={props.onPress}
+      className="min-h-14 flex-row items-center rounded-2xl px-4 py-3"
       style={{
-        flexDirection: "row",
-        alignItems: "center",
         justifyContent: props.justifyContent || "space-between",
-        borderBottomWidth: 0.5,
-        backgroundColor: props.backgroundColor || "transparent",
-        borderColor: props.borderColor,
-      }}
-      className="py-4 px-2 rounded-lg gap-4"
-      onPress={() => {
-        props.onPress?.();
+        backgroundColor:
+          props.backgroundColor || theme.background2,
       }}
     >
-      <View className="flex-row items-center justify-center gap-4">
-        {props.icon}
+      <View className="min-w-0 flex-1 flex-row items-center gap-3">
+        {props.icon && (
+          <View className="items-center justify-center">
+            {props.icon}
+          </View>
+        )}
+
         {typeof props.label === "string" ? (
           <ThemedText
-            style={{ color: props.color || theme.text }}
-            className="text-center text-lg"
+            size="sm"
+            weight="semibold"
+            colorHex={props.color || theme.text}
+            numberOfLines={1}
+            className="flex-1"
           >
             {props.label}
           </ThemedText>
@@ -97,7 +114,12 @@ export const AppMenu = (props: AppMenuType) => {
           props.label
         )}
       </View>
-      {props.rightContent}
+
+      {props.rightContent && (
+        <View className="ml-3 shrink-0">
+          {props.rightContent}
+        </View>
+      )}
     </TouchableOpacity>
   );
 };

@@ -2,44 +2,80 @@ import { ThemedText } from "@/components/themed-text";
 import { AlertModalOptions, BasicModalOptions } from "@/provider/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 type Props = AlertModalOptions & BasicModalOptions;
 
 const AlertModal = (modal: Props) => {
   const { closeCurrentModal } = useModalStore();
   const { theme } = useAppStore();
+
+  const handleOk = () => {
+    modal.onOk?.();
+    closeCurrentModal();
+  };
+
   return (
-    <View>
+    <View className="px-1 pb-1">
+      {/* Header */}
       {modal.title && (
-        <ThemedText size="xxl" weight="semibold">
+        <ThemedText
+          size="xl"
+          weight="bold"
+          color="title"
+          className="mb-2"
+        >
           {modal.title}
         </ThemedText>
       )}
-      <ThemedText>{modal.message}</ThemedText>
+
+      {/* Message */}
+      <ThemedText
+        size="sm"
+        color="text"
+        opacity={modal.subMessage ? "full" : "medium"}
+        style={{
+          lineHeight: 21,
+        }}
+      >
+        {modal.message}
+      </ThemedText>
+
+      {/* Secondary message */}
       {modal.subMessage && (
-        <ThemedText className="text-sm mt-1.5 opacity-70">
+        <ThemedText
+          size="xs"
+          color="text"
+          opacity="low"
+          className="mt-2"
+        >
           {modal.subMessage}
         </ThemedText>
       )}
-      {modal?.middle}
 
-      <TouchableOpacity
-        style={{ backgroundColor: theme.primary }}
-        className="rounded-lg py-3 mt-5 mx-2"
-        onPress={() => {
-          modal.onOk?.();
-          closeCurrentModal();
+      {/* Custom content */}
+      {modal.middle && (
+        <View className="mt-4">
+          {modal.middle}
+        </View>
+      )}
+
+      {/* Action */}
+      <Pressable
+        onPress={handleOk}
+        className="mt-6 h-12 items-center justify-center rounded-2xl"
+        style={{
+          backgroundColor: theme.primary,
         }}
       >
         <ThemedText
-          style={{ fontFamily: "PlaypenSans-Semibold" }}
-          className="text-center"
-          colorHex="white"
+          size="sm"
+          weight="semibold"
+          colorHex={theme.background}
         >
           {modal.okText || "OK"}
         </ThemedText>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

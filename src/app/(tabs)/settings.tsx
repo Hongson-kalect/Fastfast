@@ -8,14 +8,14 @@ import { ThemedText } from "@/components/themed-text";
 
 import { SettingsAccountCard } from "@/components/settings/SettingsAccountCard";
 import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
+import { ThemeKey } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
+import { toggleDarkMode, updateTheme } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
 import { capitalize } from "@/util/text";
-import { useState } from "react";
-import { toggleDarkMode, updateTheme } from "@/stores/appAction";
 import { useSQLiteContext } from "expo-sqlite";
-import { extractTheme, ThemeKey, ThemeType } from "@/constants/themes";
+import { useState } from "react";
 
 export default function SettingsScreen() {
   const { theme, settings, updateSetting, setDarkMode, setTheme } =
@@ -24,7 +24,7 @@ export default function SettingsScreen() {
 
   const [isDarkMode, setIsDarkMode] = useState(settings?.is_dark_mode ?? true);
   const dbService = useDBService();
-  const db = useSQLiteContext()
+  const db = useSQLiteContext();
 
   const openThemeModal = () => {
     present(
@@ -82,7 +82,9 @@ export default function SettingsScreen() {
             description="Use dark appearance throughout the app"
             value={isDarkMode}
             onChange={(value) => {
-              setDarkMode(value);
+              console.log("setDarkMode", value);
+              setIsDarkMode(value);
+              // setDarkMode(value);
               toggleDarkMode(db);
             }}
           />

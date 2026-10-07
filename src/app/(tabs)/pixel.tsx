@@ -3,14 +3,12 @@ import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { useDBService } from "@/hooks/useDBService";
 import {
   DailyLog,
   DailyNote,
   FastSession,
-  HabitLog,
-  SyncStatus,
+  HabitLog
 } from "@/interfaces/db.type";
 import {
   DailyPixelData,
@@ -20,6 +18,7 @@ import {
 } from "@/interfaces/pixel";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { buildPixelYearData } from "@/util/dashboard/utils";
 import { DissectedDay, splitSessionIntoDays } from "@/util/home/timespliter";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
@@ -27,16 +26,15 @@ import { getWeek } from "date-fns";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
   SectionList,
-  StatusBar,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // 1. Định nghĩa các chế độ xem (View Options)
 
@@ -48,85 +46,13 @@ interface EmojiGuide {
 const ITEM_HEIGHT = 40;
 const HEADER_HEIGHT = 60;
 
-type BuildPixelYearDataParams = {
-  logs: DailyLog[];
-  notes: DailyNote[];
-  shieldUsed: HabitLog[];
-  currentFastSession: FastSession|null;
-}
-const buildPixelYearData=({
-  logs,
-  notes,
-  shieldUsed,
-  currentFastSession,
-}:BuildPixelYearDataParams) => {
-  const yearMap: YearPixelDataMap = {};
-      const newStats: PixelStats = { fastDays: 0, fastHour: 0, logDays: 0 };
-
-      const getOrCreateDayNode = (dateStr: string): DailyPixelData => {
-        if (!yearMap[dateStr]) {
-          yearMap[dateStr] = { logs: [], totalHours: 0 };
-        }
-        return yearMap[dateStr];
-      };
-
-      // 1. Process Notes
-      notes.forEach((note) => {
-        const dayNode = getOrCreateDayNode(note.log_date);
-        dayNode.note = note;
-        newStats.logDays += 1;
-      });
-
-      // 2. Process Logs
-      const appendFastLog = (log: DailyLog | DissectedDay) => {
-        const dayNode = getOrCreateDayNode(log.log_date);
-        if (dayNode.logs.length === 0) {
-          newStats.fastDays += 1;
-        }
-        dayNode.logs.push(log);
-        dayNode.totalHours += log.hours_in_day;
-        newStats.fastHour += log.hours_in_day;
-      };
-
-      logs.forEach(appendFastLog);
-
-      // Process active session
-      if (currentFastSession?.start_time && !currentFastSession?.end_time) {
-        const parsedDays = splitSessionIntoDays(
-          currentFastSession.start_time,
-          Math.floor(Date.now()),
-          currentFastSession.id,
-        );
-        parsedDays.forEach(appendFastLog);
-      }
-
-      // 3. Process Shields
-      shieldUsed.forEach((log) => {
-        let shields = Math.abs(log.shield_delta || 0);
-        const [y, m, d] = log.log_date.split("-").map(Number);
-        const pointerDate = new Date(Date.UTC(y, m - 1, d));
-
-        while (shields > 0) {
-          pointerDate.setUTCDate(pointerDate.getUTCDate() - 1);
-          const dateStr = pointerDate.toISOString().split("T")[0];
-
-          const dayNode = getOrCreateDayNode(dateStr);
-          dayNode.shieldLog = log;
-          shields -= 1;
-        }
-      });
-
-      return { yearMap, stats: newStats };
-};
-
 const PixelScreen = () => {
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
-  const { currentFastSession, settings, updateSetting, theme } =
-    useAppStore();
+  const { currentFastSession, settings, updateSetting, theme } = useAppStore();
 
-    const sectionListRef = useRef<SectionList>(null);
+  const sectionListRef = useRef<SectionList>(null);
   const todayStr = getLocalTodayStr();
   const currentYear = new Date().getFullYear();
 
@@ -154,19 +80,19 @@ const PixelScreen = () => {
 
   const lastScrollY = useRef(0);
 
-const handleScroll = useCallback(
-  (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = e.nativeEvent.contentOffset.y;
-    const scrollingUp = y < lastScrollY.current;
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      const scrollingUp = y < lastScrollY.current;
 
-    if (scrollingUp !== isScrollUp) {
-      setIsScrollUp(scrollingUp);
-    }
+      if (scrollingUp !== isScrollUp) {
+        setIsScrollUp(scrollingUp);
+      }
 
-    lastScrollY.current = y;
-  },
-  [isScrollUp],
-);
+      lastScrollY.current = y;
+    },
+    [isScrollUp],
+  );
 
   const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
     sectionListRef.current?.scrollToLocation({
@@ -212,13 +138,11 @@ const handleScroll = useCallback(
       ]);
 
       const { yearMap, stats } = buildPixelYearData({
-    logs,
-    notes,
-    shieldUsed,
-    currentFastSession,
-  });
-
-      
+        logs,
+        notes,
+        shieldUsed,
+        currentFastSession,
+      });
 
       setYearPixelData(yearMap);
       setStats(stats);
@@ -254,7 +178,7 @@ const handleScroll = useCallback(
   );
 
   return (
-    <ThemedView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
       <View className="absolute bottom-12 right-2 z-10">
         {isScrollUp && yIndex > height ? (
           <Pressable
@@ -276,14 +200,13 @@ const handleScroll = useCallback(
           )
         )}
       </View>
-      <View
-        style={{ paddingTop: StatusBar.currentHeight || 0 }}
-        className="h-full w-full"
-      >
+      <SafeAreaView className="flex-1">
         <SectionList
+          showsVerticalScrollIndicator={false}
           ref={sectionListRef}
           contentContainerStyle={{
-            paddingHorizontal: 10,
+            paddingHorizontal: 20,
+            paddingBottom: 40,
             gap: 4,
           }}
           onScroll={handleScroll}
@@ -294,13 +217,13 @@ const handleScroll = useCallback(
           })}
           sections={[{ key: "calendar", data: gridData }]}
           ListHeaderComponent={
-              <PixelHeader
-                stats={stats}
-                year={year}
-                setYear={setYear}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
+            <PixelHeader
+              stats={stats}
+              year={year}
+              setYear={setYear}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+            />
           }
           renderSectionHeader={() => (
             <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
@@ -352,8 +275,8 @@ const handleScroll = useCallback(
             />
           )}
         />
-      </View>
-    </ThemedView>
+      </SafeAreaView>
+    </View>
   );
 };
 

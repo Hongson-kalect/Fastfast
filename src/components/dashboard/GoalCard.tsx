@@ -13,29 +13,33 @@ import { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   Easing,
+  LinearTransition,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { useDashboardStore } from "@/stores/dashboardStore";
+import { loadActiveTarget } from "@/stores/dashboardAction";
+import { useSQLiteContext } from "expo-sqlite";
 
 export const GoalCard = () => {
   const dbService = useDBService();
   const { weight, settings, theme, updateSetting, updateWeight } =
     useAppStore();
+    const {weightTarget, setWeightTarget} = useDashboardStore()
   const { addModal } = useModalStore();
-  const [activeTarget, setActiveTarget] = useState<WeightTarget | null>(null);
 
-  const targetWeight = activeTarget?.target_weight;
+  const targetWeight = weightTarget?.target_weight;
 
   const percentage =
-    activeTarget &&
+    weightTarget &&
     weight &&
-    activeTarget.start_weight !== activeTarget.target_weight
+    weightTarget.start_weight !== weightTarget.target_weight
       ? Math.max(
           Math.min(
-            ((activeTarget.start_weight - weight) /
-              (activeTarget.start_weight - activeTarget.target_weight)) *
+            ((weightTarget.start_weight - weight) /
+              (weightTarget.start_weight - weightTarget.target_weight)) *
               100,
             100,
           ),
@@ -44,7 +48,7 @@ export const GoalCard = () => {
       : 0;
 
   const remaining =
-    activeTarget && weight ? fixed(weight - activeTarget.target_weight) : 0;
+    weightTarget && weight ? fixed(weight - weightTarget.target_weight) : 0;
 
   const progress = useSharedValue(0);
 
@@ -77,6 +81,8 @@ export const GoalCard = () => {
     });
   };
 
+  const db = useSQLiteContext()
+
   const openWeightTargetModal = () => {
     addModal({
       type: "input",
@@ -91,32 +97,23 @@ export const GoalCard = () => {
           targetWeight: target,
         });
         updateSetting({ weight_target: target });
-        await refreshActiveTarget();
+        const activeTarget = await loadActiveTarget(db);
+        setWeightTarget(activeTarget)
       },
     });
   };
 
-  const refreshActiveTarget = useCallback(async () => {
-    const res = await dbService?.getActiveWeightTarget();
-    setActiveTarget(res ?? null);
-  }, [dbService]);
 
-  useEffect(() => {
-    refreshActiveTarget();
-  }, [refreshActiveTarget]);
-
-  useEffect(() => {
-    const loadActiveTarget = async () => {
-      const res = await dbService?.getActiveWeightTarget();
-      setActiveTarget(res ?? null);
-    };
-
-    loadActiveTarget();
-  }, [dbService]);
+  const goalCardLayout = LinearTransition
+  .springify()
+  .damping(18)
+  .stiffness(180);
 
   if (!weight) {
     return (
-      <View className="mb-4 rounded-2xl bg-background2 px-4 py-4">
+      <Animated.View className="mb-4 rounded-2xl bg-background2 px-4 py-4"
+      layout={goalCardLayout}
+      >
         <View className="flex-row items-center gap-3">
           <View className="h-11 w-11 items-center justify-center rounded-xl bg-success/10">
             <MaterialCommunityIcons
@@ -147,12 +144,15 @@ export const GoalCard = () => {
             <Feather name="plus" size={18} color={theme.background} />
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
     );
   }
 
   return (
-    <View className="mb-4 rounded-2xl bg-background2 px-4 py-4">
+    <Animated.View className="mb-4 rounded-2xl bg-background2 px-4 py-4"
+      layout={goalCardLayout}
+    >
+
       {/* Header */}
       <View className="flex-row items-start justify-between">
         <View>
@@ -160,7 +160,7 @@ export const GoalCard = () => {
             Weight goal
           </ThemedText>
 
-          {activeTarget ? (
+          {weightTarget ? (
             <Pressable
               onPress={openWeightTargetModal}
               className="mt-0.5 flex-row items-center gap-1.5"
@@ -210,7 +210,7 @@ export const GoalCard = () => {
       </View>
 
       {/* Progress */}
-      {activeTarget ? (
+      {weightTarget ? (
         <View className="mt-5">
           <View className="h-2 overflow-hidden rounded-full bg-text-base/10">
             <Animated.View
@@ -236,7 +236,7 @@ export const GoalCard = () => {
 
           <View className="mt-2 flex-row items-center justify-between">
             <ThemedText size="xxs" color="text" opacity="medium">
-              {fixed(activeTarget.start_weight)} kg
+              {fixed(weightTarget.start_weight)} kg
             </ThemedText>
 
             <ThemedText size="xs" weight="bold" color="primary">
@@ -244,7 +244,7 @@ export const GoalCard = () => {
             </ThemedText>
 
             <ThemedText size="xxs" color="text" opacity="medium">
-              {fixed(activeTarget.target_weight)} kg
+              {fixed(weightTarget.target_weight)} kg
             </ThemedText>
           </View>
         </View>
@@ -277,6 +277,6 @@ export const GoalCard = () => {
           </ThemedText>
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 };

@@ -13,7 +13,7 @@ import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
-import { ScrollView, useWindowDimensions } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -39,7 +39,6 @@ const DashboardScreen = () => {
   const { weightData, hasUnclaimedMilestones, fastStatistics } =
     useDashboardStore();
 
-    console.log("weightData", weightData);
   const db = useSQLiteContext();
   useFocusEffect(
     useCallback(() => {
@@ -72,25 +71,26 @@ const DashboardScreen = () => {
         >
           <DashboardHeader hasUnclamMilestones={hasUnclaimedMilestones} />
 
-          <Animated.View
-            className="mt-4"
-            layout={LinearTransition.duration(300)}
-          >
+          <View className="mt-4">
             <GoalCard />
+          </View>
+
+          <Animated.View
+            layout={LinearTransition.springify().damping(18).stiffness(180)}
+          >
+            <WeightLineChart
+              onInteractionStart={() => setEnableScroll(false)}
+              onInteractionEnd={() => setEnableScroll(true)}
+              data={weightData}
+            />
+
+            {fastStatistics && (
+              <>
+                <FastLevelBarChart fastStatistics={fastStatistics} />
+                <StatisticsSection fastStatistics={fastStatistics} />
+              </>
+            )}
           </Animated.View>
-
-          <WeightLineChart
-            onInteractionStart={() => setEnableScroll(false)}
-            onInteractionEnd={() => setEnableScroll(true)}
-            data={weightData}
-          />
-
-          {fastStatistics && (
-            <>
-              <FastLevelBarChart fastStatistics={fastStatistics} />
-              <StatisticsSection fastStatistics={fastStatistics} />
-            </>
-          )}
         </ScrollView>
       </SafeAreaView>
     </ThemedView>

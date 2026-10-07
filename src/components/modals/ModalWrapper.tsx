@@ -1,14 +1,17 @@
 import { useAppStore } from "@/stores/appStore";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
-  StatusBar,
   StyleSheet,
+  TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from "react-native";
-import { Divider } from "react-native-paper";
 import Animated, {
   Easing,
   LinearTransition,
@@ -33,7 +36,6 @@ type Props = {
   centerContent?: React.ReactNode;
   padding?: number;
   children: React.ReactNode;
-  backdropOpacity?: number;
   onExitComplete?: () => void;
 };
 
@@ -51,13 +53,15 @@ export default function ModalWrapper({
   inAnimation = "slideUp",
   outAnimation = "slideDown",
   onExitComplete,
-
-  backdropOpacity = 0.5,
 }: Props) {
   const { height, width } = useWindowDimensions();
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
+  const settings = useAppStore((state) => state.settings);
   const [mounted, setMounted] = useState(show);
   const progress = useSharedValue(show ? 1 : 0);
+  const isDark = settings?.is_dark_mode ?? true;
+
+  const backdropOpacity = isDark ? 0.4 : 0.45;
 
   /**
    * ================================
@@ -168,139 +172,130 @@ export default function ModalWrapper({
       statusBarTranslucent
       onRequestClose={onCancel}
     >
-      <View
-        style={[
-          styles.container,
-          {
-            padding: StatusBar.currentHeight,
-          },
-        ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
       >
-        {/* =====================================
-            BACKDROP
-        ====================================== */}
+        {/* 2. Cho phép chạm vào backdrop để vừa tắt keyboard vừa handle cancel */}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            {/* Backdrop */}
+            <Pressable style={StyleSheet.absoluteFill} onPress={onCancel}>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  StyleSheet.absoluteFill,
+                  styles.backdrop,
+                  {
+                    backgroundColor: theme.text,
 
-        <Pressable style={StyleSheet.absoluteFill} onPress={onCancel}>
-          <Animated.View
-            pointerEvents="none"
-            style={[StyleSheet.absoluteFill, styles.backdrop, backdropStyle]}
-          />
-        </Pressable>
+                    borderWidth: 1,
+                    borderColor: theme.text,
+                    // opacity: isDark ? 1 : 0.5,
 
-        {/* =====================================
-            MODAL CONTENT
-        ====================================== */}
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 10,
+                    },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 24,
 
-        <View style={{ width: width - 40 }}>
-          <Animated.View
-            style={[contentStyle]}
-            /**
-             * Layout animation chỉ chịu trách nhiệm
-             * khi kích thước content thay đổi.
-             *
-             * Không dùng nó cho enter / exit.
-             */
-            layout={LinearTransition.mass(0.6)}
-          >
+                    elevation: 12,
+                  },
+                  backdropStyle,
+                ]}
+              />
+            </Pressable>
+
+            {/* Modal */}
             <View
               style={{
-                backgroundColor: theme.background,
-                borderWidth: 0.5,
+                width: Math.min(width - 32, 520),
+                maxHeight: height * 0.82,
               }}
-              className="
-                relative
-                shadow-lg
-                shadow-text-base/40
-                border
-                border-text-base/60
-                rounded-2xl
-              "
             >
-              <View
-                className="pb-5 pt-3 w-full"
-                style={{
-                  maxHeight: (height / 4) * 3,
-                }}
+              <Animated.View
+                layout={LinearTransition.springify()
+                  .damping(40)
+                  .stiffness(100)
+                  .mass(1)}
+                style={contentStyle}
               >
-                {/* =================================
-                    TITLE
-                ================================== */}
-
-                {!!title &&
-                  (typeof title === "string" ? (
-                    <View>
-                      <ThemedText
-                        style={{
-                          textAlign: titlePosition,
-                          fontFamily: "PlaypenSans-Semibold",
-                          color: theme.text,
-                        }}
-                        className="text-xl p-4"
-                      >
-                        {title}
-                      </ThemedText>
-
+                <View
+                  className="overflow-hidden rounded-3xl"
+                  style={{
+                    backgroundColor: theme.background,
+                  }}
+                >
+                  {/* Header */}
+                  {!!title && (
+                    <View
+                      className="px-5 pb-3 pt-5"
+                      style={{
+                        paddingRight: 52,
+                      }}
+                    >
+                      {typeof title === "string" ? (
+                        <ThemedText
+                          size="xl"
+                          weight="bold"
+                          color="title"
+                          style={{
+                            textAlign: titlePosition,
+                          }}
+                        >
+                          {title}
+                        </ThemedText>
+                      ) : (
+                        title
+                      )}
                     </View>
-                  ) : (
-                    title
-                  ))}
+                  )}
 
-                {/* =================================
-                    CONTENT
-                ================================== */}
+                  {/* Close */}
+                  {!!title && (
+                    <Pressable
+                      onPress={onCancel}
+                      hitSlop={8}
+                      className="absolute right-4 top-4 h-9 w-9 items-center justify-center rounded-full bg-text-base/10"
+                    >
+                      <Ionicons name="close" size={18} color={theme.text} />
+                    </Pressable>
+                  )}
 
-                <Animated.ScrollView keyboardShouldPersistTaps="handled">
-                  <View
-                    style={{
-                      padding,
+                  {/* Content */}
+                  <Animated.ScrollView
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
+                    contentContainerStyle={{
+                      paddingHorizontal: padding,
+                      paddingTop: title ? 4 : padding,
+                      paddingBottom: padding,
                     }}
                   >
                     {children}
-                  </View>
-                </Animated.ScrollView>
+                  </Animated.ScrollView>
 
-                {/* =================================
-                    BOTTOM
-                ================================== */}
-
-                {!!bottom && (
-                  <>
-                    <Divider />
-                    {bottom}
-                  </>
-                )}
-              </View>
-
-              {/* =================================
-                  CLOSE BUTTON
-              ================================== */}
-
-              {!!title && (
-                <Pressable
-                  onPress={onCancel}
-                  className="
-                    absolute
-                    top-2
-                    right-2
-                    p-2
-                    rounded-full
-                  "
-                >
-                  <ThemedText
-                    style={{
-                      color: theme.text,
-                    }}
-                    size='lg'
-                    weight='semibold'
-                  >
-                    ×
-                  </ThemedText>
-                </Pressable>
-              )}
+                  {/* Bottom */}
+                  {!!bottom && (
+                    <View
+                      className="px-4 pb-4 pt-2"
+                      style={{
+                        borderTopWidth: 1,
+                        borderTopColor: theme.text + "0D",
+                      }}
+                    >
+                      {bottom}
+                    </View>
+                  )}
+                </View>
+              </Animated.View>
             </View>
-          </Animated.View>
-        </View>
-      </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

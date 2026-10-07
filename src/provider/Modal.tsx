@@ -106,7 +106,7 @@ export type BasicModalOptions = {
   modalTitle?: string;
   render?: React.ReactNode;
   onDismiss?: () => void; // lúc đóng modal
-  closable?:boolean,
+  closable?: boolean;
   header?: React.ReactNode;
   footer?: React.ReactNode;
   middle?: React.ReactNode;
@@ -131,8 +131,8 @@ export type ListModalOptions = {
   options: { label: string; value: number | string }[];
   onDismiss?: () => void;
   onSubmit: (val: number | string) => void;
-  inAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
-  outAnimation?: "fade" | "slideDown" | "slideUp" | "zoomIn" | "zoomOut";
+  inAnimation?: "fadeIn" | "slideInDown" | "slideInUp" | "zoomIn";
+  outAnimation?: "fadeOut" | "slideOutDown" | "slideOutUp" | "zoomOut";
 };
 const GlobalModalComponent = () => {
   const { currentModal, modalQueue, closeCurrentModal } = useModalStore();
@@ -154,7 +154,7 @@ const GlobalModalComponent = () => {
 
   const closeModal = () => {
     if (!currentModal) return;
-    if(currentModal.closable===false){
+    if (currentModal.closable === false) {
       return Toast.show({
         type: "error",
         text1: "Tác vụ không thể đóng",
@@ -175,7 +175,7 @@ const GlobalModalComponent = () => {
       type={showValue?.type}
       bottom={showValue?.footer}
     >
-      <View className="px-3 rounded-lg">
+      <View className="p-3 rounded-lg">
         {showValue?.header}
 
         {showValue && <RenderContent modal={showValue} />}
