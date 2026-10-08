@@ -19,8 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const DashboardScreen = () => {
   const { width } = useWindowDimensions();
-  const { currentFastSession, settings } = useAppStore();
-  const { userProfile } = useAppStore();
+  const { currentFastSession, settings, userProfile } = useAppStore();
 
   const dbService = useDBService();
   const [enableScroll, setEnableScroll] = useState(true);
@@ -36,14 +35,14 @@ const DashboardScreen = () => {
       86400000,
   );
 
-  const { weightData, hasUnclaimedMilestones, fastStatistics } =
+  const { weightData, fastStatistics } =
     useDashboardStore();
 
-  const db = useSQLiteContext();
   useFocusEffect(
     useCallback(() => {
+      console.log('focused')
       const task = requestIdleCallback(() => {
-        Promise.all([refreshDashboard(db, chartType)]);
+        Promise.all([refreshDashboard(dbService, chartType)]);
       });
 
       return () => {
@@ -69,7 +68,7 @@ const DashboardScreen = () => {
           }}
           keyboardShouldPersistTaps="handled"
         >
-          <DashboardHeader hasUnclamMilestones={hasUnclaimedMilestones} />
+          <DashboardHeader/>
 
           <View className="mt-4">
             <GoalCard />

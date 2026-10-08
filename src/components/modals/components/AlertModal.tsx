@@ -19,12 +19,7 @@ const AlertModal = (modal: Props) => {
     <View className="px-1 pb-1">
       {/* Header */}
       {modal.title && (
-        <ThemedText
-          size="xl"
-          weight="bold"
-          color="title"
-          className="mb-2"
-        >
+        <ThemedText size="xl" weight="bold" color="title" className="mb-2">
           {modal.title}
         </ThemedText>
       )}
@@ -43,22 +38,13 @@ const AlertModal = (modal: Props) => {
 
       {/* Secondary message */}
       {modal.subMessage && (
-        <ThemedText
-          size="xs"
-          color="text"
-          opacity="low"
-          className="mt-2"
-        >
+        <ThemedText size="xs" color="text" opacity="low" className="mt-2">
           {modal.subMessage}
         </ThemedText>
       )}
 
       {/* Custom content */}
-      {modal.middle && (
-        <View className="mt-4">
-          {modal.middle}
-        </View>
-      )}
+      {modal.middle && <View className="mt-4">{modal.middle}</View>}
 
       {/* Action */}
       <Pressable
@@ -68,11 +54,7 @@ const AlertModal = (modal: Props) => {
           backgroundColor: theme.primary,
         }}
       >
-        <ThemedText
-          size="sm"
-          weight="semibold"
-          colorHex={theme.background}
-        >
+        <ThemedText size="sm" weight="semibold" colorHex="white">
           {modal.okText || "OK"}
         </ThemedText>
       </Pressable>

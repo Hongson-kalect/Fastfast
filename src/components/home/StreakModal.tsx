@@ -382,7 +382,7 @@ export const StreakCheckModal = ({ data }: Props) => {
         <ThemedText
           size="sm"
           weight="bold"
-          color="background"
+          colorHex="white"
         >
           {config.btnText}
         </ThemedText>

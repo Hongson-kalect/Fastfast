@@ -1,11 +1,9 @@
 import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import PixelStatistic from "./Statistic";
-import { useState } from "react";
-import { PackPickerBottomSheet } from "./IconPackSheet";
 
 type Props = {
   stats: { fastDays: number; fastHour: number; logDays: number };
@@ -14,7 +12,13 @@ type Props = {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
 };
-const PixelHeader = ({ stats, viewMode, setViewMode, year, setYear }: Props) => {
+const PixelHeader = ({
+  stats,
+  viewMode,
+  setViewMode,
+  year,
+  setYear,
+}: Props) => {
   const { theme } = useAppStore();
 
   return (
@@ -28,24 +32,16 @@ const PixelHeader = ({ stats, viewMode, setViewMode, year, setYear }: Props) => 
           {/* <Feather name="chevron-down" size={36} color="white" /> */}
         </View>
         <View className="p-1 flex-row items-center gap-2">
-          <Pressable
-  hitSlop={10}
-  onPress={() => setYear(year-1)}
->
-  <Feather name="chevron-left" size={20} color={theme.text} />
-</Pressable>
+          <Pressable hitSlop={10} onPress={() => setYear(year - 1)}>
+            <Feather name="chevron-left" size={20} color={theme.text} />
+          </Pressable>
 
-<ThemedText weight="medium">{year}</ThemedText>
+          <ThemedText weight="medium">{year}</ThemedText>
 
-<Pressable
-  hitSlop={10}
-  onPress={() => setYear(year+1)}
->
-  <Feather name="chevron-right" size={20} color={theme.text} />
-</Pressable>
+          <Pressable hitSlop={10} onPress={() => setYear(year + 1)}>
+            <Feather name="chevron-right" size={20} color={theme.text} />
+          </Pressable>
         </View>
-
-        
       </View>
 
       <View className="mt-4 mb-6">
@@ -55,8 +51,6 @@ const PixelHeader = ({ stats, viewMode, setViewMode, year, setYear }: Props) => 
           setTrackingType={setViewMode}
         />
       </View>
-
-      
     </>
   );
 };

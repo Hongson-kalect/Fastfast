@@ -1,23 +1,21 @@
-
 import { DBService } from "@/hooks/useDBService";
 import { ViewMode } from "@/interfaces/pixel";
-import { useAppStore } from "./appStore";
 import { buildPixelYearData } from "@/util/dashboard/utils";
+import { useAppStore } from "./appStore";
 import { usePixelStore } from "./pixelStore";
-
-
 
 const DEFAULT_VIEW_MODE: ViewMode = "fasting";
 
 export const initializePixel = async (
   db: DBService,
   year: number,
-  currentFastSession?: Parameters<typeof buildPixelYearData>[0]["currentFastSession"],
+  currentFastSession?: Parameters<
+    typeof buildPixelYearData
+  >[0]["currentFastSession"],
 ) => {
   const settings = useAppStore.getState().settings;
 
-  const viewMode =
-    settings?.pixel_view_mode || DEFAULT_VIEW_MODE;
+  const viewMode = settings?.pixel_view_mode || DEFAULT_VIEW_MODE;
 
   usePixelStore.getState().setIsLoading(true);
 
@@ -41,6 +39,13 @@ export const initializePixel = async (
     stats,
   });
 
+  console.log("=> [Pixel] Khởi tạo dữ liệu thành công!", {
+    year,
+    viewMode,
+    logs: logs,
+    stats,
+  });
+
   return {
     yearPixelData: yearMap,
     stats,
@@ -51,10 +56,11 @@ export const initializePixel = async (
 export const loadPixelYear = async (
   db: DBService,
   year: number,
-  currentFastSession?: Parameters<typeof buildPixelYearData>[0]["currentFastSession"],
+  currentFastSession?: Parameters<
+    typeof buildPixelYearData
+  >[0]["currentFastSession"],
 ) => {
-  const { setIsLoading, setYearPixelData, setStats } =
-    usePixelStore.getState();
+  const { setIsLoading, updatePixel } = usePixelStore.getState();
 
   setIsLoading(true);
 
@@ -72,8 +78,7 @@ export const loadPixelYear = async (
       currentFastSession,
     });
 
-    setYearPixelData(yearMap);
-    setStats(stats);
+    updatePixel({ year, yearPixelData: yearMap, stats });
 
     return {
       yearPixelData: yearMap,

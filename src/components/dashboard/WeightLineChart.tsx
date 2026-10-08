@@ -271,7 +271,7 @@ const WeightLineChart = ({
           >
             {({ points, chartBounds }) => (
               <>
-                {/* Fast bars */ console.log("point ", points.target)}
+                {/* Fast bars */}
                 <Group opacity={isActive ? 0.5 : 0.75}>
                   <Bar
                     points={points.fast}

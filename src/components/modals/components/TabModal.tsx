@@ -33,12 +33,7 @@ const TabsModal = (modal: Props) => {
     >
       {/* Header */}
       {modal.title && (
-        <ThemedText
-          size="xl"
-          weight="bold"
-          color="title"
-          className="mb-2"
-        >
+        <ThemedText size="xl" weight="bold" color="title" className="mb-2">
           {modal.title}
         </ThemedText>
       )}
@@ -55,21 +50,12 @@ const TabsModal = (modal: Props) => {
       )}
 
       {modal.subMessage && (
-        <ThemedText
-          size="xs"
-          color="text"
-          opacity="low"
-          className="mt-2"
-        >
+        <ThemedText size="xs" color="text" opacity="low" className="mt-2">
           {modal.subMessage}
         </ThemedText>
       )}
 
-      {modal.middle && (
-        <View className="mt-4">
-          {modal.middle}
-        </View>
-      )}
+      {modal.middle && <View className="mt-4">{modal.middle}</View>}
 
       {/* Step indicator */}
       <View className="mb-3 mt-5 flex-row items-center justify-between">
@@ -81,20 +67,13 @@ const TabsModal = (modal: Props) => {
               style={{
                 width: index === tabIndex ? 20 : 6,
                 backgroundColor:
-                  index === tabIndex
-                    ? theme.primary
-                    : theme.text + "18",
+                  index === tabIndex ? theme.primary : theme.text + "18",
               }}
             />
           ))}
         </View>
 
-        <ThemedText
-          size="xxs"
-          weight="semibold"
-          color="text"
-          opacity="low"
-        >
+        <ThemedText size="xxs" weight="semibold" color="text" opacity="low">
           {tabIndex + 1} / {modal.tabs.length}
         </ThemedText>
       </View>
@@ -107,11 +86,7 @@ const TabsModal = (modal: Props) => {
           showsHorizontalScrollIndicator={false}
           data={modal.tabs}
           keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={{ width }}>
-              {item}
-            </View>
-          )}
+          renderItem={({ item }) => <View style={{ width }}>{item}</View>}
           onMomentumScrollEnd={(event) => {
             const newIndex = Math.round(
               event.nativeEvent.contentOffset.x / width,
@@ -149,11 +124,7 @@ const TabsModal = (modal: Props) => {
             backgroundColor: theme.primary,
           }}
         >
-          <ThemedText
-            size="sm"
-            weight="semibold"
-            colorHex={theme.background}
-          >
+          <ThemedText size="sm" weight="semibold" colorHex="white">
             {modal.okText || "OK"}
           </ThemedText>
         </TouchableOpacity>

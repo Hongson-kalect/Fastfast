@@ -41,12 +41,7 @@ const PromptModal = (modal: Props) => {
     <View className="px-1 pb-1">
       {/* Header */}
       {modal.title && (
-        <ThemedText
-          size="xl"
-          weight="bold"
-          color="title"
-          className="mb-2"
-        >
+        <ThemedText size="xl" weight="bold" color="title" className="mb-2">
           {modal.title}
         </ThemedText>
       )}
@@ -75,16 +70,10 @@ const PromptModal = (modal: Props) => {
         </ThemedText>
       )}
 
-      {modal.middle && (
-        <View className="mt-4">
-          {modal.middle}
-        </View>
-      )}
+      {modal.middle && <View className="mt-4">{modal.middle}</View>}
 
       {modal.textOuterHeader && (
-        <View className="mt-5">
-          {modal.textOuterHeader}
-        </View>
+        <View className="mt-5">{modal.textOuterHeader}</View>
       )}
 
       {/* Text area */}
@@ -98,9 +87,7 @@ const PromptModal = (modal: Props) => {
         }}
       >
         {modal.textInnerHeader && (
-          <View className="px-4 pt-3">
-            {modal.textInnerHeader}
-          </View>
+          <View className="px-4 pt-3">{modal.textInnerHeader}</View>
         )}
 
         <TextInput
@@ -124,16 +111,12 @@ const PromptModal = (modal: Props) => {
         />
 
         {modal.textInnerFooter && (
-          <View className="px-4 pb-3">
-            {modal.textInnerFooter}
-          </View>
+          <View className="px-4 pb-3">{modal.textInnerFooter}</View>
         )}
       </Pressable>
 
       {modal.textOuterFooter && (
-        <View className="mt-2">
-          {modal.textOuterFooter}
-        </View>
+        <View className="mt-2">{modal.textOuterFooter}</View>
       )}
 
       {/* Actions */}
@@ -166,11 +149,7 @@ const PromptModal = (modal: Props) => {
             backgroundColor: theme.primary,
           }}
         >
-          <ThemedText
-            size="sm"
-            weight="semibold"
-            colorHex={theme.background}
-          >
+          <ThemedText size="sm" weight="semibold" colorHex="white">
             {modal.okText || "OK"}
           </ThemedText>
         </TouchableOpacity>

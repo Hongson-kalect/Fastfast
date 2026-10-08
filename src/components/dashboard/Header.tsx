@@ -1,23 +1,38 @@
+import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { useDashboardStore } from "@/stores/dashboardStore";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { AchievementBottomSheet } from "./AchievementBottomSheet";
 
-type Props = {
-  hasUnclamMilestones: boolean;
-};
-const DashboardHeader = (props: Props) => {
+const DashboardHeader = () => {
   const { theme } = useAppStore();
+  const userId = useAppStore((state) => state.userProfile)?.id;
+  const { userAchievements, currentMilestones, hasUnclaimedMilestones } =
+    useDashboardStore();
+  const dbService = useDBService();
 
   const { present } = useBottomSheet();
   const openAchievement = () => {
-    present(<AchievementBottomSheet />, {
-      snapPoints: ["100%"],
-      isRaw: true,
-    });
+    if (!userId) return;
+
+    console.log("userAchievements on call", userAchievements);
+
+    present(
+      <AchievementBottomSheet/>,
+      {
+        snapPoints: ["100%"],
+        isRaw: true,
+      },
+    );
   };
+
+  useEffect(() => {
+    console.log("currentMilestones", currentMilestones);
+  }, [currentMilestones]);
 
   return (
     <View className="flex-row items-center justify-between">
@@ -38,7 +53,7 @@ const DashboardHeader = (props: Props) => {
       >
         <Ionicons name="trophy-outline" size={26} color={theme.warning} />
 
-        {props.hasUnclamMilestones && (
+        {hasUnclaimedMilestones && (
           <View className="absolute right-2 top-2 h-2 w-2 rounded-full bg-warning" />
         )}
       </Pressable>

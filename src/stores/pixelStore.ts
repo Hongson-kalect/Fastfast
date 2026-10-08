@@ -1,4 +1,3 @@
-
 import { PixelStats, ViewMode, YearPixelDataMap } from "@/interfaces/pixel";
 import { create } from "zustand";
 
@@ -23,6 +22,12 @@ type PixelStore = {
     yearPixelData: YearPixelDataMap;
     stats: PixelStats;
   }) => void;
+  updatePixel: (data: {
+    year?: number;
+    viewMode?: ViewMode;
+    yearPixelData?: YearPixelDataMap;
+    stats?: PixelStats;
+  }) => void;
 };
 
 const currentYear = new Date().getFullYear();
@@ -46,26 +51,22 @@ export const usePixelStore = create<PixelStore>((set) => ({
 
   setViewMode: (viewMode) => set({ viewMode }),
 
-  setYearPixelData: (yearPixelData) =>
-    set({ yearPixelData }),
+  setYearPixelData: (yearPixelData) => set({ yearPixelData }),
 
-  setStats: (stats) =>
-    set({ stats }),
+  setStats: (stats) => set({ stats }),
 
-  setIsLoading: (isLoading) =>
-    set({ isLoading }),
+  setIsLoading: (isLoading) => set({ isLoading }),
 
-  hydratePixel: ({
-    year,
-    viewMode,
-    yearPixelData,
-    stats,
-  }) =>
+  hydratePixel: ({ year, viewMode, yearPixelData, stats }) =>
     set({
       year,
       viewMode,
       yearPixelData,
       stats,
       isLoading: false,
+    }),
+  updatePixel: (data) =>
+    set({
+      ...data,
     }),
 }));

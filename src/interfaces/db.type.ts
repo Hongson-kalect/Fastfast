@@ -206,6 +206,7 @@ export type UserAchievement = {
 export type UserAchievementMilestone = {
   id: string;
   user_id: string;
+  achievement_id: string;
   achievement_item_id: string;
   value: number | null;
   unlocked_at: string;

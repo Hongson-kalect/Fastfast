@@ -200,7 +200,7 @@ const HomeScreen = () => {
               >
                 <FontAwesome6
                   name="circle-question"
-                  size={18}
+                  size={20}
                   color={theme.text + "80"}
                 />
               </TouchableOpacity>

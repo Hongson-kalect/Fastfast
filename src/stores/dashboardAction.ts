@@ -27,6 +27,7 @@ export interface DashboardState {
   hasUnclaimedMilestones: boolean;
   currentMilestones: UserAchievementMilestone[] | null;
   userAchievements: UserAchievement[];
+  achievements: Achievement[];
 
   // Lifecycle
   isInitialized: boolean;
@@ -49,11 +50,12 @@ export interface DashboardState {
 
 // src/store/dashboardActions.ts
 
-import { SQLiteDatabase } from "expo-sqlite";
-
-import { createDBService } from "@/database";
-
-import { getUserAchievements } from "@/constants/achievements";
+import {
+  Achievement,
+  ACHIEVEMENTS,
+  getUserAchievements,
+} from "@/constants/achievements";
+import { DBService } from "@/hooks/useDBService";
 import { useAppStore } from "./appStore";
 import { useDashboardStore } from "./dashboardStore";
 
@@ -70,6 +72,7 @@ export interface DashboardHydrationData {
   hasUnclaimedMilestones: boolean;
   currentMilestones: UserAchievementMilestone[] | null;
   userAchievements: UserAchievement[];
+  achievements: Achievement[];
 }
 
 /**
@@ -77,15 +80,13 @@ export interface DashboardHydrationData {
  * mà Dashboard sử dụng trực tiếp.
  */
 async function loadChartData(
-  db: SQLiteDatabase,
+  dbService: DBService,
   chartType: ChartRangeConfig,
   currentFastSession: FastSession | null,
 ): Promise<{
   weightData: ChartType[];
   fastStatistics: FastStatsSummary | null;
 }> {
-  const dbService = createDBService(db);
-
   const [weights, dayFasts, fastStatisticsDB] = await Promise.all([
     dbService.getWeightLogs(chartType.day),
     dbService.getDailyLogs(chartType.day),
@@ -108,10 +109,10 @@ async function loadChartData(
   });
 
   /**
-   * Current fast chưa chắc đã được ghi vào daily_logs,
+   * Current fast đang chạy, chưa được ghi vào daily_logs,
    * nên cần cộng trực tiếp vào chart.
    */
-  if (currentFastSession) {
+  if (currentFastSession && !currentFastSession.end_time) {
     const fasts = splitSessionIntoDays(
       currentFastSession.start_time,
       currentFastSession.end_time ?? Date.now(),
@@ -152,27 +153,40 @@ async function loadChartData(
  * Load trạng thái milestone của user.
  */
 async function loadAchievementData(
-  db: SQLiteDatabase,
+  dbService: DBService,
   userId: string | null,
 ): Promise<{
   hasUnclaimedMilestones: boolean;
   userAchievements: UserAchievement[];
   currentMilestones: UserAchievementMilestone[];
+  achievements: Achievement[];
 }> {
   if (!userId) {
     return {
       hasUnclaimedMilestones: false,
       userAchievements: [],
       currentMilestones: [],
+      achievements: ACHIEVEMENTS,
     };
   }
-
-  const dbService = createDBService(db);
 
   const { currentMilestones, userAchievements } = await getUserAchievements(
     dbService,
     userId,
   );
+
+  const notClampedMilestones = new Set();
+  currentMilestones.forEach((milestone) => {
+    if (!milestone.is_confirmed) {
+      notClampedMilestones.add(milestone.achievement_id);
+    }
+  });
+
+  const achievements = [...ACHIEVEMENTS].sort((a, b) => {
+    const aIndex = notClampedMilestones?.has(a.id) ? 0 : 1;
+    const bIndex = notClampedMilestones?.has(b.id) ? 0 : 1;
+    return aIndex - bIndex;
+  });
 
   const hasUnclaimedMilestones = currentMilestones.some(
     (milestone) => !milestone.is_confirmed,
@@ -182,10 +196,10 @@ async function loadAchievementData(
     hasUnclaimedMilestones,
     userAchievements,
     currentMilestones,
+    achievements,
   };
 }
-export const loadActiveTarget = async (db: SQLiteDatabase) => {
-  const dbService = createDBService(db);
+export const loadActiveTarget = async (dbService: DBService) => {
   const activeTarget = await dbService?.getActiveWeightTarget();
   return activeTarget;
 };
@@ -204,7 +218,7 @@ export const loadActiveTarget = async (db: SQLiteDatabase) => {
  * DashboardHydrationData
  */
 export async function initializeDashboard(
-  db: SQLiteDatabase,
+  dbService: DBService,
   chartType: ChartRangeConfig,
 ): Promise<DashboardHydrationData> {
   const start = Date.now();
@@ -212,9 +226,9 @@ export async function initializeDashboard(
   const { userProfile, currentFastSession } = useAppStore.getState();
 
   const [chartData, mileStoneState, activeTarget] = await Promise.all([
-    loadChartData(db, chartType, currentFastSession),
-    loadAchievementData(db, userProfile?.id ?? null),
-    loadActiveTarget(db),
+    loadChartData(dbService, chartType, currentFastSession),
+    loadAchievementData(dbService, userProfile?.id ?? null),
+    loadActiveTarget(dbService),
   ]);
 
   const data: DashboardHydrationData = {
@@ -246,7 +260,11 @@ export function hydrateDashboard(data: DashboardHydrationData): void {
     weightTarget: data.weightTarget,
     weightData: data.weightData,
     fastStatistics: data.fastStatistics,
+
     hasUnclaimedMilestones: data.hasUnclaimedMilestones,
+    currentMilestones: data.currentMilestones,
+    userAchievements: data.userAchievements,
+    achievements: data.achievements,
 
     isHydrated: true,
     isRefreshing: false,
@@ -260,7 +278,7 @@ export function hydrateDashboard(data: DashboardHydrationData): void {
  * App state đã hydrate và app đã được phép render.
  */
 export async function initializeDashboardState(
-  db: SQLiteDatabase,
+  db: DBService,
   chartType: ChartRangeConfig,
 ): Promise<void> {
   const store = useDashboardStore.getState();
@@ -293,7 +311,7 @@ export async function initializeDashboardState(
  * query DB để UI không bị nhấp nháy.
  */
 export async function refreshDashboard(
-  db: SQLiteDatabase,
+  db: DBService,
   chartType: ChartRangeConfig,
 ): Promise<void> {
   const store = useDashboardStore.getState();
@@ -318,3 +336,35 @@ export async function refreshDashboard(
     });
   }
 }
+
+export const claimAchievementMilestone = async (
+  dbService: DBService,
+  userId: string,
+  milestoneId: string,
+  currentMilestones: UserAchievementMilestone[],
+) => {
+  const { setCurrentMilestones, setHasUnclaimedMilestones } =
+    useDashboardStore.getState();
+
+  const milestone = currentMilestones.find((item) => item.id === milestoneId);
+
+  if (!milestone || milestone.is_confirmed) return;
+
+  await dbService.confirmAchievementMilestone(milestone.id);
+
+  const newMilestone = currentMilestones.map((item) => {
+    if (item.id === milestoneId) {
+      return {
+        ...item,
+        is_confirmed: 1,
+      };
+    }
+    return item;
+  });
+
+  const hasUnclaimedMilestone = newMilestone.some((item) => !item.is_confirmed);
+
+  setHasUnclaimedMilestones(hasUnclaimedMilestone);
+
+  setCurrentMilestones(newMilestone);
+};

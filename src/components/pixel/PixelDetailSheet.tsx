@@ -1,4 +1,4 @@
-import { EMOTIONS } from "@/constants/data";
+import { EMOTION_PACKS } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
@@ -74,14 +74,15 @@ const getFastSegmentsForDay = (
 
 const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const dbService = useDBService();
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
+  const isDark = settings?.is_dark_mode ?? true;
 
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
   const [weight, setWeight] = useState(0);
-  const [activeTab, setActiveTab] = useState<"fasting" | "journal">(
-    "fasting",
-  );
+  const [activeTab, setActiveTab] = useState<"fasting" | "journal">("fasting");
+
+  const EMOTIONS = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const fastIds = useMemo(
     () => [...new Set(log.map((item) => item.fast_id).filter(Boolean))],
@@ -141,9 +142,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       const fast = fastObj[item.fast_id];
       if (!fast) continue;
 
-      segments.push(
-        ...getFastSegmentsForDay(fast, dateString),
-      );
+      segments.push(...getFastSegmentsForDay(fast, dateString));
     }
 
     const unique = new Map<string, TimelineSegment>();
@@ -156,14 +155,10 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       }
     }
 
-    return [...unique.values()].sort(
-      (a, b) => a.startHour - b.startHour,
-    );
+    return [...unique.values()].sort((a, b) => a.startHour - b.startHour);
   }, [log, fastObj, dateString]);
 
-  const currentMood = note?.mood_level
-    ? EMOTIONS[note.mood_level]
-    : null;
+  const currentMood = note?.mood_level ? EMOTIONS[note.mood_level] : null;
 
   const circularSegments = useMemo(
     () =>
@@ -177,295 +172,254 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   );
 
   const totalDuration = useMemo(
-    () =>
-      timelineSegments.reduce(
-        (acc, curr) => acc + curr.duration,
-        0,
-      ),
+    () => timelineSegments.reduce((acc, curr) => acc + curr.duration, 0),
     [timelineSegments],
   );
 
   return (
-  <View className="flex-1 bg-background">
-    {/* Header */}
-    <View className="flex-row items-center justify-between border-b border-text-base/10 px-4 pb-3 pt-3">
-      <View className="flex-1">
-        <ThemedText size="xxs" color="text" opacity="medium">
-          Nhật ký ngày
-        </ThemedText>
-
-        <ThemedText
-          size="xl"
-          weight="bold"
-          color="title"
-          className="mt-0.5"
-        >
-          {dateString}
-        </ThemedText>
-      </View>
-
-      {currentMood ? (
-        <View
-          style={{
-            backgroundColor: currentMood.color,
-          }}
-          className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
-        >
-          <ThemedText
-            size="xs"
-            weight="semibold"
-            color="background"
-          >
-            {currentMood.label}
-          </ThemedText>
-
-          <ThemedText size="lg" weight="medium">
-            {currentMood.emoji}
-          </ThemedText>
-        </View>
-      ) : (
-        <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
+    <View className="flex-1 bg-background">
+      {/* Header */}
+      <View className="flex-row items-center justify-between border-b border-text-base/10 px-4 pb-3 pt-3">
+        <View className="flex-1">
           <ThemedText size="xxs" color="text" opacity="medium">
-            Chưa có mood
+            Nhật ký ngày
+          </ThemedText>
+
+          <ThemedText size="xl" weight="bold" color="title" className="mt-0.5">
+            {dateString}
           </ThemedText>
         </View>
-      )}
-    </View>
 
-    {/* Tabs */}
-    <View className="mt-3 px-4">
-      <View className="flex-row gap-3 rounded-xl border border-text-base/5 bg-background2 p-1">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => setActiveTab("fasting")}
-          className="flex-1 items-center justify-center rounded-2xl py-4"
-          style={
-            activeTab === "fasting"
-              ? {
-                  backgroundColor: `${theme.primary}18`,
-                  borderWidth: 1,
-                  borderColor: `${theme.primary}70`,
-                }
-              : undefined
-          }
-        >
-          <ThemedText
-            size="xs"
-            weight="semibold"
-            color={
-              activeTab === "fasting"
-                ? "primary"
-                : "text"
-            }
-            opacity={
-              activeTab === "fasting"
-                ? "full"
-                : "medium"
-            }
+        {currentMood ? (
+          <View
+            style={{
+              backgroundColor: currentMood.color[isDark ? "dark" : "light"],
+            }}
+            className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
           >
-            ⏱️ Daily Fast
-          </ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => setActiveTab("journal")}
-          className="flex-1 items-center justify-center rounded-2xl py-4"
-          style={
-            activeTab === "journal"
-              ? {
-                  backgroundColor: `${theme.primary}18`,
-                  borderWidth: 1,
-                  borderColor: `${theme.primary}70`,
-                }
-              : undefined
-          }
-        >
-          <ThemedText
-            size="xs"
-            weight="semibold"
-            color={
-              activeTab === "journal"
-                ? "primary"
-                : "text"
-            }
-            opacity={
-              activeTab === "journal"
-                ? "full"
-                : "medium"
-            }
-          >
-            📝 Daily Note
-          </ThemedText>
-        </TouchableOpacity>
-      </View>
-    </View>
-
-    {/* Content */}
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
-        paddingHorizontal: 16,
-        paddingTop: 16,
-        paddingBottom: 40,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Fasting */}
-      {activeTab === "fasting" && (
-        <View className="gap-y-5">
-          <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background2 p-5">
-            <Circular24hTimeline
-              segments={circularSegments}
-              totalDuration={totalDuration}
-              size={220}
-              strokeWidth={14}
-              isLoading={isLoadingFasts}
-              animated
-            />
-          </View>
-
-          {fastIds.length > 0 && (
-            <View>
-              <View className="mb-2.5 flex-row items-center justify-between px-1">
-                <ThemedText
-                  size="xs"
-                  weight="semibold"
-                  color="text"
-                  style={{
-                    letterSpacing: 1,
-                  }}
-                >
-                  CÁC PHIÊN LIÊN QUAN
-                </ThemedText>
-
-                <ThemedText
-                  size="xs"
-                  color="text"
-                  opacity="medium"
-                >
-                  {fastIds.length} phiên
-                </ThemedText>
-              </View>
-
-              <View className="gap-y-2">
-                {log.map((item, index) => (
-                  <DailyFastSessionCard
-                    key={item.fast_id}
-                    index={index}
-                    fast={fastObj[item.fast_id] ?? null}
-                    dailyLog={item}
-                  />
-                ))}
-              </View>
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* Journal */}
-      {activeTab === "journal" && (
-        <View className="gap-y-4">
-          {/* Weight */}
-          <View className="flex-row items-center gap-x-3">
-            <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-text-base/10 bg-background2 p-3.5">
-              <ThemedText
-                size="xs"
-                weight="medium"
-                color="text"
-                opacity="medium"
-              >
-                Cân nặng
-              </ThemedText>
-
-              <View className="flex-row items-baseline">
-                <ThemedText
-                  size="lg"
-                  weight="bold"
-                  color="warning"
-                >
-                  {weight || "--"}
-                </ThemedText>
-
-                <ThemedText
-                  size="xs"
-                  color="text"
-                  opacity="medium"
-                  className="ml-0.5"
-                >
-                  kg
-                </ThemedText>
-              </View>
-            </View>
-          </View>
-
-          {/* Note */}
-          <View className="rounded-2xl border border-text-base/10 bg-background2 p-4">
-            <ThemedText
-              size="xxs"
-              weight="semibold"
-              color="text"
-              opacity="medium"
-              className="mb-2.5"
-              style={{
-                letterSpacing: 1.5,
-              }}
-            >
-              GHI CHÚ TRONG NGÀY
+            <ThemedText size="xs" weight="semibold" color="background">
+              {currentMood.label}
             </ThemedText>
 
-            {note?.note ? (
-              <ThemedText
-                size="sm"
-                color="text"
-                style={{ lineHeight: 24 }}
-              >
-                {note.note}
-              </ThemedText>
-            ) : (
-              <View className="py-2">
-                <ThemedText
-                  size="sm"
-                  color="text"
-                  opacity="low"
-                  style={{ fontStyle: "italic" }}
-                >
-                  Chưa có ghi chú nào được thêm.
-                </ThemedText>
+            <ThemedText size="lg" weight="medium">
+              {currentMood.icon}
+            </ThemedText>
+          </View>
+        ) : (
+          <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
+            <ThemedText size="xxs" color="text" opacity="medium">
+              Chưa có mood
+            </ThemedText>
+          </View>
+        )}
+      </View>
+
+      {/* Tabs */}
+      <View className="mt-3 px-4">
+        <View className="flex-row gap-3 rounded-xl border border-text-base/5 bg-background2 p-1">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setActiveTab("fasting")}
+            className="flex-1 items-center justify-center rounded-2xl py-4"
+            style={
+              activeTab === "fasting"
+                ? {
+                    backgroundColor: `${theme.primary}18`,
+                    borderWidth: 1,
+                    borderColor: `${theme.primary}70`,
+                  }
+                : undefined
+            }
+          >
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color={activeTab === "fasting" ? "primary" : "text"}
+              opacity={activeTab === "fasting" ? "full" : "medium"}
+            >
+              ⏱️ Daily Fast
+            </ThemedText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setActiveTab("journal")}
+            className="flex-1 items-center justify-center rounded-2xl py-4"
+            style={
+              activeTab === "journal"
+                ? {
+                    backgroundColor: `${theme.primary}18`,
+                    borderWidth: 1,
+                    borderColor: `${theme.primary}70`,
+                  }
+                : undefined
+            }
+          >
+            <ThemedText
+              size="xs"
+              weight="semibold"
+              color={activeTab === "journal" ? "primary" : "text"}
+              opacity={activeTab === "journal" ? "full" : "medium"}
+            >
+              📝 Daily Note
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Content */}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 40,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Fasting */}
+        {activeTab === "fasting" && (
+          <View className="gap-y-5">
+            <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background2 p-5">
+              <Circular24hTimeline
+                segments={circularSegments}
+                totalDuration={totalDuration}
+                size={220}
+                strokeWidth={14}
+                isLoading={isLoadingFasts}
+                animated
+              />
+            </View>
+
+            {fastIds.length > 0 && (
+              <View>
+                <View className="mb-2.5 flex-row items-center justify-between px-1">
+                  <ThemedText
+                    size="xs"
+                    weight="semibold"
+                    color="text"
+                    style={{
+                      letterSpacing: 1,
+                    }}
+                  >
+                    CÁC PHIÊN LIÊN QUAN
+                  </ThemedText>
+
+                  <ThemedText size="xs" color="text" opacity="medium">
+                    {fastIds.length} phiên
+                  </ThemedText>
+                </View>
+
+                <View className="gap-y-2">
+                  {log.map((item, index) => (
+                    <DailyFastSessionCard
+                      key={item.fast_id}
+                      index={index}
+                      fast={fastObj[item.fast_id] ?? null}
+                      dailyLog={item}
+                    />
+                  ))}
+                </View>
               </View>
             )}
           </View>
+        )}
 
-          {/* Image */}
-          {note?.image_uri && (
-            <View className="rounded-2xl border border-text-base/10 bg-background2 p-3">
+        {/* Journal */}
+        {activeTab === "journal" && (
+          <View className="gap-y-4">
+            {/* Weight */}
+            <View className="flex-row items-center gap-x-3">
+              <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-text-base/10 bg-background2 p-3.5">
+                <ThemedText
+                  size="xs"
+                  weight="medium"
+                  color="text"
+                  opacity="medium"
+                >
+                  Cân nặng
+                </ThemedText>
+
+                <View className="flex-row items-baseline">
+                  <ThemedText size="lg" weight="bold" color="warning">
+                    {weight || "--"}
+                  </ThemedText>
+
+                  <ThemedText
+                    size="xs"
+                    color="text"
+                    opacity="medium"
+                    className="ml-0.5"
+                  >
+                    kg
+                  </ThemedText>
+                </View>
+              </View>
+            </View>
+
+            {/* Note */}
+            <View className="rounded-2xl border border-text-base/10 bg-background2 p-4">
               <ThemedText
                 size="xxs"
                 weight="semibold"
                 color="text"
                 opacity="medium"
-                className="mb-2.5 ml-1"
+                className="mb-2.5"
                 style={{
                   letterSpacing: 1.5,
                 }}
               >
-                HÌNH ẢNH
+                GHI CHÚ TRONG NGÀY
               </ThemedText>
 
-              <View className="overflow-hidden rounded-xl bg-background">
-                <Image
-                  source={{ uri: note.image_uri }}
-                  className="aspect-9/16 w-full rounded-xl"
-                  resizeMode="cover"
-                />
-              </View>
+              {note?.note ? (
+                <ThemedText size="sm" color="text" style={{ lineHeight: 24 }}>
+                  {note.note}
+                </ThemedText>
+              ) : (
+                <View className="py-2">
+                  <ThemedText
+                    size="sm"
+                    color="text"
+                    opacity="low"
+                    style={{ fontStyle: "italic" }}
+                  >
+                    Chưa có ghi chú nào được thêm.
+                  </ThemedText>
+                </View>
+              )}
             </View>
-          )}
-        </View>
-      )}
-    </ScrollView>
-  </View>
-);
+
+            {/* Image */}
+            {note?.image_uri && (
+              <View className="rounded-2xl border border-text-base/10 bg-background2 p-3">
+                <ThemedText
+                  size="xxs"
+                  weight="semibold"
+                  color="text"
+                  opacity="medium"
+                  className="mb-2.5 ml-1"
+                  style={{
+                    letterSpacing: 1.5,
+                  }}
+                >
+                  HÌNH ẢNH
+                </ThemedText>
+
+                <View className="overflow-hidden rounded-xl bg-background">
+                  <Image
+                    source={{ uri: note.image_uri }}
+                    className="aspect-9/16 w-full rounded-xl"
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
 };
 
 export default PixelDetailSheet;

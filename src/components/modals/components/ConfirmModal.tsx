@@ -27,12 +27,7 @@ const ConfirmModal = (modal: Props) => {
     <View className="px-1 pb-1">
       {/* Header */}
       {modal.title && (
-        <ThemedText
-          size="xl"
-          weight="bold"
-          color="title"
-          className="mb-2"
-        >
+        <ThemedText size="xl" weight="bold" color="title" className="mb-2">
           {modal.title}
         </ThemedText>
       )}
@@ -50,11 +45,7 @@ const ConfirmModal = (modal: Props) => {
       </ThemedText>
 
       {/* Custom content */}
-      {modal.middle && (
-        <View className="mt-4">
-          {modal.middle}
-        </View>
-      )}
+      {modal.middle && <View className="mt-4">{modal.middle}</View>}
 
       {/* Actions */}
       <View className="mt-6 flex-row gap-2.5">
@@ -88,11 +79,7 @@ const ConfirmModal = (modal: Props) => {
           }}
         >
           {typeof okText === "string" ? (
-            <ThemedText
-              size="sm"
-              weight="semibold"
-              colorHex={theme.background}
-            >
+            <ThemedText size="sm" weight="semibold" colorHex="white">
               {okText}
             </ThemedText>
           ) : (

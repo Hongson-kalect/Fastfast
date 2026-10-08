@@ -115,7 +115,7 @@ export const buildPixelYearData = ({
   logs.forEach(appendFastLog);
 
   // Process active session
-  if (currentFastSession?.start_time && !currentFastSession?.end_time) {
+  if (currentFastSession && !currentFastSession?.end_time) {
     const parsedDays = splitSessionIntoDays(
       currentFastSession.start_time,
       Math.floor(Date.now()),

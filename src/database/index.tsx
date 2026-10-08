@@ -5,7 +5,6 @@ import {
   UserAsset,
   UserProfile,
 } from "@/interfaces/db.type";
-import * as SQLite from "expo-sqlite";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
   addDailyLogs,
@@ -71,6 +70,7 @@ import {
   AchievementMilestoneUnlock,
   AchievementProgressUpdate,
 } from "@/constants/achievements";
+import { ThemeKey } from "@/constants/themes";
 import {
   getHabitLogs,
   getLastHabitLog,
@@ -93,7 +93,6 @@ import {
   removeUserAsset,
   generateString as userAssetsGenerateString,
 } from "./shema/user_assets";
-import { ThemeKey } from "@/constants/themes";
 
 export const DATABASE_NAME = "fast_fast";
 
@@ -200,15 +199,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
     updateMileStones(db, milestones),
   updateUserAchievements: (userAchievements: AchievementProgressUpdate[]) =>
     updateUserAchievements(db, userAchievements),
-  confirmAchievementMilestone: ({
-    userId,
-    achievementId,
-    milestoneItemId,
-  }: {
-    userId: string;
-    achievementId: string;
-    milestoneItemId: string;
-  }) => confirmAchievementMilestone(db, userId, achievementId, milestoneItemId),
+  confirmAchievementMilestone: (milestoneId: string) =>
+    confirmAchievementMilestone(db, milestoneId),
 
   unPurchasedTheme: (theme: string) => removeUserAsset(db, theme),
 
@@ -234,7 +226,9 @@ const generateSeedData = `
 ${userSeedData}
 `;
 
+const DATABASE_VERSION = 1;
 export const initDatabase = async (db: SQLiteDatabase) => {
+  await clearDatabase(db);
   try {
     // ⚡ 1. Tối ưu hiệu năng đọc/ghi cho SQLite (WAL mode)
     await db.execAsync(`
@@ -243,7 +237,6 @@ export const initDatabase = async (db: SQLiteDatabase) => {
       PRAGMA foreign_keys = ON;
     `);
 
-    const DATABASE_VERSION = 1;
     const version = await getDatabaseVersion(db);
 
     if (version < DATABASE_VERSION) {
@@ -273,7 +266,7 @@ export const getDatabaseVersion = async (
 const migrateDatabase = async (
   db: SQLiteDatabase,
   currentVersion: number,
-  targetVersion: number
+  targetVersion: number,
 ) => {
   for (let v = currentVersion + 1; v <= targetVersion; v++) {
     await handleMigrate(db, v);
@@ -293,6 +286,13 @@ const handleMigrate = async (db: SQLiteDatabase, version: number) => {
       }
     }
 
+    // if (version === 2) {
+    //   await db.execAsync(`CREATE UNIQUE INDEX IF NOT EXISTS
+    //     idx_user_achievement_user_achievement
+    //     ON user_achievement(user_id, achievement_id);`);
+    //   console.log("✅ update db to V2 successfully");
+    // }
+
     // Cập nhật version trong cùng transaction
     await db.execAsync(`PRAGMA user_version = ${version};`);
   });
@@ -304,7 +304,7 @@ export const clearDatabase = async (db: SQLiteDatabase) => {
       await db.execAsync("PRAGMA foreign_keys = OFF;");
 
       const tables = await db.getAllAsync<{ name: string }>(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';",
       );
 
       if (tables.length > 0) {

@@ -4,22 +4,10 @@ import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
-import {
-  DailyLog,
-  DailyNote,
-  FastSession,
-  HabitLog
-} from "@/interfaces/db.type";
-import {
-  DailyPixelData,
-  PixelStats,
-  ViewMode,
-  YearPixelDataMap,
-} from "@/interfaces/pixel";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { buildPixelYearData } from "@/util/dashboard/utils";
-import { DissectedDay, splitSessionIntoDays } from "@/util/home/timespliter";
+import { loadPixelYear, updatePixelViewMode } from "@/stores/pixelAction";
+import { usePixelStore } from "@/stores/pixelStore";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
@@ -32,7 +20,7 @@ import {
   SectionList,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -51,47 +39,45 @@ const PixelScreen = () => {
   const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
   const { currentFastSession, settings, updateSetting, theme } = useAppStore();
+  const { isLoading, stats, year, yearPixelData, viewMode } = usePixelStore();
 
   const sectionListRef = useRef<SectionList>(null);
   const todayStr = getLocalTodayStr();
-  const currentYear = new Date().getFullYear();
 
-  const [year, setYear] = useState(currentYear);
-  const [viewMode, setViewMode] = useState<ViewMode>(
-    settings?.pixel_view_mode || "fasting",
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  type ScrollButton = "up" | "down" | null;
 
-  const [yIndex, setYIndex] = useState(0);
-  const [isScrollUp, setIsScrollUp] = useState(false);
+  const [scrollButton, setScrollButton] = useState<ScrollButton>(null);
 
-  const [yearPixelData, setYearPixelData] = useState<YearPixelDataMap>({});
-  const [stats, setStats] = useState<PixelStats>({
-    fastDays: 0,
-    fastHour: 0,
-    logDays: 0,
-  });
-
-  const gridData = useMemo(() => {
-    return generateYearGrid(year);
-  }, [year]);
+  const lastScrollY = useRef(0);
+  const scrollButtonRef = useRef<ScrollButton>(null);
 
   const currentWeekY = Math.max(0, getWeek(new Date()) - 4);
 
-  const lastScrollY = useRef(0);
-
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const y = e.nativeEvent.contentOffset.y;
+  const updateScrollButton = useCallback(
+    (y: number) => {
       const scrollingUp = y < lastScrollY.current;
 
-      if (scrollingUp !== isScrollUp) {
-        setIsScrollUp(scrollingUp);
+      let nextButton: ScrollButton = null;
+
+      if (scrollingUp && y > height) {
+        nextButton = "up";
+      } else if (
+        !scrollingUp &&
+        y > ITEM_HEIGHT &&
+        currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT > height &&
+        y < currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT - height
+      ) {
+        nextButton = "down";
+      }
+
+      if (nextButton !== scrollButtonRef.current) {
+        scrollButtonRef.current = nextButton;
+        setScrollButton(nextButton);
       }
 
       lastScrollY.current = y;
     },
-    [isScrollUp],
+    [height, currentWeekY],
   );
 
   const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
@@ -128,27 +114,11 @@ const PixelScreen = () => {
     [yearPixelData, present],
   );
 
-  const getYearData = useCallback(
-    async (targetYear: number) => {
-      setIsLoading(true);
-      const [logs, notes, shieldUsed] = await Promise.all([
-        dbService.getPixelLogData(targetYear),
-        dbService.getPixelNoteData(targetYear),
-        dbService.getPixelShielLog(targetYear),
-      ]);
-
-      const { yearMap, stats } = buildPixelYearData({
-        logs,
-        notes,
-        shieldUsed,
-        currentFastSession,
-      });
-
-      setYearPixelData(yearMap);
-      setStats(stats);
-      setIsLoading(false);
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      updateScrollButton(e.nativeEvent.contentOffset.y);
     },
-    [currentFastSession, dbService],
+    [updateScrollButton],
   );
 
   useEffect(() => {
@@ -168,36 +138,38 @@ const PixelScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const task = requestIdleCallback(() => {
-        getYearData(year);
+        loadPixelYear(dbService, year, currentFastSession);
       });
 
       return () => {
         cancelIdleCallback(task);
       };
-    }, [year, getYearData]),
+    }, [year, loadPixelYear]),
   );
+
+  const gridData = useMemo(() => {
+    return generateYearGrid(year);
+  }, [year]);
 
   return (
     <View className="flex-1 bg-background">
       <View className="absolute bottom-12 right-2 z-10">
-        {isScrollUp && yIndex > height ? (
+        {scrollButton === "up" && (
           <Pressable
             onPress={() => scrollToSection(0)}
-            className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
+            className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
           >
-            <Feather name="arrow-up" size={20} color="white" />
+            <Feather name="arrow-up" size={20} color={theme.background} />
           </Pressable>
-        ) : (
-          yIndex > ITEM_HEIGHT &&
-          currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT > height &&
-          yIndex < currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT - height && (
-            <Pressable
-              onPress={() => scrollToSection(0, currentWeekY)}
-              className="bg-primary h-12 w-12 rounded-full items-center justify-center opacity-60"
-            >
-              <Feather name="arrow-down" size={20} color="white" />
-            </Pressable>
-          )
+        )}
+
+        {scrollButton === "down" && (
+          <Pressable
+            onPress={() => scrollToSection(0, currentWeekY)}
+            className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
+          >
+            <Feather name="arrow-down" size={20} color={theme.background} />
+          </Pressable>
         )}
       </View>
       <SafeAreaView className="flex-1">
@@ -209,6 +181,7 @@ const PixelScreen = () => {
             paddingBottom: 40,
             gap: 4,
           }}
+          scrollEventThrottle={32}
           onScroll={handleScroll}
           getItemLayout={(data, index) => ({
             length: ITEM_HEIGHT,
@@ -220,9 +193,11 @@ const PixelScreen = () => {
             <PixelHeader
               stats={stats}
               year={year}
-              setYear={setYear}
+              setYear={async (year) =>
+                await loadPixelYear(dbService, year, currentFastSession)
+              }
               viewMode={viewMode}
-              setViewMode={setViewMode}
+              setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
             />
           }
           renderSectionHeader={() => (

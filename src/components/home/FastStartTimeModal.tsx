@@ -103,12 +103,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           Chọn thời gian bắt đầu Fast
         </ThemedText>
 
-        <ThemedText
-          size="xs"
-          color="text"
-          opacity="medium"
-          className="mt-1"
-        >
+        <ThemedText size="xs" color="text" opacity="medium" className="mt-1">
           Có thể bắt đầu sớm hơn hiện tại tối đa 24 giờ
         </ThemedText>
       </View>
@@ -137,11 +132,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
               onPress={() => handleQuickPreset(preset.minutes)}
               className="flex-1 items-center justify-center rounded-xl border border-text-base/10 bg-background2 py-2.5"
             >
-              <ThemedText
-                size="xs"
-                weight="bold"
-                color="primary"
-              >
+              <ThemedText size="xs" weight="bold" color="primary">
                 -{preset.label}
               </ThemedText>
             </TouchableOpacity>
@@ -158,12 +149,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             onPress={() => adjustMinutes(-5)}
             className="h-11 w-11 items-center justify-center rounded-full border border-text-base/10 bg-background"
           >
-            <ThemedText
-              size="sm"
-              weight="bold"
-              color="text"
-              opacity="medium"
-            >
+            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
               −5
             </ThemedText>
           </TouchableOpacity>
@@ -192,12 +178,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             onPress={() => adjustMinutes(5)}
             className="h-11 w-11 items-center justify-center rounded-full border border-text-base/10 bg-background"
           >
-            <ThemedText
-              size="sm"
-              weight="bold"
-              color="text"
-              opacity="medium"
-            >
+            <ThemedText size="sm" weight="bold" color="text" opacity="medium">
               +5
             </ThemedText>
           </TouchableOpacity>
@@ -237,11 +218,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           boxShadow: `0px 4px 8px ${theme.primary}40`,
         }}
       >
-        <ThemedText
-          size="sm"
-          weight="bold"
-          color="background"
-        >
+        <ThemedText size="sm" weight="bold" colorHex="white">
           Xác nhận bắt đầu Fast
         </ThemedText>
       </TouchableOpacity>

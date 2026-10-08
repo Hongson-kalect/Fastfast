@@ -365,7 +365,7 @@ export const ResultModal = ({ data = testData }: Props) => {
         <ThemedText
           size="sm"
           weight="bold"
-          color="background"
+          colorHex="white"
         >
           OK
         </ThemedText>

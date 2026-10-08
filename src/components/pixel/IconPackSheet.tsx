@@ -1,11 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useState } from "react";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 // Import các định nghĩa pack đã tạo ở bước trước
 import { useDBService } from "@/hooks/useDBService";
+import { ViewMode } from "@/interfaces/pixel";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { usePixelStore } from "@/stores/pixelStore";
 import {
   EMOTION_PACKS,
   EmotionItem,
@@ -18,20 +20,17 @@ import {
 } from "../../constants/fasting_targets";
 import { ThemedText } from "../themed-text";
 
-type TabType = "emotions" | "targets";
-
 export const PackPickerBottomSheet = () => {
-  const [activeTab, setActiveTab] = useState<TabType>("emotions");
+  const { viewMode } = usePixelStore();
+  const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
 
   const { settings, updateSetting } = useAppStore();
   const dbService = useDBService();
   const { hide } = useBottomSheet();
 
-  const selectedEmotionPackId =
-    settings?.emotion_pack || "default";
+  const selectedEmotionPackId = settings?.emotion_pack || "default";
 
-  const selectedTargetPackId =
-    settings?.target_pack || "default";
+  const selectedTargetPackId = settings?.target_pack || "default";
 
   const onSelectEmotionPack = useCallback(
     async (packId: string) => {
@@ -76,22 +75,16 @@ export const PackPickerBottomSheet = () => {
       <View className="mb-5 flex-row rounded-2xl bg-text-base/5 p-1">
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => setActiveTab("emotions")}
+          onPress={() => setActiveTab("mood")}
           className={`flex-1 items-center rounded-xl py-2.5 ${
-            activeTab === "emotions"
-              ? "bg-background2"
-              : ""
+            activeTab === "mood" ? "bg-background2" : ""
           }`}
         >
           <ThemedText
             size="sm"
             weight="semibold"
-            color={
-              activeTab === "emotions"
-                ? "title"
-                : "text"
-            }
-            opacity={activeTab === "emotions" ? undefined : "medium"}
+            color={activeTab === "mood" ? "title" : "text"}
+            opacity={activeTab === "mood" ? undefined : "medium"}
           >
             Cảm xúc (Mood)
           </ThemedText>
@@ -99,22 +92,16 @@ export const PackPickerBottomSheet = () => {
 
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => setActiveTab("targets")}
+          onPress={() => setActiveTab("fasting")}
           className={`flex-1 items-center rounded-xl py-2.5 ${
-            activeTab === "targets"
-              ? "bg-background2"
-              : ""
+            activeTab === "fasting" ? "bg-background2" : ""
           }`}
         >
           <ThemedText
             size="sm"
             weight="semibold"
-            color={
-              activeTab === "targets"
-                ? "title"
-                : "text"
-            }
-            opacity={activeTab === "targets" ? undefined : "medium"}
+            color={activeTab === "fasting" ? "title" : "text"}
+            opacity={activeTab === "fasting" ? undefined : "medium"}
           >
             Mục tiêu (Target)
           </ThemedText>
@@ -122,7 +109,7 @@ export const PackPickerBottomSheet = () => {
       </View>
 
       {/* Content */}
-      {activeTab === "emotions" ? (
+      {activeTab === "mood" ? (
         <View className="gap-y-4">
           {Object.entries(EMOTION_PACKS).map(([id, pack]) => (
             <EmotionPackCard
@@ -163,9 +150,8 @@ const EmotionPackCard = ({
   isSelected,
   onSelect,
 }: EmotionPackCardProps) => {
-  const { theme} = useAppStore();
-  const isDark = useAppStore((state) => state.settings?.is_dark_mode??true)
-
+  const { theme } = useAppStore();
+  const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
 
   return (
     <TouchableOpacity
@@ -184,50 +170,36 @@ const EmotionPackCard = ({
         </ThemedText>
 
         {isSelected && (
-          <Ionicons
-            name="checkmark-circle"
-            size={22}
-            color={theme.primary}
-          />
+          <Ionicons name="checkmark-circle" size={22} color={theme.primary} />
         )}
       </View>
 
-      <ThemedText
-        size="xs"
-        color="text"
-        opacity="medium"
-        className="mb-3"
-      >
+      <ThemedText size="xs" color="text" opacity="medium" className="mb-3">
         {pack.description}
       </ThemedText>
 
       {/* Preview Icons */}
       <View className="flex-row items-center justify-between pt-1">
         {pack.emotions.map((item: EmotionItem) => {
-          const backgroundColor = isDark
-              ? item.color.light
-              : item.color.dark
+          const backgroundColor = isDark ? item.color.light : item.color.dark;
 
           return (
-            <View
-              key={item.id}
-              className="items-center gap-1"
-            >
+            <View key={item.id} className="items-center gap-1">
               <View
                 style={{ backgroundColor }}
                 className="h-10 w-10 items-center justify-center rounded-xl"
               >
-                {item.icon}
+                <ThemedText>{item.icon}</ThemedText>
               </View>
 
-              <ThemedText
+              {/* <ThemedText
                 size="tiny"
                 weight="medium"
                 color="text"
                 opacity="medium"
               >
                 Lvl {item.level}
-              </ThemedText>
+              </ThemedText> */}
             </View>
           );
         })}
@@ -248,9 +220,7 @@ const TargetPackCard = ({
   onSelect,
 }: TargetPackCardProps) => {
   const theme = useAppStore((state) => state.theme);
-  const isDark = useAppStore(
-    (state) => state.settings?.is_dark_mode ?? true,
-  );
+  const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
 
   return (
     <TouchableOpacity
@@ -269,20 +239,11 @@ const TargetPackCard = ({
         </ThemedText>
 
         {isSelected && (
-          <Ionicons
-            name="checkmark-circle"
-            size={22}
-            color={theme.primary}
-          />
+          <Ionicons name="checkmark-circle" size={22} color={theme.primary} />
         )}
       </View>
 
-      <ThemedText
-        size="xs"
-        color="text"
-        opacity="medium"
-        className="mb-3"
-      >
+      <ThemedText size="xs" color="text" opacity="medium" className="mb-3">
         {pack.description}
       </ThemedText>
 
@@ -294,20 +255,15 @@ const TargetPackCard = ({
         className="pt-1"
       >
         {pack.targets.map((item: TargetItem) => {
-          const backgroundColor = isDark
-            ? item.color.dark
-            : item.color.light;
+          const backgroundColor = isDark ? item.color.dark : item.color.light;
 
           return (
-            <View
-              key={item.id}
-              className="items-center gap-1"
-            >
+            <View key={item.id} className="items-center gap-1">
               <View
                 style={{ backgroundColor }}
                 className="h-9 w-9 items-center justify-center rounded-xl"
               >
-                {item.icon}
+                <ThemedText>{item.icon}</ThemedText>
               </View>
 
               <ThemedText

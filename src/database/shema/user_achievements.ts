@@ -18,7 +18,9 @@ CREATE TABLE IF NOT EXISTS user_achievement (
     is_deleted INTEGER DEFAULT 0, 
 
     created_at TEXT NOT NULL DEFAULT (DATETIME('now')),
-    updated_at TEXT NOT NULL DEFAULT (DATETIME('now'))
+    updated_at TEXT NOT NULL DEFAULT (DATETIME('now')),
+
+    UNIQUE(user_id, achievement_id)
 );
 `;
 
@@ -183,9 +185,7 @@ export const updateUserAchievements = async (
 
 export const confirmAchievementMilestone = async (
   db: any,
-  userId: string,
-  achievementId: string,
-  milestoneItemId: string
+  milestoneId: string,
 ) => {
   const now = new Date().toISOString();
 
@@ -195,11 +195,9 @@ export const confirmAchievementMilestone = async (
     UPDATE user_achievement_milestone
     SET is_confirmed = 1,
         updated_at = ?
-    WHERE user_id = ? 
-      AND achievement_id = ? 
-      AND achievement_item_id = ?;
+    WHERE id = ? 
   `,
-    [now, userId, achievementId, milestoneItemId]
+    [now, milestoneId]
   );
 
   // Thêm logic cộng reward/shield point cho user ở đây (nếu có)

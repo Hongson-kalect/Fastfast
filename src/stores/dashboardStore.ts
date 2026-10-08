@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { DashboardState } from "./dashboardAction";
+import { ACHIEVEMENTS } from "@/constants/achievements";
 
 export const initialState = {
   weightTarget:null,
@@ -8,6 +9,7 @@ export const initialState = {
   fastStatistics: null,
   hasUnclaimedMilestones: false,
   userAchievements: [],
+  achievements:ACHIEVEMENTS,
   currentMilestones: [],
   isInitialized: false,
   isRefreshing: false,

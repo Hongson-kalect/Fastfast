@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import { StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
+import { useDBService } from "@/hooks/useDBService";
+import { initializePixel } from "@/stores/pixelAction";
 SplashScreen.preventAutoHideAsync();
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -24,6 +26,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 
   const db = useSQLiteContext();
+  const dbService = useDBService();
 
   useEffect(() => {
     if (!db) return;
@@ -98,7 +101,8 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!db) return;
 
     const load = async () => {
-      await initializeDashboard(db, CHART_RANGES[0]);
+      await initializeDashboard(dbService, CHART_RANGES[0]);
+      await initializePixel(dbService, new Date().getFullYear());
 
       // setDBReady(true);
       // Không block app startup
@@ -106,7 +110,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     load();
-  }, [db, addModal]);
+  }, [db]);
 
   useEffect(() => {
     const loadFonts = async () => {

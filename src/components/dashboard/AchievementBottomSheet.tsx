@@ -1,20 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import {
-  Achievement,
-  ACHIEVEMENTS,
-  getUserAchievements,
-} from "@/constants/achievements";
+import { Achievement } from "@/constants/achievements";
 import { useDBService } from "@/hooks/useDBService";
 import {
   UserAchievement,
   UserAchievementMilestone,
 } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import { claimAchievementMilestone } from "@/stores/dashboardAction";
+import { useDashboardStore } from "@/stores/dashboardStore";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { runOnJS } from "react-native-worklets";
 
 export type AchievementItem = {
   id: string;
@@ -65,44 +70,121 @@ export const AchievementCard = ({
     (item) => typeof item.target === "number",
   );
 
-  // Đếm số item đã ĐẠT MỤC TIÊU (kể cả đã claim hay chưa)
   const completedCount = achievement.items.filter((item: any) => {
     if (typeof item.target === "boolean") {
       return item.target === true && currentValue >= 1;
     }
+
     return currentValue >= item.target;
   }).length;
 
   const totalCount = achievement.items.length;
   const isCompleted = completedCount === totalCount;
-  const unconfirmedMilestones = userMilestone.filter(
-    (item: any) => item.is_confirmed === 0,
+
+  const unconfirmedMilestones = userMilestone
+    .filter((item: any) => item.is_confirmed === 0)
+    .sort((a: UserAchievementMilestone, b: UserAchievementMilestone) =>
+      a.id.localeCompare(b.id),
+    );
+
+  const unclaimedItem = unconfirmedMilestones[0];
+
+  console.log(
+    "unclaimedItem",
+    unclaimedItem,
+    unconfirmedMilestones,
+    userMilestone,
   );
 
-  const unclaimedItem = userMilestone.find((item) => item.is_confirmed === 0);
+  const unclaimedMilestone = achievement.items.find(
+    (item) => item.id === unclaimedItem?.achievement_item_id,
+  );
 
   const hasUnclaimed = !!unclaimedItem;
 
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
-  const { theme, userProfile } = useAppStore();
+
+  const { theme } = useAppStore();
   const dbService = useDBService();
 
-  const handleCardPress = async () => {
-    if (onClaim && unclaimedItem && userProfile) {
-      await dbService?.confirmAchievementMilestone({
-        userId: userProfile?.id,
-        achievementId: unclaimedItem.achievement_item_id,
-        milestoneItemId: unclaimedItem.id,
-      });
-      onClaim(unclaimedItem.achievement_item_id);
-    } else {
-      onPress?.();
-    }
+  // --------------------------------------------------
+  // Progress animation
+  // --------------------------------------------------
+
+  const progress = useSharedValue(0);
+
+  const progressTarget = hasUnclaimed
+    ? 100
+    : Math.min(
+        nextItem ? (currentValue / Number(nextItem.target)) * 100 : 100,
+        100,
+      );
+
+  React.useEffect(() => {
+    progress.value = withTiming(progressTarget, {
+      duration: 450,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [progressTarget]);
+
+  const progressStyle = useAnimatedStyle(() => ({
+    width: `${progress.value}%`,
+  }));
+
+  // --------------------------------------------------
+  // Claim animation
+  // --------------------------------------------------
+
+  const cardProgress = useSharedValue(1);
+
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardProgress.value,
+    transform: [
+      {
+        translateY: (1 - cardProgress.value) * 12,
+      },
+    ],
+  }));
+
+  const handleClaim = () => {
+    if (!unclaimedItem) return;
+
+    // 1. Chạy Animation mờ/thu nhỏ dần (Out)
+    cardProgress.value = withTiming(
+      0,
+      {
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          // 👈 BẮT BUỘC dùng runOnJS để gọi hàm JS/Update State/Store
+          runOnJS(processClaim)();
+        }
+      },
+    );
+  };
+
+  // 2. Hàm xử lý logic Claim trên JS Thread sau khi animation out hoàn tất
+  const processClaim = () => {
+    if (!unclaimedItem) return;
+
+    // Gọi callback cập nhật DB / Store
+    onClaim?.(unclaimedItem.id);
+
+    // Animate hiện lại Card (In)
+    cardProgress.value = withTiming(1, {
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+    });
   };
 
   return (
-    <View className="overflow-hidden rounded-2xl border border-text-base/5 bg-background2">
-      <Pressable onPress={handleCardPress} className="active:opacity-80">
+    <Animated.View
+      style={cardAnimatedStyle}
+      className="overflow-hidden rounded-2xl border border-text-base/5 bg-background2"
+    >
+      <Pressable onPress={onPress} className="active:opacity-80">
         <View className="px-4 py-3.5">
           {/* Main row */}
           <View className="flex-row items-center">
@@ -111,7 +193,7 @@ export const AchievementCard = ({
               className="relative mr-3.5 h-11 w-11 items-center justify-center rounded-xl"
               style={{
                 backgroundColor: hasUnclaimed
-                  ? theme.warning + "15"
+                  ? theme.success + "15"
                   : isCompleted
                     ? theme.primary + "12"
                     : theme.text + "0D",
@@ -128,7 +210,7 @@ export const AchievementCard = ({
                 size={19}
                 color={
                   hasUnclaimed
-                    ? theme.warning
+                    ? theme.success
                     : isCompleted
                       ? theme.primary
                       : theme.text
@@ -138,12 +220,11 @@ export const AchievementCard = ({
                 }}
               />
 
-              {/* Unclaimed indicator */}
               {hasUnclaimed && (
                 <View
                   className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2"
                   style={{
-                    backgroundColor: theme.warning,
+                    backgroundColor: theme.success,
                     borderColor: theme.background2,
                   }}
                 />
@@ -157,7 +238,7 @@ export const AchievementCard = ({
                   size="sm"
                   weight="semibold"
                   color={
-                    hasUnclaimed ? "warning" : isCompleted ? "primary" : "title"
+                    hasUnclaimed ? "success" : isCompleted ? "primary" : "title"
                   }
                   numberOfLines={1}
                   className="flex-1"
@@ -183,8 +264,8 @@ export const AchievementCard = ({
                 className="mt-1"
               >
                 {hasUnclaimed
-                  ? "Bạn có phần thưởng chưa nhận!"
-                  : achievement.description}
+                  ? (unclaimedMilestone?.title ?? achievement.description)
+                  : (nextItem?.title ?? achievement.description)}
               </ThemedText>
             </View>
 
@@ -192,16 +273,15 @@ export const AchievementCard = ({
             <View className="ml-3 items-end">
               {hasUnclaimed ? (
                 <Pressable
-                  // onPress={handleClam}
-                  // hitSlop={6}
-                  className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5"
+                  onPress={handleClaim}
+                  className="flex-row items-center gap-1.5 rounded-full px-3 py-2"
                   style={{
-                    backgroundColor: theme.warning,
+                    backgroundColor: theme.success,
                   }}
                 >
-                  <Ionicons name="gift" size={11} color={theme.background} />
+                  <Ionicons name="gift" size={11} color="white" />
 
-                  <ThemedText size="xxs" weight="bold" color="background">
+                  <ThemedText size="xs" weight="bold" colorHex="white">
                     Nhận
                   </ThemedText>
                 </Pressable>
@@ -216,18 +296,33 @@ export const AchievementCard = ({
                 </ThemedText>
               ) : (
                 <View className="items-end">
-                  <ThemedText
-                    size="sm"
-                    weight="bold"
-                    color={isCompleted ? "success" : "title"}
-                  >
-                    {formatAchievementValue(currentValue)}
-                    {nextItem
-                      ? ` / ${formatAchievementValue(
-                          nextItem.target as number,
-                        )}`
-                      : ""}
-                  </ThemedText>
+                  <View className="flex-row items-center gap-0.5">
+                    <ThemedText
+                      size="sm"
+                      weight="bold"
+                      color={isCompleted ? "success" : "title"}
+                    >
+                      {formatAchievementValue(
+                        achievement.input === "duration"
+                          ? currentValue / 3600
+                          : currentValue,
+                      )}
+                    </ThemedText>
+
+                    <ThemedText
+                      size="sm"
+                      weight="bold"
+                      color={isCompleted ? "success" : "title"}
+                    >
+                      {nextItem
+                        ? `/ ${formatAchievementValue(
+                            achievement.input === "duration"
+                              ? (nextItem.target as number) / 3600
+                              : (nextItem.target as number),
+                          )}`
+                        : ""}
+                    </ThemedText>
+                  </View>
 
                   <ThemedText
                     size="xxs"
@@ -247,28 +342,25 @@ export const AchievementCard = ({
           {achievement.type !== "boolean" && (
             <View className="mt-3">
               <View className="h-1.5 overflow-hidden rounded-full bg-text-base/10">
-                <View
+                <Animated.View
                   className="h-full rounded-full"
-                  style={{
-                    width: `${Math.min(
-                      nextItem
-                        ? (currentValue / Number(nextItem.target)) * 100
-                        : 100,
-                      100,
-                    )}%`,
-                    backgroundColor: hasUnclaimed
-                      ? theme.warning
-                      : isCompleted
+                  style={[
+                    progressStyle,
+                    {
+                      backgroundColor: hasUnclaimed
                         ? theme.success
-                        : theme.primary,
-                  }}
+                        : isCompleted
+                          ? theme.success
+                          : theme.primary,
+                    },
+                  ]}
                 />
               </View>
             </View>
           )}
         </View>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -283,59 +375,36 @@ const formatAchievementValue = (value: number) => {
 export const AchievementBottomSheet = ({
   onSelect,
 }: AchievementBottomSheetProps) => {
-  const [userAchievements, setUserAchievements] = useState<UserAchievement[]>(
-    [],
-  );
-  const [userMilestones, setUserMilestones] = useState<
-    UserAchievementMilestone[]
-  >([]);
+  const dbService = useDBService();
+  const userId = useAppStore((state) => state.userProfile)?.id;
+  const userAchievements = useDashboardStore((state) => state.userAchievements);
 
+  const currentMilestones = useDashboardStore(
+    (state) => state.currentMilestones,
+  );
+
+  const achievements = useDashboardStore((state) => state.achievements);
+  console.log("currentMilestones On Sheet", currentMilestones);
   const achievementList = useMemo(() => {
-    return ACHIEVEMENTS.filter((item) => {
+    return achievements.filter((item) => {
       return item.items.length;
     });
-  }, [ACHIEVEMENTS]);
+  }, [achievements]);
 
   const { userProfile } = useAppStore();
-  const dbService = useDBService();
-
-  const loadAchievements = useCallback(async () => {
-    if (!userProfile) return;
-
-    const { currentMilestones, userAchievements } = await getUserAchievements(
-      dbService,
-      userProfile.id,
-    );
-
-    setUserAchievements(userAchievements ?? []);
-    setUserMilestones(currentMilestones ?? []);
-  }, [dbService, userProfile]);
-
-  useEffect(() => {
-    loadAchievements();
-  }, [loadAchievements]);
 
   const handleClaimMilestone = useCallback(
     async (milestoneId: string) => {
-      if (!userProfile) return;
-
-      const milestone = userMilestones.find((item) => item.id === milestoneId);
-
-      if (!milestone || milestone.is_confirmed) return;
-
-      await dbService?.confirmAchievementMilestone({
-        userId: userProfile.id,
-        achievementId: milestone.achievement_item_id,
-        milestoneItemId: milestone.id,
-      });
-
-      setUserMilestones((prev) =>
-        prev.map((item) =>
-          item.id === milestoneId ? { ...item, is_confirmed: 1 } : item,
-        ),
+      console.log("Vào nhận hàng nè");
+      if (!userId || !currentMilestones?.length) return;
+      await claimAchievementMilestone(
+        dbService,
+        userId,
+        milestoneId,
+        currentMilestones,
       );
     },
-    [dbService, userProfile, userMilestones],
+    [dbService, userProfile, currentMilestones],
   );
 
   const userAchievementMap = useMemo(() => {
@@ -351,14 +420,16 @@ export const AchievementBottomSheet = ({
   const userMilestoneMap = useMemo(() => {
     const map = new Map<string, UserAchievementMilestone[]>();
 
-    for (const milestone of userMilestones) {
-      const list = map.get(milestone.achievement_item_id) ?? [];
+    if (!currentMilestones) return map;
+
+    for (const milestone of currentMilestones) {
+      const list = map.get(milestone.achievement_id) ?? [];
       list.push(milestone);
-      map.set(milestone.achievement_item_id, list);
+      map.set(milestone.achievement_id, list);
     }
 
     return map;
-  }, [userMilestones]);
+  }, [currentMilestones]);
 
   const total = achievementList.length;
 
