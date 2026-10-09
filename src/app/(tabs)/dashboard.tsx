@@ -11,11 +11,12 @@ import { refreshDashboard } from "@/stores/dashboardAction";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useFocusEffect } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  useSafeAreaInsets
+} from "react-native-safe-area-context";
 
 const DashboardScreen = () => {
   const { width } = useWindowDimensions();
@@ -35,12 +36,11 @@ const DashboardScreen = () => {
       86400000,
   );
 
-  const { weightData, fastStatistics } =
-    useDashboardStore();
+  const { weightData, fastStatistics } = useDashboardStore();
 
   useFocusEffect(
     useCallback(() => {
-      console.log('focused')
+      console.log("focused");
       const task = requestIdleCallback(() => {
         Promise.all([refreshDashboard(dbService, chartType)]);
       });
@@ -57,41 +57,46 @@ const DashboardScreen = () => {
     ]),
   );
 
+  const inset = useSafeAreaInsets();
+
   return (
-    <ThemedView className="flex-1 bg-background">
-      <SafeAreaView className="flex-1">
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: 40,
-          }}
-          keyboardShouldPersistTaps="handled"
+    <ThemedView
+      style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
+      className="flex-1 bg-background"
+    >
+      {/* <SafeAreaView className="flex-1"> */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 40,
+        }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <DashboardHeader />
+
+        <View className="mt-4">
+          <GoalCard />
+        </View>
+
+        <Animated.View
+          layout={LinearTransition.springify().damping(18).stiffness(180)}
         >
-          <DashboardHeader/>
+          <WeightLineChart
+            onInteractionStart={() => setEnableScroll(false)}
+            onInteractionEnd={() => setEnableScroll(true)}
+            data={weightData}
+          />
 
-          <View className="mt-4">
-            <GoalCard />
-          </View>
-
-          <Animated.View
-            layout={LinearTransition.springify().damping(18).stiffness(180)}
-          >
-            <WeightLineChart
-              onInteractionStart={() => setEnableScroll(false)}
-              onInteractionEnd={() => setEnableScroll(true)}
-              data={weightData}
-            />
-
-            {fastStatistics && (
-              <>
-                <FastLevelBarChart fastStatistics={fastStatistics} />
-                <StatisticsSection fastStatistics={fastStatistics} />
-              </>
-            )}
-          </Animated.View>
-        </ScrollView>
-      </SafeAreaView>
+          {fastStatistics && (
+            <>
+              <FastLevelBarChart fastStatistics={fastStatistics} />
+              <StatisticsSection fastStatistics={fastStatistics} />
+            </>
+          )}
+        </Animated.View>
+      </ScrollView>
+      {/* </SafeAreaView> */}
     </ThemedView>
   );
 };

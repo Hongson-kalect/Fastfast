@@ -16,7 +16,7 @@ import { finishFast } from "@/util/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const rating = [
   {
@@ -148,10 +148,12 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [startTime, isCounting]);
 
+    const inset = useSafeAreaInsets();
+
   return (
-    <View className="flex-1 bg-background">
+    <View style={{ paddingTop: inset.top, paddingBottom: inset.bottom }} className="flex-1 bg-background">
       {/* Tối ưu StatusBar bằng SafeAreaView chuẩn xác */}
-      <SafeAreaView className="flex-1">
+      {/* <SafeAreaView className="flex-1"> */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
@@ -214,7 +216,7 @@ const HomeScreen = () => {
             <HomeBodyProgress counter={counter} />
           </View>
         </ScrollView>
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
     </View>
   );
 };

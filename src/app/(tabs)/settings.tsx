@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { SettingsItem } from "@/components/settings/SettingsItem";
 import { SettingsSection } from "@/components/settings/SettingsSection";
@@ -16,6 +16,7 @@ import { useAppStore } from "@/stores/appStore";
 import { capitalize } from "@/util/text";
 import { useSQLiteContext } from "expo-sqlite";
 import { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const { theme, settings, updateSetting, setDarkMode, setTheme } =
@@ -41,10 +42,12 @@ export default function SettingsScreen() {
     );
   };
 
+  const inset = useSafeAreaInsets();
+
   return (
     <View
       className="flex-1 bg-background"
-      style={{ paddingTop: StatusBar.currentHeight || 0 }}
+      style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}

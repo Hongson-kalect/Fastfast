@@ -42,7 +42,7 @@ interface AppState {
 
   // Simple state setters
   updateProfile: (patch: Partial<UserProfile>) => void;
-  updateHabit: (patch: Partial<HabitLog>) => void;
+  updateHabit: (patch: HabitLog) => void;
   updateSetting: (patch: Partial<AppSettings>) => void;
   updateWeight: (weight: number | null) => void;
   setCurrentFastSession: (fastSession: FastSession | null) => void;
@@ -124,7 +124,9 @@ export const useAppStore = create<AppState>((set) => ({
   updateHabit: (patch) => {
     set((state) => {
       if (!state.habit) {
-        return state;
+        return {
+          habit: { ...patch },
+        };
       }
 
       return {
@@ -181,7 +183,7 @@ export const useAppStore = create<AppState>((set) => ({
     });
   },
 
-  setDarkMode: (isDarkMode:boolean) => {
+  setDarkMode: (isDarkMode: boolean) => {
     const { settings } = useAppStore.getState();
     const theme = extractTheme({ theme: settings?.theme, isDarkMode });
     set({

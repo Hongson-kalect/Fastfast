@@ -22,7 +22,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 1. Định nghĩa các chế độ xem (View Options)
 
@@ -151,8 +151,10 @@ const PixelScreen = () => {
     return generateYearGrid(year);
   }, [year]);
 
+  const inset = useSafeAreaInsets();
+
   return (
-    <View className="flex-1 bg-background">
+    <View style={{ paddingTop: inset.top, paddingBottom: inset.bottom }} className="flex-1 bg-background">
       <View className="absolute bottom-12 right-2 z-10">
         {scrollButton === "up" && (
           <Pressable
@@ -172,7 +174,6 @@ const PixelScreen = () => {
           </Pressable>
         )}
       </View>
-      <SafeAreaView className="flex-1">
         <SectionList
           showsVerticalScrollIndicator={false}
           ref={sectionListRef}
@@ -250,7 +251,6 @@ const PixelScreen = () => {
             />
           )}
         />
-      </SafeAreaView>
     </View>
   );
 };

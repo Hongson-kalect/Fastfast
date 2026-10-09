@@ -21,13 +21,10 @@ const DashboardHeader = () => {
 
     console.log("userAchievements on call", userAchievements);
 
-    present(
-      <AchievementBottomSheet/>,
-      {
-        snapPoints: ["100%"],
-        isRaw: true,
-      },
-    );
+    present(<AchievementBottomSheet />, {
+      snapPoints: ["100%"],
+      isRaw: true,
+    });
   };
 
   useEffect(() => {
@@ -37,7 +34,7 @@ const DashboardHeader = () => {
   return (
     <View className="flex-row items-center justify-between">
       <View>
-        <ThemedText size="xxxl" weight="bold" color="title">
+        <ThemedText size="xxxl" weight="bold">
           Dashboard
         </ThemedText>
 

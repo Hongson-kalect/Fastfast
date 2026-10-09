@@ -228,7 +228,7 @@ ${userSeedData}
 
 const DATABASE_VERSION = 1;
 export const initDatabase = async (db: SQLiteDatabase) => {
-  await clearDatabase(db);
+  // await clearDatabase(db);
   try {
     // ⚡ 1. Tối ưu hiệu năng đọc/ghi cho SQLite (WAL mode)
     await db.execAsync(`

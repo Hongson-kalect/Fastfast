@@ -1,9 +1,11 @@
 import { fonts } from "@/configs/fonts";
 import { CHART_RANGES } from "@/constants/data";
+import { useDBService } from "@/hooks/useDBService";
 import { initializeAppState } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
 import { initializeDashboard } from "@/stores/dashboardAction";
 import useModalStore from "@/stores/modalStore";
+import { initializePixel } from "@/stores/pixelAction";
 import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
@@ -11,8 +13,6 @@ import { useEffect, useState } from "react";
 import { StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
-import { useDBService } from "@/hooks/useDBService";
-import { initializePixel } from "@/stores/pixelAction";
 SplashScreen.preventAutoHideAsync();
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -21,6 +21,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
 
+  const theme = useAppStore((state) => state.theme);
   const isDarkMode = useAppStore(
     (state) => state.settings?.is_dark_mode ?? true,
   );
