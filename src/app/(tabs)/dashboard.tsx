@@ -7,16 +7,14 @@ import { ThemedView } from "@/components/themed-view";
 import { CHART_RANGES, ChartRangeKey } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
-import { refreshDashboard } from "@/stores/dashboardAction";
+import { ChartType, refreshDashboard } from "@/stores/dashboardAction";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import {
-  useSafeAreaInsets
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DashboardScreen = () => {
   const { width } = useWindowDimensions();
@@ -36,7 +34,23 @@ const DashboardScreen = () => {
       86400000,
   );
 
-  const { weightData, fastStatistics } = useDashboardStore();
+  const { weightData: baseWeightData, fastStatistics } = useDashboardStore();
+  const [weightData, setWeightData] = useState(() => {
+    const data: ChartType[] = baseWeightData.map((item) => ({
+      fast: 0,
+      key: item.key,
+      weight: 0,
+      x: item.x,
+    }));
+
+    return data;
+  });
+
+  useEffect(() => {
+    setWeightData(baseWeightData);
+  }, [baseWeightData]);
+
+  console.log("weightData", weightData);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,9 +93,7 @@ const DashboardScreen = () => {
           <GoalCard />
         </View>
 
-        <Animated.View
-          layout={LinearTransition.springify().damping(18).stiffness(180)}
-        >
+        <Animated.View layout={LinearTransition.duration(200)}>
           <WeightLineChart
             onInteractionStart={() => setEnableScroll(false)}
             onInteractionEnd={() => setEnableScroll(true)}

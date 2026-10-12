@@ -1,6 +1,7 @@
 import { useDBService } from "@/hooks/useDBService";
-import { WeightTarget } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import { loadActiveTarget } from "@/stores/dashboardAction";
+import { useDashboardStore } from "@/stores/dashboardStore";
 import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/util/numberLimit";
 import {
@@ -9,7 +10,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   Easing,
@@ -19,15 +20,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { useDashboardStore } from "@/stores/dashboardStore";
-import { loadActiveTarget } from "@/stores/dashboardAction";
-import { useSQLiteContext } from "expo-sqlite";
 
 export const GoalCard = () => {
   const dbService = useDBService();
   const { weight, settings, theme, updateSetting, updateWeight } =
     useAppStore();
-    const {weightTarget, setWeightTarget} = useDashboardStore()
+  const { weightTarget, setWeightTarget } = useDashboardStore();
   const { addModal } = useModalStore();
 
   const targetWeight = weightTarget?.target_weight;
@@ -71,6 +69,7 @@ export const GoalCard = () => {
       keyboardType: "numeric",
       title: "Current Weight",
       message: "Enter your current weight",
+      // placeholder: weight?.toString(),
       onOk: async (value) => {
         const val = Number(value);
         if (val && val > 0) {
@@ -81,14 +80,13 @@ export const GoalCard = () => {
     });
   };
 
-  const db = useSQLiteContext()
-
   const openWeightTargetModal = () => {
     addModal({
       type: "input",
       keyboardType: "numeric",
       title: "Target",
       message: "Set your weight target",
+      placeholder: targetWeight?.toString(),
       onOk: async (value) => {
         const target = Number(value);
         await dbService?.setting("weight_target", target);
@@ -97,22 +95,21 @@ export const GoalCard = () => {
           targetWeight: target,
         });
         updateSetting({ weight_target: target });
-        const activeTarget = await loadActiveTarget(db);
-        setWeightTarget(activeTarget)
+        const activeTarget = await loadActiveTarget(dbService);
+        setWeightTarget(activeTarget);
       },
     });
   };
 
-
-  const goalCardLayout = LinearTransition
-  .springify()
-  .damping(18)
-  .stiffness(180);
+  const goalCardLayout = LinearTransition.springify()
+    .damping(18)
+    .stiffness(180);
 
   if (!weight) {
     return (
-      <Animated.View className="mb-4 rounded-2xl bg-background2 px-4 py-4"
-      layout={goalCardLayout}
+      <Animated.View
+        className="mb-4 rounded-2xl bg-background2 px-4 py-4"
+        layout={goalCardLayout}
       >
         <View className="flex-row items-center gap-3">
           <View className="h-11 w-11 items-center justify-center rounded-xl bg-success/10">
@@ -149,10 +146,10 @@ export const GoalCard = () => {
   }
 
   return (
-    <Animated.View className="mb-4 rounded-2xl bg-background2 px-4 py-4"
+    <Animated.View
+      className="mb-4 rounded-2xl bg-background2 px-4 py-4"
       layout={goalCardLayout}
     >
-
       {/* Header */}
       <View className="flex-row items-start justify-between">
         <View>

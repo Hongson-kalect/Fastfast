@@ -3,6 +3,7 @@ import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { hourFormat } from "@/util/timer";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -358,6 +359,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
                 numberOfLines={1}
                 className="flex-1"
               >
+                {hourFormat(activeDurationHours)}{" "}
                 {status.label}
               </ThemedText>
             </View>
