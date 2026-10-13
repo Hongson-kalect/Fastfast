@@ -32,7 +32,7 @@ export const PhotoPickerModal = ({
   photoUri,
   updateImage,
 }: PhotoPickerModalProps) => {
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
   // 1. Hàm xử lý lưu ảnh vĩnh viễn vào thư mục ứng dụng
   const saveImagePermanently = async (cacheUri: string) => {
     try {
@@ -170,6 +170,9 @@ export const PhotoPickerModal = ({
     });
   };
 
+  const isDark = settings?.is_dark_mode ?? true;
+  const backdropOpacity = isDark ? "70" : "75";
+
   return (
     <Modal
       visible={visible}
@@ -178,8 +181,11 @@ export const PhotoPickerModal = ({
       onRequestClose={() => setVisible(false)}
     >
       <Pressable
-        className="flex-1 justify-end bg-background/70"
+        className="flex-1 justify-end"
         onPress={() => setVisible(false)}
+        style={{
+          backgroundColor: theme.text + backdropOpacity,
+        }}
       >
         <Animated.View
           layout={LinearTransition.springify().duration(180).damping(80)}
@@ -319,10 +325,10 @@ export const PhotoPickerModal = ({
                 <MaterialIcons
                   name="photo-library"
                   size={25}
-                  color={theme.text}
+                  color={'white'}
                 />
 
-                <ThemedText size="sm" weight="bold" color="text">
+                <ThemedText size="sm" weight="bold" colorHex="white">
                   Gallery
                 </ThemedText>
               </TouchableOpacity>

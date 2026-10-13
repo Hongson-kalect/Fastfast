@@ -1,4 +1,4 @@
-import { ChartRangeConfig, MONTHS } from "@/constants/data";
+import { ChartRangeConfig, FASTING_TARGETS, MONTHS } from "@/constants/data";
 import { getMonth, getWeek } from "date-fns";
 import { getLocalTodayStr, getStartDateFromRange } from "../timer";
 import { DailyLog, DailyNote, FastSession, HabitLog } from "@/interfaces/db.type";
@@ -86,6 +86,27 @@ export const buildPixelYearData = ({
 }: BuildPixelYearDataParams) => {
   const yearMap: YearPixelDataMap = {};
   const newStats: PixelStats = { fastDays: 0, fastHour: 0, logDays: 0 };
+  const counter = {
+    mood:{
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+    },
+    fast:{
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+      6: 0,
+    }
+  }
+  const ranges = FASTING_TARGETS.map((item)=>({min:item.hours, max:item.toHours}))
+
+  const fastId = new Set<string>();
 
   const getOrCreateDayNode = (dateStr: string): DailyPixelData => {
     if (!yearMap[dateStr]) {
@@ -99,6 +120,8 @@ export const buildPixelYearData = ({
     const dayNode = getOrCreateDayNode(note.log_date);
     dayNode.note = note;
     newStats.logDays += 1;
+
+    if(note.mood_level) counter.mood[note.mood_level] += 1
   });
 
   // 2. Process Logs
@@ -110,6 +133,12 @@ export const buildPixelYearData = ({
     dayNode.logs.push(log);
     dayNode.totalHours += log.hours_in_day;
     newStats.fastHour += log.hours_in_day;
+
+    if(fastId.has(log.fast_id)) return;
+
+    fastId.add(log.fast_id)
+    const fastIndex = ranges.findIndex((item)=>item.min<=log.hours_in_fast && item.max>=log.hours_in_fast) as keyof typeof counter.fast
+    counter.fast[fastIndex] += 1
   };
 
   logs.forEach(appendFastLog);
@@ -140,5 +169,5 @@ export const buildPixelYearData = ({
     }
   });
 
-  return { yearMap, stats: newStats };
+  return { yearMap, stats: newStats, counter };
 };

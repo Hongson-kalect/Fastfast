@@ -2,9 +2,10 @@ import { EMOTION_PACKS } from "@/constants/emotions";
 import { TARGET_PACKS } from "@/constants/fasting_targets";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { usePixelStore } from "@/stores/pixelStore";
 import { fixed } from "@/util/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
@@ -20,166 +21,183 @@ type Props = {
     logDays: number;
   };
 };
-const PixelStatistic = React.memo(({ setTrackingType, trackingType, stats }: Props) => {
-  const { theme, settings } = useAppStore();
+const PixelStatistic = React.memo(
+  ({ setTrackingType, trackingType, stats }: Props) => {
+    const { theme, settings } = useAppStore();
+    const { counter } = usePixelStore();
 
- const emotionPack =
-  EMOTION_PACKS[settings?.emotion_pack ?? "default"];
+    const emotionPack = EMOTION_PACKS[settings?.emotion_pack ?? "default"];
 
-const targetPack =
-  TARGET_PACKS[settings?.target_pack ?? "default"];
+    const targetPack = TARGET_PACKS[settings?.target_pack ?? "default"];
 
-const emotions = emotionPack.emotions;
-const targets = targetPack.targets;
+    const emotions = emotionPack.emotions;
+    const targets = targetPack.targets;
 
-  const { present } = useBottomSheet();
+    const { present } = useBottomSheet();
 
-  const openIconPackSelector = () => {
-    present(<PackPickerBottomSheet />);
-  };
+    const openIconPackSelector = () => {
+      present(<PackPickerBottomSheet />);
+    };
 
-  const isDark = settings?.is_dark_mode ?? true;
+    const isDark = settings?.is_dark_mode ?? true;
 
-  return (
-    <View className="gap-4">
-      <View className="flex-row items-center gap-4">
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="calendar-outline" size={15} color={theme.primary} />
-          <ThemedText size="sm" weight="semibold" color="text">
-            {stats.fastDays}
-          </ThemedText>
-          <ThemedText size="xs" color="text" opacity="medium">
-            days
-          </ThemedText>
+    return (
+      <View className="gap-4">
+        <View className="flex-row items-center gap-4">
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons name="calendar-outline" size={15} color={theme.primary} />
+            <ThemedText size="sm" weight="semibold" color="text">
+              {stats.fastDays}
+            </ThemedText>
+            <ThemedText size="xs" color="text" opacity="medium">
+              days
+            </ThemedText>
+          </View>
+
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons name="time-outline" size={15} color={theme.success} />
+            <ThemedText size="sm" weight="semibold" color="text">
+              {fixed(stats.fastHour)}
+            </ThemedText>
+            <ThemedText size="xs" color="text" opacity="medium">
+              hours
+            </ThemedText>
+          </View>
+
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons
+              name="document-text-outline"
+              size={15}
+              color={theme.warning}
+            />
+            <ThemedText size="sm" weight="semibold" color="text">
+              {fixed(stats.logDays)}
+            </ThemedText>
+            <ThemedText size="xs" color="text" opacity="medium">
+              logs
+            </ThemedText>
+          </View>
         </View>
 
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="time-outline" size={15} color={theme.success} />
-          <ThemedText size="sm" weight="semibold" color="text">
-            {fixed(stats.fastHour)}
-          </ThemedText>
-          <ThemedText size="xs" color="text" opacity="medium">
-            hours
-          </ThemedText>
-        </View>
-
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons
-            name="document-text-outline"
-            size={15}
-            color={theme.warning}
-          />
-          <ThemedText size="sm" weight="semibold" color="text">
-            {fixed(stats.logDays)}
-          </ThemedText>
-          <ThemedText size="xs" color="text" opacity="medium">
-            logs
-          </ThemedText>
-        </View>
-      </View>
-
-      <View className="flex-row justify-between items-center mt-8">
-        <Pressable
-          hitSlop={10}
-          onPress={openIconPackSelector}
-          style={{ borderWidth: 0.5, borderColor: theme.warning }}
-          className="items-center flex-row px-3 py-1.5 rounded-lg gap-2"
-        >
-          <ThemedText size="xs" color="warning">
-            Style
-          </ThemedText>
-          <Ionicons
-            name="color-palette-outline"
-            size={14}
-            color={theme.warning}
-          />
-        </Pressable>
-
-        <View className="flex-row items-center gap-1">
+        <View className="flex-row justify-between items-center mt-8">
           <Pressable
             hitSlop={10}
-            style={{
-              borderWidth: 0.5,
-              borderColor:
-                trackingType === "mood" ? theme.primary : theme.text + "80",
-            }}
-            onPress={() => setTrackingType("mood")}
-            className={`items-center px-3 py-2 ${
-              trackingType === "mood" ? "bg-primary" : "bg-background/60"
-            } rounded-lg`}
+            onPress={openIconPackSelector}
+            style={{ borderWidth: 0.5, borderColor: theme.warning }}
+            className="items-center flex-row px-3 py-1.5 rounded-lg gap-2"
           >
-            <ThemedText
-              size="xs"
-              weight="medium"
-              colorHex={trackingType === "mood" ? "#FFFFFF" : theme.text + "aa"}
-            >
-              Emotion
+            <ThemedText size="xs" color="warning">
+              Style
             </ThemedText>
+            <Ionicons
+              name="color-palette-outline"
+              size={14}
+              color={theme.warning}
+            />
           </Pressable>
 
-          <Pressable
-            hitSlop={10}
-            style={{
-              borderWidth: 0.5,
-              borderColor:
-                trackingType === "fasting" ? theme.primary : theme.text + "80",
-            }}
-            onPress={() => setTrackingType("fasting")}
-            className={`items-center px-3 py-2 ${
-              trackingType === "fasting" ? "bg-primary" : "bg-background/60"
-            } rounded-lg`}
-          >
-            <ThemedText
-              size="xs"
-              weight="medium"
-              colorHex={
-                trackingType === "fasting" ? "#FFFFFF" : theme.text + "aa"
-              }
+          <View className="flex-row items-center gap-1">
+            <Pressable
+              hitSlop={10}
+              style={{
+                borderWidth: 0.5,
+                borderColor:
+                  trackingType === "mood" ? theme.primary : theme.text + "80",
+              }}
+              onPress={() => setTrackingType("mood")}
+              className={`items-center px-3 py-2 ${
+                trackingType === "mood" ? "bg-primary" : "bg-background/60"
+              } rounded-lg`}
             >
-              Fast process
-            </ThemedText>
-          </Pressable>
+              <ThemedText
+                size="xs"
+                weight="medium"
+                colorHex={
+                  trackingType === "mood" ? "#FFFFFF" : theme.text + "aa"
+                }
+              >
+                Emotion
+              </ThemedText>
+            </Pressable>
+
+            <Pressable
+              hitSlop={10}
+              style={{
+                borderWidth: 0.5,
+                borderColor:
+                  trackingType === "fasting"
+                    ? theme.primary
+                    : theme.text + "80",
+              }}
+              onPress={() => setTrackingType("fasting")}
+              className={`items-center px-3 py-2 ${
+                trackingType === "fasting" ? "bg-primary" : "bg-background/60"
+              } rounded-lg`}
+            >
+              <ThemedText
+                size="xs"
+                weight="medium"
+                colorHex={
+                  trackingType === "fasting" ? "#FFFFFF" : theme.text + "aa"
+                }
+              >
+                Fast process
+              </ThemedText>
+            </Pressable>
+          </View>
         </View>
+
+        {trackingType === "mood" && (
+          <View className="flex-row gap-4 mt-2">
+            {emotions.map((item, index) => {
+              const moodIndex = index as 0 | 1 | 2 | 3 | 4;
+              return (
+                <View
+                  key={item.label}
+                  style={{
+                    backgroundColor: isDark
+                      ? item.color.dark
+                      : item.color.light,
+                  }}
+                  className="flex-1 px-2 py-1 rounded"
+                >
+                  <View className="items-center justify-between">
+                    <ThemedText>{item.icon}</ThemedText>
+                    <ThemedText size="xs">{counter.mood[moodIndex]}</ThemedText>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+        {trackingType === "fasting" && (
+          <View className="flex-row gap-2 mt-2">
+            {targets.map((item, index) => {
+              const targetIndex = index as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+              return (
+                <View
+                  key={item.label}
+                  style={{
+                    backgroundColor: isDark
+                      ? item.color.dark
+                      : item.color.light,
+                  }}
+                  className="flex-1 px-2 py-1 rounded"
+                >
+                  <View className="items-center justify-between">
+                    <ThemedText>{item.icon}</ThemedText>
+                    <ThemedText size="xs">
+                      {counter.fast[targetIndex]}
+                    </ThemedText>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
       </View>
-
-      {trackingType === "mood" && (
-        <View className="flex-row gap-4 mt-2">
-          {emotions.map((item, index) => (
-            <View
-              key={item.label}
-              style={{
-                backgroundColor: isDark ? item.color.dark : item.color.light,
-              }}
-              className="flex-1 px-2 py-1 rounded"
-            >
-              <View className="items-center justify-between">
-                <ThemedText>{item.icon}</ThemedText>
-                <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
-      {trackingType === "fasting" && (
-        <View className="flex-row gap-2 mt-2">
-          {targets.map((item, index) => (
-            <View
-              key={item.label}
-              style={{
-                backgroundColor: isDark ? item.color.dark : item.color.light,
-              }}
-              className="flex-1 px-2 py-1 rounded"
-            >
-              <View className="items-center justify-between">
-                <ThemedText>{item.icon}</ThemedText>
-                <ThemedText size="xs">{moodCount[index || 0]}</ThemedText>
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-})
+    );
+  },
+);
 
 export default PixelStatistic;

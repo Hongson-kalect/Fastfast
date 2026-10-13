@@ -3,7 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { EMOTIONS, MoodLevel } from "@/constants/emotions";
+import { EMOTION_PACKS, EMOTIONS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 
 type SwapMoodButtonProps = {
@@ -25,7 +25,8 @@ export const SwapMoodButton = ({
   onPressIn,
   onPressOut,
 }: SwapMoodButtonProps) => {
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
+  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   return (
     <TouchableOpacity
@@ -46,7 +47,7 @@ export const SwapMoodButton = ({
       ) : (
         <View className="flex-1 items-center justify-center">
           {mood ? (
-            <ThemedText size="lg">{EMOTIONS[mood].icon}</ThemedText>
+            <ThemedText size="lg">{emotions[mood].icon}</ThemedText>
           ) : (
             <Feather name="edit-2" size={28} color={theme.text} />
           )}

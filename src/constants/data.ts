@@ -435,7 +435,7 @@ export interface FastingTargetItem {
   id: string;
   emoji: string;
   hours: number;
-  toHours?: number;
+  toHours: number;
   label: string;
   title: string;
   level: "Novice" | "Veteran" | "Expert" | "Master";
@@ -575,6 +575,7 @@ export const FASTING_TARGETS: FastingTargetItem[] = [
     id: "72h",
     emoji: "👑",
     hours: 72,
+    toHours: 9999,
     label: "Prolonged",
     title: "Thử thách cực hạn",
     level: "Master",

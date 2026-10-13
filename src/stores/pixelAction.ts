@@ -25,7 +25,7 @@ export const initializePixel = async (
     db.getPixelShielLog(year),
   ]);
 
-  const { yearMap, stats } = buildPixelYearData({
+  const { yearMap, stats, counter } = buildPixelYearData({
     logs,
     notes,
     shieldUsed,
@@ -37,6 +37,7 @@ export const initializePixel = async (
     viewMode,
     yearPixelData: yearMap,
     stats,
+    counter
   });
 
   console.log("=> [Pixel] Khởi tạo dữ liệu thành công!", {
@@ -56,11 +57,9 @@ export const initializePixel = async (
 export const loadPixelYear = async (
   db: DBService,
   year: number,
-  currentFastSession?: Parameters<
-    typeof buildPixelYearData
-  >[0]["currentFastSession"],
 ) => {
   const { setIsLoading, updatePixel } = usePixelStore.getState();
+  const {currentFastSession} = useAppStore.getState();
 
   setIsLoading(true);
 
@@ -71,14 +70,14 @@ export const loadPixelYear = async (
       db.getPixelShielLog(year),
     ]);
 
-    const { yearMap, stats } = buildPixelYearData({
+    const { yearMap, stats,counter } = buildPixelYearData({
       logs,
       notes,
       shieldUsed,
       currentFastSession,
     });
 
-    updatePixel({ year, yearPixelData: yearMap, stats });
+    updatePixel({ year, yearPixelData: yearMap, stats, counter });
 
     return {
       yearPixelData: yearMap,

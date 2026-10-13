@@ -1,4 +1,4 @@
-import { EMOTIONS } from "@/constants/data";
+import { EMOTION_PACKS } from "@/constants/emotions";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -60,7 +60,8 @@ const NoteModal = ({
   weight,
   onSelectMood,
 }: Props) => {
-  const { theme } = useAppStore();
+  const { theme, settings } = useAppStore();
+  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const [tempText, setTempText] = useState(note ?? "");
   const [tempWeight, setTempWeight] = useState(weight?.toString() ?? "");
@@ -82,6 +83,9 @@ const NoteModal = ({
     setVisible(false);
   };
 
+  const isDark = settings?.is_dark_mode ?? true;
+  const backdropOpacity = isDark ? "70" : "75";
+
   return (
     <Modal
       visible={visible}
@@ -90,8 +94,11 @@ const NoteModal = ({
       onRequestClose={() => setVisible(false)}
     >
       <Pressable
-        className="flex-1 justify-end bg-background/80"
+        className="flex-1 justify-end"
         onPress={() => setVisible(false)}
+        style={{
+          backgroundColor: theme.text + backdropOpacity,
+        }}
       >
         <Animated.View
           layout={LinearTransition.springify().duration(180).damping(80)}
@@ -152,7 +159,7 @@ const NoteModal = ({
                 </View>
 
                 <View
-                  className={`h-24 overflow-hidden rounded-3xl ${
+                  className={`h-24 overflow-hidden rounded-2xl ${
                     weightError
                       ? "border border-error bg-error/10"
                       : "border border-primary/20 bg-primary/10"
@@ -224,7 +231,7 @@ const NoteModal = ({
                   cursorColor={theme.text}
                   placeholder="How did you feel today?"
                   placeholderTextColor={`${theme.text}55`}
-                  className="h-24 rounded-3xl border border-text-base/10 bg-background px-4 py-3 text-sm text-text-base"
+                  className="h-24 rounded-2xl border border-text-base/10 bg-background px-4 py-3 text-sm text-text-base"
                 />
               </View>
             </View>
@@ -250,12 +257,12 @@ const NoteModal = ({
               </View>
 
               <View className="flex-row justify-between">
-                {EMOTIONS.map((item, index) => {
+                {emotions.map((item, index) => {
                   const isSelected = item.level === mood;
 
                   return (
                     <Animated.View
-                      key={item.emoji}
+                      key={item.level}
                       entering={SlideInDown.springify()
                         .damping(18)
                         .stiffness(180)
@@ -269,7 +276,7 @@ const NoteModal = ({
                         className={`h-14 w-14 items-center justify-center rounded-full border-2 ${
                           isSelected
                             ? "border-primary bg-primary/15"
-                            : "border-text-base/10 bg-background"
+                            : "border-text-base/10 bg-background2"
                         }`}
                         style={
                           isSelected
@@ -279,7 +286,7 @@ const NoteModal = ({
                             : undefined
                         }
                       >
-                        <Text style={{ fontSize: 28 }}>{item.emoji}</Text>
+                        <Text style={{ fontSize: 28 }}>{item.icon}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   );

@@ -27,11 +27,14 @@ const DayPixel = memo(
     const isDark = settings?.is_dark_mode ?? true;
     const isToday = day.dateString === todayStr;
 
-    let emoji: ReactNode
+    let emoji: ReactNode;
     let backgroundColor = "transparent";
     let opacity = 1;
     let icon: React.ReactNode = null;
-    let pressable = false;
+    const pressable =
+      (pixelData?.logs?.length || 0) > 0 ||
+      pixelData?.note ||
+      pixelData?.shieldLog;
 
     /*
      * Ngày trong tương lai
@@ -50,7 +53,7 @@ const DayPixel = memo(
         <View
           style={{
             boxShadow: isToday
-              ? `0 0 0 1px ${theme.primary}80`
+              ? `1px 2px 4px ${theme.primary}80, -0.5px -1px 2px ${theme.primary}80`
               : undefined,
           }}
           className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5"
@@ -58,23 +61,25 @@ const DayPixel = memo(
       );
     }
 
+    let borderClass = "border-text-base/10";
+
+    const todayShadow = isToday ? `1px 2px 4px ${theme.primary}80` : undefined;
+
     /*
      * MOOD
      */
     if (viewMode === "mood") {
       if (pixelData.note) {
-        const emotionPack =
-          EMOTION_PACKS[settings?.emotion_pack || "default"];
+        const emotionPack = EMOTION_PACKS[settings?.emotion_pack || "default"];
 
-        const mood =
-          emotionPack.emotions[pixelData.note.mood_level || 0];
+        const mood = emotionPack.emotions[pixelData.note.mood_level || 0];
 
         emoji = mood.icon;
-        backgroundColor = isDark
-          ? mood.color.dark
-          : mood.color.light;
+        backgroundColor = isDark ? mood.color.dark : mood.color.light;
 
-        pressable = true;
+        if (pixelData.note.note) {
+          borderClass = "border-primary/50";
+        }
       }
     } else {
       /*
@@ -84,47 +89,31 @@ const DayPixel = memo(
       if (!pixelData.logs.length) {
         if (pixelData.shieldLog) {
           icon = (
-            <FontAwesome5
-              name="shield-alt"
-              size={14}
-              color={theme.primary}
-            />
+            <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
           );
-
-          pressable = true;
         }
       } else {
         const fast = pixelData.logs.reduce((best, current) =>
-          current.hours_in_fast > best.hours_in_fast
-            ? current
-            : best,
+          current.hours_in_fast > best.hours_in_fast ? current : best,
         );
 
-        const targetPack =
-          TARGET_PACKS[settings?.target_pack || "default"];
+        const targetPack = TARGET_PACKS[settings?.target_pack || "default"];
 
         const pixel = FASTING_TARGETS.findIndex(
           (target) =>
             target.hours <= fast.hours_in_fast &&
-            (!target.toHours ||
-              target.toHours >= fast.hours_in_fast),
+            (!target.toHours || target.toHours >= fast.hours_in_fast),
         );
 
         if (pixel >= 0) {
-          const progress = Math.min(
-            fast.elapsed_hours / fast.hours_in_fast,
-            1,
-          );
+          const progress = Math.min(fast.elapsed_hours / fast.hours_in_fast, 1);
 
           const target = targetPack.targets[pixel];
 
           opacity = 0.5 + 0.5 * progress;
-          backgroundColor = isDark
-            ? target.color.dark
-            : target.color.light;
+          backgroundColor = isDark ? target.color.dark : target.color.light;
 
           emoji = target.icon;
-          pressable = true;
         }
       }
     }
@@ -139,33 +128,25 @@ const DayPixel = memo(
           size="sm"
           weight="medium"
           colorHex={
-            day.isCurrentYear
-              ? theme.background
-              : `${theme.background}33`
+            day.isCurrentYear ? theme.background : `${theme.background}33`
           }
         >
           {emoji}
         </ThemedText>
       ) : null);
 
-    const borderClass = day.isCurrentYear
-      ? "border-text-base/10"
-      : "border-dashed border-text-base/5";
-
-    const todayShadow = isToday
-      ? `0 0 0 1px ${theme.primary}80`
-      : undefined;
-
+    if (!day.isCurrentYear) borderClass = "border-dashed border-text-base/5";
     /*
      * Pixel có thể click
      */
+
     if (pressable) {
       return (
         <Pressable
           onPress={() => onPress(day.dateString)}
           style={{
             backgroundColor,
-            boxShadow: todayShadow,
+            // boxShadow: todayShadow,
           }}
           className={`flex-1 aspect-square items-center justify-center rounded-md border ${borderClass}`}
         >

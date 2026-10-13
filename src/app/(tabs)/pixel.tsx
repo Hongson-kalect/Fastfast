@@ -38,7 +38,7 @@ const PixelScreen = () => {
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
-  const { currentFastSession, settings, updateSetting, theme } = useAppStore();
+  const { updateSetting, theme } = useAppStore();
   const { isLoading, stats, year, yearPixelData, viewMode } = usePixelStore();
 
   const sectionListRef = useRef<SectionList>(null);
@@ -138,7 +138,7 @@ const PixelScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const task = requestIdleCallback(() => {
-        loadPixelYear(dbService, year, currentFastSession);
+        loadPixelYear(dbService, year);
       });
 
       return () => {
@@ -195,7 +195,7 @@ const PixelScreen = () => {
               stats={stats}
               year={year}
               setYear={async (year) =>
-                await loadPixelYear(dbService, year, currentFastSession)
+                await loadPixelYear(dbService, year)
               }
               viewMode={viewMode}
               setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}

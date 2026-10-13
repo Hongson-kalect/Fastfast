@@ -24,9 +24,7 @@ export const timeString = (time: number) => {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
-export const getLocalTodayStr = (
-  dateParam?: Date | number,
-): string => {
+export const getLocalTodayStr = (dateParam?: Date | number): string => {
   const date = new Date(dateParam ?? Date.now());
 
   const year = date.getFullYear();
@@ -36,11 +34,17 @@ export const getLocalTodayStr = (
   return `${year}-${month}-${day}`;
 };
 
-export const hourFormat = (duration: number) => {
+export const hourFormat = (duration: number, isLong = false) => {
   const timeCheck = Math.floor(duration / 1);
   const hours = Math.floor(timeCheck / 60 / 60);
   const minutes = Math.floor(timeCheck / 60) % 60;
   const seconds = timeCheck % 60;
+  if (!hours) {
+    if (isLong) return `${minutes.toString().padStart(2, "0")}Minutes`;
+    return `${minutes.toString().padStart(2, "0")}m`;
+  }
+  if (isLong)
+    return `${hours.toString().padStart(2, "0")}Hours ${minutes.toString().padStart(2, "0")}Minutes`;
   return `${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m`;
 };
 

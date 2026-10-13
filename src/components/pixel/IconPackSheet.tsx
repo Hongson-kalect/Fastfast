@@ -181,7 +181,7 @@ const EmotionPackCard = ({
       {/* Preview Icons */}
       <View className="flex-row items-center justify-between pt-1">
         {pack.emotions.map((item: EmotionItem) => {
-          const backgroundColor = isDark ? item.color.light : item.color.dark;
+          const backgroundColor = isDark ? item.color.dark : item.color.light;
 
           return (
             <View key={item.id} className="items-center gap-1">

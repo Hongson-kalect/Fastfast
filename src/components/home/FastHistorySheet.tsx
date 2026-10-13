@@ -212,7 +212,8 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const { theme } = useAppStore();
   const { addModal, closeCurrentModal } = useModalStore();
 
-  const durationHours = Number(item.duration ?? 0) / S_PER_HOUR;
+  const durationSeconds = Number(item.duration ?? 0);
+  const durationHours = durationSeconds / S_PER_HOUR;
   const targetHours = Number(item.target_duration ?? 0);
 
   const target = getTarget(targetHours || durationHours);
@@ -221,12 +222,20 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const isFailed = item.status === "failed";
   const hasTarget = targetHours > 0;
 
-  const activeDurationHours = isActive
-    ? Math.max(0, Date.now() - item.start_time) / S_PER_HOUR
-    : durationHours;
+  const activeDurationSeconds = isActive
+    ? Math.max(0, Math.floor((Date.now() - item.start_time) / 1000))
+    : durationSeconds;
+
+  const displayDuration = isActive
+    ? hourFormat(activeDurationSeconds)
+    : isFailed && durationSeconds <= 0
+      ? "--:--"
+      : hourFormat(durationSeconds);
+
+  const progressHours = activeDurationSeconds / S_PER_HOUR;
 
   const progressPercent = hasTarget
-    ? Math.min(Math.round((activeDurationHours / targetHours) * 100), 100)
+    ? Math.min(Math.round((progressHours / targetHours) * 100), 100)
     : 100;
 
   const reached = hasTarget && durationHours >= targetHours;
@@ -236,13 +245,15 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
       return {
         label: "Bị hủy",
         color: theme.error,
+        icon: "x-circle" as const,
       };
     }
 
     if (isActive) {
       return {
-        label: `Đang nhịn · ${targetHours}h`,
+        label: "Đang nhịn",
         color: theme.primary,
+        icon: "clock" as const,
       };
     }
 
@@ -250,19 +261,22 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
       return {
         label: "Tự do",
         color: theme.success,
+        icon: "zap" as const,
       };
     }
 
     if (reached) {
       return {
-        label: `Đạt mục tiêu · ${targetHours}h`,
+        label: "Đạt mục tiêu",
         color: theme.success,
+        icon: "check-circle" as const,
       };
     }
 
     return {
-      label: `Chưa đạt · ${targetHours}h`,
+      label: "Chưa đạt",
       color: theme.warning,
+      icon: "alert-circle" as const,
     };
   })();
 
@@ -314,14 +328,6 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
     });
   };
 
-  const durationLabel = isFailed
-    ? "--:--"
-    : isActive
-      ? "Fasting"
-      : Number(item.duration ?? 0) > 0
-        ? formatTime(new Date(item.duration))
-        : "0h";
-
   return (
     <TouchableOpacity
       onLongPress={handleLongPress}
@@ -329,89 +335,124 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
       activeOpacity={0.75}
       className="mb-3 overflow-hidden rounded-2xl bg-background2"
     >
-      <View className="px-4 py-3.5">
-        {/* Main row */}
-        <View className="flex-row items-center">
-          {/* Target */}
+      <View className="px-3 py-2">
+        {/* Main content */}
+        <View className="flex-row items-center gap-3">
+          {/* Target icon */}
           <View
-            className="mr-3.5 h-11 w-11 items-center justify-center rounded-xl"
+            className="h-14 w-14 items-center justify-center rounded-2xl"
             style={{
-              backgroundColor: `${status.color}12`,
+              backgroundColor: `${target?.colors.accent || theme.primary}20`,
             }}
           >
             <ThemedText size="lg">{target?.emoji || "⚡"}</ThemedText>
           </View>
 
-          {/* Info */}
-          <View className="min-w-0 flex-1">
-            <View className="flex-row items-center gap-1.5">
-              <View
-                className="h-1.5 w-1.5 rounded-full"
-                style={{
-                  backgroundColor: status.color,
-                }}
-              />
-
+          {/* Duration + status */}
+          <View className="min-w-0 flex-1 justify-between">
+            <View className="flex-row justify-between">
               <ThemedText
-                size="sm"
-                weight="semibold"
-                color="title"
+                size="xl"
+                weight="bold"
+                color={isFailed ? "error" : "title"}
                 numberOfLines={1}
-                className="flex-1"
               >
-                {hourFormat(activeDurationHours)}{" "}
-                {status.label}
+                {displayDuration}
               </ThemedText>
+
+              <View
+                className="flex-row items-center gap-1.5 px-2 py-1 rounded-full"
+                style={{ backgroundColor: `${status.color}12` }}
+              >
+                <Feather name={status.icon} size={10} color={status.color} />
+
+                <ThemedText
+                  size="xxs"
+                  weight="medium"
+                  colorHex={status.color}
+                  numberOfLines={1}
+                >
+                  {status.label}
+                </ThemedText>
+              </View>
             </View>
 
-            <ThemedText
-              size="xxs"
-              color="text"
-              opacity="medium"
-              numberOfLines={1}
-              className="mt-1"
-            >
-              {dateRangeLabel}
-            </ThemedText>
-          </View>
+            <View className="flex-row justify-between">
+              <View className="flex-row items-center gap-1.5">
+                {target ? (
+                  <View
+                    className="rounded-full px-2 py-0.5"
+                    style={{
+                      backgroundColor: target.colors.accent + "20",
+                    }}
+                  >
+                    <ThemedText
+                      size="xs"
+                      weight="medium"
+                      colorHex={target.colors.accent}
+                    >
+                      {target?.label}
+                    </ThemedText>
+                  </View>
+                ) : (
+                  <View
+                    className="rounded-lg px-2 py-0.5"
+                    style={{
+                      backgroundColor: `${theme.success}12`,
+                    }}
+                  >
+                    <ThemedText
+                      size="xs"
+                      weight="semibold"
+                      colorHex={theme.success}
+                    >
+                      Tự do
+                    </ThemedText>
+                  </View>
+                )}
+              </View>
 
-          {/* Duration */}
-          <View className="ml-3 items-end">
-            <ThemedText
-              size="md"
-              weight="bold"
-              color={isFailed ? "error" : "title"}
-            >
-              {durationLabel}
-            </ThemedText>
-
-            {hasTarget && !isFailed && (
-              <ThemedText
-                size="xxs"
-                weight="semibold"
-                color={progressPercent >= 100 ? "success" : "text"}
-                opacity={progressPercent >= 100 ? "full" : "low"}
-                className="mt-0.5"
-              >
-                {progressPercent}%
-              </ThemedText>
-            )}
+              {hasTarget && !isFailed && (
+                <ThemedText
+                  size="xs"
+                  weight="semibold"
+                  color={progressPercent >= 100 ? "success" : "text"}
+                  opacity={progressPercent >= 100 ? "full" : "low"}
+                >
+                  {Math.round((progressHours / targetHours) * 100)}%
+                </ThemedText>
+              )}
+            </View>
           </View>
+        </View>
+
+        {/* Progress bar */}
+        {hasTarget && (
+          <View className="h-1.5 bg-text-base/5 rounded-full overflow-hidden mt-2">
+            <View
+              className="h-full rounded-r-full"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor: status.color,
+              }}
+            />
+          </View>
+        )}
+
+        {/* Date range */}
+        <View className="mt-2 flex-row items-center gap-1.5">
+          <Feather
+            name="clock"
+            size={10}
+            color={theme.text}
+            style={{ opacity: 0.5 }}
+          />
+
+          <ThemedText size="xxs" color="text" opacity="half" numberOfLines={1}>
+            {dateRangeLabel}
+          </ThemedText>
         </View>
       </View>
-
-      {/* Progress */}
-      {hasTarget && (
-        <View className="h-1.5 bg-text-base/5">
-          <View
-            className="h-full rounded-r-full"
-            style={{
-              width: `${Math.min(progressPercent, 100)}%`,
-              backgroundColor: status.color,
-            }}
-          />
-        </View>
-      )}
     </TouchableOpacity>
   );
 };

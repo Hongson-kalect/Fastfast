@@ -1,7 +1,9 @@
 import { EMOTION_PACKS } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
+import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
+import { usePixelStore } from "@/stores/pixelStore";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
@@ -80,7 +82,8 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
   const [weight, setWeight] = useState(0);
-  const [activeTab, setActiveTab] = useState<"fasting" | "journal">("fasting");
+  const viewMode = usePixelStore((state) => state.viewMode);
+  const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
 
   const EMOTIONS = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
@@ -243,10 +246,10 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => setActiveTab("journal")}
+            onPress={() => setActiveTab("fasting")}
             className="flex-1 items-center justify-center rounded-2xl py-4"
             style={
-              activeTab === "journal"
+              activeTab === "mood"
                 ? {
                     backgroundColor: `${theme.primary}18`,
                     borderWidth: 1,
@@ -258,8 +261,8 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
             <ThemedText
               size="xs"
               weight="semibold"
-              color={activeTab === "journal" ? "primary" : "text"}
-              opacity={activeTab === "journal" ? "full" : "medium"}
+              color={activeTab === "mood" ? "primary" : "text"}
+              opacity={activeTab === "mood" ? "full" : "medium"}
             >
               📝 Daily Note
             </ThemedText>
@@ -326,7 +329,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
         )}
 
         {/* Journal */}
-        {activeTab === "journal" && (
+        {activeTab === "mood" && (
           <View className="gap-y-4">
             {/* Weight */}
             <View className="flex-row items-center gap-x-3">

@@ -1,10 +1,28 @@
 import { PixelStats, ViewMode, YearPixelDataMap } from "@/interfaces/pixel";
 import { create } from "zustand";
-
+export type PixelCounter={
+  mood:{
+    0: number,
+    1: number,
+    2: number,
+    3: number,
+    4: number,
+  },
+  fast:{
+    0: number,
+    1: number,
+    2: number,
+    3: number,
+    4: number,
+    5: number,
+    6: number,
+  }
+}
 type PixelStore = {
   year: number;
   viewMode: ViewMode;
 
+  counter: PixelCounter;
   yearPixelData: YearPixelDataMap;
   stats: PixelStats;
 
@@ -21,12 +39,14 @@ type PixelStore = {
     viewMode: ViewMode;
     yearPixelData: YearPixelDataMap;
     stats: PixelStats;
+    counter: PixelCounter;
   }) => void;
   updatePixel: (data: {
     year?: number;
     viewMode?: ViewMode;
     yearPixelData?: YearPixelDataMap;
     stats?: PixelStats;
+    counter?: PixelCounter;
   }) => void;
 };
 
@@ -42,6 +62,24 @@ export const usePixelStore = create<PixelStore>((set) => ({
   year: currentYear,
   viewMode: "fasting",
 
+  counter: {
+    mood: {
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+    },
+    fast:{
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+      6: 0,
+    }
+  },
   yearPixelData: {},
   stats: initialStats,
 
