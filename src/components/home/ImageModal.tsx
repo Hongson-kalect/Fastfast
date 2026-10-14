@@ -145,9 +145,9 @@ export const PhotoPickerModal = ({
       title: "Add Photo",
       okText: (
         <View className="flex-row items-center justify-center gap-2">
-          <MaterialIcons name="photo-library" size={25} color={theme.text} />
+          <MaterialIcons name="photo-library" size={25} color={"white"} />
 
-          <ThemedText size="sm" weight="bold" color="text">
+          <ThemedText size="sm" weight="bold" colorHex="white">
             Gallery
           </ThemedText>
         </View>
@@ -322,11 +322,7 @@ export const PhotoPickerModal = ({
                 onPress={handleSelectPhoto}
                 className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
               >
-                <MaterialIcons
-                  name="photo-library"
-                  size={25}
-                  color={'white'}
-                />
+                <MaterialIcons name="photo-library" size={25} color={"white"} />
 
                 <ThemedText size="sm" weight="bold" colorHex="white">
                   Gallery

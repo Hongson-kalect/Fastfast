@@ -45,6 +45,9 @@ const DayPixel = memo(
       );
     }
 
+    const todayShadow = isToday
+      ? `1px 2px 4px ${theme.primary}80, -0.5px -1px 2px ${theme.primary}60`
+      : undefined;
     /*
      * Không có dữ liệu
      */
@@ -52,9 +55,7 @@ const DayPixel = memo(
       return (
         <View
           style={{
-            boxShadow: isToday
-              ? `1px 2px 4px ${theme.primary}80, -0.5px -1px 2px ${theme.primary}80`
-              : undefined,
+            boxShadow: todayShadow,
           }}
           className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5"
         />
@@ -62,8 +63,6 @@ const DayPixel = memo(
     }
 
     let borderClass = "border-text-base/10";
-
-    const todayShadow = isToday ? `1px 2px 4px ${theme.primary}80` : undefined;
 
     /*
      * MOOD
@@ -146,7 +145,7 @@ const DayPixel = memo(
           onPress={() => onPress(day.dateString)}
           style={{
             backgroundColor,
-            // boxShadow: todayShadow,
+            boxShadow: todayShadow,
           }}
           className={`flex-1 aspect-square items-center justify-center rounded-md border ${borderClass}`}
         >

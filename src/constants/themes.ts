@@ -9,6 +9,7 @@ export type ThemeType = {
   info: string;
   title: string;
   text: string;
+  buttonText: string;
   background: string;
   background2: string;
   card: string;
@@ -40,6 +41,8 @@ export const defaultDark = {
   title: "#E3F2FD",
   text: "#FFFFFF",
 
+  buttonText: "#FFFFFF",
+
   background: "#111111",
   background2: "#282828",
   card: "#1E1E1E",
@@ -65,12 +68,57 @@ export const themes: { [key: string]: ThemeItem } = {
       title: "#0F172A",
       text: "#334155",
 
+      buttonText: "#FFFFFF",
+
       background: "#F8FAFC",
       background2: "#F1F5F9",
       card: "#FFFFFF",
     },
 
     dark: defaultDark,
+  },
+
+  black: {
+    type: "normal",
+    light: {
+      primary: "#171717",
+      secondary: "#404040",
+      tertiary: "#737373",
+
+      success: "#16A34A",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#525252",
+
+      title: "#000000",
+      text: "#262626",
+
+      buttonText: "#FFFFFF",
+
+      background: "#FFFFFF",
+      background2: "#F5F5F5",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#FFFFFF",
+      secondary: "#D4D4D4",
+      tertiary: "#A3A3A3",
+
+      success: "#81C784",
+      error: "#F87171",
+      warning: "#FFB74D",
+      info: "#D4D4D4",
+
+      title: "#FFFFFF",
+      text: "#E5E5E5",
+
+      buttonText: "#000000",
+
+      background: "#000000",
+      background2: "#171717",
+      card: "#262626",
+    },
   },
 
   // ─────────────────────────────────────────────
@@ -91,6 +139,8 @@ export const themes: { [key: string]: ThemeItem } = {
       title: "#1E1B4B",
       text: "#37334D",
 
+      buttonText: "#FFFFFF",
+
       background: "#FAF9FF",
       background2: "#F3F1FA",
       card: "#FFFFFF",
@@ -108,6 +158,8 @@ export const themes: { [key: string]: ThemeItem } = {
 
       title: "#EDE9FE",
       text: "#F5F3FF",
+
+      buttonText: "#000000",
 
       background: "#14121A",
       background2: "#1C1924",
@@ -133,6 +185,8 @@ export const themes: { [key: string]: ThemeItem } = {
       title: "#022C22",
       text: "#33413C",
 
+      buttonText: "#FFFFFF",
+
       background: "#F7FCFA",
       background2: "#EEF8F4",
       card: "#FFFFFF",
@@ -150,6 +204,8 @@ export const themes: { [key: string]: ThemeItem } = {
 
       title: "#D1FAE5",
       text: "#F0FDF4",
+
+      buttonText: "#000000",
 
       background: "#0F1714",
       background2: "#17211D",
@@ -177,6 +233,8 @@ export const themes: { [key: string]: ThemeItem } = {
       title: "#4C0519",
       text: "#4A3440",
 
+      buttonText: "#FFFFFF",
+
       background: "#FFF9FA",
       background2: "#FFF1F3",
       card: "#FFFFFF",
@@ -194,6 +252,8 @@ export const themes: { [key: string]: ThemeItem } = {
 
       title: "#FFE4E6",
       text: "#FFF1F2",
+
+      buttonText: "#000000",
 
       background: "#180F12",
       background2: "#211519",
