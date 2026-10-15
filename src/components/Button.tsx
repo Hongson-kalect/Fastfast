@@ -5,6 +5,8 @@ import {
   TouchableOpacityProps,
 } from "react-native";
 import { ThemedText } from "./themed-text";
+import { getContrastTextColor } from "@/util/color";
+import { useAppStore } from "@/stores/appStore";
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -27,6 +29,8 @@ export const Button = ({
       ? "bg-brand shadow-lg shadow-brand/20"
       : "bg-surface border border-slate-700";
 
+    const theme = useAppStore((state) => state.theme);
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -38,7 +42,7 @@ export const Button = ({
         <ActivityIndicator color="#38BDF8" />
       ) : (
         <ThemedText
-          colorHex={variant === "primary" ? "white" : "textSecondary"}
+          colorHex={getContrastTextColor(variant=== "primary" ? theme.primary : theme.background)}
           weight="bold"
         >
           {title}

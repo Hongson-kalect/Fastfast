@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import LiquidCircle from "./Waterball";
+import { getContrastTextColor } from "@/util/color";
 
 const FullHabitModal = ({ habitName }: { habitName: string }) => {
   const { theme } = useAppStore();
@@ -105,7 +106,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
         hitSlop={10}
         className="mt-6 h-12 items-center justify-center rounded-xl bg-primary"
       >
-        <ThemedText size="md" weight="bold" colorHex="#FFFFFF">
+        <ThemedText size="md" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
           Đã hiểu
         </ThemedText>
       </Pressable>

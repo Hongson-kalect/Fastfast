@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, InputModalOptions } from "@/provider/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { getContrastTextColor } from "@/util/color";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -139,7 +140,7 @@ const InputModal = (modal: Props) => {
             backgroundColor: theme.primary,
           }}
         >
-          <ThemedText size="sm" weight="semibold" colorHex="white">
+          <ThemedText size="sm" weight="semibold" colorHex={getContrastTextColor(theme.primary)}>
             {modal.okText || "OK"}
           </ThemedText>
         </TouchableOpacity>

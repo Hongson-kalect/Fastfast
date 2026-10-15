@@ -14,6 +14,7 @@ import { useMemo, useRef, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 type Props = {
   startTime: number;
@@ -273,7 +274,7 @@ const FastEndTimeModal = ({
         }}
         className="mt-5 items-center justify-center rounded-2xl bg-error py-3.5"
       >
-        <ThemedText size="sm" weight="bold" colorHex="#FFFFFF">
+        <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.error)}>
           Xác nhận kết thúc Fast
         </ThemedText>
       </TouchableOpacity>

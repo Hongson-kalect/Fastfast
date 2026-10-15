@@ -20,6 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { runOnJS } from "react-native-worklets";
+import { getContrastTextColor } from "@/util/color";
 
 export type AchievementItem = {
   id: string;
@@ -281,7 +282,7 @@ export const AchievementCard = ({
                 >
                   <Ionicons name="gift" size={11} color="white" />
 
-                  <ThemedText size="xs" weight="bold" colorHex="white">
+                  <ThemedText size="xs" weight="bold" colorHex={getContrastTextColor(theme.success)}>
                     Nhận
                   </ThemedText>
                 </Pressable>

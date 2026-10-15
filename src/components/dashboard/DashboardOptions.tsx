@@ -7,6 +7,7 @@ import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
+import { getContrastTextColor } from "@/util/color";
 
 const DashboardOptions = () => {
   const { theme, updateWeight, settings, weight } = useAppStore();
@@ -72,9 +73,9 @@ const DashboardOptions = () => {
         onPress={openUpdateWeightModal}
         className="flex-row items-center gap-1 px-3 h-9 rounded-lg bg-success"
       >
-        <Feather name="plus" size={16} color="#FFFFFF" />
+        <Feather name="plus" size={16} color={getContrastTextColor(theme.success)}/>
 
-        <ThemedText size="sm" weight="medium" colorHex="#FFFFFF">
+        <ThemedText size="sm" weight="medium" colorHex={getContrastTextColor(theme.success)}>
           Update weight
         </ThemedText>
       </TouchableOpacity>

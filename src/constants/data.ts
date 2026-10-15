@@ -244,7 +244,7 @@ export const processData: ProcessDataType[] = [
     key: "fatBurning",
     title: "Fat Burning",
     icon: "fire",
-    color: "#FB923C",
+    color: "#F97316",
 
     process: [
       { hours: 10, level: 0 }, // Trước 10 tiếng: Trạng thái Khóa/Chờ (Locked)
@@ -292,7 +292,7 @@ export const processData: ProcessDataType[] = [
     key: "autophagy",
     title: "Autophagy",
     icon: "repeat",
-    color: "#EC4899",
+    color: "#D9468F",
 
     process: [
       { hours: 20, level: 0 }, // Trước 20 tiếng: Locked

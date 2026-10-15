@@ -18,6 +18,7 @@ import Animated, {
   SlideOutDown,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 interface PhotoPickerModalProps {
   visible: boolean;
@@ -145,9 +146,9 @@ export const PhotoPickerModal = ({
       title: "Add Photo",
       okText: (
         <View className="flex-row items-center justify-center gap-2">
-          <MaterialIcons name="photo-library" size={25} color={"white"} />
+          <MaterialIcons name="photo-library" size={25} color={getContrastTextColor(theme.primary)} />
 
-          <ThemedText size="sm" weight="bold" colorHex="white">
+          <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
             Gallery
           </ThemedText>
         </View>
@@ -322,9 +323,9 @@ export const PhotoPickerModal = ({
                 onPress={handleSelectPhoto}
                 className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
               >
-                <MaterialIcons name="photo-library" size={25} color={"white"} />
+                <MaterialIcons name="photo-library" size={25} color={getContrastTextColor(theme.primary)} />
 
-                <ThemedText size="sm" weight="bold" colorHex="white">
+                <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
                   Gallery
                 </ThemedText>
               </TouchableOpacity>

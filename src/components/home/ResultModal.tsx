@@ -8,6 +8,7 @@ import { useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 export type FastResultStatus = "COMPLETED" | "ENDED_EARLY" | "OVERACHIEVED";
 
@@ -365,7 +366,7 @@ export const ResultModal = ({ data = testData }: Props) => {
         <ThemedText
           size="sm"
           weight="bold"
-          colorHex="white"
+          colorHex={getContrastTextColor(theme.primary)}
         >
           OK
         </ThemedText>

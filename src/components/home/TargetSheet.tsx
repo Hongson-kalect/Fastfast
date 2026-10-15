@@ -13,6 +13,7 @@ import { useMemo, useRef, useState } from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
@@ -254,7 +255,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         alignItems: "center",
                       }}
                     >
-                      <ThemedText size="lg" weight="bold" colorHex="#FFFFFF">
+                      <ThemedText size="lg" weight="bold" colorHex={getContrastTextColor(item.colors.accent)}>
                         {isCurrent ? "Xác nhận" : "Chọn mục tiêu này"}
                       </ThemedText>
                     </Pressable>

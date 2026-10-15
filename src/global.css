@@ -10,6 +10,7 @@
   --color-tertiary: var(--dynamic-tertiary);
 
   --color-text-base: var(--dynamic-text-base);
+  --color-text-button: var(--dynamic-text-button);
   --color-title: var(--dynamic-title);
 
   --color-background: var(--dynamic-background);

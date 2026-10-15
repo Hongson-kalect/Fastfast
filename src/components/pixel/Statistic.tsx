@@ -3,6 +3,7 @@ import { TARGET_PACKS } from "@/constants/fasting_targets";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
+import { getContrastTextColor } from "@/util/color";
 import { fixed } from "@/util/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -113,7 +114,9 @@ const PixelStatistic = React.memo(
                 size="xs"
                 weight="medium"
                 colorHex={
-                  trackingType === "mood" ? "#FFFFFF" : theme.text + "aa"
+                  trackingType === "mood"
+                    ? getContrastTextColor(theme.primary)
+                    : theme.text + "aa"
                 }
               >
                 Emotion
@@ -138,7 +141,9 @@ const PixelStatistic = React.memo(
                 size="xs"
                 weight="medium"
                 colorHex={
-                  trackingType === "fasting" ? "#FFFFFF" : theme.text + "aa"
+                  trackingType === "fasting"
+                    ? getContrastTextColor(theme.primary)
+                    : theme.text + "aa"
                 }
               >
                 Fast process

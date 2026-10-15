@@ -7,6 +7,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { memo, ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
+
 const DayPixel = memo(
   ({
     day,
@@ -26,77 +27,52 @@ const DayPixel = memo(
 
     const isDark = settings?.is_dark_mode ?? true;
     const isToday = day.dateString === todayStr;
+    const isFuture = day.dateString > todayStr;
 
-    let emoji: ReactNode;
-    let backgroundColor = "transparent";
-    let opacity = 1;
-    let icon: React.ReactNode = null;
-    const pressable =
-      (pixelData?.logs?.length || 0) > 0 ||
-      pixelData?.note ||
-      pixelData?.shieldLog;
+    const logs = pixelData?.logs ?? [];
+    const note = pixelData?.note;
+    const shieldLog = pixelData?.shieldLog;
 
-    /*
-     * Ngày trong tương lai
-     */
-    if (day.dateString > todayStr) {
-      return (
-        <View className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5" />
-      );
-    }
+    const canPress = !isFuture;
 
     const todayShadow = isToday
       ? `1px 2px 4px ${theme.primary}80, -0.5px -1px 2px ${theme.primary}60`
       : undefined;
-    /*
-     * Không có dữ liệu
-     */
-    if (!pixelData) {
-      return (
-        <View
-          style={{
-            boxShadow: todayShadow,
-          }}
-          className="flex-1 aspect-square items-center justify-center rounded-md border border-text-base/5"
-        />
-      );
+
+    const baseClass =
+      "flex-1 aspect-square items-center justify-center rounded-md border";
+
+    // Ngày tương lai luôn disabled.
+    if (isFuture) {
+      return <View className={`${baseClass} border-text-base/5`} />;
     }
 
+    let emoji: ReactNode = null;
+    let icon: ReactNode = null;
+    let backgroundColor = "transparent";
+    let opacity = 1;
     let borderClass = "border-text-base/10";
 
-    /*
-     * MOOD
-     */
     if (viewMode === "mood") {
-      if (pixelData.note) {
+      if (note) {
         const emotionPack = EMOTION_PACKS[settings?.emotion_pack || "default"];
 
-        const mood = emotionPack.emotions[pixelData.note.mood_level || 0];
+        const mood = emotionPack.emotions[note.mood_level || 0];
 
-        emoji = mood.icon;
-        backgroundColor = isDark ? mood.color.dark : mood.color.light;
+        if (mood) {
+          emoji = mood.icon;
+          backgroundColor = isDark ? mood.color.dark : mood.color.light;
+        }
 
-        if (pixelData.note.note) {
+        if (note.note) {
           borderClass = "border-primary/50";
         }
       }
     } else {
-      /*
-       * FAST
-       */
-
-      if (!pixelData.logs.length) {
-        if (pixelData.shieldLog) {
-          icon = (
-            <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
-          );
-        }
-      } else {
-        const fast = pixelData.logs.reduce((best, current) =>
+      if (logs.length > 0) {
+        const fast = logs.reduce((best, current) =>
           current.hours_in_fast > best.hours_in_fast ? current : best,
         );
-
-        const targetPack = TARGET_PACKS[settings?.target_pack || "default"];
 
         const pixel = FASTING_TARGETS.findIndex(
           (target) =>
@@ -105,23 +81,29 @@ const DayPixel = memo(
         );
 
         if (pixel >= 0) {
-          const progress = Math.min(fast.elapsed_hours / fast.hours_in_fast, 1);
+          const targetPack = TARGET_PACKS[settings?.target_pack || "default"];
 
           const target = targetPack.targets[pixel];
+          const progress = Math.min(fast.elapsed_hours / fast.hours_in_fast, 1);
 
           opacity = 0.5 + 0.5 * progress;
           backgroundColor = isDark ? target.color.dark : target.color.light;
 
           emoji = target.icon;
         }
+      } else if (shieldLog) {
+        icon = (
+          <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
+        );
       }
     }
 
-    /*
-     * Nội dung
-     */
+    if (!day.isCurrentYear) {
+      borderClass = "border-dashed border-text-base/5";
+    }
+
     const content =
-      icon ||
+      icon ??
       (emoji ? (
         <ThemedText
           size="sm"
@@ -134,48 +116,32 @@ const DayPixel = memo(
         </ThemedText>
       ) : null);
 
-    if (!day.isCurrentYear) borderClass = "border-dashed border-text-base/5";
-    /*
-     * Pixel có thể click
-     */
+    const style = {
+      backgroundColor,
+      boxShadow: todayShadow,
+    };
 
-    if (pressable) {
+    const children = (
+      <View style={{ opacity }} className="flex-1 items-center justify-center">
+        {content}
+      </View>
+    );
+
+    if (canPress) {
       return (
         <Pressable
           onPress={() => onPress(day.dateString)}
-          style={{
-            backgroundColor,
-            boxShadow: todayShadow,
-          }}
-          className={`flex-1 aspect-square items-center justify-center rounded-md border ${borderClass}`}
+          style={style}
+          className={`${baseClass} ${borderClass}`}
         >
-          <View
-            style={{ opacity }}
-            className="flex-1 items-center justify-center"
-          >
-            {content}
-          </View>
+          {children}
         </Pressable>
       );
     }
 
-    /*
-     * Pixel rỗng
-     */
     return (
-      <View
-        style={{
-          backgroundColor,
-          boxShadow: todayShadow,
-        }}
-        className={`flex-1 aspect-square rounded-md border ${borderClass}`}
-      >
-        <View
-          style={{ opacity }}
-          className="flex-1 items-center justify-center"
-        >
-          {content}
-        </View>
+      <View style={style} className={`${baseClass} ${borderClass}`}>
+        {children}
       </View>
     );
   },

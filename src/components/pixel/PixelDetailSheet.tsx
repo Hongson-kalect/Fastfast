@@ -3,13 +3,14 @@ import { useDBService } from "@/hooks/useDBService";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
 import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Image, ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
-import Circular24hTimeline from "./Circular24hTimeline";
-import { DailyFastSessionCard } from "./DailySessionFast";
+import PixelDailyFast from "./PixelDailyFast";
+import PixelDailyNote from "./PixelDailyNote";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -19,7 +20,7 @@ type DetailType = {
 
 type FastMap = Record<string, FastSession>;
 
-type TimelineSegment = {
+export type TimelineSegment = {
   fastId: string;
   startHour: number;
   endHour: number;
@@ -105,15 +106,11 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
     try {
       setIsLoadingFasts(true);
-
       const fasts = await dbService.getFastSessionByIds(fastIds);
-
       const result: FastMap = {};
-
       for (const fast of fasts ?? []) {
         result[fast.id] = fast;
       }
-
       setFastObj(result);
     } catch (error) {
       console.error("PixelDetailSheet.getFasts", error);
@@ -178,6 +175,14 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     () => timelineSegments.reduce((acc, curr) => acc + curr.duration, 0),
     [timelineSegments],
   );
+
+  const { addModal } = useModalStore();
+  const onEditNote = () => {
+    addModal({
+      type: "prompt",
+      onOk(value) {},
+    });
+  };
 
   return (
     <View className="flex-1 bg-background">
@@ -280,145 +285,17 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Fasting */}
-        {activeTab === "fasting" && (
-          <View className="gap-y-5">
-            <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background2 p-5">
-              <Circular24hTimeline
-                segments={circularSegments}
-                totalDuration={totalDuration}
-                size={220}
-                strokeWidth={14}
-                isLoading={isLoadingFasts}
-                animated
-              />
-            </View>
-
-            {fastIds.length > 0 && (
-              <View>
-                <View className="mb-2.5 flex-row items-center justify-between px-1">
-                  <ThemedText
-                    size="xs"
-                    weight="semibold"
-                    color="text"
-                    style={{
-                      letterSpacing: 1,
-                    }}
-                  >
-                    CÁC PHIÊN LIÊN QUAN
-                  </ThemedText>
-
-                  <ThemedText size="xs" color="text" opacity="medium">
-                    {fastIds.length} phiên
-                  </ThemedText>
-                </View>
-
-                <View className="gap-y-2">
-                  {log.map((item, index) => (
-                    <DailyFastSessionCard
-                      key={item.fast_id}
-                      index={index}
-                      fast={fastObj[item.fast_id] ?? null}
-                      dailyLog={item}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* Journal */}
-        {activeTab === "mood" && (
-          <View className="gap-y-4">
-            {/* Weight */}
-            <View className="flex-row items-center gap-x-3">
-              <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-text-base/10 bg-background2 p-3.5">
-                <ThemedText
-                  size="xs"
-                  weight="medium"
-                  color="text"
-                  opacity="medium"
-                >
-                  Cân nặng
-                </ThemedText>
-
-                <View className="flex-row items-baseline">
-                  <ThemedText size="lg" weight="bold" color="warning">
-                    {weight || "--"}
-                  </ThemedText>
-
-                  <ThemedText
-                    size="xs"
-                    color="text"
-                    opacity="medium"
-                    className="ml-0.5"
-                  >
-                    kg
-                  </ThemedText>
-                </View>
-              </View>
-            </View>
-
-            {/* Note */}
-            <View className="rounded-2xl border border-text-base/10 bg-background2 p-4">
-              <ThemedText
-                size="xxs"
-                weight="semibold"
-                color="text"
-                opacity="medium"
-                className="mb-2.5"
-                style={{
-                  letterSpacing: 1.5,
-                }}
-              >
-                GHI CHÚ TRONG NGÀY
-              </ThemedText>
-
-              {note?.note ? (
-                <ThemedText size="sm" color="text" style={{ lineHeight: 24 }}>
-                  {note.note}
-                </ThemedText>
-              ) : (
-                <View className="py-2">
-                  <ThemedText
-                    size="sm"
-                    color="text"
-                    opacity="low"
-                    style={{ fontStyle: "italic" }}
-                  >
-                    Chưa có ghi chú nào được thêm.
-                  </ThemedText>
-                </View>
-              )}
-            </View>
-
-            {/* Image */}
-            {note?.image_uri && (
-              <View className="rounded-2xl border border-text-base/10 bg-background2 p-3">
-                <ThemedText
-                  size="xxs"
-                  weight="semibold"
-                  color="text"
-                  opacity="medium"
-                  className="mb-2.5 ml-1"
-                  style={{
-                    letterSpacing: 1.5,
-                  }}
-                >
-                  HÌNH ẢNH
-                </ThemedText>
-
-                <View className="overflow-hidden rounded-xl bg-background">
-                  <Image
-                    source={{ uri: note.image_uri }}
-                    className="aspect-9/16 w-full rounded-xl"
-                    resizeMode="cover"
-                  />
-                </View>
-              </View>
-            )}
-          </View>
+        {activeTab === "fasting" ? (
+          <PixelDailyFast
+            circularSegments={circularSegments}
+            totalDuration={totalDuration}
+            isLoadingFasts={isLoadingFasts}
+            fastIds={fastIds}
+            log={log}
+            fastObj={fastObj}
+          />
+        ) : (
+          <PixelDailyNote weight={weight} note={note} />
         )}
       </ScrollView>
     </View>

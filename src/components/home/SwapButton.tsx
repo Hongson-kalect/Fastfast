@@ -295,7 +295,6 @@ export const SwapButton = React.memo(
             setVisible={setNoteModalVisible}
             note={todayData.note}
             mood={todayData.mood}
-            weight={weight}
             onSelectMood={handleSelectMood}
           />
 

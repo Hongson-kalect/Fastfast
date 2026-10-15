@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, ConfirmModalOptions } from "@/provider/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { getContrastTextColor } from "@/util/color";
 import { TouchableOpacity, View } from "react-native";
 
 type Props = ConfirmModalOptions & BasicModalOptions;
@@ -79,7 +80,7 @@ const ConfirmModal = (modal: Props) => {
           }}
         >
           {typeof okText === "string" ? (
-            <ThemedText size="sm" weight="semibold" colorHex="white">
+            <ThemedText size="sm" weight="semibold" colorHex={getContrastTextColor(theme.primary)}>
               {okText}
             </ThemedText>
           ) : (

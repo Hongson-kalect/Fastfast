@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 interface FastingSheetProps {
   counter: number;
@@ -361,7 +362,7 @@ const FastingSheet = ({
           onPress={finishFasting}
           className="items-center rounded-2xl bg-error py-3.5"
         >
-          <ThemedText size="md" weight="bold" colorHex="white">
+          <ThemedText size="md" weight="bold" colorHex={getContrastTextColor(theme.error)}>
             Kết thúc Fasting
           </ThemedText>
         </TouchableOpacity>

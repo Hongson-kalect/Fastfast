@@ -12,6 +12,7 @@ import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 interface Props {
   data: StreakCheckResult | null;
@@ -382,7 +383,7 @@ export const StreakCheckModal = ({ data }: Props) => {
         <ThemedText
           size="sm"
           weight="bold"
-          colorHex="white"
+          colorHex={getContrastTextColor(color)}
         >
           {config.btnText}
         </ThemedText>

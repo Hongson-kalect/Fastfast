@@ -53,9 +53,20 @@ export const setDailyNote = async (
   dateStr: string = getLocalTodayStr(),
 ) => {
   const query = `
-    INSERT OR REPLACE INTO daily_notes (log_date, mood_level, note, image_uri, updated_at)
-    VALUES (?, ?, ?, ?, strftime('%s', 'now'));
-  `;
+    INSERT INTO daily_notes (
+      log_date,
+      mood_level,
+      note,
+      image_uri,
+      updated_at
+    )
+    VALUES (?, ?, ?, ?, strftime('%s', 'now'))
+    ON CONFLICT(log_date) DO UPDATE SET
+      mood_level = excluded.mood_level,
+      note = excluded.note,
+      image_uri = excluded.image_uri,
+      updated_at = excluded.updated_at;
+    `;
   try {
     await db.runAsync(query, [
       dateStr,

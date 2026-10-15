@@ -1,13 +1,17 @@
+import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
+import { MoodLevel } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { loadPixelYear, updatePixelViewMode } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
+import { getContrastTextColor } from "@/util/color";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
@@ -22,7 +26,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // 1. Định nghĩa các chế độ xem (View Options)
 
@@ -38,7 +42,7 @@ const PixelScreen = () => {
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
-  const { updateSetting, theme } = useAppStore();
+  const { updateSetting, theme, weight, updateWeight } = useAppStore();
   const { isLoading, stats, year, yearPixelData, viewMode } = usePixelStore();
 
   const sectionListRef = useRef<SectionList>(null);
@@ -88,12 +92,44 @@ const PixelScreen = () => {
     });
   }, []);
 
+  const [moodModalVisible, setMoodModalVisible] = useState(false);
+
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const openAddMoodModal = (date: string) => {
+    setSelectedDate(date);
+    setMoodModalVisible(true);
+  };
+
+  const handleSelectMood = async (
+    mood?: MoodLevel,
+    note?: string,
+    newWeight?: number,
+    date?: string,
+  ) => {
+    if (!dbService) return console.log("db not ready");
+
+    // animationProgress.value = 0;
+    // setIsMenuOpen(false);
+    // await dbService.setDailyNote(mood, note, todayData.image);
+
+    await dbService.setDailyNote(mood, note, undefined, date);
+    await loadPixelYear(dbService, year);
+
+    if (newWeight && weight !== newWeight) {
+      await dbService.updateWeight(newWeight);
+      updateWeight(newWeight);
+    }
+  };
+
   const handleSelectDate = useCallback(
     (date: string) => {
       console.log("handleSelectDate", Date.now());
       const data = yearPixelData[date];
       console.log("selected Date ", date, data);
-      if (!data) return;
+      if (!data) {
+        openAddMoodModal(date);
+        // Chưa có dữ liệu - Mở modal add dữ liệu ngày
+      }
 
       if (data.note || data.logs.length > 0) {
         present(
@@ -113,6 +149,9 @@ const PixelScreen = () => {
     },
     [yearPixelData, present],
   );
+
+  const { addModal } = useModalStore();
+  const handleAddNewNote = () => {};
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -154,7 +193,16 @@ const PixelScreen = () => {
   const inset = useSafeAreaInsets();
 
   return (
-    <View style={{ paddingTop: inset.top, paddingBottom: inset.bottom }} className="flex-1 bg-background">
+    <View
+      style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
+      className="flex-1 bg-background"
+    >
+      <NoteModal
+        dateStr={selectedDate ?? undefined}
+        visible={moodModalVisible}
+        setVisible={setMoodModalVisible}
+        onSelectMood={handleSelectMood}
+      />
       <View className="absolute bottom-12 right-2 z-10">
         {scrollButton === "up" && (
           <Pressable
@@ -174,83 +222,81 @@ const PixelScreen = () => {
           </Pressable>
         )}
       </View>
-        <SectionList
-          showsVerticalScrollIndicator={false}
-          ref={sectionListRef}
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: 40,
-            gap: 4,
-          }}
-          scrollEventThrottle={32}
-          onScroll={handleScroll}
-          getItemLayout={(data, index) => ({
-            length: ITEM_HEIGHT,
-            offset: ITEM_HEIGHT * index,
-            index,
-          })}
-          sections={[{ key: "calendar", data: gridData }]}
-          ListHeaderComponent={
-            <PixelHeader
-              stats={stats}
-              year={year}
-              setYear={async (year) =>
-                await loadPixelYear(dbService, year)
-              }
-              viewMode={viewMode}
-              setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
-            />
-          }
-          renderSectionHeader={() => (
-            <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
-              {/* Header Thứ (T2 -> CN) */}
-              <View className="flex-row mb-2 items-center">
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  hitSlop={25}
-                  style={{ borderTopLeftRadius: 4 }}
-                  className="w-15 bg-primary justify-center items-center"
+      <SectionList
+        showsVerticalScrollIndicator={false}
+        ref={sectionListRef}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 40,
+          gap: 4,
+        }}
+        scrollEventThrottle={32}
+        onScroll={handleScroll}
+        getItemLayout={(data, index) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        })}
+        sections={[{ key: "calendar", data: gridData }]}
+        ListHeaderComponent={
+          <PixelHeader
+            stats={stats}
+            year={year}
+            setYear={async (year) => await loadPixelYear(dbService, year)}
+            viewMode={viewMode}
+            setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
+          />
+        }
+        renderSectionHeader={() => (
+          <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
+            {/* Header Thứ (T2 -> CN) */}
+            <View className="flex-row mb-2 items-center">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                hitSlop={25}
+                style={{ borderTopLeftRadius: 4 }}
+                className="w-15 bg-primary justify-center items-center"
+              >
+                <ThemedText
+                  size="xs"
+                  weight="bold"
+                  colorHex={getContrastTextColor(theme.primary)}
+                  style={{ paddingVertical: 4 }}
                 >
-                  <ThemedText
-                    size="xs"
-                    weight="bold"
-                    colorHex="#FFFFFF"
-                    style={{ paddingVertical: 4 }}
-                  >
-                    Week
-                  </ThemedText>
-                </TouchableOpacity>
+                  Week
+                </ThemedText>
+              </TouchableOpacity>
 
-                <View className="flex-1 flex-row justify-between">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (day, idx) => (
-                      <View
-                        key={idx}
-                        className="flex-1 items-center justify-center pt-1"
-                      >
-                        <ThemedText size="xxs" color="text" opacity="medium">
-                          {day}
-                        </ThemedText>
-                      </View>
-                    ),
-                  )}
-                </View>
+              <View className="flex-1 flex-row justify-between">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day, idx) => (
+                    <View
+                      key={idx}
+                      className="flex-1 items-center justify-center pt-1"
+                    >
+                      <ThemedText size="xxs" color="text" opacity="medium">
+                        {day}
+                      </ThemedText>
+                    </View>
+                  ),
+                )}
               </View>
             </View>
-          )}
-          stickySectionHeadersEnabled
-          contentContainerClassName="gap-1"
-          keyExtractor={(week) => week.weekIndex.toString()}
-          renderItem={({ item }) => (
-            <WeekRow
-              week={item}
-              todayStr={todayStr}
-              viewMode={viewMode}
-              yearPixelData={yearPixelData}
-              onSelectDate={handleSelectDate}
-            />
-          )}
-        />
+          </View>
+        )}
+        stickySectionHeadersEnabled
+        contentContainerClassName="gap-1"
+        keyExtractor={(week) => week.weekIndex.toString()}
+        renderItem={({ item }) => (
+          <WeekRow
+            week={item}
+            todayStr={todayStr}
+            viewMode={viewMode}
+            yearPixelData={yearPixelData}
+            onSelectDate={handleSelectDate}
+          />
+        )}
+      />
     </View>
   );
 };

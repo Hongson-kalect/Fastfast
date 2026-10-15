@@ -1,4 +1,4 @@
-import { getProcessLevelTitle, processData } from "@/constants/data";
+import { FASTING_TARGETS, getProcessLevelTitle, processData } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
 import { getProcessProgress } from "@/util/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";

@@ -1,6 +1,7 @@
 import { EMOTION_PACKS } from "@/constants/emotions";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import { getLocalTodayStr } from "@/util/timer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
@@ -49,7 +50,8 @@ type Props = {
   setVisible: (visible: boolean) => void;
   note?: string;
   mood?: MoodLevel;
-  weight: number | null;
+  dateStr?: string;
+  // weight: number | null;
   onSelectMood: (mood?: MoodLevel, note?: string, weight?: number) => void;
 };
 const NoteModal = ({
@@ -57,10 +59,11 @@ const NoteModal = ({
   setVisible,
   note,
   mood,
-  weight,
+  dateStr,
   onSelectMood,
 }: Props) => {
-  const { theme, settings } = useAppStore();
+  const today = getLocalTodayStr();
+  const { theme, settings, weight } = useAppStore();
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const [tempText, setTempText] = useState(note ?? "");
@@ -114,9 +117,19 @@ const NoteModal = ({
                   <FontAwesome6 name="pen" size={17} color={theme.primary} />
                 </View>
 
-                <ThemedText size="xl" weight="bold" color="title">
+                {dateStr === today ? (
+                  <ThemedText size="xl" weight="bold" color="primary">
+                    Today Note
+                  </ThemedText>
+                ) : (
+                  <ThemedText size="xl" weight="bold" color="title">
+                    Note {dateStr}
+                  </ThemedText>
+                )}
+
+                {/* <ThemedText size="xl" weight="bold" color="title">
                   Daily note
-                </ThemedText>
+                </ThemedText> */}
               </View>
 
               <TouchableOpacity

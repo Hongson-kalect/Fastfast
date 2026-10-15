@@ -14,6 +14,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         "--dynamic-secondary": theme.secondary,
         "--dynamic-title": theme.title,
         "--dynamic-text-base": theme.text,
+        "--dynamic-text-button": theme.buttonText,
         "--dynamic-background": theme.background,
         "--dynamic-background2": theme.background2,
         "--dynamic-error": theme.error,

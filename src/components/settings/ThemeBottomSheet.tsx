@@ -10,6 +10,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
+import { getContrastTextColor } from "@/util/color";
 
 type ThemeBottomSheetProps = {
   currentThemeId: keyof typeof themes;
@@ -358,7 +359,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                             size="sm"
                             // weight="medium"
                             opacity="full"
-                            colorHex={"white"}
+                            colorHex={getContrastTextColor(theme.primary)}
                             className="ml-1"
                           >
                             Purchase
@@ -374,7 +375,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                         }}
                         className="flex-row items-center px-4 py-2 rounded-xl"
                       >
-                        <ThemedText size="sm" colorHex={"white"}>
+                        <ThemedText size="sm" colorHex={getContrastTextColor(theme.primary)}>
                           {!usable ? "Be premium" : "Un premium"}
                           {/* Be Premium */}
                         </ThemedText>
@@ -394,7 +395,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                           size="sm"
                           // weight="medium"
                           opacity="full"
-                          colorHex={"white"}
+                          colorHex={getContrastTextColor(theme.primary)}
                           className="ml-1"
                         >
                           Purchase

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
+import { getContrastTextColor } from "@/util/color";
 
 type Props = {
   minTime?: number | null;
@@ -218,7 +219,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           boxShadow: `0px 4px 8px ${theme.primary}40`,
         }}
       >
-        <ThemedText size="sm" weight="bold" colorHex="white">
+        <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
           Xác nhận bắt đầu Fast
         </ThemedText>
       </TouchableOpacity>
