@@ -3,7 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { EMOTION_PACKS, EMOTIONS, MoodLevel } from "@/constants/emotions";
+import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 
 type SwapMoodButtonProps = {
@@ -53,8 +53,12 @@ export const SwapMoodButton = ({
           )}
 
           {note && (
-            <View className="absolute -top-4 right-0">
-              <Ionicons name="chatbox" size={24} color={theme.text} />
+            <View className="absolute -top-4 right-0 bg-background/80 rounded">
+              <Ionicons
+                name="chatbox-ellipses-outline"
+                size={24}
+                color={theme.text}
+              />
             </View>
           )}
         </View>

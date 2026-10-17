@@ -5,12 +5,14 @@ import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { usePixelStore } from "@/stores/pixelStore";
+import { getWeight } from "@/util/home/fast";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import PixelDailyFast from "./PixelDailyFast";
 import PixelDailyNote from "./PixelDailyNote";
+import { MoodModal } from "./modals/MoodModal";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -85,6 +87,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const [weight, setWeight] = useState(0);
   const viewMode = usePixelStore((state) => state.viewMode);
   const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
+  const [moodModalVisible, setMoodModalVisible] = useState(false);
 
   const EMOTIONS = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
@@ -120,18 +123,15 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     }
   }, [dbService, fastIds]);
 
-  const getWeight = useCallback(async () => {
-    const result = await dbService.getCurrentWeight(dateString);
-
-    if (result) {
-      setWeight(result.weight);
-    }
-  }, [dbService, dateString]);
+  const getActiveWeight = async () => {
+    const weight = await getWeight(dbService, dateString);
+    console.log("get weight", weight);
+    setWeight(weight ? weight.weight : 0);
+  };
 
   useEffect(() => {
-    getFasts();
-    getWeight();
-  }, [getFasts, getWeight]);
+    Promise.all([getFasts(), getActiveWeight()]);
+  }, [getFasts]);
 
   const timelineSegments = useMemo(() => {
     const segments: TimelineSegment[] = [];
@@ -198,28 +198,30 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
           </ThemedText>
         </View>
 
-        {currentMood ? (
-          <View
-            style={{
-              backgroundColor: currentMood.color[isDark ? "dark" : "light"],
-            }}
-            className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
-          >
-            <ThemedText size="xs" weight="semibold" color="background">
-              {currentMood.label}
-            </ThemedText>
+        <Pressable onPress={() => setMoodModalVisible(true)}>
+          {currentMood ? (
+            <View
+              style={{
+                backgroundColor: currentMood.color[isDark ? "dark" : "light"],
+              }}
+              className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
+            >
+              <ThemedText size="xs" weight="semibold" color="background">
+                {currentMood.label}
+              </ThemedText>
 
-            <ThemedText size="lg" weight="medium">
-              {currentMood.icon}
-            </ThemedText>
-          </View>
-        ) : (
-          <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
-            <ThemedText size="xxs" color="text" opacity="medium">
-              Chưa có mood
-            </ThemedText>
-          </View>
-        )}
+              <ThemedText size="lg" weight="medium">
+                {currentMood.icon}
+              </ThemedText>
+            </View>
+          ) : (
+            <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
+              <ThemedText size="xxs" color="text" opacity="medium">
+                Chưa có mood
+              </ThemedText>
+            </View>
+          )}
+        </Pressable>
       </View>
 
       {/* Tabs */}
@@ -251,7 +253,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => setActiveTab("fasting")}
+            onPress={() => setActiveTab("mood")}
             className="flex-1 items-center justify-center rounded-2xl py-4"
             style={
               activeTab === "mood"
@@ -284,6 +286,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
           paddingBottom: 40,
         }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {activeTab === "fasting" ? (
           <PixelDailyFast
@@ -298,6 +301,18 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
           <PixelDailyNote weight={weight} note={note} />
         )}
       </ScrollView>
+
+      <MoodModal
+        visible={moodModalVisible}
+        setVisible={setMoodModalVisible}
+        dateStr={dateString}
+        mood={note?.mood_level}
+        onSave={(value, date) => {
+          console.log("mood value", value, "date", date);
+
+          // Chỉ cập nhật mood.
+        }}
+      />
     </View>
   );
 };

@@ -148,7 +148,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
 
   getCurrentWeight: (date?: string) => getCurrentWeight(db, date),
   getWeightLogs: (days?: number) => getWeightLogs(db, days),
-  updateWeight: (weight: number) => updateWeight(db, weight),
+  updateWeight: (weight: number, date?:string) => updateWeight(db, weight, date),
 
   setting: (key: string, value: any) => setAppSetting(db, key, value),
 

@@ -1,28 +1,38 @@
-import { Image, View } from "react-native";
-import { ThemedText } from "../themed-text";
 import { DailyNote } from "@/interfaces/db.type";
+import { getLocalTodayStr } from "@/util/timer";
+import { useState } from "react";
+import { Image, Pressable, View } from "react-native";
+import { ThemedText } from "../themed-text";
+import { DailyNoteModal } from "./modals/DailyNoteModal";
+import { MoodModal } from "./modals/MoodModal";
+import { WeightModal } from "./modals/WeightModal";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   weight: number | null;
   note?: DailyNote | null;
+  date?: string;
 };
 
-export default function PixelDailyNote({ weight, note }: Props) {
+export default function PixelDailyNote({
+  weight,
+  note,
+  date = getLocalTodayStr(),
+}: Props) {
+  const [weightModalVisible, setWeightModalVisible] = useState(false);
+  const [noteModalVisible, setNoteModalVisible] = useState(false);
+  const [moodModalVisible, setMoodModalVisible] = useState(false);
+
   return (
     <View className="gap-y-4">
       {/* Weight */}
       <View className="flex-row items-center gap-x-3">
         <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-text-base/10 bg-background2 p-3.5">
-          <ThemedText
-            size="xs"
-            weight="medium"
-            color="text"
-            opacity="medium"
-          >
+          <ThemedText size="xs" weight="medium" color="text" opacity="medium">
             Cân nặng
           </ThemedText>
 
-          <View className="flex-row items-baseline">
+          <Pressable onPress={() => setWeightModalVisible(true)} className="flex-row items-baseline">
             <ThemedText size="lg" weight="bold" color="warning">
               {weight || "--"}
             </ThemedText>
@@ -35,12 +45,14 @@ export default function PixelDailyNote({ weight, note }: Props) {
             >
               kg
             </ThemedText>
-          </View>
+          </Pressable>
         </View>
       </View>
 
       {/* Note */}
       <View className="rounded-2xl border border-text-base/10 bg-background2 p-4">
+      <View className = "flex-row items-center justify-between">
+
         <ThemedText
           size="xxs"
           weight="semibold"
@@ -51,6 +63,11 @@ export default function PixelDailyNote({ weight, note }: Props) {
         >
           GHI CHÚ TRONG NGÀY
         </ThemedText>
+      </View>
+
+      <Pressable onPress={() => setNoteModalVisible(true)}>
+       <ThemedText>Edit</ThemedText>
+      </Pressable>
 
         {note?.note ? (
           <ThemedText size="sm" color="text" style={{ lineHeight: 24 }}>
@@ -93,6 +110,28 @@ export default function PixelDailyNote({ weight, note }: Props) {
           </View>
         </View>
       )}
+
+      <WeightModal
+        visible={weightModalVisible}
+        setVisible={setWeightModalVisible}
+        dateStr={date}
+        onSave={(value, date) => {
+          console.log("weight value", value, "date", date);
+          // Lưu cân nặng cho đúng ngày.
+        }}
+      />
+
+      <DailyNoteModal
+        visible={noteModalVisible}
+        setVisible={setNoteModalVisible}
+        dateStr={date}
+        note={note?.note}
+        onSave={(value, date) => {
+          console.log("note value", value, "date", date);
+
+          // Chỉ cập nhật note.
+        }}
+      />
     </View>
   );
 }

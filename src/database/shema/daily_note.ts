@@ -47,32 +47,49 @@ export const getDailyNote = async (
 // Hàm lưu hoặc cập nhật Note của ngày hôm nay
 export const setDailyNote = async (
   db: SQLiteDatabase,
-  mood?: MoodLevel,
-  note?: string,
-  image?: string,
+  mood?: MoodLevel | null,
+  note?: string | null,
+  image?: string | null,
   dateStr: string = getLocalTodayStr(),
 ) => {
-  const query = `
-    INSERT INTO daily_notes (
-      log_date,
-      mood_level,
-      note,
-      image_uri,
-      updated_at
-    )
-    VALUES (?, ?, ?, ?, strftime('%s', 'now'))
-    ON CONFLICT(log_date) DO UPDATE SET
-      mood_level = excluded.mood_level,
-      note = excluded.note,
-      image_uri = excluded.image_uri,
-      updated_at = excluded.updated_at;
-    `;
   try {
+    const query = `
+      INSERT INTO daily_notes (
+        log_date,
+        mood_level,
+        note,
+        image_uri,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, strftime('%s', 'now'))
+      ON CONFLICT(log_date) DO UPDATE SET
+        mood_level = CASE
+          WHEN ? THEN excluded.mood_level
+          ELSE daily_notes.mood_level
+        END,
+        note = CASE
+          WHEN ? THEN excluded.note
+          ELSE daily_notes.note
+        END,
+        image_uri = CASE
+          WHEN ? THEN excluded.image_uri
+          ELSE daily_notes.image_uri
+        END,
+        updated_at = excluded.updated_at;
+    `;
+
+    const hasMood = mood !== undefined;
+    const hasNote = note !== undefined;
+    const hasImage = image !== undefined;
+
     await db.runAsync(query, [
       dateStr,
-      mood || null,
-      note || null,
-      image || null,
+      mood ?? null,
+      note ?? null,
+      image ?? null,
+      hasMood ? 1 : 0,
+      hasNote ? 1 : 0,
+      hasImage ? 1 : 0,
     ]);
   } catch (e) {
     console.log("error on setDailyNote", e);

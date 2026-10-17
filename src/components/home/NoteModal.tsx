@@ -1,6 +1,8 @@
 import { EMOTION_PACKS } from "@/constants/emotions";
+import { useDBService } from "@/hooks/useDBService";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
+import { getWeight } from "@/util/home/fast";
 import { getLocalTodayStr } from "@/util/timer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -19,7 +21,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 
-const checkWeightError = (text: string): string => {
+export const checkWeightError = (text: string): string => {
   if (!text) return "";
 
   if (!/^[\d.]*$/.test(text)) {
@@ -51,8 +53,12 @@ type Props = {
   note?: string;
   mood?: MoodLevel;
   dateStr?: string;
-  // weight: number | null;
-  onSelectMood: (mood?: MoodLevel, note?: string, weight?: number) => void;
+  onSelectMood: (
+    mood?: MoodLevel,
+    note?: string,
+    weight?: number,
+    date?: string,
+  ) => void;
 };
 const NoteModal = ({
   visible,
@@ -63,11 +69,15 @@ const NoteModal = ({
   onSelectMood,
 }: Props) => {
   const today = getLocalTodayStr();
+  console.log("dateStr", dateStr);
   const { theme, settings, weight } = useAppStore();
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const [tempText, setTempText] = useState(note ?? "");
   const [tempWeight, setTempWeight] = useState(weight?.toString() ?? "");
+  const [weightPlaceholder, setWeightPlaceholder] = useState(
+    weight?.toString() ?? "",
+  );
 
   const parsedWeight = tempWeight ? Number(tempWeight) : undefined;
 
@@ -82,9 +92,28 @@ const NoteModal = ({
   const weightError = checkWeightError(tempWeight);
 
   const handleSelectMood = (level: MoodLevel) => {
-    onSelectMood(level, tempText, parsedWeight);
+    onSelectMood(
+      level,
+      tempText,
+      parsedWeight === Number(weightPlaceholder) ? undefined : parsedWeight,
+      dateStr ?? today,
+    );
     setVisible(false);
   };
+
+  const dbService = useDBService();
+  const date = dateStr ?? today;
+  const getActiveWeight = async () => {
+    const weight = await getWeight(dbService, date);
+    console.log("get weight", weight);
+    setTempWeight(weight ? weight.weight.toString() : "");
+    setWeightPlaceholder(weight ? weight.weight.toString() : "");
+  };
+
+  useEffect(() => {
+    console.log("reload weight on ", dateStr);
+    getActiveWeight();
+  }, [dateStr]);
 
   const isDark = settings?.is_dark_mode ?? true;
   const backdropOpacity = isDark ? "70" : "75";
@@ -180,7 +209,7 @@ const NoteModal = ({
                 >
                   <TextInput
                     value={tempWeight}
-                    placeholder={weight?.toString() || "0"}
+                    placeholder={weightPlaceholder || "0"}
                     placeholderTextColor={`${theme.text}55`}
                     onChangeText={setTempWeight}
                     maxLength={6}

@@ -5,13 +5,14 @@ import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
-import { MoodLevel } from "@/interfaces/db.type";
+import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { loadPixelYear, updatePixelViewMode } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/util/color";
+import { getWeight } from "@/util/home/fast";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
@@ -95,8 +96,10 @@ const PixelScreen = () => {
   const [moodModalVisible, setMoodModalVisible] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const openAddMoodModal = (date: string) => {
-    setSelectedDate(date);
+  const [dateNote, setDateNote] = useState<DailyNote | null>(null);
+  const [dateWeight, setDateWeight] = useState<number | null>(null);
+
+  const openAddMoodModal = async (date: string) => {
     setMoodModalVisible(true);
   };
 
@@ -114,20 +117,26 @@ const PixelScreen = () => {
 
     await dbService.setDailyNote(mood, note, undefined, date);
     await loadPixelYear(dbService, year);
+    console.log("loaded pixel year");
 
-    if (newWeight && weight !== newWeight) {
-      await dbService.updateWeight(newWeight);
-      updateWeight(newWeight);
+    if(date!== todayStr) {
+      if(newWeight) await dbService.updateWeight(newWeight, date);
+    } else{
+      if(newWeight && weight !== newWeight) {
+        await dbService.updateWeight(newWeight);
+        updateWeight(newWeight);
+
+      } 
     }
   };
 
   const handleSelectDate = useCallback(
-    (date: string) => {
-      console.log("handleSelectDate", Date.now());
+    async (date: string) => {
+      setSelectedDate(date);
+      setDateNote(yearPixelData[date]?.note ?? null);
       const data = yearPixelData[date];
-      console.log("selected Date ", date, data);
       if (!data) {
-        openAddMoodModal(date);
+        return setMoodModalVisible(true);
         // Chưa có dữ liệu - Mở modal add dữ liệu ngày
       }
 
@@ -202,6 +211,8 @@ const PixelScreen = () => {
         visible={moodModalVisible}
         setVisible={setMoodModalVisible}
         onSelectMood={handleSelectMood}
+        note={dateNote?.note}
+        mood={dateNote?.mood_level}
       />
       <View className="absolute bottom-12 right-2 z-10">
         {scrollButton === "up" && (
