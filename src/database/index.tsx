@@ -130,7 +130,7 @@ export const createDBService = (db: SQLiteDatabase) => ({
   setDailyNote: (
     moodLevel?: MoodLevel,
     note?: string,
-    image_uri?: string,
+    image_uri?: string|null,
     date?: string,
   ) => setDailyNote(db, moodLevel, note, image_uri, date),
   addDailyLogs: (data: {

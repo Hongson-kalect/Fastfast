@@ -15,6 +15,7 @@ type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   dateStr?: string;
+  weight?: number | null;
   onSave: (weight: number | null, date: string) => void;
 };
 
@@ -22,6 +23,7 @@ export const WeightModal = ({
   visible,
   setVisible,
   dateStr,
+  weight,
   onSave,
 }: Props) => {
   const today = getLocalTodayStr();
@@ -32,7 +34,7 @@ export const WeightModal = ({
 
   const [tempWeight, setTempWeight] = useState("");
   const [initialWeight, setInitialWeight] = useState<number | undefined>(
-    currentWeight ?? undefined,
+    weight ?? currentWeight ?? undefined,
   );
   const [loading, setLoading] = useState(false);
 
@@ -146,8 +148,8 @@ export const WeightModal = ({
 
         <TouchableOpacity
           className={`flex-row items-center justify-center gap-x-2 px-4 py-2 rounded-lg bg-primary  ${
-        disabled ? "bg-primary/40" : "bg-primary"
-      }`}
+            disabled ? "bg-primary/40" : "bg-primary"
+          }`}
           onPress={handleSave}
           disabled={disabled}
         >

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 
+import { ThemedText } from "@/components/themed-text";
 import { useAppStore } from "@/stores/appStore";
-import { NoteModalShell } from "./NoteModalShell";
+import { getContrastTextColor } from "@/util/color";
 import { getLocalTodayStr } from "@/util/timer";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedText } from "@/components/themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { NoteModalShell } from "./NoteModalShell";
 
 type Props = {
   visible: boolean;
@@ -64,7 +64,7 @@ export const DailyNoteModal = ({
         />
 
         <TouchableOpacity
-          className="flex-row items-center justify-center gap-x-2 px-4 py-2 rounded-lg bg-primary"
+          className="flex-row items-center justify-center gap-x-2 p-4 rounded-lg bg-primary"
           onPress={handleSave}
         >
           <Ionicons

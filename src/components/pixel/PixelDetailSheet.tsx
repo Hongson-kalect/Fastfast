@@ -5,7 +5,6 @@ import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { usePixelStore } from "@/stores/pixelStore";
-import { getWeight } from "@/util/home/fast";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
@@ -123,14 +122,10 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     }
   }, [dbService, fastIds]);
 
-  const getActiveWeight = async () => {
-    const weight = await getWeight(dbService, dateString);
-    console.log("get weight", weight);
-    setWeight(weight ? weight.weight : 0);
-  };
+  console.log("weight state", weight);
 
   useEffect(() => {
-    Promise.all([getFasts(), getActiveWeight()]);
+    Promise.all([getFasts()]);
   }, [getFasts]);
 
   const timelineSegments = useMemo(() => {
@@ -206,7 +201,11 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
               }}
               className="flex-row items-center gap-x-1.5 rounded-full border border-text-base/10 px-5 py-1.5"
             >
-              <ThemedText size="xs" weight="semibold" color="background">
+              <ThemedText
+                size="xs"
+                weight="semibold"
+                colorHex={currentMood.color[isDark ? "light" : "dark"]}
+              >
                 {currentMood.label}
               </ThemedText>
 
@@ -298,7 +297,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
             fastObj={fastObj}
           />
         ) : (
-          <PixelDailyNote weight={weight} note={note} />
+          <PixelDailyNote note={note} date={dateString} />
         )}
       </ScrollView>
 

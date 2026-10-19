@@ -1,8 +1,8 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { getContrastTextColor } from "@/util/color";
+import { deleteSavedImage, selectPhoto, takePhoto } from "@/util/image";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system";
-import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import {
   Alert,
@@ -18,7 +18,7 @@ import Animated, {
   SlideOutDown,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { useDBService } from "@/hooks/useDBService";
 
 interface PhotoPickerModalProps {
   visible: boolean;
@@ -35,97 +35,62 @@ export const PhotoPickerModal = ({
 }: PhotoPickerModalProps) => {
   const { theme, settings } = useAppStore();
   // 1. Hàm xử lý lưu ảnh vĩnh viễn vào thư mục ứng dụng
-  const saveImagePermanently = async (cacheUri: string) => {
-    try {
-      const filename = cacheUri.split("/").pop() ?? `${Date.now()}.jpg`;
-
-      const file = new FileSystem.File(cacheUri);
-
-      const imagesDir = new FileSystem.Directory(
-        FileSystem.Paths.document,
-        "images",
-      );
-
-      if (!imagesDir.exists) {
-        imagesDir.create();
-      }
-
-      const destination = new FileSystem.File(imagesDir, filename);
-
-      file.move(destination);
-
-      updateImage(destination.uri);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  // 2. Logic xử lý CHỤP ẢNH MỚI từ Camera
-  const handleTakePhoto = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert(
-        "Quyền truy cập",
-        "App cần quyền sử dụng Camera để chụp hình thể!",
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [9, 16], // Ép ảnh vuông
-      quality: 0.7, // Nén ảnh nhẹ
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      await saveImagePermanently(result.assets[0].uri);
-      setVisible(false);
-    }
-  };
-
-  // 3. Logic xử lý CHỌN ẢNH có sẵn từ Thư viện (Gallery)
   const handleSelectPhoto = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert(
-        "Quyền truy cập",
-        "App cần quyền truy cập bộ sưu tập để chọn ảnh!",
-      );
-      return;
-    }
+    try {
+      const uri = await selectPhoto();
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [2, 3],
-      quality: 0.7,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      await saveImagePermanently(result.assets[0].uri);
-      setVisible(false);
+      if (uri) {
+        updateImage(uri);
+        setVisible(false);
+      }
+    } catch (error) {
+      console.error("Lỗi chọn hoặc lưu ảnh:", error);
+      Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
     }
   };
 
-  // 4. Logic xử lý XÓA ẢNH hiện tại
+  const dbService = useDBService()
+
+  const handleTakePhoto = async () => {
+    try {
+      const uri = await takePhoto();
+
+      if (uri) {
+        updateImage(uri);
+        setVisible(false);
+      }
+    } catch (error) {
+      console.error("Lỗi chọn hoặc lưu ảnh:", error);
+      Alert.alert("Lỗi", "Không thể lưu ảnh. Vuiổi thử lagi.");
+    }
+  };
+
   const handleDeletePhoto = () => {
-    Alert.alert(
-      "Xóa ảnh",
-      "Bạn có chắc chắn muốn xóa ảnh track hình thể của ngày hôm nay?",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: () => {
-            updateImage(undefined); // Truyền null báo hiệu xóa ảnh
+    Alert.alert("Xóa ảnh", "Bạn có chắc chắn muốn xóa ảnh của ngày này?", [
+      {
+        text: "Hủy",
+        style: "cancel",
+      },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: async() => {
+          try {
+            await dbService.setDailyNote(undefined, undefined, null);
+            // Chỉ xóa file nếu ảnh nằm trong document/images.
+            deleteSavedImage(photoUri);
+
+            // Cập nhật dữ liệu ảnh của ngày đang xem.
+            updateImage(undefined);
+
             setVisible(false);
-          },
+          } catch (error) {
+            console.error("Lỗi xóa ảnh:", error);
+            Alert.alert("Lỗi", "Không thể xóa ảnh. Vui lòng thử lại.");
+          }
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -146,9 +111,17 @@ export const PhotoPickerModal = ({
       title: "Add Photo",
       okText: (
         <View className="flex-row items-center justify-center gap-2">
-          <MaterialIcons name="photo-library" size={25} color={getContrastTextColor(theme.primary)} />
+          <MaterialIcons
+            name="photo-library"
+            size={25}
+            color={getContrastTextColor(theme.primary)}
+          />
 
-          <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
+          <ThemedText
+            size="sm"
+            weight="bold"
+            colorHex={getContrastTextColor(theme.primary)}
+          >
             Gallery
           </ThemedText>
         </View>
@@ -323,9 +296,17 @@ export const PhotoPickerModal = ({
                 onPress={handleSelectPhoto}
                 className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
               >
-                <MaterialIcons name="photo-library" size={25} color={getContrastTextColor(theme.primary)} />
+                <MaterialIcons
+                  name="photo-library"
+                  size={25}
+                  color={getContrastTextColor(theme.primary)}
+                />
 
-                <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
+                <ThemedText
+                  size="sm"
+                  weight="bold"
+                  colorHex={getContrastTextColor(theme.primary)}
+                >
                   Gallery
                 </ThemedText>
               </TouchableOpacity>

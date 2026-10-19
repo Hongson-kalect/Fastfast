@@ -168,7 +168,11 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
       );
     }
 
-    return <BottomSheetScrollView>{content}</BottomSheetScrollView>;
+    return (
+      <BottomSheetScrollView keyboardShouldPersistTaps="handled">
+        {content}
+      </BottomSheetScrollView>
+    );
   };
 
   return (

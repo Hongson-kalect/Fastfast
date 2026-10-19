@@ -1,5 +1,6 @@
 import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
+import { DailyNoteModal } from "@/components/pixel/modals/DailyNoteModal";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
@@ -12,7 +13,6 @@ import useModalStore from "@/stores/modalStore";
 import { loadPixelYear, updatePixelViewMode } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/util/color";
-import { getWeight } from "@/util/home/fast";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
@@ -119,14 +119,13 @@ const PixelScreen = () => {
     await loadPixelYear(dbService, year);
     console.log("loaded pixel year");
 
-    if(date!== todayStr) {
-      if(newWeight) await dbService.updateWeight(newWeight, date);
-    } else{
-      if(newWeight && weight !== newWeight) {
+    if (date !== todayStr) {
+      if (newWeight) await dbService.updateWeight(newWeight, date);
+    } else {
+      if (newWeight && weight !== newWeight) {
         await dbService.updateWeight(newWeight);
         updateWeight(newWeight);
-
-      } 
+      }
     }
   };
 
@@ -206,6 +205,7 @@ const PixelScreen = () => {
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
       className="flex-1 bg-background"
     >
+     
       <NoteModal
         dateStr={selectedDate ?? undefined}
         visible={moodModalVisible}
@@ -234,6 +234,7 @@ const PixelScreen = () => {
         )}
       </View>
       <SectionList
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={sectionListRef}
         contentContainerStyle={{
