@@ -1,75 +1,64 @@
 import { useDBService } from "@/hooks/useDBService";
-import { DailyNote } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { getContrastTextColor } from "@/util/color";
-import { getWeight } from "@/util/home/fast";
 import { deleteSavedImage, selectPhoto, takePhoto } from "@/util/image";
 import { getLocalTodayStr } from "@/util/timer";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Image, Pressable, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
 import { DailyNoteModal } from "./modals/DailyNoteModal";
 import { WeightModal } from "./modals/WeightModal";
 
+export type ModalNote = {
+  note?: string;
+  weight?: number;
+  image_uri?: string;
+};
 type Props = {
-  note?: DailyNote | null;
+  note: ModalNote;
+  updateSheetNote: (note: ModalNote) => void;
   date?: string;
 };
 
 export default function PixelDailyNote({
   note,
+  updateSheetNote,
   date = getLocalTodayStr(),
 }: Props) {
   const { theme, weight } = useAppStore();
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
-  const [modalNote, setModalNote] = useState({
-    note: note?.note,
-    weight: weight,
-    image_uri: note?.image_uri,
-    // log_date: note?.log_date,
-  });
 
-  const getActiveWeight = async () => {
-    const weight = await getWeight(dbService, date);
-    console.log("get weight", weight, date);
-
-    console.log(weight?.weight);
-    setModalNote((prev) => ({ ...prev, weight: weight ? weight.weight : 0 }));
-  };
-
-  useEffect(() => {
-    console.log("component reload", weight, modalNote);
-  }, [modalNote]);
+  // const getActiveWeight = async () => {
+  //   const weight = await getWeight(dbService, date);
+  //   updateSheetNote({weight:weight ? weight.weight: 0});
+  // };
 
   const { addModal } = useModalStore();
   const dbService = useDBService();
 
   const updateNote = async (noteText: string) => {
-    await dbService.setDailyNote(
-      undefined,
-      noteText || "",
-      undefined,
-      note?.log_date,
-    );
-    setModalNote((prev) => ({ ...prev, note: noteText }));
+    await dbService.setDailyNote(undefined, noteText || "", undefined, date);
+    updateSheetNote({ note: noteText });
   };
 
   const updateImage = async (uri: string | undefined) => {
     await dbService.setDailyNote(undefined, undefined, uri || null, date);
-    if (!uri) {
+
+    // if (uri !== note?.image_uri) deleteSavedImage(note?.image_uri);
+    if (!uri || uri !== note?.image_uri) {
       deleteSavedImage(note?.image_uri);
     }
-    setModalNote({ ...modalNote, image_uri: uri });
+    updateSheetNote({ image_uri: uri });
   };
 
   const updateWeight = async (weight: number) => {
     await dbService.updateWeight(weight, date);
-    setModalNote({ ...modalNote, weight });
+    updateSheetNote({ weight });
   };
 
   const handleSelectPhoto = async () => {
@@ -132,18 +121,18 @@ export default function PixelDailyNote({
         ),
         cancelText: (
           <View className="flex-row items-center justify-center gap-2">
-            <MaterialIcons name="photo-camera" size={25} color={theme.text} />
+            <MaterialIcons name="delete" size={25} color={theme.text} />
 
             <ThemedText size="sm" weight="bold" color="text">
               Xóa ảnh
             </ThemedText>
           </View>
         ),
-        onOk: () => {
+        onOk: async () => {
           handleAddPhoto();
         },
-        onCancel: () => {
-          handleTakePhoto();
+        onCancel: async () => {
+          await handleDeleteImage();
         },
       });
     } else {
@@ -151,10 +140,38 @@ export default function PixelDailyNote({
     }
   };
 
+  const handleDeleteImage = async () => {
+    addModal({
+      type: "confirm",
+      title: "Xóa ảnh",
+      okText: (
+        <View className="flex-row items-center justify-center gap-2">
+          <MaterialIcons
+            name="delete"
+            size={25}
+            color={getContrastTextColor(theme.primary)}
+          />
+
+          <ThemedText
+            size="sm"
+            weight="bold"
+            colorHex={getContrastTextColor(theme.primary)}
+          >
+            Xóa
+          </ThemedText>
+        </View>
+      ),
+      onOk: () => {
+        deleteSavedImage(note?.image_uri);
+        updateImage(undefined);
+      },
+    });
+  };
+
   const handleAddPhoto = () => {
     addModal({
       type: "confirm",
-      title: "Thêm hình ảnh",
+      title: "Hình ảnh từ",
       okText: (
         <View className="flex-row items-center justify-center gap-2">
           <MaterialIcons
@@ -190,10 +207,6 @@ export default function PixelDailyNote({
     });
   };
 
-  useEffect(() => {
-    getActiveWeight();
-  }, []);
-
   return (
     <View className="gap-y-3">
       {/* Weight */}
@@ -212,7 +225,7 @@ export default function PixelDailyNote({
             </ThemedText>
 
             <ThemedText size="xxs" color="text" opacity="medium">
-              {modalNote.weight ? "Nhấn để chỉnh sửa" : "Thêm cân nặng"}
+              {note?.weight ? "Nhấn để chỉnh sửa" : "Thêm cân nặng"}
             </ThemedText>
           </View>
         </View>
@@ -221,10 +234,10 @@ export default function PixelDailyNote({
           <ThemedText
             size="xl"
             weight="bold"
-            color={modalNote.weight ? "warning" : "text"}
-            opacity={modalNote.weight ? undefined : "low"}
+            color={note?.weight ? "warning" : "text"}
+            opacity={note?.weight ? undefined : "low"}
           >
-            {modalNote.weight || "—"}
+            {note.weight || "—"}
           </ThemedText>
 
           <ThemedText size="xs" color="text" opacity="medium" className="ml-1">
@@ -265,15 +278,15 @@ export default function PixelDailyNote({
 
           <View className="flex-row items-center gap-x-1">
             <ThemedText size="xxs" color="primary" opacity="medium">
-              {modalNote?.note ? "Chỉnh sửa" : "Thêm"}
+              {note?.note ? "Chỉnh sửa" : "Thêm"}
             </ThemedText>
             <Ionicons name="chevron-forward" size={14} color={theme.primary} />
           </View>
         </View>
 
-        {modalNote?.note?.trim() ? (
+        {note?.note?.trim() ? (
           <ThemedText size="sm" color="text" style={{ lineHeight: 24 }}>
-            {modalNote.note}
+            {note.note}
           </ThemedText>
         ) : (
           <View className="flex-row items-center gap-x-2 py-1">
@@ -284,7 +297,7 @@ export default function PixelDailyNote({
               style={{ opacity: 0.45 }}
             />
             <ThemedText
-              size="sm"
+              size="xs"
               color="text"
               opacity="low"
               style={{ fontStyle: "italic" }}
@@ -316,16 +329,16 @@ export default function PixelDailyNote({
 
           <View className="flex-row items-center gap-x-1">
             <ThemedText size="xxs" color="primary" opacity="medium">
-              {modalNote?.image_uri ? "Chỉnh sửa" : "Thêm ảnh"}
+              {note?.image_uri ? "Chỉnh sửa" : "Thêm ảnh"}
             </ThemedText>
             <Ionicons name="chevron-forward" size={14} color={theme.primary} />
           </View>
         </View>
 
-        {modalNote?.image_uri ? (
+        {note?.image_uri ? (
           <View className="overflow-hidden rounded-xl bg-background">
             <Image
-              source={{ uri: modalNote.image_uri }}
+              source={{ uri: note.image_uri }}
               className="aspect-9/16 w-full rounded-xl"
               resizeMode="cover"
             />
@@ -349,7 +362,7 @@ export default function PixelDailyNote({
       <WeightModal
         visible={weightModalVisible}
         setVisible={setWeightModalVisible}
-        weight={modalNote.weight}
+        weight={note?.weight}
         dateStr={date}
         onSave={(value, date) => {
           if (value) updateWeight(value);

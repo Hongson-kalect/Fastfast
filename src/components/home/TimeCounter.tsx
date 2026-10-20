@@ -191,7 +191,6 @@ const HomeTimeCounter = ({
   const dbService = useDBService();
 
   const showHistory = () => {
-    console.log("show");
     present(<FastHistorySheet />, {
       isRaw: true,
       snapPoints: ["100%"],

@@ -19,8 +19,6 @@ const DashboardHeader = () => {
   const openAchievement = () => {
     if (!userId) return;
 
-    console.log("userAchievements on call", userAchievements);
-
     present(<AchievementBottomSheet />, {
       snapPoints: ["100%"],
       isRaw: true,
@@ -28,7 +26,6 @@ const DashboardHeader = () => {
   };
 
   useEffect(() => {
-    console.log("currentMilestones", currentMilestones);
   }, [currentMilestones]);
 
   return (

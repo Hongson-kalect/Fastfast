@@ -50,11 +50,8 @@ const DashboardScreen = () => {
     setWeightData(baseWeightData);
   }, [baseWeightData]);
 
-  console.log("weightData", weightData);
-
   useFocusEffect(
     useCallback(() => {
-      console.log("focused");
       const task = requestIdleCallback(() => {
         Promise.all([refreshDashboard(dbService, chartType)]);
       });

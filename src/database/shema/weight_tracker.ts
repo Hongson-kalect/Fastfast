@@ -24,30 +24,49 @@ export const getWeightLogs = async (
   const startDay = new Date(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
-  const rows = await db.getAllAsync<WeightLog>(
-    `SELECT * FROM weight_logs WHERE log_date >= ?;`,
-    [startDate],
-  );
 
-  if (rows.length === 0) {
-    const lastWeight = await getCurrentWeight(db, startDate);
-    return lastWeight ? [lastWeight] : []; // Lấy last weight
-  }
-  // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
-  return rows;
+  const [previousWeight, rows] = await Promise.all([
+    db.getFirstAsync<WeightLog>(
+      `SELECT *
+       FROM weight_logs
+       WHERE log_date < ?
+       ORDER BY log_date DESC
+       LIMIT 1;`,
+      [startDate],
+    ),
+
+    db.getAllAsync<WeightLog>(
+      `SELECT *
+       FROM weight_logs
+       WHERE log_date >= ?
+         AND log_date <= ?
+       ORDER BY log_date ASC;`,
+      [startDate, today],
+    ),
+  ]);
+
+  return [...(previousWeight ? [previousWeight] : []), ...rows];
 };
 
 export const getCurrentWeight = async (
   db: SQLiteDatabase,
   date?: string,
 ): Promise<WeightLog | null> => {
-  const row = await db.getFirstAsync<WeightLog>(
-    `SELECT * FROM weight_logs WHERE log_date <= ? Order by created_at DESC LIMIT 1`,
-    [date || getLocalTodayStr()],
+  return db.getFirstAsync<WeightLog>(
+    `SELECT *
+     FROM weight_logs
+     WHERE log_date <= ?
+     ORDER BY log_date DESC, created_at DESC
+     LIMIT 1;`,
+    [date ?? getLocalTodayStr()],
   );
-  return row;
 };
-export const updateWeight = async (db: SQLiteDatabase, weight: number, date: string=getLocalTodayStr()) => {
+
+export const updateWeight = async (
+  db: SQLiteDatabase,
+  weight: number,
+  date: string = getLocalTodayStr(),
+) => {
   const id = uuidv7();
   try {
     await db.runAsync(

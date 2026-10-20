@@ -85,7 +85,6 @@ export default function SettingsScreen() {
             description="Use dark appearance throughout the app"
             value={isDarkMode}
             onChange={(value) => {
-              console.log("setDarkMode", value);
               setIsDarkMode(value);
               // setDarkMode(value);
               toggleDarkMode(db);

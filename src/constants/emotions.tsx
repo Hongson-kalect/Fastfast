@@ -13,7 +13,10 @@ export interface EmotionItem {
   level: MoodLevel;
   label: string;
   // Hỗ trợ cả string (emoji/pixel art char) lẫn JSX Component
-  icon: string | React.ReactNode;
+  icon: {
+    light: string | React.ReactNode;
+    dark: string | React.ReactNode;
+  };
   color: {
     light: string;
     dark: string;
@@ -40,55 +43,71 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: "😫",
+        icon: {
+          light: "😫",
+          dark: "😫",
+        },
         color: {
-          light: "#FADBD8",
-          dark: "#6E2020",
+          light: "#FEE2E2", // Đỏ nhạt dịu mắt
+          dark: "#450A0A", // Đỏ trầm tối sâu
         },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: "😮‍💨",
+        icon: {
+          light: "😮‍💨",
+          dark: "😮‍💨",
+        },
         color: {
-          light: "#FDEBD0",
-          dark: "#874D14",
+          light: "#FEF3C7", // Vàng cam nhạt
+          dark: "#451A03", // Nâu cam tối
         },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: "🙂",
+        icon: {
+          light: "🙂",
+          dark: "🙂",
+        },
         color: {
-          light: "#E5E7EB",
-          dark: "#3A3F47",
+          light: "#F3F4F6", // Xám nhạt trung tính
+          dark: "#1F2937", // Xám đậm hiện đại
         },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: "😃",
+        icon: {
+          light: "😃",
+          dark: "😃",
+        },
         color: {
-          light: "#D4EFDF",
-          dark: "#1A5C70",
+          light: "#D1FAE5", // Xanh ngọc nhạt
+          dark: "#064E3B", // Xanh ngọc sẫm
         },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: "🥰",
+        icon: {
+          light: "🥰",
+          dark: "🥰",
+        },
         color: {
-          light: "#A9DFBF",
-          dark: "#2E6930",
+          light: "#EDE9FE", // Tím nhạt tinh tế
+          dark: "#2E1065", // Tím đậm hoàng gia
         },
       },
     ],
   },
-  // 2. IONICONS OUTLINE / FILLED PACK
+
+  // 2. IONICONS MINIMAL
   ionicons_faces: {
     id: "ionicons_faces",
     name: "Ionicons Minimal",
@@ -98,41 +117,56 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: <Ionicons name="sad-outline" size={20} color="#EF4444" />,
-        color: { light: "#FEE2E2", dark: "#7F1D1D" },
+        icon: {
+          light: <Ionicons name="sad-outline" size={20} color="#DC2626" />, // Đỏ đậm sắc nét
+          dark: <Ionicons name="sad-outline" size={20} color="#F87171" />, // Đỏ sáng nổi bật trên nền tối
+        },
+        color: { light: "#FEE2E2", dark: "#450A0A" },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: <Ionicons name="ellipse-outline" size={20} color="#F59E0B" />,
-        color: { light: "#FEF3C7", dark: "#78350F" },
+        icon: {
+          light: <Ionicons name="ellipse-outline" size={20} color="#D97706" />, // Cam vàng đậm
+          dark: <Ionicons name="ellipse-outline" size={20} color="#FBBF24" />, // Vàng sáng
+        },
+        color: { light: "#FEF3C7", dark: "#451A03" },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: <Ionicons name="happy-outline" size={20} color="#3B82F6" />,
+        icon: {
+          light: <Ionicons name="happy-outline" size={20} color="#2563EB" />, // Xanh dương rõ nét
+          dark: <Ionicons name="happy-outline" size={20} color="#60A5FA" />, // Xanh dương sáng
+        },
         color: { light: "#DBEAFE", dark: "#1E3A8A" },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: <Ionicons name="flame-outline" size={20} color="#10B981" />,
+        icon: {
+          light: <Ionicons name="flame-outline" size={20} color="#059669" />, // Xanh lá đậm
+          dark: <Ionicons name="flame-outline" size={20} color="#34D399" />, // Xanh lá sáng
+        },
         color: { light: "#D1FAE5", dark: "#064E3B" },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: <Ionicons name="sparkles-outline" size={20} color="#8B5CF6" />,
-        color: { light: "#EDE9FE", dark: "#4C1D95" },
+        icon: {
+          light: <Ionicons name="sparkles-outline" size={20} color="#7C3AED" />, // Tím đậm
+          dark: <Ionicons name="sparkles-outline" size={20} color="#A78BFA" />, // Tím sáng
+        },
+        color: { light: "#EDE9FE", dark: "#2E1065" },
       },
     ],
   },
 
-  // 3. MATERIAL COMMUNITY EMOTICONS (Mặt cười đa dạng)
+  // 3. MATERIAL COMMUNITY EMOTICONS
   material_emoticons: {
     id: "material_emoticons",
     name: "Material Moods",
@@ -142,66 +176,111 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: (
-          <MaterialCommunityIcons
-            name="emoticon-dead-outline"
-            size={22}
-            color="#DC2626"
-          />
-        ),
-        color: { light: "#FCA5A5", dark: "#5B1111" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="emoticon-dead-outline"
+              size={22}
+              color="#DC2626"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="emoticon-dead-outline"
+              size={22}
+              color="#F87171"
+            />
+          ),
+        },
+        color: { light: "#FEE2E2", dark: "#450A0A" },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: (
-          <MaterialCommunityIcons
-            name="emoticon-neutral-outline"
-            size={22}
-            color="#D97706"
-          />
-        ),
-        color: { light: "#FCD34D", dark: "#5B3006" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="emoticon-neutral-outline"
+              size={22}
+              color="#D97706"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="emoticon-neutral-outline"
+              size={22}
+              color="#FBBF24"
+            />
+          ),
+        },
+        color: { light: "#FEF3C7", dark: "#451A03" },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: (
-          <MaterialCommunityIcons
-            name="emoticon-happy-outline"
-            size={22}
-            color="#2563EB"
-          />
-        ),
-        color: { light: "#93C5FD", dark: "#172554" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="emoticon-happy-outline"
+              size={22}
+              color="#2563EB"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="emoticon-happy-outline"
+              size={22}
+              color="#60A5FA"
+            />
+          ),
+        },
+        color: { light: "#DBEAFE", dark: "#1E3A8A" },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: (
-          <MaterialCommunityIcons
-            name="emoticon-cool-outline"
-            size={22}
-            color="#059669"
-          />
-        ),
-        color: { light: "#6EE7B7", dark: "#022C22" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="emoticon-cool-outline"
+              size={22}
+              color="#059669"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="emoticon-cool-outline"
+              size={22}
+              color="#34D399"
+            />
+          ),
+        },
+        color: { light: "#D1FAE5", dark: "#064E3B" },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: (
-          <MaterialCommunityIcons
-            name="emoticon-excited-outline"
-            size={22}
-            color="#7C3AED"
-          />
-        ),
-        color: { light: "#C4B5FD", dark: "#2E1065" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="emoticon-excited-outline"
+              size={22}
+              color="#7C3AED"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="emoticon-excited-outline"
+              size={22}
+              color="#A78BFA"
+            />
+          ),
+        },
+        color: { light: "#EDE9FE", dark: "#2E1065" },
       },
     ],
   },
@@ -216,36 +295,51 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: <Feather name="cloud-lightning" size={20} color="#6B7280" />,
-        color: { light: "#E5E7EB", dark: "#1F2937" },
+        icon: {
+          light: <Feather name="cloud-lightning" size={20} color="#4B5563" />, // Xám chì rõ nét
+          dark: <Feather name="cloud-lightning" size={20} color="#9CA3AF" />, // Xám sáng trên nền tối
+        },
+        color: { light: "#F3F4F6", dark: "#1F2937" },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: <Feather name="cloud-rain" size={20} color="#60A5FA" />,
-        color: { light: "#BFDBFE", dark: "#1E293B" },
+        icon: {
+          light: <Feather name="cloud-rain" size={20} color="#2563EB" />, // Xanh mưa đậm
+          dark: <Feather name="cloud-rain" size={20} color="#60A5FA" />, // Xanh mưa sáng
+        },
+        color: { light: "#DBEAFE", dark: "#1E3A8A" },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: <Feather name="cloud" size={20} color="#93C5FD" />,
-        color: { light: "#E0F2FE", dark: "#0F172A" },
+        icon: {
+          light: <Feather name="cloud" size={20} color="#0284C7" />, // Xanh mây
+          dark: <Feather name="cloud" size={20} color="#38BDF8" />,
+        },
+        color: { light: "#E0F2FE", dark: "#0C4A6E" },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: <Feather name="sun" size={20} color="#F59E0B" />,
-        color: { light: "#FEF08A", dark: "#451A03" },
+        icon: {
+          light: <Feather name="sun" size={20} color="#D97706" />, // Vàng nắng ấm
+          dark: <Feather name="sun" size={20} color="#FBBF24" />, // Vàng rực trên nền tối
+        },
+        color: { light: "#FEF3C7", dark: "#451A03" },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: <FontAwesome5 name="rainbow" size={18} color="#EC4899" />,
-        color: { light: "#FBCFE8", dark: "#500724" },
+        icon: {
+          light: <FontAwesome5 name="rainbow" size={18} color="#DB2777" />, // Cầu vồng hồng tươi
+          dark: <FontAwesome5 name="rainbow" size={18} color="#F472B6" />,
+        },
+        color: { light: "#FCE7F3", dark: "#500724" },
       },
     ],
   },
@@ -260,115 +354,172 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: (
-          <MaterialCommunityIcons
-            name="battery-alert-variant-outline"
-            size={22}
-            color="#EF4444"
-          />
-        ),
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="battery-alert-variant-outline"
+              size={22}
+              color="#DC2626"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="battery-alert-variant-outline"
+              size={22}
+              color="#F87171"
+            />
+          ),
+        },
         color: { light: "#FEE2E2", dark: "#450A0A" },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: (
-          <MaterialCommunityIcons
-            name="battery-medium"
-            size={22}
-            color="#F59E0B"
-          />
-        ),
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="battery-medium"
+              size={22}
+              color="#D97706"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="battery-medium"
+              size={22}
+              color="#FBBF24"
+            />
+          ),
+        },
         color: { light: "#FEF3C7", dark: "#451A03" },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: (
-          <MaterialCommunityIcons
-            name="battery-high"
-            size={22}
-            color="#3B82F6"
-          />
-        ),
-        color: { light: "#DBEAFE", dark: "#172554" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="battery-high"
+              size={22}
+              color="#2563EB"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="battery-high"
+              size={22}
+              color="#60A5FA"
+            />
+          ),
+        },
+        color: { light: "#DBEAFE", dark: "#1E3A8A" },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: <Ionicons name="flash-outline" size={20} color="#10B981" />,
-        color: { light: "#D1FAE5", dark: "#022C22" },
+        icon: {
+          light: <Ionicons name="flash-outline" size={20} color="#059669" />,
+          dark: <Ionicons name="flash-outline" size={20} color="#34D399" />,
+        },
+        color: { light: "#D1FAE5", dark: "#064E3B" },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: (
-          <MaterialCommunityIcons
-            name="crown-outline"
-            size={22}
-            color="#EAB308"
-          />
-        ),
-        color: { light: "#FEF08A", dark: "#713F12" },
+        icon: {
+          light: (
+            <MaterialCommunityIcons
+              name="crown-outline"
+              size={22}
+              color="#CA8A04"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="crown-outline"
+              size={22}
+              color="#FACC15"
+            />
+          ),
+        },
+        color: { light: "#FEF08A", dark: "#422006" },
       },
     ],
   },
+
+  // 6. PIXEL ENERGY (Emoji & Pixel Art Vibes)
   pixel_vibe: {
     id: "pixel_vibe",
     name: "Pixel Energy",
+    description: "Cảm xúc phong cách Pixel & Emoji tượng hình",
     emotions: [
       {
         id: "mood_0",
         level: 0,
         label: "Exhausted",
-        icon: "💀",
+        icon: {
+          light: "💀",
+          dark: "💀",
+        },
         color: {
-          light: "#4A4A4A",
-          dark: "#1F1F1F",
+          light: "#F3F4F6", // Xám nhạt pastel (sửa lại từ xám xịt #4A4A4A)
+          dark: "#1F2937", // Xám đen trầm
         },
       },
       {
         id: "mood_1",
         level: 1,
         label: "Neutral",
-        icon: "🌧️",
+        icon: {
+          light: "🌧️",
+          dark: "🌧️",
+        },
         color: {
-          light: "#A0AEC0",
-          dark: "#2D3748",
+          light: "#E0F2FE", // Xanh mây nhạt
+          dark: "#0C4A6E", // Xanh mây đêm
         },
       },
       {
         id: "mood_2",
         level: 2,
         label: "Good",
-        icon: "🌱",
+        icon: {
+          light: "🌱",
+          dark: "🌱",
+        },
         color: {
-          light: "#6EE7B7",
-          dark: "#065F46",
+          light: "#D1FAE5", // Xanh mầm cây nhạt
+          dark: "#064E3B", // Xanh lục sẫm
         },
       },
       {
         id: "mood_3",
         level: 3,
         label: "Focused",
-        icon: "🔥",
+        icon: {
+          light: "🔥",
+          dark: "🔥",
+        },
         color: {
-          light: "#FDBA74",
-          dark: "#9A3412",
+          light: "#FFEDD5", // Cam lửa pastel
+          dark: "#431407", // Cam lửa trầm
         },
       },
       {
         id: "mood_4",
         level: 4,
         label: "Peak",
-        icon: "👑",
+        icon: {
+          light: "👑",
+          dark: "👑",
+        },
         color: {
-          light: "#FDE047",
-          dark: "#854D0E",
+          light: "#FEF08A", // Vàng hoàng gia pastel
+          dark: "#422006", // Vàng đồng sẫm
         },
       },
     ],

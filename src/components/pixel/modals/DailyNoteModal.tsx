@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
@@ -43,6 +43,14 @@ export const DailyNoteModal = ({
     setVisible(false);
   };
 
+    const inputRef = useRef<TextInput>(null);
+    useEffect(() => {
+      if (visible && inputRef.current) {
+        setTimeout(() => inputRef.current?.focus(), 150);
+      }
+    }, [visible]);
+  
+
   return (
     <NoteModalShell
       visible={visible}
@@ -52,6 +60,7 @@ export const DailyNoteModal = ({
     >
       <View className="gap-y-4">
         <TextInput
+          ref={inputRef}
           value={tempText}
           onChangeText={setTempText}
           multiline

@@ -88,6 +88,22 @@ export const loadPixelYear = async (
   }
 };
 
+// Thằng này chỉ update pixel year chủa 1 thằng
+export const updatePixelNote = async (db: DBService, date: string) => {
+  const { setYearPixelData, yearPixelData } = usePixelStore.getState();
+  const note = await db.getDailyNote(date);
+  const oldYearPixelData = yearPixelData[date];
+  const newYearPixelData = {
+    ...oldYearPixelData,
+    note: note||undefined,
+  };
+
+  setYearPixelData({
+    ...yearPixelData,
+    [date]: newYearPixelData,
+  });
+};
+
 export const updatePixelViewMode = async (
   db: DBService,
   viewMode: ViewMode,

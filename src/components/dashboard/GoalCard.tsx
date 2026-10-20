@@ -25,6 +25,7 @@ export const GoalCard = () => {
   const dbService = useDBService();
   const { weight, settings, theme, updateSetting, updateWeight } =
     useAppStore();
+
   const { weightTarget, setWeightTarget } = useDashboardStore();
   const { addModal } = useModalStore();
 

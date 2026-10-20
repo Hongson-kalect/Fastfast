@@ -43,7 +43,6 @@ export const finishFast = async ({
   });
 
   const { lastSession, habitLog, profile, streak } = result;
-  console.log("finishFast", { profile, habitLog, streak, lastSession });
 
   // update zustand
   const tempProfile = { ...userProfile!, ...profile! };
@@ -92,8 +91,6 @@ export const finishFast = async ({
     note: habitLog?.description,
   };
 
-  console.log("result data", resultData, habitLog, lastSession);
-
   addModal({
     type: "custom",
     render: <ResultModal data={resultData} />,
@@ -113,7 +110,6 @@ export const finishFast = async ({
       endTime,
       currentFast.id,
     );
-    console.log(parsedDays.map((x) => x.log_date));
 
     for (const dayData of parsedDays) {
       await dbService?.addDailyLogs({
@@ -148,8 +144,6 @@ export const finishFast = async ({
   }
 
   if (finalHabitLog) updateHabit(finalHabitLog);
-
-  console.log("reconcile", finalHabitLog, finalProfile, finalStreak);
 
   finalStreak && checkStreak(finalStreak);
 };
@@ -206,6 +200,5 @@ export const getWeight = async (
   dbService: DBService,
   dateString: string = getLocalTodayStr(),
 ) => {
-  console.log("get weight date ", dateString);
   return await dbService.getCurrentWeight(dateString);
 };

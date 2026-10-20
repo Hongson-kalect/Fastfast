@@ -26,7 +26,11 @@ export const SwapMoodButton = ({
   onPressOut,
 }: SwapMoodButtonProps) => {
   const { theme, settings } = useAppStore();
+  const isDark = settings?.is_dark_mode ?? true;
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
+  const color = mood
+    ? emotions[mood].color[isDark ? "dark" : "light"]
+    : theme.text;
 
   return (
     <TouchableOpacity
@@ -36,18 +40,20 @@ export const SwapMoodButton = ({
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       disabled={loading}
-      className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-inner ${
-        mood
-          ? "shadow-primary/50 border-primary/50"
-          : "shadow-text-base/10 border-text-base/10"
-      } ${loading ? "opacity-60" : ""} ${className}`}
+      style={{
+        backgroundColor: color,
+        borderColor: color + "80",
+      }}
+      className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-inner shadow-text-base/10 ${loading ? "opacity-60" : ""} ${className}`}
     >
       {loading ? (
         <ActivityIndicator color={theme.primary} />
       ) : (
         <View className="flex-1 items-center justify-center">
           {mood ? (
-            <ThemedText size="lg">{emotions[mood].icon}</ThemedText>
+            <ThemedText size="lg">
+              {emotions[mood].icon[isDark ? "dark" : "light"]}
+            </ThemedText>
           ) : (
             <Feather name="edit-2" size={28} color={theme.text} />
           )}
@@ -57,7 +63,7 @@ export const SwapMoodButton = ({
               <Ionicons
                 name="chatbox-ellipses-outline"
                 size={24}
-                color={theme.text}
+                color={color}
               />
             </View>
           )}

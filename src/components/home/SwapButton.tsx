@@ -4,7 +4,7 @@ import { useDBService } from "@/hooks/useDBService";
 import { DailyNote } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -20,6 +20,7 @@ import NoteModal from "./NoteModal";
 import { SwapFastButton } from "./SwapButton/SwapFastButton";
 import { SwapImageButton } from "./SwapButton/SwapImageButton";
 import { SwapMoodButton } from "./SwapButton/SwapMoodButton";
+import { useFocusEffect } from "expo-router";
 
 type SwapButtonProps = {
   isCounting: boolean;
@@ -164,12 +165,12 @@ export const SwapButton = React.memo(
       });
     };
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
       if (!dbService) return;
 
       detectTodayNote();
       getCurrentWeight();
-    }, [dbService]);
+    }, [dbService]));
 
     useEffect(() => {
       if (!todayNote) return;

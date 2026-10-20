@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 
 import { checkWeightError } from "@/components/home/NoteModal";
@@ -99,6 +99,13 @@ export const WeightModal = ({
 
   const disabled = loading || !!weightError;
 
+  const inputRef = useRef<TextInput>(null);
+  useEffect(() => {
+    if (visible && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 150);
+    }
+  }, [visible]);
+
   return (
     <NoteModalShell
       visible={visible}
@@ -115,13 +122,16 @@ export const WeightModal = ({
           }`}
         >
           <TextInput
+            ref={inputRef}
             value={tempWeight}
             placeholder={initialWeight?.toString() ?? "0"}
             placeholderTextColor={`${theme.text}55`}
             onChangeText={setTempWeight}
+            onSubmitEditing={handleSave}
             maxLength={6}
             keyboardType="decimal-pad"
             editable={!loading}
+            // autoFocus
             style={{
               textAlign: "center",
               fontVariant: ["tabular-nums"],
@@ -147,7 +157,7 @@ export const WeightModal = ({
         ) : null}
 
         <TouchableOpacity
-          className={`flex-row items-center justify-center gap-x-2 px-4 py-2 rounded-lg bg-primary  ${
+          className={`flex-row items-center justify-center gap-x-2 p-4 rounded-lg bg-primary  ${
             disabled ? "bg-primary/40" : "bg-primary"
           }`}
           onPress={handleSave}

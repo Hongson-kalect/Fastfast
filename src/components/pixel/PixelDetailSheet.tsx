@@ -1,16 +1,22 @@
 import { EMOTION_PACKS } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
-import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
+import {
+  DailyLog,
+  DailyNote,
+  FastSession,
+  MoodLevel,
+} from "@/interfaces/db.type";
 import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { updatePixelNote } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { DissectedDay } from "@/util/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import PixelDailyFast from "./PixelDailyFast";
-import PixelDailyNote from "./PixelDailyNote";
+import PixelDailyNote, { ModalNote } from "./PixelDailyNote";
 import { MoodModal } from "./modals/MoodModal";
 
 type DetailType = {
@@ -81,6 +87,14 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const { theme, settings } = useAppStore();
   const isDark = settings?.is_dark_mode ?? true;
 
+  const [sheetNote, setSheetNote] = useState({
+    mood_level: note?.mood_level,
+    note: note?.note,
+    weight: 0,
+    dateStr: note?.log_date,
+    image_uri: note?.image_uri,
+  });
+
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
   const [weight, setWeight] = useState(0);
@@ -122,8 +136,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     }
   }, [dbService, fastIds]);
 
-  console.log("weight state", weight);
-
   useEffect(() => {
     Promise.all([getFasts()]);
   }, [getFasts]);
@@ -153,7 +165,9 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     return [...unique.values()].sort((a, b) => a.startHour - b.startHour);
   }, [log, fastObj, dateString]);
 
-  const currentMood = note?.mood_level ? EMOTIONS[note.mood_level] : null;
+  const currentMood = useMemo(() => {
+    return sheetNote.mood_level ? EMOTIONS[sheetNote.mood_level] : null;
+  }, [sheetNote.mood_level]);
 
   const circularSegments = useMemo(
     () =>
@@ -178,6 +192,53 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       onOk(value) {},
     });
   };
+
+  const updateMood = async (mood: MoodLevel) => {
+    await dbService.setDailyNote(mood, undefined, undefined, dateString);
+    setSheetNote({
+      ...sheetNote,
+      mood_level: mood,
+    });
+
+    // loadPixelYear(dbService, Number(dateString.slice(0, 4)))
+    await updatePixelNote(dbService, dateString);
+  };
+
+  const updateSheetNote = async (update: Partial<ModalNote>) => {
+    setSheetNote((prev) => ({
+      ...prev,
+      ...update,
+    }));
+
+    await updatePixelNote(dbService, dateString);
+  };
+
+  const loadNote = async () => {
+    await dbService.getDailyNote(dateString).then((note) => {
+      if (note)
+        setSheetNote((prev) => ({
+          ...prev,
+          mood_level: note.mood_level,
+          note: note.note,
+          dateStr: note.log_date,
+          image_uri: note.image_uri,
+        }));
+    });
+  };
+  const loadWeight = async () => {
+    await dbService.getCurrentWeight(dateString).then((weight) => {
+      if (weight)
+        setSheetNote((prev) => ({
+          ...prev,
+          weight: weight.weight,
+        }));
+    });
+  };
+
+  useEffect(() => {
+    loadNote();
+    loadWeight();
+  }, [dateString]);
 
   return (
     <View className="flex-1 bg-background">
@@ -210,7 +271,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
               </ThemedText>
 
               <ThemedText size="lg" weight="medium">
-                {currentMood.icon}
+                {currentMood.icon[isDark ? "dark" : "light"]}
               </ThemedText>
             </View>
           ) : (
@@ -297,7 +358,11 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
             fastObj={fastObj}
           />
         ) : (
-          <PixelDailyNote note={note} date={dateString} />
+          <PixelDailyNote
+            note={sheetNote}
+            updateSheetNote={updateSheetNote}
+            date={dateString}
+          />
         )}
       </ScrollView>
 
@@ -305,9 +370,9 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
         visible={moodModalVisible}
         setVisible={setMoodModalVisible}
         dateStr={dateString}
-        mood={note?.mood_level}
+        mood={sheetNote?.mood_level}
         onSave={(value, date) => {
-          console.log("mood value", value, "date", date);
+          updateMood(value);
 
           // Chỉ cập nhật mood.
         }}

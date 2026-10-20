@@ -157,8 +157,6 @@ const PixelGridManager = (props: Props) => {
       const logData = props.logData[selectedDate];
       const noteData = props.noteData[selectedDate];
 
-      console.log("props", logData, noteData);
-
       if (logData || noteData) {
         present(
           <PixelDetailSheet

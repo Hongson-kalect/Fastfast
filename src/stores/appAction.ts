@@ -1,9 +1,14 @@
-
 // src/store/appActions.ts
 
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 
+import {
+  defaultDark,
+  extractTheme,
+  ThemeKey,
+  ThemeType,
+} from "@/constants/themes";
 import { createDBService } from "@/database";
 import {
   AppSettings,
@@ -13,7 +18,6 @@ import {
 } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { handleLogin } from "@/util/login";
-import { defaultDark, extractTheme, ThemeKey, ThemeType } from "@/constants/themes";
 import { useAppStore } from "./appStore";
 
 const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
@@ -58,9 +62,7 @@ export interface AppInitResult {
  */
 function resolveLanguage(settings: AppSettings | null): string {
   let locale =
-    settings?.language ||
-    Localization.getLocales()[0]?.languageCode ||
-    "vi";
+    settings?.language || Localization.getLocales()[0]?.languageCode || "vi";
 
   if (!SUPPORTED_LANGUAGES.includes(locale.toString())) {
     locale = "en";
@@ -105,27 +107,18 @@ export async function initializeApp(
 
   const dbService = createDBService(db);
 
-  const [
-    currentFast,
-    weightObj,
-    currentProfile,
-    dbSettings,
-    currentHabitLog,
-  ] = await Promise.all([
-    dbService.getLastFastSession(),
-    dbService.getCurrentWeight(),
-    dbService.getUserProfile(),
-    dbService.getUserSettings(),
-    dbService.getLastHabitLog(),
-  ]);
+  const [currentFast, weightObj, currentProfile, dbSettings, currentHabitLog] =
+    await Promise.all([
+      dbService.getLastFastSession(),
+      dbService.getCurrentWeight(),
+      dbService.getUserProfile(),
+      dbService.getUserSettings(),
+      dbService.getLastHabitLog(),
+    ]);
 
-  const {
-    lastFast,
-    profile,
-    habitLog,
-    streak,
-    modal,
-  } = await handleLogin({
+  console.log("weight on init", weightObj);
+
+  const { lastFast, profile, habitLog, streak, modal } = await handleLogin({
     db,
     lastFast: currentFast,
     profile: currentProfile,
@@ -202,10 +195,7 @@ export async function initializeAppState(
 
     return result;
   } catch (error) {
-    console.error(
-      "=> [App] Khởi tạo dữ liệu thất bại:",
-      error,
-    );
+    console.error("=> [App] Khởi tạo dữ liệu thất bại:", error);
 
     useAppStore.setState({
       isLoadingData: false,
@@ -265,9 +255,7 @@ export async function updateTheme(
  * DB được update trước.
  * Sau khi DB thành công mới update Zustand.
  */
-export async function toggleDarkMode(
-  db: SQLiteDatabase,
-): Promise<void> {
+export async function toggleDarkMode(db: SQLiteDatabase): Promise<void> {
   const dbService = createDBService(db);
 
   const { settings } = useAppStore.getState();

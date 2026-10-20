@@ -90,13 +90,6 @@ export const AchievementCard = ({
 
   const unclaimedItem = unconfirmedMilestones[0];
 
-  console.log(
-    "unclaimedItem",
-    unclaimedItem,
-    unconfirmedMilestones,
-    userMilestone,
-  );
-
   const unclaimedMilestone = achievement.items.find(
     (item) => item.id === unclaimedItem?.achievement_item_id,
   );
@@ -385,7 +378,6 @@ export const AchievementBottomSheet = ({
   );
 
   const achievements = useDashboardStore((state) => state.achievements);
-  console.log("currentMilestones On Sheet", currentMilestones);
   const achievementList = useMemo(() => {
     return achievements.filter((item) => {
       return item.items.length;
@@ -396,7 +388,6 @@ export const AchievementBottomSheet = ({
 
   const handleClaimMilestone = useCallback(
     async (milestoneId: string) => {
-      console.log("Vào nhận hàng nè");
       if (!userId || !currentMilestones?.length) return;
       await claimAchievementMilestone(
         dbService,

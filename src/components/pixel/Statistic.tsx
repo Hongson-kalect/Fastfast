@@ -167,7 +167,9 @@ const PixelStatistic = React.memo(
                   className="flex-1 px-2 py-1 rounded"
                 >
                   <View className="items-center justify-between">
-                    <ThemedText>{item.icon}</ThemedText>
+                    <ThemedText>
+                      {item.icon[isDark ? "dark" : "light"]}
+                    </ThemedText>
                     <ThemedText size="xs">{counter.mood[moodIndex]}</ThemedText>
                   </View>
                 </View>

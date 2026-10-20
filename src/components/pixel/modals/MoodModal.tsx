@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  SlideInDown,
-  SlideOutDown,
-} from "react-native-reanimated";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { useAppStore } from "@/stores/appStore";
 import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
-import { NoteModalShell } from "./NoteModalShell";
+import { useAppStore } from "@/stores/appStore";
 import { getLocalTodayStr } from "@/util/timer";
+import { NoteModalShell } from "./NoteModalShell";
 
 type Props = {
   visible: boolean;
@@ -29,9 +25,9 @@ export const MoodModal = ({
   const date = dateStr ?? today;
 
   const { settings } = useAppStore();
+  const isDark = settings?.is_dark_mode ?? true;
 
-  const emotions =
-    EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
+  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const handleSave = (mood: MoodLevel) => {
     if (mood == null) return;
@@ -51,6 +47,7 @@ export const MoodModal = ({
         <View className="flex-row justify-between">
           {emotions.map((item, index) => {
             const isSelected = item.level === mood;
+            const background = item.color[isDark ? "dark" : "light"];
 
             return (
               <Animated.View
@@ -70,14 +67,15 @@ export const MoodModal = ({
                       ? "border-primary bg-primary/15"
                       : "border-text-base/10 bg-background2"
                   }`}
-                  style={
-                    isSelected
-                      ? { transform: [{ scale: 1.08 }] }
-                      : undefined
-                  }
+                  style={[
+                    isSelected ? { transform: [{ scale: 1.08 }] } : undefined,
+                    {
+                      backgroundColor: background,
+                    },
+                  ]}
                 >
                   <Text style={{ fontSize: 28 }}>
-                    {item.icon}
+                    {item.icon[isDark ? "dark" : "light"]}
                   </Text>
                 </TouchableOpacity>
               </Animated.View>

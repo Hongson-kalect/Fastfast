@@ -229,8 +229,6 @@ export const checkAchievements = async (
     }
   }
 
-  console.log("progresses", progresses, "milestones", milestones);
-
   return {
     progresses,
     milestones,

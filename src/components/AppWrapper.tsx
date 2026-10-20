@@ -99,7 +99,8 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [db, addModal]);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db || !isDBReady) return;
+    // load app xong thì mới load mấy thằng này
 
     const load = async () => {
       await initializeDashboard(dbService, CHART_RANGES[0]);
@@ -111,7 +112,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     load();
-  }, [db]);
+  }, [db, isDBReady]);
 
   useEffect(() => {
     const loadFonts = async () => {

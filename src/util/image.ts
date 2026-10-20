@@ -99,6 +99,8 @@ export const selectPhoto = async (): Promise<string | null> => {
 export const deleteSavedImage = (uri?: string | null): void => {
   if (!uri) return;
 
+  console.log("delete saved image", uri);
+
   const imagesDir = new FileSystem.Directory(
     FileSystem.Paths.document,
     "images",

@@ -107,7 +107,6 @@ const HomeScreen = () => {
     setCounter(0);
 
     const newSession = await dbService?.startNewSession(now, settings?.target);
-    console.log("new", newSession?.id);
     setCurrentFastSession(newSession);
   };
 

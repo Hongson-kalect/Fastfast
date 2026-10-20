@@ -1,6 +1,5 @@
 import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
-import { DailyNoteModal } from "@/components/pixel/modals/DailyNoteModal";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
@@ -10,7 +9,11 @@ import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/provider/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { loadPixelYear, updatePixelViewMode } from "@/stores/pixelAction";
+import {
+  loadPixelYear,
+  updatePixelNote,
+  updatePixelViewMode,
+} from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/util/color";
 import { getLocalTodayStr } from "@/util/timer";
@@ -116,8 +119,8 @@ const PixelScreen = () => {
     // await dbService.setDailyNote(mood, note, todayData.image);
 
     await dbService.setDailyNote(mood, note, undefined, date);
-    await loadPixelYear(dbService, year);
-    console.log("loaded pixel year");
+    // await loadPixelYear(dbService, year);
+    await updatePixelNote(dbService, date || todayStr);
 
     if (date !== todayStr) {
       if (newWeight) await dbService.updateWeight(newWeight, date);
@@ -150,7 +153,6 @@ const PixelScreen = () => {
             snapPoints: ["100%"],
           },
         );
-        console.log("present ", Date.now());
       } else if (data.shieldLog) {
         // TODO: Show shield log detail
       }
@@ -205,7 +207,6 @@ const PixelScreen = () => {
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
       className="flex-1 bg-background"
     >
-     
       <NoteModal
         dateStr={selectedDate ?? undefined}
         visible={moodModalVisible}

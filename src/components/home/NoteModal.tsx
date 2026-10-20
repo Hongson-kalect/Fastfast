@@ -69,7 +69,6 @@ const NoteModal = ({
   onSelectMood,
 }: Props) => {
   const today = getLocalTodayStr();
-  console.log("dateStr", dateStr);
   const { theme, settings, weight } = useAppStore();
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
@@ -105,13 +104,11 @@ const NoteModal = ({
   const date = dateStr ?? today;
   const getActiveWeight = async () => {
     const weight = await getWeight(dbService, date);
-    console.log("get weight", weight);
     setTempWeight(weight ? weight.weight.toString() : "");
     setWeightPlaceholder(weight ? weight.weight.toString() : "");
   };
 
   useEffect(() => {
-    console.log("reload weight on ", dateStr);
     getActiveWeight();
   }, [dateStr]);
 
@@ -301,6 +298,7 @@ const NoteModal = ({
               <View className="flex-row justify-between">
                 {emotions.map((item, index) => {
                   const isSelected = item.level === mood;
+                  const background = item.color[isDark ? "dark" : "light"];
 
                   return (
                     <Animated.View
@@ -320,15 +318,20 @@ const NoteModal = ({
                             ? "border-primary bg-primary/15"
                             : "border-text-base/10 bg-background2"
                         }`}
-                        style={
+                        style={[
                           isSelected
                             ? {
                                 transform: [{ scale: 1.08 }],
                               }
-                            : undefined
-                        }
+                            : undefined,
+                          {
+                            backgroundColor: background,
+                          },
+                        ]}
                       >
-                        <Text style={{ fontSize: 28 }}>{item.icon}</Text>
+                        <Text style={{ fontSize: 28 }}>
+                          {item.icon[isDark ? "dark" : "light"]}
+                        </Text>
                       </TouchableOpacity>
                     </Animated.View>
                   );
