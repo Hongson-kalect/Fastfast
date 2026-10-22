@@ -30,7 +30,7 @@ export const SwapMoodButton = ({
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
   const color = mood
     ? emotions[mood].color[isDark ? "dark" : "light"]
-    : theme.text;
+    : theme.background;
 
   return (
     <TouchableOpacity

@@ -3,6 +3,7 @@ import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import WeekRow from "@/components/pixel/WeekRow";
+import YearExportView from "@/components/pixel/YearExportView";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
@@ -19,18 +20,21 @@ import { getContrastTextColor } from "@/util/color";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
+import * as MediaLibrary from "expo-media-library";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
   SectionList,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ViewShot, { ViewShotRef } from "react-native-view-shot";
 
 // 1. Định nghĩa các chế độ xem (View Options)
 
@@ -41,6 +45,7 @@ interface EmojiGuide {
 
 const ITEM_HEIGHT = 40;
 const HEADER_HEIGHT = 60;
+const EXPORT_WIDTH = 600;
 
 const PixelScreen = () => {
   const dbService = useDBService();
@@ -199,6 +204,23 @@ const PixelScreen = () => {
   const gridData = useMemo(() => {
     return generateYearGrid(year);
   }, [year]);
+  const exportRef = useRef<ViewShotRef>(null);
+
+  const handleExport = async () => {
+    try {
+      if (!exportRef.current) return;
+
+      const uri = await exportRef.current.capture();
+      if (!uri) return;
+
+      await MediaLibrary.saveToLibraryAsync(uri);
+
+      Alert.alert("Thành công", "Đã lưu ảnh vào thư viện ảnh.");
+    } catch (error) {
+      console.error("Export image error:", error);
+      Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
+    }
+  };
 
   const inset = useSafeAreaInsets();
 
@@ -207,6 +229,19 @@ const PixelScreen = () => {
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
       className="flex-1 bg-background"
     >
+      <View
+        style={{
+          position: "absolute",
+          left: -10000,
+          top: 0,
+          width: EXPORT_WIDTH,
+        }}
+        pointerEvents="none"
+      >
+        <ViewShot ref={exportRef} options={{ format: "png", quality: 1 }}>
+          <YearExportView gridData={gridData} />
+        </ViewShot>
+      </View>
       <NoteModal
         dateStr={selectedDate ?? undefined}
         visible={moodModalVisible}
@@ -215,6 +250,15 @@ const PixelScreen = () => {
         note={dateNote?.note}
         mood={dateNote?.mood_level}
       />
+
+      <View className="absolute bottom-12 left-2 z-10">
+        <Pressable
+          onPress={handleExport}
+          className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
+        >
+          <Feather name="save" size={20} color={theme.background} />
+        </Pressable>
+      </View>
       <View className="absolute bottom-12 right-2 z-10">
         {scrollButton === "up" && (
           <Pressable
