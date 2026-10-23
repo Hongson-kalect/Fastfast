@@ -57,7 +57,7 @@ const DayPixel = memo(
       if (note) {
         const emotionPack = EMOTION_PACKS[settings?.emotion_pack || "default"];
 
-        const mood = emotionPack.emotions[note.mood_level || 0];
+        const mood = note.mood_level && emotionPack.emotions[note.mood_level];
 
         if (mood) {
           emoji = mood.icon[isDark ? "dark" : "light"];

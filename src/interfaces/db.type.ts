@@ -14,6 +14,8 @@ export interface AppSettings {
   chart_range?: ChartRangeKey;
   is_dark_mode?: boolean;
   pixel_view_mode?: "fasting" | "mood";
+  pixel_view_type?: "week" | "month";
+  pixel_view_orientation?: "horizontal" | "vertical";
   theme?: string;
   emotion_pack?: string;
   target_pack?: string;
@@ -181,8 +183,8 @@ export type UserAsset = {
   id: string;
   user_id: string;
   asset_id: string;
-  type:'theme'|'effect'
-  token:string
+  type: "theme" | "effect";
+  token: string;
   source: string;
   purchased_at: string | null;
   is_deleted: number;
@@ -213,7 +215,6 @@ export type UserAchievementMilestone = {
   is_deleted: number;
   created_at: string;
   updated_at: string;
-    is_confirmed: number,
-    reward?: string
-
+  is_confirmed: number;
+  reward?: string;
 };

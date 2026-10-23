@@ -21,9 +21,11 @@ type Props = {
     fastHour: number;
     logDays: number;
   };
+
+  onSaveImage: () => void;
 };
 const PixelStatistic = React.memo(
-  ({ setTrackingType, trackingType, stats }: Props) => {
+  ({ setTrackingType, trackingType, stats, onSaveImage }: Props) => {
     const { theme, settings } = useAppStore();
     const { counter } = usePixelStore();
 
@@ -44,43 +46,53 @@ const PixelStatistic = React.memo(
 
     return (
       <View className="gap-4">
-        <View className="flex-row items-center gap-4">
-          <View className="flex-row items-center gap-1.5">
-            <Ionicons name="calendar-outline" size={15} color={theme.primary} />
-            <ThemedText size="sm" weight="semibold" color="text">
-              {stats.fastDays}
-            </ThemedText>
-            <ThemedText size="xs" color="text" opacity="medium">
-              days
-            </ThemedText>
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center gap-0.5">
+              <Ionicons
+                name="calendar-outline"
+                size={12}
+                color={theme.primary}
+              />
+              <ThemedText size="xs" weight="semibold" color="text">
+                {stats.fastDays}
+              </ThemedText>
+              <ThemedText size="xxs" color="text" opacity="medium">
+                days
+              </ThemedText>
+            </View>
+
+            <View className="flex-row items-center gap-1.5">
+              <Ionicons name="time-outline" size={12} color={theme.success} />
+              <ThemedText size="xs" weight="semibold" color="text">
+                {fixed(stats.fastHour)}
+              </ThemedText>
+              <ThemedText size="xxs" color="text" opacity="medium">
+                hours
+              </ThemedText>
+            </View>
+
+            <View className="flex-row items-center gap-1.5">
+              <Ionicons
+                name="document-text-outline"
+                size={12}
+                color={theme.warning}
+              />
+              <ThemedText size="xs" weight="semibold" color="text">
+                {fixed(stats.logDays)}
+              </ThemedText>
+              <ThemedText size="xxs" color="text" opacity="medium">
+                logs
+              </ThemedText>
+            </View>
           </View>
 
-          <View className="flex-row items-center gap-1.5">
-            <Ionicons name="time-outline" size={15} color={theme.success} />
-            <ThemedText size="sm" weight="semibold" color="text">
-              {fixed(stats.fastHour)}
-            </ThemedText>
-            <ThemedText size="xs" color="text" opacity="medium">
-              hours
-            </ThemedText>
-          </View>
-
-          <View className="flex-row items-center gap-1.5">
-            <Ionicons
-              name="document-text-outline"
-              size={15}
-              color={theme.warning}
-            />
-            <ThemedText size="sm" weight="semibold" color="text">
-              {fixed(stats.logDays)}
-            </ThemedText>
-            <ThemedText size="xs" color="text" opacity="medium">
-              logs
-            </ThemedText>
-          </View>
+          <Pressable hitSlop={10} onPress={onSaveImage} className="flex-row items-center justify-center p-2 rounded-xl border border-primary/60 shadow-primary">
+            <Ionicons name="save" size={15} color={theme.text} />
+          </Pressable>
         </View>
 
-        <View className="flex-row justify-between items-center mt-8">
+        <View className="flex-row justify-between items-center mt-6">
           <Pressable
             hitSlop={10}
             onPress={openIconPackSelector}

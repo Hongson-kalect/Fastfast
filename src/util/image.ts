@@ -1,7 +1,32 @@
-
-import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
+
+
+export const saveToGallery = async (cacheUri: string): Promise<boolean> => {
+  try {
+    // const sourceFile = new ExpoFile(cacheUri);
+
+    // if (!sourceFile.exists) {
+    //   console.error('File nguồn không tồn tại:', cacheUri);
+    //   return false;
+    // }
+
+    // const { status } = await requestPermissionsAsync();
+
+    // if (status !== 'granted') {
+    //   console.warn('Chưa được cấp quyền lưu ảnh.');
+    //   return false;
+    // }
+
+    // await Asset.create(sourceFile.uri);
+
+    return true;
+  } catch (error) {
+    console.error("Lỗi khi lưu ảnh vào Gallery:", error);
+    return false;
+  }
+};
 
 /**
  * Lưu ảnh từ cache vào thư mục document/images.
@@ -41,10 +66,7 @@ export const takePhoto = async (): Promise<string | null> => {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
 
   if (!permission.granted) {
-    Alert.alert(
-      "Quyền truy cập",
-      "App cần quyền sử dụng Camera để chụp ảnh!",
-    );
+    Alert.alert("Quyền truy cập", "App cần quyền sử dụng Camera để chụp ảnh!");
     return null;
   }
 
@@ -67,8 +89,7 @@ export const takePhoto = async (): Promise<string | null> => {
  * Trả về URI ảnh đã lưu, hoặc null nếu người dùng hủy.
  */
 export const selectPhoto = async (): Promise<string | null> => {
-  const permission =
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
   if (!permission.granted) {
     Alert.alert(

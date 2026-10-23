@@ -11,6 +11,7 @@ type Props = {
   setYear: (year: number) => void;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  onSaveImage: () => void;
 };
 const PixelHeader = ({
   stats,
@@ -18,6 +19,8 @@ const PixelHeader = ({
   setViewMode,
   year,
   setYear,
+
+  onSaveImage,
 }: Props) => {
   const { theme } = useAppStore();
 
@@ -49,6 +52,7 @@ const PixelHeader = ({
           stats={stats}
           trackingType={viewMode}
           setTrackingType={setViewMode}
+          onSaveImage={onSaveImage}
         />
       </View>
     </>

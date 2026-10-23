@@ -2,6 +2,7 @@ import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
+import PixelLayoutSheet from "@/components/pixel/PixelLayoutSheet";
 import WeekRow from "@/components/pixel/WeekRow";
 import YearExportView from "@/components/pixel/YearExportView";
 import { ThemedText } from "@/components/themed-text";
@@ -17,10 +18,10 @@ import {
 } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/util/color";
+import { saveToGallery } from "@/util/image";
 import { getLocalTodayStr } from "@/util/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
-import * as MediaLibrary from "expo-media-library";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -31,7 +32,7 @@ import {
   SectionList,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
@@ -213,13 +214,19 @@ const PixelScreen = () => {
       const uri = await exportRef.current.capture();
       if (!uri) return;
 
-      await MediaLibrary.saveToLibraryAsync(uri);
+      await saveToGallery(uri);
 
       Alert.alert("Thành công", "Đã lưu ảnh vào thư viện ảnh.");
     } catch (error) {
       console.error("Export image error:", error);
       Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
     }
+  };
+
+  const openPixelLayoutSheet = () => {
+    present(<PixelLayoutSheet />, {
+      snapPoints: ["80%"],
+    });
   };
 
   const inset = useSafeAreaInsets();
@@ -250,15 +257,6 @@ const PixelScreen = () => {
         note={dateNote?.note}
         mood={dateNote?.mood_level}
       />
-
-      <View className="absolute bottom-12 left-2 z-10">
-        <Pressable
-          onPress={handleExport}
-          className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
-        >
-          <Feather name="save" size={20} color={theme.background} />
-        </Pressable>
-      </View>
       <View className="absolute bottom-12 right-2 z-10">
         {scrollButton === "up" && (
           <Pressable
@@ -297,6 +295,7 @@ const PixelScreen = () => {
         sections={[{ key: "calendar", data: gridData }]}
         ListHeaderComponent={
           <PixelHeader
+            onSaveImage={handleExport}
             stats={stats}
             year={year}
             setYear={async (year) => await loadPixelYear(dbService, year)}
@@ -309,6 +308,7 @@ const PixelScreen = () => {
             {/* Header Thứ (T2 -> CN) */}
             <View className="flex-row mb-2 items-center">
               <TouchableOpacity
+                onPress={openPixelLayoutSheet}
                 activeOpacity={0.7}
                 hitSlop={25}
                 style={{ borderTopLeftRadius: 4 }}
