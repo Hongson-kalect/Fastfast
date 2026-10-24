@@ -10,12 +10,14 @@ import { ThemedText } from "../themed-text";
 
 const DayPixel = memo(
   ({
+    size,
     day,
     pixelData,
     todayStr,
     viewMode,
     onPress,
   }: {
+    size: number;
     day: DayItem;
     pixelData?: DailyPixelData;
     todayStr: string;
@@ -119,6 +121,8 @@ const DayPixel = memo(
     const style = {
       backgroundColor,
       boxShadow: todayShadow,
+      width: size,
+      height: size,
     };
 
     const children = (

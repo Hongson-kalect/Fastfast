@@ -61,15 +61,17 @@ const PixelLayoutPreview = ({
 
   // Vertical: weekdays across the top, weeks/months downwards.
   // Horizontal: weekdays/days down the left, weeks/months across.
-  const rowCount = isHorizontal ? (isWeek ? 7 : 5) : isWeek ? 5 : 4;
+  const rowCount = isHorizontal ? 6 : 5;
 
-  const colCount = isHorizontal ? (isWeek ? 7 : 4) : isWeek ? 7 : 7;
+  const colCount = isHorizontal ? 5 : 6;
 
   const labels = isWeek
-    ? ["M", "T", "W", "T", "F", "S", "S"]
+    ? isHorizontal
+      ? ["M", "T", "W", "T", "F", "..."]
+      : ["M", "T", "W", "T", "F", "..."]
     : isHorizontal
-      ? ["J", "F", "M", "A"]
-      : ["1", "8", "15", "22", "31", "", ""];
+      ? ["J", "F", "M", "A", "M", "..."]
+      : ["J", "F", "M", "A", "M", "..."];
 
   const background = selected ? theme.primary + "22" : theme.background2;
 
@@ -89,8 +91,8 @@ const PixelLayoutPreview = ({
       style={{ backgroundColor: background }}
     >
       {!isHorizontal && (
-        <View className="flex-row items-center mb-1" style={{ gap: 3 }}>
-          <View style={{ width: 13 }} />
+        <View className="flex-row items-center mb-1 justify-between">
+          {/* <View style={{ width: 13 }} /> */}
           {labels.map((label, index) => (
             <View key={index} className="flex-1 items-center">
               <ThemedText size="xxs" opacity="medium">
@@ -120,7 +122,7 @@ const PixelLayoutPreview = ({
               key={col}
               className="flex-1 rounded-xs"
               style={{
-                height: isHorizontal ? 9 : 11,
+                height: 12,
                 backgroundColor: cellColor(row, col),
               }}
             />
@@ -141,7 +143,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
     orientation: settings?.pixel_view_orientation ?? "vertical",
   });
 
-  const handleSelect = (layout: PixelLayout) => {
+  const handleSelect = async (layout: PixelLayout) => {
     setSelected(layout);
 
     updateSetting({
@@ -149,8 +151,8 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
       pixel_view_orientation: layout.orientation,
     });
 
-    dbService.setting("pixel_view_type", layout.type);
-    dbService.setting("pixel_view_orientation", layout.orientation);
+    await dbService.setting("pixel_view_type", layout.type);
+    await dbService.setting("pixel_view_orientation", layout.orientation);
 
     onSelectLayout?.(layout);
     hide();

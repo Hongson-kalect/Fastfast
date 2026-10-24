@@ -3,7 +3,7 @@ import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import PixelLayoutSheet from "@/components/pixel/PixelLayoutSheet";
-import WeekRow from "@/components/pixel/WeekRow";
+import WeekPixel from "@/components/pixel/WeekPixel";
 import YearExportView from "@/components/pixel/YearExportView";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
@@ -52,8 +52,12 @@ const PixelScreen = () => {
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
   const { width, height } = useWindowDimensions();
-  const { updateSetting, theme, weight, updateWeight } = useAppStore();
+  const { updateSetting, theme, weight, updateWeight, settings } =
+    useAppStore();
   const { isLoading, stats, year, yearPixelData, viewMode } = usePixelStore();
+
+  const viewType = settings?.pixel_view_type ?? "week";
+  const orientation = settings?.pixel_view_orientation ?? "vertical";
 
   const sectionListRef = useRef<SectionList>(null);
   const todayStr = getLocalTodayStr();
@@ -231,6 +235,10 @@ const PixelScreen = () => {
 
   const inset = useSafeAreaInsets();
 
+  const numberOfColumns = viewType === "week" ? 7 : 12;
+  const pixelSize = (width - 40 - 60 - numberOfColumns) / numberOfColumns;
+  console.log("pixelSize", pixelSize);
+
   return (
     <View
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
@@ -276,6 +284,18 @@ const PixelScreen = () => {
           </Pressable>
         )}
       </View>
+
+      <View style={{ paddingHorizontal: 20 }}>
+        <PixelHeader
+          onSaveImage={handleExport}
+          stats={stats}
+          year={year}
+          setYear={async (year) => await loadPixelYear(dbService, year)}
+          viewMode={viewMode}
+          setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
+        />
+      </View>
+
       <SectionList
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -283,7 +303,7 @@ const PixelScreen = () => {
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingBottom: 40,
-          gap: 4,
+          gap: 2,
         }}
         scrollEventThrottle={32}
         onScroll={handleScroll}
@@ -293,59 +313,98 @@ const PixelScreen = () => {
           index,
         })}
         sections={[{ key: "calendar", data: gridData }]}
-        ListHeaderComponent={
-          <PixelHeader
-            onSaveImage={handleExport}
-            stats={stats}
-            year={year}
-            setYear={async (year) => await loadPixelYear(dbService, year)}
-            viewMode={viewMode}
-            setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
-          />
-        }
+        // ListHeaderComponent={
+        //   <PixelHeader
+        //     onSaveImage={handleExport}
+        //     stats={stats}
+        //     year={year}
+        //     setYear={async (year) => await loadPixelYear(dbService, year)}
+        //     viewMode={viewMode}
+        //     setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
+        //   />
+        // }
         renderSectionHeader={() => (
-          <View className="bg-background rounded-lg pr-1 pb-1 overflow-hidden">
-            {/* Header Thứ (T2 -> CN) */}
-            <View className="flex-row mb-2 items-center">
-              <TouchableOpacity
-                onPress={openPixelLayoutSheet}
-                activeOpacity={0.7}
-                hitSlop={25}
-                style={{ borderTopLeftRadius: 4 }}
-                className="w-15 bg-primary justify-center items-center"
-              >
-                <ThemedText
-                  size="xs"
-                  weight="bold"
-                  colorHex={getContrastTextColor(theme.primary)}
-                  style={{ paddingVertical: 4 }}
+          <View className="bg-background rounded-lg overflow-hidden">
+            {orientation === "vertical" ? (
+              // Header của lịch dọc
+              <View className="flex-row items-center mb-2 pr-1 border-b border-text-base/10">
+                <TouchableOpacity
+                  onPress={openPixelLayoutSheet}
+                  activeOpacity={0.7}
+                  hitSlop={25}
+                  style={{ borderTopLeftRadius: 4 }}
+                  className="w-15 h-12 bg-primary justify-center items-center"
                 >
-                  Week
-                </ThemedText>
-              </TouchableOpacity>
+                  <ThemedText
+                    size="xs"
+                    weight="bold"
+                    colorHex={getContrastTextColor(theme.primary)}
+                    style={{ paddingVertical: 4 }}
+                  >
+                    Week
+                  </ThemedText>
+                </TouchableOpacity>
 
-              <View className="flex-1 flex-row justify-between">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                  (day, idx) => (
-                    <View
-                      key={idx}
-                      className="flex-1 items-center justify-center pt-1"
-                    >
-                      <ThemedText size="xxs" color="text" opacity="medium">
-                        {day}
-                      </ThemedText>
-                    </View>
-                  ),
-                )}
+                <View className="flex-1 flex-row justify-between">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (day) => (
+                      <View
+                        key={day}
+                        className="flex-1 items-center justify-center pt-4 bg-blue-400"
+                      >
+                        <ThemedText size="xxs" color="text" opacity="medium">
+                          {day}
+                        </ThemedText>
+                      </View>
+                    ),
+                  )}
+                </View>
               </View>
-            </View>
+            ) : (
+              // Header của lịch ngang
+              <View className="flex-col gap-1">
+                <TouchableOpacity
+                  onPress={openPixelLayoutSheet}
+                  activeOpacity={0.7}
+                  className="w-15 h-12 bg-primary justify-center items-center py-2"
+                  style={{ borderTopLeftRadius: 4 }}
+                >
+                  <ThemedText
+                    size="xs"
+                    weight="bold"
+                    colorHex={getContrastTextColor(theme.primary)}
+                  >
+                    Week
+                  </ThemedText>
+                </TouchableOpacity>
+
+                <View className="gap-0.5">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (day) => (
+                      <View
+                        key={day}
+                        style={{ height: pixelSize }}
+                        className="items-center justify-center w-15 bg-blue-400"
+                      >
+                        <ThemedText size="xxs" color="text" opacity="medium">
+                          {day}
+                        </ThemedText>
+                      </View>
+                    ),
+                  )}
+                </View>
+              </View>
+            )}
           </View>
         )}
         stickySectionHeadersEnabled
         contentContainerClassName="gap-1"
         keyExtractor={(week) => week.weekIndex.toString()}
+        horizontal={orientation === "horizontal"}
         renderItem={({ item }) => (
-          <WeekRow
+          <WeekPixel
+            size={pixelSize}
+            orientation={orientation}
             week={item}
             todayStr={todayStr}
             viewMode={viewMode}
