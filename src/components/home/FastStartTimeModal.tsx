@@ -11,8 +11,6 @@ type Props = {
   minTime?: number | null;
   onSubmit: (startTime: number) => void;
 };
-const MAX_DELAY_MS = 24 * 60 * 60 * 1000;
-
 const START_PRESETS = [
   { label: "2h", minutes: 120 },
   { label: "6h", minutes: 360 },
@@ -26,7 +24,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
 
   const [now] = useState(() => new Date());
   const [startTime, setStartTime] = useState(now.getTime());
-  const [showPicker, setShowPicker] = useState(false);
+  const [pickerMode, setPickerMode] = useState<"date" | "time" | null>(null);
 
   const selectedDate = new Date(startTime);
 
@@ -35,8 +33,6 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
 
   const hours = selectedDate.getHours();
   const minutes = selectedDate.getMinutes();
-
-  const minAllowedTime = now.getTime() - MAX_DELAY_MS;
 
   const showError = (text2: string) => {
     Toast.show({
@@ -50,11 +46,6 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const validateTime = (time: number) => {
     if (minTime && time < minTime) {
       showError("Trùng thời gian với phiên trước đó!");
-      return false;
-    }
-
-    if (time < minAllowedTime) {
-      showError("Chỉ được phép bắt đầu sớm tối đa 24 giờ!");
       return false;
     }
 
@@ -81,13 +72,22 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   };
 
   const handlePickerChange = (_event: any, value?: Date) => {
+    const mode = pickerMode;
     if (Platform.OS === "android") {
-      setShowPicker(false);
+      setPickerMode(null);
     }
 
-    if (value) {
-      applyTime(value.getTime());
+    if (!value) return;
+
+    // Picker ngày chỉ đổi ngày, giữ nguyên giờ:phút đang chọn
+    if (mode === "date") {
+      const next = new Date(startTime);
+      next.setFullYear(value.getFullYear(), value.getMonth(), value.getDate());
+      applyTime(next.getTime());
+      return;
     }
+
+    applyTime(value.getTime());
   };
 
   const handleSubmit = () => {
@@ -105,7 +105,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         </ThemedText>
 
         <ThemedText size="xs" color="text" opacity="medium" className="mt-1">
-          Có thể bắt đầu sớm hơn hiện tại tối đa 24 giờ
+          Chạm vào giờ hoặc ngày để chọn thời điểm bắt đầu
         </ThemedText>
       </View>
 
@@ -157,7 +157,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => setShowPicker(true)}
+            onPress={() => setPickerMode("time")}
             className="min-w-36 items-center justify-center rounded-xl border border-primary/20 bg-primary/5 px-5 py-3"
           >
             <ThemedText
@@ -186,7 +186,12 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         </View>
 
         {/* Date */}
-        <View className="mt-3">
+        <TouchableOpacity
+          activeOpacity={0.7}
+          hitSlop={10}
+          onPress={() => setPickerMode("date")}
+          className="mt-3 rounded-lg px-3 py-1"
+        >
           <ThemedText
             size="xs"
             weight="medium"
@@ -194,17 +199,18 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             opacity={selectedDay !== today ? "full" : "medium"}
           >
             {selectedDay !== today && "⚠️ "}
-            {selectedDay === today ? "Hôm nay" : selectedDay}
+            {selectedDay === today ? "Hôm nay" : selectedDay} ▾
           </ThemedText>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Native picker */}
-      {showPicker && (
+      {pickerMode && (
         <DateTimePicker
           value={selectedDate}
-          mode="time"
+          mode={pickerMode}
           is24Hour
+          maximumDate={now}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onValueChange={handlePickerChange}
         />
