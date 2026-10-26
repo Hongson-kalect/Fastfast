@@ -39,7 +39,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
       if (modal?.type === "finishFast" && lastFast) {
         const targetFinishTime = lastFast.target_duration
-          ? lastFast.start_time + lastFast.target_duration * 60 * 1000
+          ? lastFast.start_time + lastFast.target_duration * 3600 * 1000
           : null;
 
         addModal({

@@ -137,7 +137,7 @@ export const SwapButton = React.memo(
       if (isCounting && currentFastSession) {
         const finishTime = currentFastSession.target_duration
           ? currentFastSession.start_time +
-            currentFastSession.target_duration * 60 * 1000
+            currentFastSession.target_duration * 3600 * 1000
           : null;
 
         addModal({
