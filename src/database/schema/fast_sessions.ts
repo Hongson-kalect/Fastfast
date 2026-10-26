@@ -187,6 +187,7 @@ export const getFastSessionByIds = async (
 export const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
 export const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
 export const MAX_FAST_HOURS = 100;
+const LONG_FAST_GRACE_HOURS = 0.25; // 15 phút
 
 type FinishFastResult = {
   lastSession: FastSession | null;
@@ -454,7 +455,11 @@ export const calculateFastReward = (
 
   const inputHabitDelta = fixed(3.0 + (hours - 16) * 0.2);
 
-  const sessionShieldGain = Math.max(0, Math.floor(hours / 24) - 1);
+  // Cho phép hụt LONG_FAST_GRACE_HOURS: phiên "48h" bấm dừng sớm vài giây/phút vẫn được tính
+  const sessionShieldGain = Math.max(
+    0,
+    Math.floor((hours + LONG_FAST_GRACE_HOURS) / 24) - 1,
+  );
 
   const oldHabitScore = habitLog?.habit_snap || 0;
   const oldRetain = habitLog?.habit_retain || 0;
