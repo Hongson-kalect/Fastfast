@@ -15,6 +15,8 @@ export const SCREEN_PADDING = 20;
 // Chiều cao tab bar nổi + khoảng cách đáy → nội dung cuộn cần chừa ra
 export const TAB_BAR_HEIGHT = 64;
 export const TAB_BAR_BOTTOM_GAP = 12;
+// Tab bar rộng hơn lề nội dung (SCREEN_PADDING) để nổi thành một lớp riêng
+export const TAB_BAR_SIDE_GAP = 12;
 export const TAB_BAR_SPACE = TAB_BAR_HEIGHT + TAB_BAR_BOTTOM_GAP + 24;
 
 /** Gradient nhấn cho hành động chính, ghép từ màu theme. */

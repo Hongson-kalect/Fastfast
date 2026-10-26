@@ -1,7 +1,7 @@
 import {
   RADIUS,
-  SCREEN_PADDING,
   TAB_BAR_BOTTOM_GAP,
+  TAB_BAR_SIDE_GAP,
   TAB_BAR_HEIGHT,
   glow,
 } from "@/constants/design";
@@ -63,17 +63,18 @@ const MainTab = () => {
         tabBarStyle: {
           position: "absolute",
           // left/right/bottom bị bỏ qua với tab bar của React Navigation → dùng margin
-          marginHorizontal: SCREEN_PADDING,
+          // Rộng hơn lề nội dung một chút để đọc ra là lớp nổi, không lẫn với card
+          marginHorizontal: TAB_BAR_SIDE_GAP,
           marginBottom: inset.bottom + TAB_BAR_BOTTOM_GAP,
           height: TAB_BAR_HEIGHT,
           paddingTop: 6,
           paddingBottom: 6,
           borderRadius: RADIUS.lg,
-          // Nổi rõ cả khi nằm trên card/background2: viền sáng hơn + bóng đậm
+          // Viền mảnh đều 4 cạnh + bóng đậm để tách khỏi card/background2
           borderTopWidth: 1,
           borderWidth: 1,
-          borderColor: theme.text + "26",
-          borderTopColor: theme.text + "33",
+          borderColor: theme.text + "1A",
+          borderTopColor: theme.text + "1A",
           backgroundColor: theme.card,
           ...glow("#000", 0.6),
           shadowRadius: 20,
