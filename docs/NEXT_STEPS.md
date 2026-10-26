@@ -146,7 +146,14 @@ Trạng thái: [x] đã áp dụng mục 1–5; mục 6 còn mở.
 - [x] Mở rộng mốc theo độ khó tăng dần (giữ nguyên id cũ để không mất tiến độ), thêm `retain_circles`.
 - [x] Mốc vẫn được kiểm tra khi giá trị không đổi (mốc mới thấp hơn kỷ lục cũ sẽ mở ở phiên tiếp theo).
 - [ ] `fastFailedCount` / `fastInvalidCount` không bao giờ được phát ra — chỉ `handleCompletedFast` trả `achievement`.
-- [ ] Claim mốc chưa cho phần thưởng gì. Gợi ý: mốc lớn tặng 1 khiên / mở icon pack / theme.
+- Quyết định: **không tặng thưởng vật chất** (shield phải kiếm bằng habit; theme/icon pack để bán).
+  Phần thưởng là ghi nhận:
+  - [ ] Hình huy hiệu cho từng mốc (`AchievementItem.image`), tầng đồng/bạc/vàng/kim cương.
+  - [ ] Profile: chọn tối đa 3 huy hiệu để trưng bày (key `achievement_showcase` trong `app_settings`).
+  - [ ] Hiệu ứng ăn mừng khi claim; mốc hiếm có hiệu ứng riêng.
+  - [ ] Hiện tỉ lệ/độ hiếm (VD "Top mốc khó") và ngày đạt được.
+  - [ ] Ảnh chia sẻ huy hiệu / gắn huy hiệu trưng bày vào ảnh xuất Year in Pixels.
+  - [ ] (Tuỳ chọn) khung avatar/viền profile độc quyền cho mốc lớn — không bán, không ảnh hưởng điểm.
 - [ ] Mốc habit (10/30/50/70/100) lệch với mốc shield (35/70/100) — cân nhắc đồng bộ.
 - [ ] Achievement cần input mới: khiên cứu streak (`shieldUsed`, phát từ luồng penalty),
   người quay lại (`comeback`), ghi cảm xúc/cân nặng (`noteCount`, `weightLogCount`), năm pixel đầy đủ.
