@@ -292,7 +292,7 @@ export async function refreshDashboard(
   });
 
   try {
-    const data = await initializeDashboard(db, chartType);
+    await initializeDashboard(db, chartType);
 
   } catch (error) {
     console.error("=> [Dashboard] Refresh dữ liệu thất bại:", error);
