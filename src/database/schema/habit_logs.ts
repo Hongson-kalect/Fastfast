@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { FastSession, HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { getDaysDiff, getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
@@ -107,7 +108,7 @@ export const getPixelShielLog = async (
 
     return rows;
   } catch (e) {
-    console.warn("error on getPixelShielLog", e);
+    logDbError("error on getPixelShielLog", e);
     return [];
   }
 };
@@ -229,7 +230,7 @@ export const reduceShield = async (
     const lastHabit = await getLastHabitLog(db);
     return lastHabit;
   } catch (e) {
-    console.warn("error on reduceShield", e);
+    logDbError("error on reduceShield", e);
     return null;
   }
 };
@@ -262,7 +263,7 @@ export const reduceHabit = async (
     const lastHabit = await getLastHabitLog(db);
     return lastHabit;
   } catch (e) {
-    console.warn("error on reduceHabit", e);
+    logDbError("error on reduceHabit", e);
     return null;
   }
 };

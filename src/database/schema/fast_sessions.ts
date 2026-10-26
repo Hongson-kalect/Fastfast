@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { AchievementInput, UserStats } from "@/constants/achievements";
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
@@ -116,7 +117,7 @@ export const getFastStatsSummary = async (
       }
     );
   } catch (e) {
-    console.warn("error on getFastStatsSummary", e);
+    logDbError("error on getFastStatsSummary", e);
     return {
       total_hours: 0,
       avg_hours: 0,
@@ -141,7 +142,7 @@ export const getLastFastSession = async (
     );
     return row;
   } catch (e) {
-    console.warn("error on getLastFastSession", e);
+    logDbError("error on getLastFastSession", e);
     return null;
   }
 };
@@ -157,7 +158,7 @@ export const getSessionById = async (
     );
     return row;
   } catch (e) {
-    console.warn("error on getActiveSession", e);
+    logDbError("error on getActiveSession", e);
     return null;
   }
 };
@@ -179,7 +180,7 @@ export const getFastSessionByIds = async (
 
     return rows;
   } catch (e) {
-    console.warn("error on getFastSessionByIds", e);
+    logDbError("error on getFastSessionByIds", e);
     return [];
   }
 };
@@ -587,7 +588,7 @@ export const startNewSession = async (
     const res = await getLastFastSession(db);
     return res;
   } catch (e) {
-    console.warn("error on startNewSession", e);
+    logDbError("error on startNewSession", e);
     return null;
   }
 };
@@ -609,7 +610,7 @@ export const updateSessionTarget = async (
     );
     return res;
   } catch (e) {
-    console.warn("error on updateSessionTarget", e);
+    logDbError("error on updateSessionTarget", e);
     return null;
   }
 };
@@ -619,7 +620,7 @@ export const deleteSession = async (db: SQLiteDatabase, id: string) => {  try {
       id,
     ]);
   } catch (e) {
-    console.warn("error on deleteSession", e);
+    logDbError("error on deleteSession", e);
   }
 };
 
@@ -634,7 +635,7 @@ export const fastFail = async (
     );
     return await getLastFastSession(db);
   } catch (e) {
-    console.warn("error on fastFail", e);
+    logDbError("error on fastFail", e);
     return null;
   }
 };
@@ -645,7 +646,7 @@ export const deleteFast = async (db: SQLiteDatabase, id: string) => {
       id,
     ]);
   } catch (e) {
-    console.warn("error on deleteFast", e);
+    logDbError("error on deleteFast", e);
   }
 };
 

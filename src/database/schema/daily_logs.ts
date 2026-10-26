@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { DailyLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -39,7 +40,7 @@ export const getDailyLogs = async (
     );
     return rows;
   }catch(e){
-    console.warn('error on getDailyLogs', e);
+    logDbError("error on getDailyLogs", e);
     return [];
   }
 };
@@ -68,7 +69,7 @@ export const addDailyLogs = async (
     );
 
   }catch(e){
-    console.warn('error on addDailyLogs', e);
+    logDbError("error on addDailyLogs", e);
 
     return null
   }
@@ -93,7 +94,7 @@ export const getPixelLogData = async (
 
     return rows;
   } catch (e) {
-    console.warn("error on getPixelLogData", e);
+    logDbError("error on getPixelLogData", e);
     return [];
   }
 };

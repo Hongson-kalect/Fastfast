@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { UserProfile } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
@@ -107,7 +108,7 @@ export const getUserProfile = async (
     };
   }
   catch (e){
-    console.warn('get user profile error', e);
+    logDbError("get user profile error", e);
     return null;
   }
 };
@@ -137,7 +138,7 @@ export const increaseStreak = async (
     return newProfile!;
   }
   catch (e){
-    console.warn('increaseStreak error', e);
+    logDbError("increaseStreak error", e);
     return null;
   }
 };
@@ -176,7 +177,7 @@ export const gainShield = async (db: SQLiteDatabase, num:number,  habit:number, 
       }
   }
   catch (e){
-    console.warn('gainShield error', e);
+    logDbError("gainShield error", e);
     return {
       profile: null,
       habitShield: 0,
@@ -230,7 +231,7 @@ export const clearStreak = async (
     const newProfile = await getUserProfile(db);
     return newProfile;
   } catch (e) {
-    console.warn("clearStreak error", e);
+    logDbError("clearStreak error", e);
     return null;
   }
 };

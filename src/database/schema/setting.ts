@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { ThemeKey } from "@/constants/themes";
 import { AppSettings } from "@/interfaces/db.type";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -39,7 +40,7 @@ export const getUserSettings = async (
     });
     return settingsObj;
   } catch (e) {
-    console.warn("error on getUserSettings", e);
+    logDbError("error on getUserSettings", e);
     return null;
   }
 };
@@ -76,7 +77,7 @@ export const toggleTheme = async (
     return await getUserSettings(db);
 
   } catch (error) {
-    console.error("Lỗi khi update theme mode trong DB:", error);
+    logDbError("Lỗi khi update theme mode trong DB:", error);
     throw error;
   }
 };

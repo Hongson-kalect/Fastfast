@@ -1,3 +1,4 @@
+import "@/utils/devPromiseTracking";
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import "../global.css";

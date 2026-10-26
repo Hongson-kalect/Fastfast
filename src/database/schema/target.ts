@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { WeightTarget } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
@@ -34,7 +35,7 @@ export const getActiveWeightTarget = async (
     return row;
   }
   catch (error) {
-    console.warn("error on getActiveWeightTarget", error);
+    logDbError("error on getActiveWeightTarget", error);
     return null;
   }
 };
@@ -72,7 +73,7 @@ export const checkAndUpdateActiveTarget = async (
     return false;
   }
   catch (error) {
-    console.warn("error on checkAndUpdateActiveTarget", error);
+    logDbError("error on checkAndUpdateActiveTarget", error);
     return false;
   }
 };
@@ -118,6 +119,6 @@ export const createWeightTarget = async (
   });
 }
 catch (error) {
-  console.warn("error on createWeightTarget", error);
+  logDbError("error on createWeightTarget", error);
 }
 };

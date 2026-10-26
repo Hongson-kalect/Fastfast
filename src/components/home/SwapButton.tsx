@@ -20,6 +20,7 @@ import NoteModal from "./NoteModal";
 import { SwapFastButton } from "./SwapButton/SwapFastButton";
 import { SwapImageButton } from "./SwapButton/SwapImageButton";
 import { SwapMoodButton } from "./SwapButton/SwapMoodButton";
+import { runDbTask } from "@/utils/dbError";
 import { useFocusEffect } from "expo-router";
 
 type SwapButtonProps = {
@@ -68,15 +69,17 @@ export const SwapButton = React.memo(
           .accent ?? theme.primary)
       : theme.primary;
 
-    const detectTodayNote = async () => {
-      const note = await dbService?.getDailyNote();
-      setTodayNote(note || null);
-    };
+    const detectTodayNote = () =>
+      runDbTask("load today note", async () => {
+        const note = await dbService?.getDailyNote();
+        setTodayNote(note || null);
+      });
 
-    const getCurrentWeight = async () => {
-      const weightObj = await dbService?.getCurrentWeight();
-      updateWeight(weightObj?.weight || 0);
-    };
+    const getCurrentWeight = () =>
+      runDbTask("load current weight", async () => {
+        const weightObj = await dbService?.getCurrentWeight();
+        updateWeight(weightObj?.weight || 0);
+      });
 
     const toggleMenu = () => {
       if (isMenuOpen) {

@@ -5,6 +5,7 @@ import { initializeAppState } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
 import { initializeDashboard } from "@/stores/dashboardAction";
 import useModalStore from "@/stores/modalStore";
+import { runDbTask } from "@/utils/dbError";
 import { feedback } from "@/utils/feedback";
 import { initializePixel } from "@/stores/pixelAction";
 import * as Font from "expo-font";
@@ -96,7 +97,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       }, 1000);
     };
 
-    load();
+    runDbTask("app startup", load);
   }, [db, addModal]);
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       // Không block app startup
     };
 
-    load();
+    runDbTask("dashboard/pixel startup", load);
   }, [db, isDBReady]);
 
   useEffect(() => {

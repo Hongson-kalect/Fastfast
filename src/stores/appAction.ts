@@ -17,6 +17,7 @@ import {
 } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { CHART_RANGES } from "@/constants/data";
+import { logDbError } from "@/utils/dbError";
 import { handleLogin } from "@/utils/login";
 import { useAppStore } from "./appStore";
 import { initializeDashboard } from "./dashboardAction";
@@ -197,7 +198,7 @@ export async function initializeAppState(
 
     return result;
   } catch (error) {
-    console.error("=> [App] Khởi tạo dữ liệu thất bại:", error);
+    logDbError("initializeAppState", error);
 
     useAppStore.setState({
       isLoadingData: false,

@@ -56,6 +56,7 @@ import {
   getUserAchievements,
 } from "@/constants/achievements";
 import { DBService } from "@/hooks/useDBService";
+import { logDbError } from "@/utils/dbError";
 import { useAppStore } from "./appStore";
 import { useDashboardStore } from "./dashboardStore";
 
@@ -295,7 +296,7 @@ export async function refreshDashboard(
     await initializeDashboard(db, chartType);
 
   } catch (error) {
-    console.error("=> [Dashboard] Refresh dữ liệu thất bại:", error);
+    logDbError("refreshDashboard", error);
 
     useDashboardStore.setState({
       isRefreshing: false,

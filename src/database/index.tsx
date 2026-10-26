@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import {
   FastSession,
   HabitLog,
@@ -227,7 +228,7 @@ export const initDatabase = async (db: SQLiteDatabase) => {
       await migrateDatabase(db, version, DATABASE_VERSION);
     }
   } catch (error) {
-    console.error("❌ Lỗi khởi tạo SQLite DB:", error);
+    logDbError("❌ Lỗi khởi tạo SQLite DB:", error);
   }
 };
 
@@ -243,7 +244,7 @@ export const getDatabaseVersion = async (
     // Trả về số version, nếu lỗi không tìm thấy thì mặc định là 0
     return result?.user_version ?? 0;
   } catch (error) {
-    console.error("Lỗi khi lấy DB Version:", error);
+    logDbError("Lỗi khi lấy DB Version:", error);
     return 0;
   }
 };
@@ -296,6 +297,6 @@ export const clearDatabase = async (db: SQLiteDatabase) => {
     });
     console.log("🧹 Clear Database thành công!");
   } catch (error) {
-    console.error("Lỗi clear Database:", error);
+    logDbError("Lỗi clear Database:", error);
   }
 };

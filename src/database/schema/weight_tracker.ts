@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { WeightLog } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
@@ -79,6 +80,6 @@ export const updateWeight = async (
     );
     return row;
   } catch (e) {
-    console.warn("error on updateWeight", e);
+    logDbError("error on updateWeight", e);
   }
 };

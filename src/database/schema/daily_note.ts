@@ -1,3 +1,4 @@
+import { logDbError } from "@/utils/dbError";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -27,7 +28,7 @@ export const getDailyNote = async (
     );
     return row;
   } catch (e) {
-    console.warn("error on getDailyNote", e);
+    logDbError("error on getDailyNote", e);
     return null;
   }
 };
@@ -80,7 +81,7 @@ export const setDailyNote = async (
       hasImage ? 1 : 0,
     ]);
   } catch (e) {
-    console.warn("error on setDailyNote", e);
+    logDbError("error on setDailyNote", e);
   }
 };
 
@@ -102,7 +103,7 @@ export const getPixelNoteData = async (
 
     return rows;
   } catch (e) {
-    console.warn("error on getPixelNoteData", e);
+    logDbError("error on getPixelNoteData", e);
     return [];
   }
 };

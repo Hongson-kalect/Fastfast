@@ -23,6 +23,7 @@ import {
 } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/utils/color";
+import { runDbTask } from "@/utils/dbError";
 import { saveToGallery } from "@/utils/image";
 import { getLocalTodayStr } from "@/utils/timer";
 import { Feather } from "@expo/vector-icons";
@@ -204,7 +205,9 @@ const PixelScreen = () => {
   );
 
   useEffect(() => {
-    dbService.setting("pixel_view_mode", viewMode || "fasting");
+    runDbTask("save pixel view mode", () =>
+      dbService.setting("pixel_view_mode", viewMode || "fasting"),
+    );
     updateSetting({ pixel_view_mode: viewMode });
   }, [viewMode, dbService, updateSetting]);
 
@@ -219,13 +222,14 @@ const PixelScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const task = requestIdleCallback(() => {
-        loadPixelYear(dbService, year);
+        runDbTask("loadPixelYear", () => loadPixelYear(dbService, year));
       });
 
       return () => {
         cancelIdleCallback(task);
       };
-    }, [year, loadPixelYear]),
+      // dbService đổi khi SQLiteProvider mở lại kết nối → phải load bằng instance mới
+    }, [year, dbService]),
   );
 
   const exportRef = useRef<ViewShotRef>(null);
