@@ -1,3 +1,4 @@
+import { StreakHero } from "@/components/dashboard/StreakHero";
 import { TAB_BAR_SPACE } from "@/constants/design";
 import { FastLevelBarChart } from "@/components/dashboard/FastLevelChart";
 import { GoalCard } from "@/components/dashboard/GoalCard";
@@ -84,6 +85,10 @@ const DashboardScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         <DashboardHeader />
+
+        <View className="mt-5">
+          <StreakHero />
+        </View>
 
         <View className="mt-4">
           <GoalCard />

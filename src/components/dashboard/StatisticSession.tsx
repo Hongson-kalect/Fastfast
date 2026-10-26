@@ -1,4 +1,6 @@
+import { RADIUS } from "@/constants/design";
 import { FastStatsSummary } from "@/database/schema/fast_sessions";
+import { SectionTitle } from "../SectionTitle";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
@@ -76,7 +78,14 @@ const StatCard = ({
     );
   }
   return (
-    <View className="w-[48%] rounded-2xl bg-background2 p-3.5">
+    <View
+      className="w-[48.5%] bg-card p-4"
+      style={{
+        borderRadius: RADIUS.lg,
+        borderWidth: 1,
+        borderColor: theme.text + "0F",
+      }}
+    >
       <View className="mb-2.5 flex-row items-center gap-2">
         <View
           className="h-7 w-7 items-center justify-center rounded-lg"
@@ -120,14 +129,6 @@ type Props = {
 export const StatisticsSection = ({ fastStatistics }: Props) => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
   const { userProfile, theme } = useAppStore();
-  const heroStat: StatCardProps = {
-    icon: "flame",
-    title: "Current streak",
-    value: userProfile?.current_streak || 0,
-    unit: "days",
-    color: theme.warning,
-  };
-
   const gridStats: StatCardProps[] = [
     {
       icon: "timer-outline",
@@ -173,22 +174,24 @@ export const StatisticsSection = ({ fastStatistics }: Props) => {
     },
   ];
 
+  // Streak đã có card riêng (StreakHero) ở đầu Dashboard → thay ô Max streak bằng số khiên đã dùng
+  const stats: StatCardProps[] = [
+    ...gridStats.filter((item) => item.title !== "Max streak"),
+    {
+      icon: "shield-checkmark-outline",
+      title: "Shields used",
+      value: userProfile?.total_shield_used || 0,
+      unit: "times",
+      color: theme.info,
+    },
+  ];
+
   return (
-    <View className="mt-5">
-      <View className="mb-4">
-        <ThemedText size="md" weight="bold" color="title">
-          Statistics
-        </ThemedText>
+    <View className="mt-7">
+      <SectionTitle title="Thống kê" />
 
-        <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
-          Your fasting and habit overview
-        </ThemedText>
-      </View>
-
-      <StatCard {...heroStat} isHero />
-
-      <View className="flex-row flex-wrap justify-between gap-y-2.5">
-        {gridStats.map((item) => (
+      <View className="flex-row flex-wrap justify-between gap-y-3">
+        {stats.map((item) => (
           <StatCard key={item.title} {...item} />
         ))}
       </View>

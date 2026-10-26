@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { Achievement } from "@/constants/achievements";
+import { RADIUS } from "@/constants/design";
 import { useDBService } from "@/hooks/useDBService";
 import {
   UserAchievement,
@@ -100,6 +101,8 @@ export const AchievementCard = ({
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
 
   const { theme } = useAppStore();
+  const tier = getTier(completedCount, totalCount);
+  const tierColor = tier?.color ?? theme.text;
 
   // --------------------------------------------------
   // Progress animation
@@ -176,43 +179,39 @@ export const AchievementCard = ({
 
   return (
     <Animated.View
-      style={cardAnimatedStyle}
-      className="overflow-hidden rounded-2xl border border-text-base/5 bg-background2"
+      className="overflow-hidden border bg-card"
+      // Viền theo tầng đã đạt (đồng/bạc/vàng/kim cương), xám khi chưa đạt mốc nào
+      style={[
+        cardAnimatedStyle,
+        {
+          borderRadius: RADIUS.lg,
+          borderColor: hasUnclaimed
+            ? theme.success + "55"
+            : tier
+              ? tierColor + "40"
+              : theme.text + "0F",
+        },
+      ]}
     >
       <Pressable onPress={onPress} className="active:opacity-80">
-        <View className="px-4 py-3.5">
+        <View className="px-4 py-4">
           {/* Main row */}
           <View className="flex-row items-center">
-            {/* Icon */}
+            {/* Huy hiệu */}
             <View
-              className="relative mr-3.5 h-11 w-11 items-center justify-center rounded-xl"
+              className="relative mr-3.5 h-12 w-12 items-center justify-center"
               style={{
+                borderRadius: RADIUS.md,
                 backgroundColor: hasUnclaimed
-                  ? theme.success + "15"
-                  : isCompleted
-                    ? theme.primary + "12"
-                    : theme.text + "0D",
+                  ? theme.success + "1F"
+                  : tierColor + (tier ? "26" : "0D"),
               }}
             >
               <Ionicons
-                name={
-                  hasUnclaimed
-                    ? "gift"
-                    : isCompleted
-                      ? "trophy"
-                      : "trophy-outline"
-                }
-                size={19}
-                color={
-                  hasUnclaimed
-                    ? theme.success
-                    : isCompleted
-                      ? theme.primary
-                      : theme.text
-                }
-                style={{
-                  opacity: isCompleted || hasUnclaimed ? 1 : 0.45,
-                }}
+                name={hasUnclaimed ? "gift" : tier ? "medal" : "medal-outline"}
+                size={22}
+                color={hasUnclaimed ? theme.success : tierColor}
+                style={{ opacity: tier || hasUnclaimed ? 1 : 0.4 }}
               />
 
               {hasUnclaimed && (
@@ -241,12 +240,18 @@ export const AchievementCard = ({
                   {achievement.name}
                 </ThemedText>
 
-                {isCompleted && !hasUnclaimed && (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={13}
-                    color={theme.success}
-                  />
+                {tier && !hasUnclaimed && (
+                  <View
+                    className="px-2 py-0.5"
+                    style={{
+                      borderRadius: RADIUS.pill,
+                      backgroundColor: tierColor + "26",
+                    }}
+                  >
+                    <ThemedText size="tiny" weight="extrabold" colorHex={tierColor}>
+                      {tier.label}
+                    </ThemedText>
+                  </View>
                 )}
               </View>
 
@@ -344,8 +349,8 @@ export const AchievementCard = ({
                     {
                       backgroundColor: hasUnclaimed
                         ? theme.success
-                        : isCompleted
-                          ? theme.success
+                        : tier
+                          ? tierColor
                           : theme.primary,
                     },
                   ]}
@@ -357,6 +362,23 @@ export const AchievementCard = ({
       </Pressable>
     </Animated.View>
   );
+};
+
+// Tầng huy hiệu theo tỉ lệ mốc đã đạt
+const TIERS = [
+  { min: 0, label: "BRONZE", color: "#D08A4E" },
+  { min: 0.34, label: "SILVER", color: "#B8C4D6" },
+  { min: 0.67, label: "GOLD", color: "#F5C542" },
+  { min: 1, label: "DIAMOND", color: "#7DD3FC" },
+];
+
+const getTier = (completed: number, total: number) => {
+  if (!completed || !total) return null;
+  const ratio = completed / total;
+  if (ratio >= 1) return TIERS[3];
+  if (ratio >= TIERS[2].min) return TIERS[2];
+  if (ratio >= TIERS[1].min) return TIERS[1];
+  return TIERS[0];
 };
 
 const formatAchievementValue = (value: number) => {
