@@ -70,7 +70,7 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
                   size="sm"
                   weight="medium"
                   color="text"
-                  opacity={isSelected ? "hight" : "medium"}
+                  opacity={isSelected ? "high" : "medium"}
                 >
                   {item.unit === "day"
                     ? "ngày"

@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS user_profile (
 );
 `;
 
-
 // Mặc định bản ghi seed cơ bản
 const seedProfile = {
   id: uuidv7(),
@@ -235,27 +234,5 @@ export const clearStreak = async (
   } catch (e) {
     console.warn("clearStreak error", e);
     return null;
-  }
-};
-
-export const updateLastLoginDate = async (db: SQLiteDatabase, profile: UserProfile, date_string:string) => {
-  try {
-    await db.runAsync(`Update user_profile SET updated_at = strftime('%s', 'now'), last_login_date = ? WHERE id = ?;`, [date_string, profile.id]); 
-    const newProfile = await getUserProfile(db);
-    return newProfile;
-  } catch (e) {
-    console.warn("error on updateLastUserLogin", e);
-    return null
-  }
-};
-
-export const updateStreakDate = async (db: SQLiteDatabase, profile: UserProfile, date_string:string) => {
-  try {
-    await db.runAsync(`Update user_profile SET updated_at = strftime('%s', 'now'), streak_date = ? WHERE id = ?;`, [date_string, profile.id]); 
-    const newProfile = await getUserProfile(db);
-    return newProfile;
-  } catch (e) {
-    console.warn("error on updateLastUserLogin", e);
-    return null
   }
 };

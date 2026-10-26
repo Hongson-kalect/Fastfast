@@ -1,4 +1,4 @@
-export type FontFamily = keyof typeof fonts;
+
 
 export const fonts = {
   SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),

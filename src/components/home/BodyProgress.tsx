@@ -74,7 +74,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                       style={{ backgroundColor: color + "20" }}
                       className="px-2 py-1 rounded-full"
                     >
-                      <ThemedText size="xs" colorHex={color} opacity="hight">
+                      <ThemedText size="xs" colorHex={color} opacity="high">
                         {getProcessLevelTitle(key, level)}
                       </ThemedText>
                     </View>

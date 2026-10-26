@@ -1,6 +1,6 @@
 import { Text, type TextProps } from "react-native";
 
-import { Opacity, TextSize, TextWeight } from "@/constants/theme";
+import { Opacity, TextSize, TextWeight } from "@/constants/typography";
 import { ThemeType } from "@/constants/themes";
 import { useAppStore } from "@/stores/appStore";
 import { useMemo } from "react";

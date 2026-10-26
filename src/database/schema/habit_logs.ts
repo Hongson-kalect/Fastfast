@@ -290,49 +290,6 @@ export const getShieldUsedLog = async (
   }
 };
 
-// Helper 2: Calculate Gap, Shield & Habit Penalties
-export const calculateStreakPenalties = (
-  referenceDate: string,
-  todayStr: string,
-  currentShield: number,
-) => {
-  const gap = getDaysDiff(referenceDate, todayStr);
-  const shieldNeed = Math.max(gap - 1, 0);
-
-  if (gap <= 1) {
-    return {
-      gap,
-      reduceShieldNumber: 0,
-      reduceHabitNumber: 0,
-      overRestDays: 0,
-      isStreakSavedByShield: false,
-    };
-  }
-
-  if (currentShield >= shieldNeed) {
-    return {
-      gap,
-      reduceShieldNumber: shieldNeed,
-      reduceHabitNumber: 0,
-      overRestDays: 0,
-      isStreakSavedByShield: true,
-    };
-  }
-
-  // Khái niệm overRestDays -= currentShield
-  const overRestDays = shieldNeed - currentShield;
-  const reduceHabitNumber =
-    5 + Math.round(Math.pow(overRestDays, 1 + overRestDays / 19) * 10) / 10;
-
-  return {
-    gap,
-    reduceShieldNumber: currentShield, // Trừ sạch khiên hiện có
-    reduceHabitNumber,
-    overRestDays,
-    isStreakSavedByShield: false,
-  };
-};
-
 export const calculatePenaltyEffect = (
   referenceDate: string,
   profile: UserProfile,
@@ -457,7 +414,6 @@ export const calculatePenaltyEffect = (
   if (newHabitScore < shield_rewards[1]) {
     fullClaimable = 1;
   }
-
 
   // ─────────────────────────────
   // Shield

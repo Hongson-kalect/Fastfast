@@ -272,39 +272,6 @@ export function hydrateDashboard(data: DashboardHydrationData): void {
 }
 
 /**
- * Khởi tạo Dashboard và hydrate Zustand.
- *
- * Đây là wrapper được gọi từ AppWrapper sau khi
- * App state đã hydrate và app đã được phép render.
- */
-export async function initializeDashboardState(
-  db: DBService,
-  chartType: ChartRangeConfig,
-): Promise<void> {
-  const store = useDashboardStore.getState();
-
-  if (store.isHydrated || store.isRefreshing) {
-    return;
-  }
-
-  useDashboardStore.setState({
-    isRefreshing: true,
-  });
-
-  try {
-    const data = await initializeDashboard(db, chartType);
-
-    hydrateDashboard(data);
-  } catch (error) {
-    console.error("=> [Dashboard] Khởi tạo dữ liệu thất bại:", error);
-
-    useDashboardStore.setState({
-      isRefreshing: false,
-    });
-  }
-}
-
-/**
  * Refresh dữ liệu Dashboard.
  *
  * Data cũ vẫn được giữ trong Zustand trong lúc

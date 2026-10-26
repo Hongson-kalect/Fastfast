@@ -195,14 +195,3 @@ const values = themes
     )`,
   )
   .join(",");
-
-export const seedData = `
-INSERT OR IGNORE INTO theme (
-  id,
-  name,
-  color_palette,
-  font,
-  priority
-)
-VALUES ${values};
-`;

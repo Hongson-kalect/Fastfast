@@ -152,16 +152,6 @@ export interface Theme {
   updated_at: string;
 }
 
-// 💡 Gợi ý thêm các Type Utility phục vụ lúc INSERT (không cần truyền các trường tự sinh)
-export type InsertFastSessionInput = Omit<
-  FastSession,
-  "created_at" | "updated_at" | "is_deleted" | "sync_status"
->;
-export type InsertDailyLogInput = Omit<
-  DailyLog,
-  "created_at" | "updated_at" | "is_deleted" | "sync_status"
->;
-
 export type HabitEffect = {
   habitDelta: number;
   newHabitScore: number;

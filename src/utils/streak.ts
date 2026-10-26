@@ -44,32 +44,6 @@ export const createStreakContext = (
   stats: initStreakStats(profile, habitLog),
 });
 
-export const setStreakProfile = (
-  context: StreakContext,
-  profile: UserProfile,
-) => {
-  context.profile = profile;
-
-  context.stats.streak.current = profile.current_streak || 0;
-
-  context.stats.streak.max = profile.max_streak || 0;
-};
-
-export const applyStreakIncrease = (context: StreakContext, amount: number) => {
-  if (amount <= 0) return;
-
-  const current = context.profile.current_streak || 0;
-  const max = context.profile.max_streak || 0;
-
-  const newStreak = current + amount;
-
-  context.profile.current_streak = newStreak;
-  context.profile.max_streak = Math.max(max, newStreak);
-
-  context.stats.streak.current = newStreak;
-  context.stats.streak.max = context.profile.max_streak;
-};
-
 export const applyStreakDate = (context: StreakContext, date: string) => {
   context.profile.streak_date = date;
 };
@@ -78,55 +52,6 @@ export const applyClearStreak = (context: StreakContext) => {
   context.profile.current_streak = 0;
 
   context.stats.streak.current = 0;
-};
-
-export const applyShieldReduction = (
-  context: StreakContext,
-  amount: number,
-) => {
-  if (!context.habitLog || amount <= 0) return;
-
-  const current = context.habitLog.shield_snap || 0;
-
-  context.habitLog.shield_snap = Math.max(current - amount, 0);
-
-  context.stats.shield.current = context.habitLog.shield_snap;
-};
-
-export const applyHabitReduction = (
-  context: StreakContext,
-  amount: number,
-  overRestDays: number,
-) => {
-  if (!context.habitLog) return;
-
-  // Nếu reduceHabit hiện tại có công thức phức tạp,
-  // đưa phần calculation vào đây.
-
-  const current = context.habitLog.habit_snap || 0;
-
-  const reduction = amount;
-
-  context.habitLog.habit_snap = Math.max(current - reduction, 0);
-
-  context.stats.habit.currentPercent = context.habitLog.habit_snap;
-
-  context.stats.shield.current = context.habitLog.shield_snap || 0;
-
-  context.stats.retain.current = context.habitLog.habit_retain || 0;
-};
-
-export const calculateStreakGain = (
-  streakDate: string | null,
-  endDate: string,
-) => {
-  if (!streakDate) return 0;
-
-  return Math.max(getDaysDiff(streakDate, endDate), 0);
-};
-
-export const getStreakResult = (context: StreakContext): StreakCheckResult => {
-  return context.stats;
 };
 
 export const saveStreakContext = async (

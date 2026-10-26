@@ -323,4 +323,3 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
 
 // Target Pack mặc định
 export const DEFAULT_TARGET_PACK_ID = "default_emoji_targets";
-export const TARGETS = TARGET_PACKS["default"].targets;

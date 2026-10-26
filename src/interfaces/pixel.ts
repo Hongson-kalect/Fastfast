@@ -25,8 +25,6 @@ export type DayItem = {
   data?: DayItemType;
 }
 
-
-
 // ─── THUẬT TOÁN SINH LƯỚI PIXEL ĐÃ NÂNG CẤP NHÃN BIÊN ───
 export type DayItemType = {
   dateString: string;
@@ -35,11 +33,6 @@ export type DayItemType = {
   fastingRange: number;
   isCurrentYear: boolean;
 };
-
-export type DayItemObj = {
-  [key: string]: DayItemType;
-};
-
 
 export type WeekItem= {
   weekIndex: number; // 0, 1, 2... tương ứng với hàng

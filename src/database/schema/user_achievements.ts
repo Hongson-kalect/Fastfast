@@ -77,24 +77,6 @@ export const getUserAchievements = async (
   );
 };
 
-export const getUserArchievement = async (
-  db: SQLiteDatabase,
-  userId: string,
-  achievementId: string
-): Promise<UserAchievement| null> => {
-  return db.getFirstAsync<UserAchievement>(
-    `
-      SELECT *
-      FROM user_achievement
-      WHERE user_id = ?
-        AND achievement_id = ?
-        AND is_deleted = 0
-        LIMIT 1
-    `,
-    [userId, achievementId]
-  );
-};
-
 export const getUserMilestones = async (db: SQLiteDatabase, userId: string): Promise<UserAchievementMilestone[]> => {
   return db.getAllAsync<UserAchievementMilestone>(
     `

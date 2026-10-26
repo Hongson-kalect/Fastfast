@@ -1,8 +1,4 @@
-export type StreakCheckStatus = 
-  | 'ALREADY_CHECKED'      // Hôm nay đã check rồi -> Không hiện modal
-  | 'STREAK_MAINTAINED'    // Vào đúng hạn -> +1 Streak / giữ Streak
-  | 'SHIELD_USED'          // Trễ hạn nhưng ĐỦ Shield bảo vệ (Trừ Shield, giữ Streak)
-  | 'STREAK_LOST';         // Trễ hạn & KHÔNG đủ Shield (Mất Streak/Retain)
+         // Trễ hạn & KHÔNG đủ Shield (Mất Streak/Retain)
 
 export interface StreakCheckResult {
   

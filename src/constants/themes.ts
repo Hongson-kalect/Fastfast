@@ -1,4 +1,4 @@
-export type ThemeObjType = keyof typeof themes;
+
 export type ThemeType = {
   primary: string;
   secondary: string;

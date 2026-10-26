@@ -11,11 +11,6 @@ import { FlatList, Pressable, View } from "react-native";
 import PixelDetailSheet from "./PixelDetailSheet";
 import { DayItem, WeekItem } from "@/interfaces/pixel";
 
-
-export const fastArr = [
-  { index: 1, emoji: "😫", label: "Tired", color: "#6E2020" }, // Đỏ tràm nhưng cô sắc hồng (Crimson Dark) - Rô ràng là tiêu cúc
-];
-
 export const generateYearGrid = (
   targetYear: number,
   sundayFirst: boolean = false,
@@ -432,8 +427,5 @@ const FastPixel = ({
   </Pressable>
 );
 };
-
-
-
 
 export default PixelGridManager;
