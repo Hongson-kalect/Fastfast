@@ -50,7 +50,7 @@ const WeekPixel = React.memo(
           </View>
 
           {/* Days */}
-          <View className="flex-row items-center gap-1 flex-1 justify-between">
+          <View className="flex-row items-center gap-1">
             {week.days.map((day) => (
               <DayPixel
                 size={size}

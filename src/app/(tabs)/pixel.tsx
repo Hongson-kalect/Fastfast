@@ -2,6 +2,11 @@ import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
+import MonthPixel, {
+  generateMonthGrid,
+  MONTH_LABELS,
+  MonthDayItem,
+} from "@/components/pixel/MonthPixel";
 import PixelLayoutSheet from "@/components/pixel/PixelLayoutSheet";
 import WeekPixel from "@/components/pixel/WeekPixel";
 import YearExportView from "@/components/pixel/YearExportView";
@@ -37,13 +42,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 
 const EXPORT_WIDTH = 600;
-// Khoảng cách giữa các tuần, phải khớp gap-1 giữa các ô ngày trong WeekPixel
-const WEEK_GAP = 4;
-// Số tuần hiển thị trước tuần hiện tại khi cuộn tới
-const WEEKS_BEFORE_CURRENT = 3;
+// Khoảng cách giữa các ô, phải khớp gap-1 trong WeekPixel/MonthPixel
+const CELL_GAP = 4;
+const H_PADDING = 20;
+// Cột nhãn bên trái (nút Week, w-15) và hàng nhãn phía trên ở layout ngang (h-12)
+const LABEL_WIDTH = 60;
+const LABEL_HEIGHT = 48;
+// Số hàng hiển thị trước hàng hiện tại khi cuộn tới
+const ROWS_BEFORE_CURRENT = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type ScrollButton = "back" | "current" | null;
+type GridItem = WeekItem | MonthDayItem;
+
+// Chia đều chiều dài còn lại cho `count` ô vuông
+const fitCells = (length: number, count: number) =>
+  Math.floor((length - CELL_GAP * (count - 1)) / count);
 
 const PixelScreen = () => {
   const dbService = useDBService();
@@ -57,25 +71,38 @@ const PixelScreen = () => {
   const orientation = settings?.pixel_view_orientation ?? "vertical";
   const isHorizontal = orientation === "horizontal";
 
-  const listRef = useRef<FlatList<WeekItem>>(null);
+  const listRef = useRef<FlatList<GridItem>>(null);
   const todayStr = getLocalTodayStr();
+  const isMonth = viewType === "month";
 
-  const numberOfColumns = viewType === "week" ? 7 : 12;
-  const pixelSize = (width - 40 - 60 - numberOfColumns) / numberOfColumns;
-  // Chiều dài một tuần theo trục cuộn: hàng (dọc) hoặc cột (ngang)
-  const itemLength = pixelSize + WEEK_GAP;
+  // Ô vuông: số ô cố định (7 ngày hoặc 12 tháng) chia đều theo chiều không cuộn.
+  // Dọc: chiều rộng màn hình − padding − cột nhãn. Ngang: chiều cao vùng lưới − hàng nhãn.
+  const cellCount = isMonth ? 12 : 7;
+  const [gridHeight, setGridHeight] = useState(0);
+  const widthSize = fitCells(width - H_PADDING * 2 - LABEL_WIDTH, cellCount);
+  const heightSize = fitCells(gridHeight - LABEL_HEIGHT - CELL_GAP * 2, cellCount);
+  const pixelSize =
+    isHorizontal && gridHeight > 0 ? Math.min(widthSize * 2, heightSize) : widthSize;
+  // Chiều dài một hàng/cột theo trục cuộn
+  const itemLength = pixelSize + CELL_GAP;
 
   const gridData = useMemo(() => {
     return generateYearGrid(year);
   }, [year]);
+  const monthGrid = useMemo(() => generateMonthGrid(), []);
+  const listData: GridItem[] = isMonth ? monthGrid : gridData;
 
-  // Tuần hiện tại lấy từ chính grid, năm khác thì về đầu năm
+  // Hàng/cột hiện tại lấy từ chính grid, năm khác thì về đầu năm
   const scrollTargetIndex = useMemo(() => {
-    const index = gridData.findIndex((week) =>
-      week.days.some((day) => day.dateString === todayStr),
-    );
-    return Math.max(0, index - WEEKS_BEFORE_CURRENT);
-  }, [gridData, todayStr]);
+    const index = isMonth
+      ? todayStr.startsWith(`${year}-`)
+        ? Number(todayStr.slice(8)) - 1
+        : -1
+      : gridData.findIndex((week) =>
+          week.days.some((day) => day.dateString === todayStr),
+        );
+    return Math.max(0, index - ROWS_BEFORE_CURRENT);
+  }, [isMonth, gridData, todayStr, year]);
 
   const [scrollButton, setScrollButton] = useState<ScrollButton>(null);
 
@@ -186,7 +213,7 @@ const PixelScreen = () => {
     lastOffset.current = 0;
     scrollButtonRef.current = null;
     setScrollButton(null);
-  }, [orientation, year]);
+  }, [orientation, viewType, year]);
 
   // Refetch data on screen focus
   useFocusEffect(
@@ -240,17 +267,19 @@ const PixelScreen = () => {
         weight="bold"
         colorHex={getContrastTextColor(theme.primary)}
       >
-        Week
+        {isMonth ? "Day" : "Week"}
       </ThemedText>
     </TouchableOpacity>
   );
 
+  const axisLabels = isMonth ? MONTH_LABELS : WEEKDAYS;
+
   const list = (
     <FlatList
-      // Đổi trục cuộn trên cùng một instance làm hỏng offset/layout cache → remount
-      key={`${orientation}-${year}`}
+      // Đổi trục cuộn / kiểu lưới trên cùng một instance làm hỏng offset và layout cache → remount
+      key={`${viewType}-${orientation}-${year}-${pixelSize}`}
       ref={listRef}
-      data={gridData}
+      data={listData}
       horizontal={isHorizontal}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
@@ -266,20 +295,35 @@ const PixelScreen = () => {
         offset: itemLength * index,
         index,
       })}
-      keyExtractor={(week) => week.weekIndex.toString()}
+      keyExtractor={(item) =>
+        "day" in item ? `d${item.day}` : `w${item.weekIndex}`
+      }
       renderItem={({ item }) => (
         <View
           style={isHorizontal ? { width: itemLength } : { height: itemLength }}
         >
-          <WeekPixel
-            size={pixelSize}
-            orientation={orientation}
-            week={item}
-            todayStr={todayStr}
-            viewMode={viewMode}
-            yearPixelData={yearPixelData}
-            onSelectDate={handleSelectDate}
-          />
+          {"day" in item ? (
+            <MonthPixel
+              size={pixelSize}
+              orientation={orientation}
+              item={item}
+              year={year}
+              todayStr={todayStr}
+              viewMode={viewMode}
+              yearPixelData={yearPixelData}
+              onSelectDate={handleSelectDate}
+            />
+          ) : (
+            <WeekPixel
+              size={pixelSize}
+              orientation={orientation}
+              week={item}
+              todayStr={todayStr}
+              viewMode={viewMode}
+              yearPixelData={yearPixelData}
+              onSelectDate={handleSelectDate}
+            />
+          )}
         </View>
       )}
     />
@@ -352,18 +396,22 @@ const PixelScreen = () => {
 
       {isHorizontal ? (
         // Lịch ngang: cột thứ cố định bên trái, các tuần cuộn ngang bên phải
-        <View className="flex-1 flex-row" style={{ paddingLeft: 20 }}>
+        <View
+          className="flex-1 flex-row"
+          style={{ paddingLeft: H_PADDING }}
+          onLayout={(e) => setGridHeight(e.nativeEvent.layout.height)}
+        >
           <View className="bg-background">
             {weekButton}
             <View className="gap-1">
-              {WEEKDAYS.map((day) => (
+              {axisLabels.map((label) => (
                 <View
-                  key={day}
+                  key={label}
                   style={{ height: pixelSize }}
                   className="items-center justify-center w-15"
                 >
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    {day}
+                    {label}
                   </ThemedText>
                 </View>
               ))}
@@ -372,18 +420,19 @@ const PixelScreen = () => {
           {list}
         </View>
       ) : (
-        // Lịch dọc: hàng thứ cố định phía trên, các tuần cuộn dọc bên dưới
-        <View className="flex-1" style={{ paddingHorizontal: 20 }}>
-          <View className="flex-row items-center mb-2 pr-1 border-b border-text-base/10">
+        // Lịch dọc: hàng nhãn cố định phía trên, các hàng cuộn dọc bên dưới
+        <View className="flex-1" style={{ paddingHorizontal: H_PADDING }}>
+          <View className="flex-row items-end mb-2 border-b border-text-base/10">
             {weekButton}
-            <View className="flex-1 flex-row justify-between">
-              {WEEKDAYS.map((day) => (
+            <View className="flex-row gap-1">
+              {axisLabels.map((label) => (
                 <View
-                  key={day}
-                  className="flex-1 items-center justify-center pt-4"
+                  key={label}
+                  style={{ width: pixelSize }}
+                  className="items-center justify-center pb-1"
                 >
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    {day}
+                    {isMonth ? label.charAt(0) : label}
                   </ThemedText>
                 </View>
               ))}

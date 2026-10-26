@@ -41,12 +41,16 @@ const DayPixel = memo(
       ? `1px 2px 4px ${theme.primary}80, -0.5px -1px 2px ${theme.primary}60`
       : undefined;
 
-    const baseClass =
-      "flex-1 aspect-square items-center justify-center rounded-md border";
+    // Kích thước luôn lấy từ `size`: flex-1/aspect-square làm ô bị co về 0
+    // khi cha là cột không có chiều cao cố định (layout cuộn ngang).
+    const baseClass = "items-center justify-center rounded-md border";
+    const sizeStyle = { width: size, height: size };
 
     // Ngày tương lai luôn disabled.
     if (isFuture) {
-      return <View className={`${baseClass} border-text-base/5`} />;
+      return (
+        <View style={sizeStyle} className={`${baseClass} border-text-base/5`} />
+      );
     }
 
     let emoji: ReactNode = null;
@@ -119,10 +123,9 @@ const DayPixel = memo(
       ) : null);
 
     const style = {
+      ...sizeStyle,
       backgroundColor,
       boxShadow: todayShadow,
-      width: size,
-      height: size,
     };
 
     const children = (
