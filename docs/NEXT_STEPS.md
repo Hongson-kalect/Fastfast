@@ -162,13 +162,13 @@ Trạng thái: [x] đã áp dụng mục 1–5; mục 6 còn mở.
 ## 8. Kết quả giả lập 02/09 → 25/10/2026 (43 phiên, máy ảo)
 
 ### Bug logic
-- [ ] **Nhập lùi phiên (long press) bị phạt ngay**: `reconcileStreak` và `calculatePenaltyEffect` tính khoảng nghỉ
-  theo *hôm nay*, không theo ngày của phiên. Phiên 20→21/10 nhập lúc 26/10: +3.3 habit rồi bị phạt về 0,
-  streak/max_streak không tăng. Cũng cho phép bắt đầu > `MAX_FAST_HOURS` trước (timer hiện 144h).
-- [ ] **`addHabitLogs` kẹp `habit_delta` vào [0,100]** → log phạt luôn lưu 0 thay vì số âm.
-- [ ] **Log dùng shield lưu `shield_delta = totalShieldGain` (0)** thay vì `-shieldUsed` → `getPixelShielLog`
-  (lọc `shield_delta < 0`) không bao giờ thấy → Journey không hiện icon khiên ngày 22/09, 07–10/10.
-- [ ] **Shield phiên dài quá gắt**: `floor(hours/24) - 1` → phiên "48h" thiếu vài giây (47.99h) không được shield.
+- [x] **Nhập lùi phiên bị phạt ngay** — `streak_date` chỉ tiến, reconcile lấy mốc muộn nhất.
+  Phiên nhập lùi được cộng habit nhưng không cộng streak (tránh khôi phục streak bằng phiên giả).
+- [ ] Vẫn cho phép bắt đầu > `MAX_FAST_HOURS` trước (timer hiện 144h) — cân nhắc cảnh báo trong modal.
+- [x] **`addHabitLogs` kẹp `habit_delta` vào [0,100]** → giờ giữ số âm.
+- [x] **Log dùng shield** → lưu `shield_delta` âm, Journey/HabitDetail hiện được ngày dùng khiên.
+- [x] **Shield phiên dài** → cho hụt 15 phút (`LONG_FAST_GRACE_HOURS`).
+- [ ] Badge shield trong StreakCheckModal hiện "0 -2 /" (thiếu tổng).
 - [ ] **Streak không nhất quán**: phiên đầu tiên +1, phiên đầu sau khi mất streak +2 (do `streak_date` = hôm qua).
 - [ ] ResultModal hiện `+3.9%` khi habit 98.1 → 100 (thực tăng 1.9).
 - [ ] FullHabitModal ("Đã hiểu") không thấy hiện khi chạm 100% ngày 16/10 — cần kiểm tra lại thủ công.
