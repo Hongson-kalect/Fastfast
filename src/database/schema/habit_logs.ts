@@ -132,16 +132,20 @@ export const addHabitLogs = async (
   db: SQLiteDatabase,
   data: {
     log_date?: string;
-    fast_id?: string;} & HabitEffect,
+    fast_id?: string;
+    // Penalty truyền số shield bị dùng (âm); reward thì dùng totalShieldGain
+    shieldDelta?: number;
+  } & HabitEffect,
 ) => {
   const id = uuidv7();
   const logDate = data.log_date || getLocalTodayStr();
+
+  const shieldDelta = data.shieldDelta || data.totalShieldGain;
 
   const {
     habitDelta,
     newHabitScore: habitSnap,
     retainDelta,
-    totalShieldGain: shieldDelta,
     newShieldScore: shieldSnap,
     milestoneShieldGain,
     bonusShieldGain,
