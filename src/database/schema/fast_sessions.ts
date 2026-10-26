@@ -713,9 +713,15 @@ export const reconcileStreak = async (
   // 1. Get reference date
   // --------------------------------------------------
 
-  const referenceDate = lastFast?.end_time
+  // Lấy mốc hoạt động muộn nhất: phiên nhập lùi kết thúc trước streak_date
+  // không được làm phát sinh khoảng nghỉ mới.
+  const lastFastDate = lastFast?.end_time
     ? getLocalTodayStr(new Date(lastFast.end_time))
-    : profile.streak_date;
+    : null;
+  const referenceDate =
+    lastFastDate && lastFastDate > profile.streak_date
+      ? lastFastDate
+      : profile.streak_date;
 
   // --------------------------------------------------
   // 2. Calculate penalty

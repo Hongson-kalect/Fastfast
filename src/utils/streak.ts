@@ -148,7 +148,11 @@ export const applyStreakReward = (
     : 0;
 
   oldProfile.active_days = oldProfile.active_days + streakGain;
-  oldProfile.streak_date = endDate;
+  // Phiên nhập lùi (kết thúc trước mốc streak hiện tại) không được kéo streak_date lùi lại,
+  // nếu không lần reconcile tiếp theo sẽ coi khoảng từ đó tới hôm nay là ngày nghỉ.
+  if (!oldProfile.streak_date || endDate > oldProfile.streak_date) {
+    oldProfile.streak_date = endDate;
+  }
   oldProfile.current_streak = oldProfile.current_streak + streakGain;
   oldProfile.max_streak = Math.max(
     oldProfile.max_streak,
