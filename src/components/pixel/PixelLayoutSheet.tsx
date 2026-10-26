@@ -21,7 +21,6 @@ const PIXEL_LAYOUTS: {
   type: PixelViewType;
   orientation: PixelOrientation;
   title: string;
-  //   description: string;
 }[] = [
   {
     type: "week",
@@ -92,7 +91,6 @@ const PixelLayoutPreview = ({
     >
       {!isHorizontal && (
         <View className="flex-row items-center mb-1 justify-between">
-          {/* <View style={{ width: 13 }} /> */}
           {labels.map((label, index) => (
             <View key={index} className="flex-1 items-center">
               <ThemedText size="xxs" opacity="medium">

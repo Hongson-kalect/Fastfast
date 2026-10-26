@@ -21,7 +21,6 @@ export function ThemedText({
   colorHex,
   ...rest
 }: ThemedTextProps) {
-  // const theme = useTheme();
   const { theme } = useAppStore();
   const colors = useMemo(() => {
     return theme;

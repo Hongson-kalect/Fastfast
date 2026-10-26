@@ -21,7 +21,6 @@ type Props = {
 const HomeBodyProgress = ({ counter }: Props) => {
   const { theme } = useAppStore();
 
-
   return (
     <View className="gap-3">
       {processData.map(({ key, title, icon, color, process }) => {

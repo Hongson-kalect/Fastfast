@@ -32,11 +32,6 @@ export default function PixelDailyNote({
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
 
-  // const getActiveWeight = async () => {
-  //   const weight = await getWeight(dbService, date);
-  //   updateSheetNote({weight:weight ? weight.weight: 0});
-  // };
-
   const { addModal } = useModalStore();
   const dbService = useDBService();
 
@@ -48,7 +43,6 @@ export default function PixelDailyNote({
   const updateImage = async (uri: string | undefined) => {
     await dbService.setDailyNote(undefined, undefined, uri || null, date);
 
-    // if (uri !== note?.image_uri) deleteSavedImage(note?.image_uri);
     if (!uri || uri !== note?.image_uri) {
       deleteSavedImage(note?.image_uri);
     }

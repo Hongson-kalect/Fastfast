@@ -83,7 +83,6 @@ export const createWeightTarget = async (
     startWeight: number;
     targetWeight: number;
     startDate?: string;
-    // targetDate?: string;
   },
 ) => {
   try{
@@ -115,7 +114,6 @@ export const createWeightTarget = async (
       target.startWeight,
       target.targetWeight,
       startDate,
-      // target.targetDate || null,
     ]);
   });
 }

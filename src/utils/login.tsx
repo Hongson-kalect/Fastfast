@@ -209,8 +209,6 @@ export const handleLogin = async ({
     };
   }
 
-  // returnLastFast = await fastFail(db, lastFast);
-
   // Login hôm nay đã được xử lý
   applyLastLoginDate(streak, todayStr);
   await saveStreakContext(db, streak);

@@ -105,9 +105,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       await initializeDashboard(dbService, CHART_RANGES[0]);
       await initializePixel(dbService, new Date().getFullYear());
 
-      // setDBReady(true);
       // Không block app startup
-      // initializeDashboard(db, CHART_RANGES[0]);
     };
 
     load();

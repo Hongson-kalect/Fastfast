@@ -1,6 +1,5 @@
 
 
-
 type RGB = {
   r: number;
   g: number;

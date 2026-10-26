@@ -5,7 +5,6 @@ import { initReactI18next, useTranslation } from "react-i18next";
 // Import JSON
 import en from "@/locales/en.json";
 import vi from "@/locales/vi.json";
-// import jp from "@/locales/jp.json";
 
 // Init i18next (only once)
 if (!i18n.isInitialized) {
@@ -16,7 +15,6 @@ if (!i18n.isInitialized) {
     resources: {
       en: { translation: en },
       vi: { translation: vi },
-      //   jp: { translation: jp },
     },
     interpolation: {
       escapeValue: false,

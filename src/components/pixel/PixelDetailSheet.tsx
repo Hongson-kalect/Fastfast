@@ -107,7 +107,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     [log],
   );
 
-
   const getFasts = useCallback(async () => {
     if (fastIds.length === 0) {
       setFastObj({});
@@ -179,7 +178,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     [timelineSegments],
   );
 
-
   const updateMood = async (mood: MoodLevel) => {
     await dbService.setDailyNote(mood, undefined, undefined, dateString);
     setSheetNote({
@@ -187,7 +185,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       mood_level: mood,
     });
 
-    // loadPixelYear(dbService, Number(dateString.slice(0, 4)))
     await updatePixelNote(dbService, dateString);
   };
 

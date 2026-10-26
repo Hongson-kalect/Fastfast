@@ -31,13 +31,9 @@ type Props = {
   finishFasting: () => void;
 };
 
-
 const padding = 48;
 const MIN_ANGLE = 3;
 const strokeWidth = 20;
-// const padding = 10;
-// const MIN_ANGLE = 0.1; // Góc xoay tối thiểu nếu cần
-
 
 export const CircleCounter = ({
   isCounting,
@@ -156,7 +152,6 @@ export const CircleCounter = ({
 
   // --- TÍNH TỎA ĐỘ ĐẦU MÚT DỰA TRÊN PROGRESS ---
   // const radius = width / 2 - strokeWidth; // Bán kính đường tròn
-
 
   useEffect(() => {
     getHabitLogs();

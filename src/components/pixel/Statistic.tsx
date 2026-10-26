@@ -11,7 +11,6 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
 
-
 type Props = {
   trackingType: "mood" | "fasting";
   setTrackingType: (mode: "mood" | "fasting") => void;

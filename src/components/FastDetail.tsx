@@ -13,8 +13,6 @@ type FastDetailProps = {
 
 const S_PER_HOUR = 60 * 60;
 
-
-
 const formatDuration = (hours: number) => {
   if (hours <= 0) return "0m";
 

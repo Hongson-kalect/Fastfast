@@ -45,7 +45,6 @@ export default function TabLayout() {
                                 name="(tabs)"
                                 options={{ title: "Home" }}
                               />
-                              {/* <Stack.Screen name="_notFound" options={{ title: 'Dashboard' }} /> */}
                             </Stack>
                           </AppWrapper>
                           <ToastManager useModal={false} />
@@ -57,7 +56,6 @@ export default function TabLayout() {
                     <ListModal />
                     <GlobalModal />
                   </Portal>
-                  {/* <StatusBar style="auto" /> */}
                 </LanguageProvider>
               </Provider>
             </GestureHandlerRootView>

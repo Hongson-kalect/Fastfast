@@ -5,7 +5,6 @@ import { DissectedDay } from "@/utils/home/timespliter";
 import { ThemedText } from "../themed-text";
 import { DailyFastSessionCard } from "./DailySessionFast";
 
-
 type Props = {
   circularSegments: CircularTimelineSegment[];
   totalDuration: number;

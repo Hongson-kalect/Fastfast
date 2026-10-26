@@ -48,7 +48,6 @@ const WeightLineChart = ({
     present(<ChartRangeSheet />);
   };
 
-
   const isDenseData = data.length > 15;
   const activeBarFont = isDenseData ? font : font3;
   const activeLineFont = isDenseData ? font : font2;
@@ -324,7 +323,6 @@ const WeightLineChart = ({
                         x: width,
                       },
                     ]}
-                    // curveType="cardinal"
                     color={"#FF000080"}
                     strokeWidth={1}
                   >

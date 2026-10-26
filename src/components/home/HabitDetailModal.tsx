@@ -27,7 +27,6 @@ export const HabitDetailModal = ({
   const isPositiveRetain = Number(log.retain_delta) >= 0;
   const isPositiveShield = Number(log.shield_delta) >= 0;
 
-
   const hasFastDetail = Boolean(
     log.duration || log.target_duration,
   );

@@ -74,7 +74,6 @@ const DashboardScreen = () => {
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
       className="flex-1 bg-background"
     >
-      {/* <SafeAreaView className="flex-1"> */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -104,7 +103,6 @@ const DashboardScreen = () => {
           )}
         </Animated.View>
       </ScrollView>
-      {/* </SafeAreaView> */}
     </ThemedView>
   );
 };

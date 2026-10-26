@@ -36,7 +36,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 
-
 const ITEM_HEIGHT = 40;
 const HEADER_HEIGHT = 60;
 const EXPORT_WIDTH = 600;
@@ -104,7 +103,6 @@ const PixelScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dateNote, setDateNote] = useState<DailyNote | null>(null);
 
-
   const handleSelectMood = async (
     mood?: MoodLevel,
     note?: string,
@@ -113,12 +111,7 @@ const PixelScreen = () => {
   ) => {
     if (!dbService) return console.log("db not ready");
 
-    // animationProgress.value = 0;
-    // setIsMenuOpen(false);
-    // await dbService.setDailyNote(mood, note, todayData.image);
-
     await dbService.setDailyNote(mood, note, undefined, date);
-    // await loadPixelYear(dbService, year);
     await updatePixelNote(dbService, date || todayStr);
 
     if (date !== todayStr) {
@@ -158,7 +151,6 @@ const PixelScreen = () => {
     },
     [yearPixelData, present],
   );
-
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -299,16 +291,6 @@ const PixelScreen = () => {
           index,
         })}
         sections={[{ key: "calendar", data: gridData }]}
-        // ListHeaderComponent={
-        //   <PixelHeader
-        //     onSaveImage={handleExport}
-        //     stats={stats}
-        //     year={year}
-        //     setYear={async (year) => await loadPixelYear(dbService, year)}
-        //     viewMode={viewMode}
-        //     setViewMode={async (mode) => updatePixelViewMode(dbService, mode)}
-        //   />
-        // }
         renderSectionHeader={() => (
           <View className="bg-background rounded-lg overflow-hidden">
             {orientation === "vertical" ? (

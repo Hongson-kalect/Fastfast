@@ -100,7 +100,6 @@ export const PhotoPickerModal = ({
     setPreviewVisible(true);
   };
 
-
   const { addModal } = useModalStore();
   const handleAddPhoto = () => {
     addModal({

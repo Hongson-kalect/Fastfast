@@ -173,22 +173,18 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
     {
       label: "24-36 hrs",
       count: fastStatistics.above_24,
-      //   badge: "🔥",
     },
     {
       label: "36-48 hrs",
       count: fastStatistics.above_36,
-      //   badge: "⚡",
     },
     {
       label: "48-72 hrs",
       count: fastStatistics.above_48,
-      //   badge: "👑",
     },
     {
       label: "72+ hrs",
       count: fastStatistics.above_72,
-      //   badge: "🏆",
     },
   ];
 

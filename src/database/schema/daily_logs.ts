@@ -37,7 +37,6 @@ export const getDailyLogs = async (
       `SELECT * FROM daily_logs WHERE log_date >= ?;`,
       [startDate],
     );
-    // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
     return rows;
   }catch(e){
     console.warn('error on getDailyLogs', e);
@@ -68,8 +67,6 @@ export const addDailyLogs = async (
       ],
     );
 
-    // const res = await db.getFirstAsync<DailyLog>(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?;`, [data.log_date, data.fast_id]);
-    // return res;
   }catch(e){
     console.warn('error on addDailyLogs', e);
 

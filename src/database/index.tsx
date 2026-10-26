@@ -150,7 +150,6 @@ export const createDBService = (db: SQLiteDatabase) => ({
     targetDate?: string;
   }) => createWeightTarget(db, newTarget),
   getHabitLogs: () => getHabitLogs(db),
-  // addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
 
   getPixelNoteData: (year: number) => getPixelNoteData(db, year),
@@ -214,7 +213,6 @@ ${userSeedData}
 
 const DATABASE_VERSION = 1;
 export const initDatabase = async (db: SQLiteDatabase) => {
-  // await clearDatabase(db);
   try {
     // ⚡ 1. Tối ưu hiệu năng đọc/ghi cho SQLite (WAL mode)
     await db.execAsync(`
@@ -271,13 +269,6 @@ const handleMigrate = async (db: SQLiteDatabase, version: number) => {
         console.log("✅ Seed data inserted successfully");
       }
     }
-
-    // if (version === 2) {
-    //   await db.execAsync(`CREATE UNIQUE INDEX IF NOT EXISTS
-    //     idx_user_achievement_user_achievement
-    //     ON user_achievement(user_id, achievement_id);`);
-    //   console.log("✅ update db to V2 successfully");
-    // }
 
     // Cập nhật version trong cùng transaction
     await db.execAsync(`PRAGMA user_version = ${version};`);

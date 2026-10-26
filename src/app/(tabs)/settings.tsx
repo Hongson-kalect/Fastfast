@@ -51,14 +51,12 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 10,
-          //   paddingTop: 20,
           paddingBottom: 40,
         }}
       >
         {/* Header */}
         <View className="pb-6">
           <View className="flex-row items-center">
-            {/* <Feather name="settings" size={22} color={theme.primary} /> */}
 
             <ThemedText size="xxxl" weight="semibold">
               Settings
@@ -84,7 +82,6 @@ export default function SettingsScreen() {
             value={isDarkMode}
             onChange={(value) => {
               setIsDarkMode(value);
-              // setDarkMode(value);
               toggleDarkMode(db);
             }}
           />

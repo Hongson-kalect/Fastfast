@@ -52,16 +52,12 @@ const lightTheme = {
 
   // primary: "#60A5FA", // Xanh chủ đạo (Nút bấm chính)
   // secondary: "#7EF9FF", // Xanh phụ
-  // title: "#F8FAFC", // Chữ tiêu đề lớn
   // text: "#94A3B8", // Chữ nội dung
   textSecondary: "#B0B4BA",
   // background: "#0B1528", // Nền sâu nhất
   backgroundSecondary: "#16223F", // Nền thẻ card
   backgroundElement: "#212225",
   backgroundSelected: "#2E3135",
-  // error: "#EF4444",
-  // success: "#22C55E",
-  // white: "#ffffff",
   black: "#000000",
 };
 
@@ -90,16 +86,10 @@ export const darkTheme = {
 
   // primary: "#3B82F6", // Xanh chủ đạo (Nút bấm chính)
   // secondary: "#10B981", // Xanh phụ
-  // title: "#F8FAFC", // Chữ tiêu đề lớn
-  // text: "#000000",
   textSecondary: "#60646C",
-  // background: "#ffffff",
   backgroundSecondary: "#f5f5f5",
   backgroundElement: "#F0F0F3",
   backgroundSelected: "#E0E1E6",
-  // error: "#EF4444",
-  // success: "#22C55E",
-  // white: "#ffffff",
   black: "#000000",
 };
 

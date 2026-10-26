@@ -32,7 +32,6 @@ const PixelHeader = ({
             Journey
           </ThemedText>
 
-          {/* <Feather name="chevron-down" size={36} color="white" /> */}
         </View>
         <View className="p-1 flex-row items-center gap-2">
           <Pressable hitSlop={10} onPress={() => setYear(year - 1)}>

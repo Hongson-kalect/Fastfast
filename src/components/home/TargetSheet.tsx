@@ -94,7 +94,6 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
           }}
           snapToInterval={CARD_WIDTH + GAP}
           snapToAlignment="start"
-          // decelerationRate="fast"
           disableIntervalMomentum
           onMomentumScrollEnd={(e) => {
             const offset = e.nativeEvent.contentOffset.x;
@@ -105,7 +104,6 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
             setIsScrolling(false);
           }}
           // 🟢 1. Bật sự kiện scroll liên tục
-          // scrollEventThrottle={16}
           // 🟢 4. Khi buông tay mà KHÔNG CÓ đà trượt (dừng tay ngay lập tức)
           onScrollBeginDrag={() => setIsScrolling(true)}
           onScrollEndDrag={(e) => {
@@ -126,7 +124,6 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
             return (
               <View>
                 <Pressable
-                  // onPress={() => setSelected(item)}
                   style={{
                     width: CARD_WIDTH,
                     borderRadius: 22,

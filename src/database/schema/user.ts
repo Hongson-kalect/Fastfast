@@ -104,8 +104,6 @@ export const getUserProfile = async (
     
     return {
       ...row,
-      // learning_languages: JSON.parse(row.learning_languages || '[]'),
-      // learning_languages: JSON.parse(row.learning_languages || '[]'),
     };
   }
   catch (e){

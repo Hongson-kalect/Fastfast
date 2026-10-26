@@ -5,7 +5,6 @@ import CircularProgress from "../CircleProgress";
 import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
 
-
 const HomeHeader = () => {
   const {  habit } = useAppStore();
   const { present } = useBottomSheet();

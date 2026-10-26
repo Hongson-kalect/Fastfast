@@ -294,7 +294,6 @@ export async function refreshDashboard(
   try {
     const data = await initializeDashboard(db, chartType);
 
-    // hydrateDashboard(data);
   } catch (error) {
     console.error("=> [Dashboard] Refresh dữ liệu thất bại:", error);
 

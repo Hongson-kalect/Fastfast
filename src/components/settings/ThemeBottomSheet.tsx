@@ -112,7 +112,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
   const onUnPurchase = async (themeId: string) => {
     await dbService?.unPurchasedTheme(themeId);
     Toast.success(`Theme ${themeId} đã bị xóa`);
-    // onSelect(themeId);
   };
 
   useEffect(() => {
@@ -149,11 +148,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
           const usable = canUseTheme(themeData, themeId);
           const isPurchased = themeData.type === "limited" && owned;
 
-          // const locked =
-          //   access === "purchase" ||
-          //   access === "unavailable" ||
-          //   (access === "premium" && isPremiumUser);
-
           return (
             <View key={themeId} className="mb-3">
               <Pressable
@@ -180,7 +174,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                     className="m-3 rounded-xl p-3"
                     style={{
                       backgroundColor: colors.background2,
-                      // opacity: locked ? 0.65 : 1,
                     }}
                   >
                     <View className="flex-row items-center">
@@ -306,7 +299,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                         <Feather name="check" size={16} color="#FFFFFF" />
                       </View>
                     ) : // :usable?
-                    // <View></View>
                     isPurchased ? (
                       <Pressable
                         hitSlop={8}
@@ -357,7 +349,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
 
                           <ThemedText
                             size="sm"
-                            // weight="medium"
                             opacity="full"
                             colorHex={getContrastTextColor(theme.primary)}
                             className="ml-1"
@@ -393,7 +384,6 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
 
                         <ThemedText
                           size="sm"
-                          // weight="medium"
                           opacity="full"
                           colorHex={getContrastTextColor(theme.primary)}
                           className="ml-1"

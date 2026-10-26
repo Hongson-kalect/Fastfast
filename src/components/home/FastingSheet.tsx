@@ -75,7 +75,6 @@ const FastingSheet = ({
 
   const accentColor = fastTarget?.colors.accent || theme.primary;
 
-
   const finishFasting = () => {
     hide();
     onStopFasting?.();

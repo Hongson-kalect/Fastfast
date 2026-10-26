@@ -77,7 +77,6 @@ export const getHabitLogs = async (
   `,
     [startDate],
   );
-  // const rows = await db.getAllAsync<HabitLog>(`SELECT * FROM habit_logs;`);
   return rows;
 };
 

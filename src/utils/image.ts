@@ -2,25 +2,10 @@ import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
 
-
-export const saveToGallery = async (cacheUri: string): Promise<boolean> => {
+// TODO: chưa lưu thật vào Gallery — expo-media-library không chạy trên Expo Go Android,
+// cần Development Build. Hiện hàm luôn trả về true.
+export const saveToGallery = async (_cacheUri: string): Promise<boolean> => {
   try {
-    // const sourceFile = new ExpoFile(cacheUri);
-
-    // if (!sourceFile.exists) {
-    //   console.error('File nguồn không tồn tại:', cacheUri);
-    //   return false;
-    // }
-
-    // const { status } = await requestPermissionsAsync();
-
-    // if (status !== 'granted') {
-    //   console.warn('Chưa được cấp quyền lưu ảnh.');
-    //   return false;
-    // }
-
-    // await Asset.create(sourceFile.uri);
-
     return true;
   } catch (error) {
     console.error("Lỗi khi lưu ảnh vào Gallery:", error);
@@ -118,7 +103,7 @@ export const selectPhoto = async (): Promise<string | null> => {
  * Không xóa file nằm ngoài thư mục ảnh của app.
  */
 export const deleteSavedImage = (uri?: string | null): void => {
-  if (!uri) return;
+  if (!uri) return;
   const imagesDir = new FileSystem.Directory(
     FileSystem.Paths.document,
     "images",

@@ -39,7 +39,6 @@ const StatCard = ({
             }}
           >
             <Ionicons name="sparkles" size={24} color={color} />
-            {/* <ThemedText size="xl">{icon}</ThemedText> */}
           </View>
 
           <View>
@@ -86,7 +85,6 @@ const StatCard = ({
           }}
         >
           <Ionicons name={icon} size={16} color={color} />
-          {/* <ThemedText size="xs">{icon}</ThemedText> */}
         </View>
 
         <ThemedText

@@ -17,7 +17,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-
 const HomeScreen = () => {
   const setCurrentFastSession = useAppStore(
     (state) => state.setCurrentFastSession,
@@ -95,7 +94,6 @@ const HomeScreen = () => {
       });
     }
     // Bắt đầu đếm
-    // const now = new Date().getTime();
     setCounter(0);
 
     const newSession = await dbService?.startNewSession(now, settings?.target);
@@ -128,7 +126,6 @@ const HomeScreen = () => {
     let interval = undefined;
     handleCounter();
     if (!isCounting) {
-      // setCounter(0);
       return;
     }
 
@@ -144,7 +141,6 @@ const HomeScreen = () => {
   return (
     <View style={{ paddingTop: inset.top, paddingBottom: inset.bottom }} className="flex-1 bg-background">
       {/* Tối ưu StatusBar bằng SafeAreaView chuẩn xác */}
-      {/* <SafeAreaView className="flex-1"> */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
@@ -189,7 +185,6 @@ const HomeScreen = () => {
               <TouchableOpacity
                 activeOpacity={0.7}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                // onPress={() => handleOpenPhaseInfoModal()}
               >
                 <FontAwesome6
                   name="circle-question"
@@ -207,7 +202,6 @@ const HomeScreen = () => {
             <HomeBodyProgress counter={counter} />
           </View>
         </ScrollView>
-      {/* </SafeAreaView> */}
     </View>
   );
 };

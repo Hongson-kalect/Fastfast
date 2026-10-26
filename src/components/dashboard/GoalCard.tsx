@@ -70,7 +70,6 @@ export const GoalCard = () => {
       keyboardType: "numeric",
       title: "Current Weight",
       message: "Enter your current weight",
-      // placeholder: weight?.toString(),
       onOk: async (value) => {
         const val = Number(value);
         if (val && val > 0) {

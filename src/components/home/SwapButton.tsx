@@ -297,7 +297,6 @@ export const SwapButton = React.memo(
             note={todayData.note}
             mood={todayData.mood}
             onSelectMood={handleSelectMood}
-            // weight={weight}
           />
 
           <PhotoPickerModal

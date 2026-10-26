@@ -191,7 +191,6 @@ export default function ModalWrapper({
 
                     borderWidth: 1,
                     borderColor: theme.text,
-                    // opacity: isDark ? 1 : 0.5,
 
                     shadowColor: "#000",
                     shadowOffset: {
