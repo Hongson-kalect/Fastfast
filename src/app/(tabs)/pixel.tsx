@@ -8,6 +8,7 @@ import YearExportView from "@/components/pixel/YearExportView";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
+import { WeekItem } from "@/interfaces/pixel";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import {
@@ -20,15 +21,14 @@ import { getContrastTextColor } from "@/utils/color";
 import { saveToGallery } from "@/utils/image";
 import { getLocalTodayStr } from "@/utils/timer";
 import { Feather } from "@expo/vector-icons";
-import { getWeek } from "date-fns";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
+  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
-  SectionList,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -36,9 +36,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 
-const ITEM_HEIGHT = 40;
-const HEADER_HEIGHT = 60;
 const EXPORT_WIDTH = 600;
+// Khoảng cách giữa các tuần, phải khớp gap-1 giữa các ô ngày trong WeekPixel
+const WEEK_GAP = 4;
+// Số tuần hiển thị trước tuần hiện tại khi cuộn tới
+const WEEKS_BEFORE_CURRENT = 3;
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+type ScrollButton = "back" | "current" | null;
 
 const PixelScreen = () => {
   const dbService = useDBService();
@@ -50,34 +55,49 @@ const PixelScreen = () => {
 
   const viewType = settings?.pixel_view_type ?? "week";
   const orientation = settings?.pixel_view_orientation ?? "vertical";
+  const isHorizontal = orientation === "horizontal";
 
-  const sectionListRef = useRef<SectionList>(null);
+  const listRef = useRef<FlatList<WeekItem>>(null);
   const todayStr = getLocalTodayStr();
 
-  type ScrollButton = "up" | "down" | null;
+  const numberOfColumns = viewType === "week" ? 7 : 12;
+  const pixelSize = (width - 40 - 60 - numberOfColumns) / numberOfColumns;
+  // Chiều dài một tuần theo trục cuộn: hàng (dọc) hoặc cột (ngang)
+  const itemLength = pixelSize + WEEK_GAP;
+
+  const gridData = useMemo(() => {
+    return generateYearGrid(year);
+  }, [year]);
+
+  // Tuần hiện tại lấy từ chính grid, năm khác thì về đầu năm
+  const scrollTargetIndex = useMemo(() => {
+    const index = gridData.findIndex((week) =>
+      week.days.some((day) => day.dateString === todayStr),
+    );
+    return Math.max(0, index - WEEKS_BEFORE_CURRENT);
+  }, [gridData, todayStr]);
 
   const [scrollButton, setScrollButton] = useState<ScrollButton>(null);
 
-  const lastScrollY = useRef(0);
+  const lastOffset = useRef(0);
   const scrollButtonRef = useRef<ScrollButton>(null);
 
-  const currentWeekY = Math.max(0, getWeek(new Date()) - 4);
-
   const updateScrollButton = useCallback(
-    (y: number) => {
-      const scrollingUp = y < lastScrollY.current;
+    (offset: number) => {
+      const viewport = isHorizontal ? width : height;
+      const targetOffset = scrollTargetIndex * itemLength;
+      const scrollingBack = offset < lastOffset.current;
 
       let nextButton: ScrollButton = null;
 
-      if (scrollingUp && y > height) {
-        nextButton = "up";
+      if (scrollingBack && offset > viewport) {
+        nextButton = "back";
       } else if (
-        !scrollingUp &&
-        y > ITEM_HEIGHT &&
-        currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT > height &&
-        y < currentWeekY * ITEM_HEIGHT + HEADER_HEIGHT - height
+        !scrollingBack &&
+        offset > itemLength &&
+        offset < targetOffset - viewport
       ) {
-        nextButton = "down";
+        nextButton = "current";
       }
 
       if (nextButton !== scrollButtonRef.current) {
@@ -85,17 +105,13 @@ const PixelScreen = () => {
         setScrollButton(nextButton);
       }
 
-      lastScrollY.current = y;
+      lastOffset.current = offset;
     },
-    [height, currentWeekY],
+    [isHorizontal, width, height, scrollTargetIndex, itemLength],
   );
 
-  const scrollToSection = useCallback((sectionIndex: number, itemIndex = 0) => {
-    sectionListRef.current?.scrollToLocation({
-      sectionIndex,
-      itemIndex,
-      animated: true,
-    });
+  const scrollToWeek = useCallback((index: number) => {
+    listRef.current?.scrollToIndex({ index, animated: true });
   }, []);
 
   const [moodModalVisible, setMoodModalVisible] = useState(false);
@@ -154,9 +170,10 @@ const PixelScreen = () => {
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      updateScrollButton(e.nativeEvent.contentOffset.y);
+      const { x, y } = e.nativeEvent.contentOffset;
+      updateScrollButton(isHorizontal ? x : y);
     },
-    [updateScrollButton],
+    [updateScrollButton, isHorizontal],
   );
 
   useEffect(() => {
@@ -164,13 +181,12 @@ const PixelScreen = () => {
     updateSetting({ pixel_view_mode: viewMode });
   }, [viewMode, dbService, updateSetting]);
 
-  // Initial Auto Scroll to Current Week
+  // List được remount khi đổi chiều/năm nên trạng thái nút cuộn phải reset theo
   useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollToSection(0, currentWeekY);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [currentWeekY, scrollToSection]);
+    lastOffset.current = 0;
+    scrollButtonRef.current = null;
+    setScrollButton(null);
+  }, [orientation, year]);
 
   // Refetch data on screen focus
   useFocusEffect(
@@ -185,9 +201,6 @@ const PixelScreen = () => {
     }, [year, loadPixelYear]),
   );
 
-  const gridData = useMemo(() => {
-    return generateYearGrid(year);
-  }, [year]);
   const exportRef = useRef<ViewShotRef>(null);
 
   const handleExport = async () => {
@@ -214,8 +227,63 @@ const PixelScreen = () => {
 
   const inset = useSafeAreaInsets();
 
-  const numberOfColumns = viewType === "week" ? 7 : 12;
-  const pixelSize = (width - 40 - 60 - numberOfColumns) / numberOfColumns;
+  const weekButton = (
+    <TouchableOpacity
+      onPress={openPixelLayoutSheet}
+      activeOpacity={0.7}
+      hitSlop={25}
+      style={{ borderTopLeftRadius: 4 }}
+      className="w-15 h-12 bg-primary justify-center items-center"
+    >
+      <ThemedText
+        size="xs"
+        weight="bold"
+        colorHex={getContrastTextColor(theme.primary)}
+      >
+        Week
+      </ThemedText>
+    </TouchableOpacity>
+  );
+
+  const list = (
+    <FlatList
+      // Đổi trục cuộn trên cùng một instance làm hỏng offset/layout cache → remount
+      key={`${orientation}-${year}`}
+      ref={listRef}
+      data={gridData}
+      horizontal={isHorizontal}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={
+        isHorizontal ? { paddingRight: 20 } : { paddingBottom: 40 }
+      }
+      scrollEventThrottle={32}
+      onScroll={handleScroll}
+      initialScrollIndex={scrollTargetIndex}
+      getItemLayout={(_, index) => ({
+        length: itemLength,
+        offset: itemLength * index,
+        index,
+      })}
+      keyExtractor={(week) => week.weekIndex.toString()}
+      renderItem={({ item }) => (
+        <View
+          style={isHorizontal ? { width: itemLength } : { height: itemLength }}
+        >
+          <WeekPixel
+            size={pixelSize}
+            orientation={orientation}
+            week={item}
+            todayStr={todayStr}
+            viewMode={viewMode}
+            yearPixelData={yearPixelData}
+            onSelectDate={handleSelectDate}
+          />
+        </View>
+      )}
+    />
+  );
 
   return (
     <View
@@ -244,21 +312,29 @@ const PixelScreen = () => {
         mood={dateNote?.mood_level}
       />
       <View className="absolute bottom-12 right-2 z-10">
-        {scrollButton === "up" && (
+        {scrollButton === "back" && (
           <Pressable
-            onPress={() => scrollToSection(0)}
+            onPress={() => scrollToWeek(0)}
             className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
           >
-            <Feather name="arrow-up" size={20} color={theme.background} />
+            <Feather
+              name={isHorizontal ? "arrow-left" : "arrow-up"}
+              size={20}
+              color={theme.background}
+            />
           </Pressable>
         )}
 
-        {scrollButton === "down" && (
+        {scrollButton === "current" && (
           <Pressable
-            onPress={() => scrollToSection(0, currentWeekY)}
+            onPress={() => scrollToWeek(scrollTargetIndex)}
             className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
           >
-            <Feather name="arrow-down" size={20} color={theme.background} />
+            <Feather
+              name={isHorizontal ? "arrow-right" : "arrow-down"}
+              size={20}
+              color={theme.background}
+            />
           </Pressable>
         )}
       </View>
@@ -274,113 +350,48 @@ const PixelScreen = () => {
         />
       </View>
 
-      <SectionList
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        ref={sectionListRef}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingBottom: 40,
-          gap: 2,
-        }}
-        scrollEventThrottle={32}
-        onScroll={handleScroll}
-        getItemLayout={(data, index) => ({
-          length: ITEM_HEIGHT,
-          offset: ITEM_HEIGHT * index,
-          index,
-        })}
-        sections={[{ key: "calendar", data: gridData }]}
-        renderSectionHeader={() => (
-          <View className="bg-background rounded-lg overflow-hidden">
-            {orientation === "vertical" ? (
-              // Header của lịch dọc
-              <View className="flex-row items-center mb-2 pr-1 border-b border-text-base/10">
-                <TouchableOpacity
-                  onPress={openPixelLayoutSheet}
-                  activeOpacity={0.7}
-                  hitSlop={25}
-                  style={{ borderTopLeftRadius: 4 }}
-                  className="w-15 h-12 bg-primary justify-center items-center"
+      {isHorizontal ? (
+        // Lịch ngang: cột thứ cố định bên trái, các tuần cuộn ngang bên phải
+        <View className="flex-1 flex-row" style={{ paddingLeft: 20 }}>
+          <View className="bg-background">
+            {weekButton}
+            <View className="gap-1">
+              {WEEKDAYS.map((day) => (
+                <View
+                  key={day}
+                  style={{ height: pixelSize }}
+                  className="items-center justify-center w-15"
                 >
-                  <ThemedText
-                    size="xs"
-                    weight="bold"
-                    colorHex={getContrastTextColor(theme.primary)}
-                    style={{ paddingVertical: 4 }}
-                  >
-                    Week
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    {day}
                   </ThemedText>
-                </TouchableOpacity>
-
-                <View className="flex-1 flex-row justify-between">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (day) => (
-                      <View
-                        key={day}
-                        className="flex-1 items-center justify-center pt-4"
-                      >
-                        <ThemedText size="xxs" color="text" opacity="medium">
-                          {day}
-                        </ThemedText>
-                      </View>
-                    ),
-                  )}
                 </View>
-              </View>
-            ) : (
-              // Header của lịch ngang
-              <View className="flex-col gap-1">
-                <TouchableOpacity
-                  onPress={openPixelLayoutSheet}
-                  activeOpacity={0.7}
-                  className="w-15 h-12 bg-primary justify-center items-center py-2"
-                  style={{ borderTopLeftRadius: 4 }}
-                >
-                  <ThemedText
-                    size="xs"
-                    weight="bold"
-                    colorHex={getContrastTextColor(theme.primary)}
-                  >
-                    Week
-                  </ThemedText>
-                </TouchableOpacity>
-
-                <View className="gap-1">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (day) => (
-                      <View
-                        key={day}
-                        style={{ height: pixelSize }}
-                        className="items-center justify-center w-15"
-                      >
-                        <ThemedText size="xxs" color="text" opacity="medium">
-                          {day}
-                        </ThemedText>
-                      </View>
-                    ),
-                  )}
-                </View>
-              </View>
-            )}
+              ))}
+            </View>
           </View>
-        )}
-        stickySectionHeadersEnabled
-        contentContainerClassName="gap-1"
-        keyExtractor={(week) => week.weekIndex.toString()}
-        horizontal={orientation === "horizontal"}
-        renderItem={({ item }) => (
-          <WeekPixel
-            size={pixelSize}
-            orientation={orientation}
-            week={item}
-            todayStr={todayStr}
-            viewMode={viewMode}
-            yearPixelData={yearPixelData}
-            onSelectDate={handleSelectDate}
-          />
-        )}
-      />
+          {list}
+        </View>
+      ) : (
+        // Lịch dọc: hàng thứ cố định phía trên, các tuần cuộn dọc bên dưới
+        <View className="flex-1" style={{ paddingHorizontal: 20 }}>
+          <View className="flex-row items-center mb-2 pr-1 border-b border-text-base/10">
+            {weekButton}
+            <View className="flex-1 flex-row justify-between">
+              {WEEKDAYS.map((day) => (
+                <View
+                  key={day}
+                  className="flex-1 items-center justify-center pt-4"
+                >
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    {day}
+                  </ThemedText>
+                </View>
+              ))}
+            </View>
+          </View>
+          {list}
+        </View>
+      )}
     </View>
   );
 };
