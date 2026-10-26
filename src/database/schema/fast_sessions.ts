@@ -5,6 +5,7 @@ import { fixed, numberLimit } from "@/utils/numberLimit";
 import {
   applyClearStreak,
   applyHabitReward,
+  applyPenaltyClaimables,
   applyShieldReward,
   applyStreakDate,
   applyStreakReward,
@@ -482,11 +483,11 @@ export const calculateFastReward = (
     retainDelta = inputHabitDelta;
     newRetain = oldRetain + retainDelta;
 
-    // Retain đủ một vòng
+    // Retain đủ vòng → mỗi vòng +1 shield, giữ lại phần dư cho vòng sau
     if (newRetain >= RETAIN_LIMIT) {
-      newRetain = 1;
-      retainCircle = 1;
-      bonusShieldGain = 1;
+      retainCircle = Math.floor(newRetain / RETAIN_LIMIT);
+      newRetain = fixed(newRetain - retainCircle * RETAIN_LIMIT);
+      bonusShieldGain = retainCircle;
     }
   } else {
     // Habit chưa đầy → cộng bình thường
@@ -531,6 +532,12 @@ export const calculateFastReward = (
     SHIELD_LIMIT,
   );
 
+  // Shield nhận được nhưng bị bỏ do kho đã đầy
+  const wastedShield = Math.max(
+    0,
+    oldShieldScore + totalShieldGain - SHIELD_LIMIT,
+  );
+
   return {
     // Habit
     habitDelta,
@@ -547,6 +554,7 @@ export const calculateFastReward = (
     bonusShieldGain,
     totalShieldGain,
     newShieldScore,
+    wastedShield,
 
     // Milestone state
     lowClaimable,
@@ -733,13 +741,14 @@ export const reconcileStreak = async (
   streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
 
   applyStreakDate(streak, getYesterdayStr(todayStr));
+  applyPenaltyClaimables(streak, data);
 
   // --------------------------------------------------
   // 4. Shield saves streak
   // --------------------------------------------------
   if (data.shieldDelta) {
     streak.profile.total_shield_used =
-      (streak.profile.total_shield_used || 0) + data.shieldDelta;
+      (streak.profile.total_shield_used || 0) + Math.abs(data.shieldDelta);
   }
 
   if (isStreakSavedByShield) {

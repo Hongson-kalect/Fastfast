@@ -64,18 +64,44 @@ export const saveStreakContext = async (
     `UPDATE user_profile
      SET current_streak = ?,
          max_streak = ?,
+         active_days = ?,
          streak_date = ?,
-         last_login_date=?,
+         last_login_date = ?,
+         total_shield_used = ?,
+         total_shield_clamable = ?,
+         total_shield_wasted = ?,
+         low_shield_clamable = ?,
+         mid_shield_clamable = ?,
+         full_shield_clamable = ?,
+         full_habit_at = ?,
          updated_at = strftime('%s', 'now')
      WHERE id = ?;`,
     [
       profile.current_streak,
       profile.max_streak,
+      profile.active_days ?? 0,
       profile.streak_date,
       profile.last_login_date,
+      profile.total_shield_used ?? 0,
+      profile.total_shield_clamable ?? 0,
+      profile.total_shield_wasted ?? 0,
+      profile.low_shield_clamable,
+      profile.mid_shield_clamable,
+      profile.full_shield_clamable,
+      profile.full_habit_at ?? null,
       profile.id,
     ],
   );
+};
+
+// Penalty có thể mở lại các mốc shield khi habit tụt dưới ngưỡng
+export const applyPenaltyClaimables = (
+  context: StreakContext,
+  penalty: { lowClaimable: number; midClaimable: number; fullClaimable: number },
+) => {
+  context.profile.low_shield_clamable = penalty.lowClaimable;
+  context.profile.mid_shield_clamable = penalty.midClaimable;
+  context.profile.full_shield_clamable = penalty.fullClaimable;
 };
 
 export const applyLastLoginDate = (context: StreakContext, date: string) => {
@@ -99,7 +125,10 @@ export const applyShieldReward = (
 
   const { profile, stats } = context;
 
-  profile.total_shield_clamable += reward.totalShieldGain;
+  profile.total_shield_clamable =
+    (profile.total_shield_clamable ?? 0) + reward.totalShieldGain;
+  profile.total_shield_wasted =
+    (profile.total_shield_wasted ?? 0) + reward.wastedShield;
   profile.low_shield_clamable = reward.lowClaimable;
   profile.mid_shield_clamable = reward.midClaimable;
   profile.full_shield_clamable = reward.fullClaimable;
@@ -142,8 +171,12 @@ export const applyHabitReward = (
     return;
   }
 
-  const { stats } = context;
+  const { stats, profile } = context;
   const { newHabitScore, newShieldScore, newRetain } = reward;
+
+  if (newHabitScore >= 100 && !profile.full_habit_at) {
+    profile.full_habit_at = getLocalTodayStr();
+  }
 
   stats.shield.current = Math.min(newShieldScore, SHIELD_LIMIT);
   stats.retain.current = Math.min(newRetain, RETAIN_LIMIT);

@@ -7,14 +7,18 @@ Trạng thái: `[ ]` chưa làm · `[~]` đang làm · `[x]` xong.
 
 ## 1. Sửa lỗi trong cơ chế điểm (ưu tiên cao)
 
-- [ ] **Retain tràn vòng bị mất phần dư** — `calculateFastReward` (`src/database/schema/fast_sessions.ts`)
-  đặt `newRetain = 1` khi đủ `RETAIN_LIMIT`. Phải là `newRetain - RETAIN_LIMIT` để giữ phần dư
-  và không "tặng" 1 điểm.
-- [ ] **`total_shield_clamable` không được lưu** — chỉ cộng trong RAM ở `applyShieldReward`
-  (`src/utils/streak.ts`), `saveStreakContext` không ghi cột này. Hoặc lưu xuống DB, hoặc bỏ cột.
-- [ ] **`full_habit_at` không bao giờ được gán** — gán ngày khi `newHabitScore` lần đầu chạm 100.
-- [ ] **`total_shield_wasted` không được cập nhật** — khi shield nhận được vượt `SHIELD_LIMIT`,
-  cộng phần thừa vào cột này và báo cho user ("Khiên đã đầy, +1 bị bỏ qua").
+- [x] **Retain tràn vòng bị mất phần dư** — giờ giữ phần dư, mỗi vòng đủ +1 shield.
+- [x] **`saveStreakContext` thiếu cột** — trước đây chỉ lưu streak/ngày, nên `active_days`,
+  `total_shield_*`, `full_habit_at` và **các cờ mốc shield (`low/mid/full_shield_clamable`)
+  không bao giờ xuống DB**. Hậu quả: mỗi lần mở lại app, các mốc 35/70/100% lại nhận được
+  shield. Đã lưu đủ.
+- [x] **Penalty không áp dụng việc mở lại mốc** — `calculatePenaltyEffect` tính `lowClaimable…`
+  nhưng không gán vào profile. Đã thêm `applyPenaltyClaimables` cho cả 2 luồng penalty.
+- [x] **`total_shield_used` bị trừ thay vì cộng** trong `reconcileStreak` (`shieldDelta` âm). Đã dùng `Math.abs`.
+- [x] **`full_habit_at`** được gán khi habit lần đầu chạm 100.
+- [x] **`total_shield_wasted`** cộng phần shield vượt `SHIELD_LIMIT` (`wastedShield` trong reward).
+- [ ] UI báo "Khiên đã đầy, +1 bị bỏ qua" dựa trên `wastedShield`.
+- [ ] Xoá code chết trong `src/database/schema/user.ts`: `increaseStreak`, `gainShield`, `clearStreak` (không còn ai gọi).
 
 ### Giữ nguyên (đã thống nhất)
 - Mốc shield mở lại khi habit tụt: 100% mở lại khi < 70, 70% khi < 35, 35% khi về 0.
@@ -111,6 +115,8 @@ Cần `expo-notifications` (đọc docs SDK 56 trước khi code).
 | G | `currentWeekY = getWeek(new Date()) - 4` dùng tuần bắt đầu Chủ nhật (date-fns mặc định), grid bắt đầu Thứ 2, và không phụ thuộc năm đang xem | Lệch 1 tuần quanh Chủ nhật; xem năm khác vẫn cuộn tới "tuần hiện tại" |
 
 ### Đề xuất hoàn thiện
+Trạng thái: [x] đã áp dụng mục 1–5; mục 6 còn mở.
+
 1. **Thay `SectionList` bằng `FlatList`, đưa nhãn thứ ra ngoài list** (không cần sticky):
    - Dọc: `[hàng Week | Mon…Sun]` cố định phía trên, `FlatList` dọc bên dưới.
    - Ngang: `View flex-row` gồm `[cột Week/Mon…Sun cố định] [FlatList horizontal]`.

@@ -10,6 +10,7 @@ import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import {
   applyClearStreak,
   applyLastLoginDate,
+  applyPenaltyClaimables,
   applyStreakDate,
   createStreakContext,
   getYesterdayStr,
@@ -117,6 +118,7 @@ export const handleLogin = async ({
     streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
 
     applyStreakDate(streak, getYesterdayStr(todayStr));
+    applyPenaltyClaimables(streak, data);
 
     // --------------------------------------------------
     // Shield used

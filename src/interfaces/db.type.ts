@@ -41,6 +41,7 @@ export interface UserProfile {
   low_shield_clamable: number;
   mid_shield_clamable: number;
   full_shield_clamable: number;
+  full_habit_at: string | null;
 
   last_fast_completed_at: number;
   rest_point: number;
