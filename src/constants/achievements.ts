@@ -168,24 +168,25 @@ export const checkAchievements = async (
         continue;
       }
 
-      // -----------------------------------------------------
-      // 5. Nothing changed
-      // -----------------------------------------------------
-
-      if (newValue === null || newValue === currentValue) {
+      if (newValue === null) {
         continue;
       }
 
       // -----------------------------------------------------
-      // 6. Store new statistic/progress
+      // 5–6. Store new statistic/progress (only when changed)
       // -----------------------------------------------------
 
-      progresses.push({
-        userId,
-        input:achievement.input,
-        achievementId: achievement.id,
-        currentValue: newValue,
-      });
+      if (newValue !== currentValue) {
+        progresses.push({
+          userId,
+          input: achievement.input,
+          achievementId: achievement.id,
+          currentValue: newValue,
+        });
+      }
+
+      // Vẫn kiểm tra mốc khi giá trị không đổi: mốc mới thêm vào có target
+      // thấp hơn kỷ lục cũ (VD longest_fast_18 khi đã từng nhịn 24h) phải được mở.
 
       // -----------------------------------------------------
       // 7. Check milestones
@@ -253,6 +254,25 @@ export const getUserAchievements = async (
 };
 
 const SECONDS_IN_HOUR = 60 * 60;
+
+/**
+ * Tạo danh sách mốc với id `${prefix}_${n}` (giữ nguyên id cũ để không mất tiến độ).
+ * `scale` đổi n sang đơn vị lưu trữ (VD giờ → giây).
+ */
+const steps = (
+  prefix: string,
+  targets: number[],
+  title: (n: number) => string,
+  scale = 1,
+): AchievementItem[] =>
+  targets.map((n) => ({
+    id: `${prefix}_${n}`,
+    target: n * scale,
+    title: title(n),
+  }));
+
+// Nhịp tham chiếu: 16:8 mỗi ngày ≈ 1 phiên, +3 habit, ~16 giờ/ngày.
+// Mốc đầu đạt trong tuần đầu, mốc cuối cần ~1–2 năm duy trì.
 export const ACHIEVEMENTS: Achievement[] = [
   // ---------------------------------------------------------
   // Statistics
@@ -264,23 +284,12 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Total number of hours spent fasting.",
     input: "duration",
     type: "progress",
-    items: [
-      {
-        id: "fasting_hours_10",
-        target: 10 * SECONDS_IN_HOUR,
-        title: "10 fasting hours",
-      },
-      {
-        id: "fasting_hours_50",
-        target: 50 * SECONDS_IN_HOUR,
-        title: "50 fasting hours",
-      },
-      {
-        id: "fasting_hours_100",
-        target: 100 * SECONDS_IN_HOUR,
-        title: "100 fasting hours",
-      },
-    ],
+    items: steps(
+      "fasting_hours",
+      [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+      (n) => `${n.toLocaleString()} fasting hours`,
+      SECONDS_IN_HOUR,
+    ),
   },
 
   {
@@ -289,8 +298,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Total number of invalid fasting sessions.",
     input: "fastInvalidCount",
     type: "progress",
-    items: [
-    ],
+    items: [],
   },
   {
     id: "failed_fasts",
@@ -298,8 +306,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Total number of failed fasting sessions.",
     input: "fastFailedCount",
     type: "progress",
-    items: [
-    ],
+    items: [],
   },
   {
     id: "completed_fasts",
@@ -307,28 +314,11 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Total number of completed fasting sessions.",
     input: "fastCompletedCount",
     type: "progress",
-    items: [
-      {
-        id: "completed_fasts_1",
-        target: 1,
-        title: "Complete first fasts",
-      },
-      {
-        id: "completed_fasts_5",
-        target: 5,
-        title: "Complete 5 fasts",
-      },
-      {
-        id: "completed_fasts_10",
-        target: 10,
-        title: "Complete 10 fasts",
-      },
-      {
-        id: "completed_fasts_50",
-        target: 50,
-        title: "Complete 50 fasts",
-      },
-    ],
+    items: steps(
+      "completed_fasts",
+      [1, 3, 5, 10, 25, 50, 100, 200, 365, 500, 1000],
+      (n) => (n === 1 ? "Complete your first fast" : `Complete ${n} fasts`),
+    ),
   },
 
   {
@@ -337,7 +327,11 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Number of days you actively use the app.",
     input: "streakGain",
     type: "progress",
-    items: [],
+    items: steps(
+      "active_days",
+      [7, 30, 100, 200, 365, 730],
+      (n) => `${n} active days`,
+    ),
   },
 
   {
@@ -346,23 +340,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Current fasting habit score.",
     input: "habitMax",
     type: "max",
-    items: [
-      {
-        id: "habit_30",
-        target: 30,
-        title: "Reach 30 habit",
-      },
-      {
-        id: "habit_70",
-        target: 70,
-        title: "Reach 70 habit",
-      },
-      {
-        id: "habit_100",
-        target: 100,
-        title: "Reach 100 habit",
-      },
-    ],
+    items: steps("habit", [10, 30, 50, 70, 100], (n) => `Reach ${n} habit`),
   },
 
   // ---------------------------------------------------------
@@ -375,33 +353,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Longest fasting session ever completed.",
     input: "duration",
     type: "max",
-    items: [
-      {
-        id: "longest_fast_16",
-        target: 16 * SECONDS_IN_HOUR,
-        title: "Complete a 16-hour fast",
-      },
-      {
-        id: "longest_fast_24",
-        target: 24 * SECONDS_IN_HOUR,
-        title: "Complete a 24-hour fast",
-      },
-      {
-        id: "longest_fast_36",
-        target: 36 * SECONDS_IN_HOUR,
-        title: "Complete a 36-hour fast",
-      },
-      {
-        id: "longest_fast_48",
-        target: 48 * SECONDS_IN_HOUR,
-        title: "Complete a 48-hour fast",
-      },
-      {
-        id: "longest_fast_72",
-        target: 72 * SECONDS_IN_HOUR,
-        title: "Complete a 72-hour fast",
-      },
-    ],
+    // Dừng ở 72h: nhịn lâu hơn nên có giám sát y tế
+    items: steps(
+      "longest_fast",
+      [16, 18, 20, 24, 36, 48, 72],
+      (n) => `Complete a ${n}-hour fast`,
+      SECONDS_IN_HOUR,
+    ),
   },
 
   {
@@ -410,24 +368,16 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Longest fasting streak ever achieved.",
     input: "streakMax",
     type: "max",
-    items: [
-      {
-        id: "max_streak_7",
-        target: 7,
-        title: "Reach a 7-day streak",
-      },
-      {
-        id: "max_streak_30",
-        target: 30,
-        title: "Reach a 30-day streak",
-      },
-      {
-        id: "max_streak_100",
-        target: 100,
-        title: "Reach a 100-day streak",
-      },
-    ],
+    items: steps(
+      "max_streak",
+      [3, 7, 14, 30, 60, 100, 180, 365],
+      (n) => `Reach a ${n}-day streak`,
+    ),
   },
+
+  // ---------------------------------------------------------
+  // Shields & Retain
+  // ---------------------------------------------------------
 
   {
     id: "total_shields",
@@ -435,6 +385,25 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: "Total number of shields earned.",
     input: "shieldGain",
     type: "progress",
-    items: [],
+    items: steps(
+      "total_shields",
+      [1, 5, 10, 25, 50, 100],
+      (n) => (n === 1 ? "Earn your first shield" : `Earn ${n} shields`),
+    ),
+  },
+
+  {
+    id: "retain_circles",
+    name: "Retain Master",
+    description: "Retain circles completed while your habit is full.",
+    input: "retainCircleGain",
+    type: "progress",
+    // Mỗi vòng ≈ 8–9 phiên 16h ở habit 100%
+    items: steps(
+      "retain_circles",
+      [1, 3, 5, 10, 25],
+      (n) =>
+        n === 1 ? "Complete your first retain circle" : `Complete ${n} retain circles`,
+    ),
   },
 ];

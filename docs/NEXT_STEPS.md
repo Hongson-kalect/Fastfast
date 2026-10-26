@@ -141,7 +141,18 @@ Trạng thái: [x] đã áp dụng mục 1–5; mục 6 còn mở.
 
 ---
 
-## 7. Phát hành
+## 7. Achievement
+
+- [x] Mở rộng mốc theo độ khó tăng dần (giữ nguyên id cũ để không mất tiến độ), thêm `retain_circles`.
+- [x] Mốc vẫn được kiểm tra khi giá trị không đổi (mốc mới thấp hơn kỷ lục cũ sẽ mở ở phiên tiếp theo).
+- [ ] `fastFailedCount` / `fastInvalidCount` không bao giờ được phát ra — chỉ `handleCompletedFast` trả `achievement`.
+- [ ] Claim mốc chưa cho phần thưởng gì. Gợi ý: mốc lớn tặng 1 khiên / mở icon pack / theme.
+- [ ] Mốc habit (10/30/50/70/100) lệch với mốc shield (35/70/100) — cân nhắc đồng bộ.
+- [ ] Achievement cần input mới: khiên cứu streak (`shieldUsed`, phát từ luồng penalty),
+  người quay lại (`comeback`), ghi cảm xúc/cân nặng (`noteCount`, `weightLogCount`), năm pixel đầy đủ.
+- [ ] Phân tầng hiển thị (đồng/bạc/vàng/kim cương) theo vị trí mốc, và i18n tên/tiêu đề.
+
+## 8. Phát hành
 
 - [ ] IAP thật cho premium/theme (hiện `togglePremium` chỉ đổi cờ trong DB).
 - [ ] `saveToGallery` lưu thật (cần Development Build cho `expo-media-library`) + watermark.
