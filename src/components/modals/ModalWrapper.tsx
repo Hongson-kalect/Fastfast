@@ -1,6 +1,6 @@
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -59,6 +59,15 @@ export default function ModalWrapper({
   const settings = useAppStore((state) => state.settings);
   const [mounted, setMounted] = useState(show);
   const progress = useSharedValue(show ? 1 : 0);
+
+  // Animation đóng có thể kết thúc sau khi modal kế tiếp đã mở (máy chậm, modal
+  // nối nhau qua hàng đợi). Chỉ unmount nếu lúc đó vẫn đang ở trạng thái đóng,
+  // nếu không modal mới bị gỡ mất và hàng đợi modal kẹt lại.
+  const showRef = useRef(show);
+
+  const handleClosed = () => {
+    if (!showRef.current) setMounted(false);
+  };
   const isDark = settings?.is_dark_mode ?? true;
 
   const backdropOpacity = isDark ? 0.4 : 0.45;
@@ -69,6 +78,8 @@ export default function ModalWrapper({
    * ================================
    */
   useEffect(() => {
+    showRef.current = show;
+
     if (show) {
       // 1. Mount Modal
       setMounted(true);
@@ -90,7 +101,7 @@ export default function ModalWrapper({
         (finished) => {
           if (finished) {
             // ⚠️ BẮT BUỘC dùng runOnJS để chuyển call về JS Thread an toàn
-            runOnJS(setMounted)(false);
+            runOnJS(handleClosed)();
           }
         },
       );
