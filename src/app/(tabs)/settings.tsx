@@ -273,7 +273,7 @@ export default function SettingsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingHorizontal: 10,
+          paddingHorizontal: 20,
           paddingBottom: TAB_BAR_SPACE,
         }}
       >

@@ -1,5 +1,8 @@
+import { RADIUS } from "@/constants/design";
+import { useAppStore } from "@/stores/appStore";
+import React from "react";
 import { View } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { SectionTitle } from "../SectionTitle";
 
 type Props = {
   title: string;
@@ -7,20 +10,32 @@ type Props = {
 };
 
 export function SettingsSection({ title, children }: Props) {
+  const { theme } = useAppStore();
+  const items = React.Children.toArray(children).filter(Boolean);
+
   return (
     <View className="mb-6">
-      <ThemedText
-        size="xs"
-        weight="semibold"
-        color="text"
-        opacity="medium"
-        className="mb-2 px-1"
-      >
-        {title.toUpperCase()}
-      </ThemedText>
+      <SectionTitle title={title} />
 
-      <View className="overflow-hidden rounded-2xl border border-text-base/5 bg-background2">
-        {children}
+      <View
+        className="overflow-hidden bg-card"
+        style={{
+          borderRadius: RADIUS.lg,
+          borderWidth: 1,
+          borderColor: theme.text + "0F",
+        }}
+      >
+        {items.map((child, index) => (
+          <View key={index}>
+            {index > 0 && (
+              <View
+                className="ml-16 h-px"
+                style={{ backgroundColor: theme.text + "0D" }}
+              />
+            )}
+            {child}
+          </View>
+        ))}
       </View>
     </View>
   );

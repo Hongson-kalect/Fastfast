@@ -1,4 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
+import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
@@ -29,21 +30,23 @@ export function SettingsItem({
   const { theme } = useAppStore();
 
   const content = (
-    <View className="min-h-14 flex-row items-center px-4 py-3">
+    <View className="min-h-16 flex-row items-center px-4 py-3">
       <View
-        className={`mr-3 h-9 w-9 items-center justify-center rounded-xl ${
-          danger ? "bg-error/10" : "bg-text-base/5"
-        }`}
+        className="mr-3.5 h-9 w-9 items-center justify-center"
+        style={{
+          borderRadius: RADIUS.sm,
+          backgroundColor: (danger ? theme.error : theme.primary) + "1F",
+        }}
       >
         <Feather
           name={icon}
           size={16}
-          color={danger ? theme.error : theme.text}
+          color={danger ? theme.error : theme.primary}
         />
       </View>
 
       <View className="min-w-0 flex-1">
-        <ThemedText size="sm" weight="medium" color={danger ? "error" : "text"}>
+        <ThemedText size="sm" weight="semibold" color={danger ? "error" : "title"}>
           {title}
         </ThemedText>
 
