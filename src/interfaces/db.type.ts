@@ -18,6 +18,7 @@ export interface AppSettings {
   emotion_pack?: string;
   target_pack?: string;
   language?: string;
+  onboarding_done?: boolean;
 }
 
 // 2. Interface cho bảng user_profile

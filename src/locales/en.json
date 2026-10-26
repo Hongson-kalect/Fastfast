@@ -1,4 +1,29 @@
 {
   "hello": "Hello {{name}}!",
-  "goodbye": "Goodbye!"
+  "goodbye": "Goodbye!",
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get started",
+    "welcome": {
+      "title": "Intermittent fasting, made fun",
+      "body": "Tap start when you stop eating. FastFast keeps time and tells you when you hit your goal."
+    },
+    "habit": {
+      "title": "Streak & Habit strength",
+      "body": "Every completed fast keeps your streak and fills your habit bar. Longer fasts fill it faster."
+    },
+    "shield": {
+      "title": "Shields — rest days that keep your streak",
+      "body": "Stay consistent or finish a long fast to earn shields. On a rest day, a shield protects your streak automatically."
+    },
+    "pixel": {
+      "title": "A colorful year",
+      "body": "Every day is a pixel. Log your mood and weight, and see your whole year in one picture."
+    },
+    "health": {
+      "title": "Listen to your body",
+      "body": "FastFast is not a substitute for medical advice. If you are pregnant, have a medical condition or plan to fast longer than 48 hours, talk to a doctor. Stop right away if you feel dizzy or unusually unwell."
+    }
+  }
 }

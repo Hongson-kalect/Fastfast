@@ -14,6 +14,7 @@ import { BottomSheetProvider } from "@/providers/BottomSheet";
 import { LanguageProvider } from "@/providers/Language";
 import { GlobalModal } from "@/providers/Modal";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { useAppStore } from "@/stores/appStore";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { SQLiteProvider } from "expo-sqlite";
 import { Suspense } from "react";
@@ -25,6 +26,26 @@ import {
 import ToastManager from "toastify-react-native";
 
 const queryClient = new QueryClient();
+
+// AppWrapper chỉ render children sau khi store đã hydrate, nên settings đã có ở đây.
+// User cũ (đã từng có phiên nhịn) không phải xem onboarding.
+const RootStack = () => {
+  const onboarded = useAppStore(
+    (state) => !!state.settings?.onboarding_done || !!state.currentFastSession,
+  );
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={onboarded}>
+        <Stack.Screen name="(tabs)" options={{ title: "Home" }} />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!onboarded}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
+    </Stack>
+  );
+};
 
 export default function TabLayout() {
   return (
@@ -40,12 +61,7 @@ export default function TabLayout() {
                       <Suspense>
                         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
                           <AppWrapper>
-                            <Stack screenOptions={{ headerShown: false }}>
-                              <Stack.Screen
-                                name="(tabs)"
-                                options={{ title: "Home" }}
-                              />
-                            </Stack>
+                            <RootStack />
                           </AppWrapper>
                           <ToastManager useModal={false} />
                         </SafeAreaProvider>

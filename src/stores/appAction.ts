@@ -1,5 +1,6 @@
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
+import i18n from "i18next";
 
 import {
   defaultDark,
@@ -155,6 +156,8 @@ export async function initializeApp(
  * hydrateApp() mới cập nhật RAM state.
  */
 export function hydrateApp(data: AppHydrationData): void {
+  i18n.changeLanguage(data.language);
+
   useAppStore.setState({
     userProfile: data.userProfile,
     habit: data.habit,

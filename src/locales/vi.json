@@ -1,4 +1,29 @@
 {
   "hello": "Chao xìn {name}!",
-  "goodbye": "Tạm biệt!"
+  "goodbye": "Tạm biệt!",
+  "onboarding": {
+    "skip": "Bỏ qua",
+    "next": "Tiếp",
+    "start": "Bắt đầu",
+    "welcome": {
+      "title": "Nhịn ăn gián đoạn, theo cách vui hơn",
+      "body": "Bấm bắt đầu khi bạn ngừng ăn, FastFast đếm giờ và báo khi bạn chạm mục tiêu."
+    },
+    "habit": {
+      "title": "Streak & Độ bền thói quen",
+      "body": "Mỗi phiên hoàn thành giữ streak và làm đầy thanh thói quen. Nhịn càng lâu, thanh đầy càng nhanh."
+    },
+    "shield": {
+      "title": "Khiên — ngày nghỉ không mất streak",
+      "body": "Đi đều đặn hoặc sau một phiên nhịn dài bạn sẽ nhận khiên. Hôm nào nghỉ, khiên tự bảo vệ streak cho bạn."
+    },
+    "pixel": {
+      "title": "Một năm đầy màu sắc",
+      "body": "Mỗi ngày là một ô pixel. Ghi cảm xúc, cân nặng và xem cả năm của bạn trong một bức ảnh."
+    },
+    "health": {
+      "title": "Lắng nghe cơ thể",
+      "body": "FastFast không thay thế tư vấn y tế. Nếu bạn đang mang thai, có bệnh nền hoặc định nhịn trên 48 giờ, hãy hỏi ý kiến bác sĩ. Ngừng ngay nếu thấy chóng mặt hoặc mệt bất thường."
+    }
+  }
 }
