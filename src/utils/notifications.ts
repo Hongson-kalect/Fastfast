@@ -1,25 +1,50 @@
 import { DBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import * as Notifications from "expo-notifications";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 
-// Thông báo cục bộ (không cần server). Chạy được cả trong Expo Go.
+// Thông báo cục bộ (không cần server).
+// Expo Go Android (SDK 53+) ném lỗi ngay khi import expo-notifications,
+// nên module chỉ được nạp khi chạy development/production build.
+type NotificationsModule = typeof import("expo-notifications");
+
 const CHANNEL_ID = "fasting";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+export const isNotificationSupported = !(
+  Platform.OS === "android" &&
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+);
+
+let notificationsModule: NotificationsModule | null = null;
+
+const getNotifications = (): NotificationsModule | null => {
+  if (!isNotificationSupported) return null;
+  if (notificationsModule) return notificationsModule;
+
+  try {
+    notificationsModule = require("expo-notifications") as NotificationsModule;
+    notificationsModule.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  } catch (e) {
+    console.warn("expo-notifications unavailable", e);
+  }
+  return notificationsModule;
+};
 
 let channelReady = false;
 
 /** Tạo channel Android (bắt buộc trước khi xin quyền trên Android 13+) rồi xin quyền. */
 export const ensureNotificationPermission = async (): Promise<boolean> => {
+  const Notifications = getNotifications();
+  if (!Notifications) return false;
+
   try {
     if (Platform.OS === "android" && !channelReady) {
       await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
@@ -50,7 +75,8 @@ const saveSetting = async (
 };
 
 const cancel = async (id?: string | null) => {
-  if (!id) return;
+  const Notifications = getNotifications();
+  if (!id || !Notifications) return;
   try {
     await Notifications.cancelScheduledNotificationAsync(id);
   } catch (e) {
@@ -83,7 +109,8 @@ export const scheduleTargetReached = async (
   const fireAt = session.start_time + session.target_duration * 3600 * 1000;
   if (fireAt <= Date.now()) return;
 
-  if (!(await ensureNotificationPermission())) return;
+  const Notifications = getNotifications();
+  if (!Notifications || !(await ensureNotificationPermission())) return;
 
   try {
     const id = await Notifications.scheduleNotificationAsync({
@@ -120,7 +147,8 @@ export const setDailyReminder = async (
     return true;
   }
 
-  if (!(await ensureNotificationPermission())) return false;
+  const Notifications = getNotifications();
+  if (!Notifications || !(await ensureNotificationPermission())) return false;
 
   try {
     const id = await Notifications.scheduleNotificationAsync({

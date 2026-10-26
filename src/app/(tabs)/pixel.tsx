@@ -81,9 +81,14 @@ const PixelScreen = () => {
   // Chiều dài một hàng/cột theo trục cuộn
   const itemLength = pixelSize + CELL_GAP;
 
+  const sundayFirst = settings?.week_starts_on === "sunday";
+  const weekdays = sundayFirst
+    ? ["Sun", ...WEEKDAYS.slice(0, 6)]
+    : WEEKDAYS;
+
   const gridData = useMemo(() => {
-    return generateYearGrid(year);
-  }, [year]);
+    return generateYearGrid(year, sundayFirst);
+  }, [year, sundayFirst]);
   const monthGrid = useMemo(() => generateMonthGrid(), []);
   const listData: GridItem[] = isMonth ? monthGrid : gridData;
 
@@ -267,12 +272,12 @@ const PixelScreen = () => {
     </TouchableOpacity>
   );
 
-  const axisLabels = isMonth ? MONTH_LABELS : WEEKDAYS;
+  const axisLabels = isMonth ? MONTH_LABELS : weekdays;
 
   const list = (
     <FlatList
       // Đổi trục cuộn / kiểu lưới trên cùng một instance làm hỏng offset và layout cache → remount
-      key={`${viewType}-${orientation}-${year}-${pixelSize}`}
+      key={`${viewType}-${orientation}-${year}-${pixelSize}-${sundayFirst}`}
       ref={listRef}
       data={listData}
       horizontal={isHorizontal}

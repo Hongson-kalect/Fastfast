@@ -16,8 +16,11 @@ import {
   UserProfile,
 } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
+import { CHART_RANGES } from "@/constants/data";
 import { handleLogin } from "@/utils/login";
 import { useAppStore } from "./appStore";
+import { initializeDashboard } from "./dashboardAction";
+import { initializePixel } from "./pixelAction";
 
 const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
 
@@ -214,6 +217,17 @@ export async function initializeAppState(
       streak: null,
     };
   }
+}
+
+/**
+ * Nạp lại toàn bộ state từ DB (sau khi khôi phục sao lưu hoặc reset cài đặt).
+ */
+export async function reloadAppData(db: SQLiteDatabase): Promise<void> {
+  const dbService = createDBService(db);
+
+  await initializeAppState(db);
+  await initializeDashboard(dbService, CHART_RANGES[0]);
+  await initializePixel(dbService, new Date().getFullYear());
 }
 
 /**
