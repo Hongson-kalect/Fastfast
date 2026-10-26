@@ -183,21 +183,6 @@ export const getFastSessionByIds = async (
   }
 };
 
-export const getYearFastSession = async (
-  db: SQLiteDatabase,
-  year: number,
-): Promise<FastSession | null> => {
-  try {
-    const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions WHERE is_deleted = 0 AND strftime('%Y', start_time) = ${year} ORDER BY updated_at DESC;`,
-    );
-    return row;
-  } catch (e) {
-    console.warn("error on getYearFastSession", e);
-    return null;
-  }
-};
-
 export const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
 export const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
 export const MAX_FAST_HOURS = 100;
@@ -569,8 +554,6 @@ export const calculateFastReward = (
     fullClaimable,
   };
 };
-
-
 
 export const startNewSession = async (
   db: SQLiteDatabase,

@@ -11,12 +11,10 @@ import {
   generateString as daily_logsGenerateString,
   getDailyLogs,
   getPixelLogData,
-  getTodayLog,
 } from "./schema/daily_logs";
 import {
   generateString as daily_noteGenerateString,
   getDailyNote,
-  getDailyNotes,
   getPixelNoteData,
   setDailyNote,
 } from "./schema/daily_note";
@@ -28,7 +26,6 @@ import {
   getFastSessions,
   getFastStatsSummary,
   getLastFastSession,
-  getYearFastSession,
   reconcileStreak,
   startNewSession,
   updateSessionTarget,
@@ -44,12 +41,9 @@ import {
   checkAndUpdateActiveTarget,
   createWeightTarget,
   getActiveWeightTarget,
-  getAllWeightTargets,
   generateString as target_GenerateString,
 } from "./schema/target";
 import {
-  getActiveTheme,
-  getThemes,
   generateString as themeGenerateString,
 } from "./schema/theme";
 import {
@@ -75,7 +69,6 @@ import {
   getHabitLogs,
   getLastHabitLog,
   getPixelShielLog,
-  getShieldUsedLog,
   generateString as habit_logsGenerateString,
 } from "./schema/habit_logs";
 import {
@@ -103,7 +96,6 @@ export const createDBService = (db: SQLiteDatabase) => ({
   getFastSessions: () => getFastSessions(db),
   getFastStatsSummary: () => getFastStatsSummary(db),
   getLastFastSession: () => getLastFastSession(db),
-  getYearFastSession: (year: number) => getYearFastSession(db, year),
   finishLastSession: (data: { id: string; endTime: number }) =>
     finishLastSession({ db, ...data }),
 
@@ -123,10 +115,8 @@ export const createDBService = (db: SQLiteDatabase) => ({
     updateSessionTarget(db, id, targetDuration),
 
   getDailyLogs: (days?: number) => getDailyLogs(db, days),
-  getTodayLog: () => getTodayLog(db),
 
   getDailyNote: (date?: string) => getDailyNote(db, date),
-  getDailyNotes: () => getDailyNotes(db),
   setDailyNote: (
     moodLevel?: MoodLevel,
     note?: string,
@@ -141,8 +131,6 @@ export const createDBService = (db: SQLiteDatabase) => ({
     hour_in_fast: number;
   }) => addDailyLogs(db, data),
 
-  getActiveTheme: () => getActiveTheme(db),
-  getThemes: () => getThemes(db),
   changeTheme: (theme: ThemeKey) => changeTheme(db, theme),
   toggleTheme: (value: boolean) => toggleTheme(db, value),
 
@@ -161,11 +149,9 @@ export const createDBService = (db: SQLiteDatabase) => ({
     startDate?: string;
     targetDate?: string;
   }) => createWeightTarget(db, newTarget),
-  getAllWeightTargets: () => getAllWeightTargets(db),
   getHabitLogs: () => getHabitLogs(db),
   // addHabitLogs: (data: AddHabitType) => addHabitLogs(db, data),
   getLastHabitLog: () => getLastHabitLog(db),
-  getShieldUsedLog: (year: number) => getShieldUsedLog(db, year),
 
   getPixelNoteData: (year: number) => getPixelNoteData(db, year),
   getPixelLogData: (year: number) => getPixelLogData(db, year),

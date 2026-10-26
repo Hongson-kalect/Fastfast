@@ -387,16 +387,7 @@ export const getTarget = (fastHour: number) => {
       fastHour >= item.hours &&
       (item.toHours == null || fastHour < item.toHours),
   );
-};
-
-export interface FastingStatusInfo {
-  minHours: number;
-  maxHours: number;
-  title: string;
-  icon: string;
-  color: string;
-  description: string;
-} // Khoảng cách bay xa (px)
+}; // Khoảng cách bay xa (px)
 
 export type ChartRangeKey = "7d" | "30d" | "12w" | "24w" | "12m" | "24m";
 

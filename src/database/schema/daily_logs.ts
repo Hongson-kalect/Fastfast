@@ -45,23 +45,6 @@ export const getDailyLogs = async (
   }
 };
 
-export const getTodayLog = async (
-  db: SQLiteDatabase,
-): Promise<DailyLog | null> => {
-  const today = getLocalTodayStr();
-  try{
-
-    const rows = await db.getFirstAsync<DailyLog>(
-      `SELECT * FROM daily_logs WHERE log_date = ?`,
-      [today],
-    );
-    return rows;
-  }catch(e){
-    console.warn('error on getTodayLog', e);
-    return null;
-  }
-};
-
 export const addDailyLogs = async (
   db: SQLiteDatabase,
   data: {

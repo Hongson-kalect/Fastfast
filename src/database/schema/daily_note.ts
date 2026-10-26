@@ -16,18 +16,6 @@ CREATE TABLE IF NOT EXISTS daily_notes (
 CREATE INDEX IF NOT EXISTS idx_daily_notes_date ON daily_notes(log_date);
 `;
 
-export const getDailyNotes = async (
-  db: SQLiteDatabase,
-): Promise<DailyNote[] | null> => {
-  try {
-    const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes;`);
-    return rows;
-  } catch (e) {
-    console.warn("error on getDailyNotes", e);
-    return null;
-  }
-};
-
 export const getDailyNote = async (
   db: SQLiteDatabase,
   day: string = getLocalTodayStr(),

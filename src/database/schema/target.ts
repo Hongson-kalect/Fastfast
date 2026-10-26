@@ -123,21 +123,3 @@ catch (error) {
   console.warn("error on createWeightTarget", error);
 }
 };
-/**
- * Lấy danh sách toàn bộ lịch sử các mục tiêu (cho trang Traceback / History)
-*/
-export const getAllWeightTargets = async (
-  db: SQLiteDatabase,
-): Promise<WeightTarget[]> => {
-  try{
-
-    const rows = await db.getAllAsync<WeightTarget>(
-      `SELECT * FROM weight_targets ORDER BY created_at DESC;`,
-    );
-    return rows;
-  }catch (error) {
-    console.warn("error on getAllWeightTargets", error);
-    return [];
-
-  }
-};

@@ -1,5 +1,4 @@
-import { AppSettings, Theme } from "@/interfaces/db.type";
-import { SQLiteDatabase } from "expo-sqlite";
+import { AppSettings } from "@/interfaces/db.type";
 
 export const generateString = /*sql*/ `
 CREATE TABLE IF NOT EXISTS theme (
@@ -30,37 +29,6 @@ ON theme(priority);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_theme_single_active
 ON theme(is_deleted);
 `;
-
-export const getThemes = async (db: SQLiteDatabase): Promise<ThemeType[]> => {
-  try{
-
-    const rows = await db.getAllAsync<Theme & { color_palette: string }>(
-      `SELECT * FROM theme WHERE is_deleted = 0 ORDER BY priority DESC;`,
-    );
-  return rows.map((row) => ({
-    ...row,
-    color_palette: JSON.parse(row.color_palette || "{}"),
-  }));
-}catch(e){console.warn('error on getThemes', e); return [];}
-};
-
-export const getActiveTheme = async (
-  db: SQLiteDatabase,
-): Promise<ThemeType | null> => {
-  try{
-
-    const now = new Date().toISOString();
-    const row = await db.getFirstAsync<Theme & { color_palette: string }>(
-      `SELECT * FROM theme WHERE (expired_at IS NULL OR expired_at > "${now}") AND is_deleted = 0 ORDER BY priority DESC LIMIT 1;`,
-    );
-    if (!row) return null;
-  
-    return {
-      ...row,
-      color_palette: JSON.parse(row.color_palette || "{}"),
-    };
-  }catch(e){console.warn('error on getActiveTheme', e); return null;}
-};
 
 const lightTheme = {
   primary: "#ff0000",
