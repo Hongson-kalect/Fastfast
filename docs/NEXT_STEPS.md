@@ -159,7 +159,34 @@ Trạng thái: [x] đã áp dụng mục 1–5; mục 6 còn mở.
   người quay lại (`comeback`), ghi cảm xúc/cân nặng (`noteCount`, `weightLogCount`), năm pixel đầy đủ.
 - [ ] Phân tầng hiển thị (đồng/bạc/vàng/kim cương) theo vị trí mốc, và i18n tên/tiêu đề.
 
-## 8. Phát hành
+## 8. Kết quả giả lập 02/09 → 25/10/2026 (43 phiên, máy ảo)
+
+### Bug logic
+- [ ] **Nhập lùi phiên (long press) bị phạt ngay**: `reconcileStreak` và `calculatePenaltyEffect` tính khoảng nghỉ
+  theo *hôm nay*, không theo ngày của phiên. Phiên 20→21/10 nhập lúc 26/10: +3.3 habit rồi bị phạt về 0,
+  streak/max_streak không tăng. Cũng cho phép bắt đầu > `MAX_FAST_HOURS` trước (timer hiện 144h).
+- [ ] **`addHabitLogs` kẹp `habit_delta` vào [0,100]** → log phạt luôn lưu 0 thay vì số âm.
+- [ ] **Log dùng shield lưu `shield_delta = totalShieldGain` (0)** thay vì `-shieldUsed` → `getPixelShielLog`
+  (lọc `shield_delta < 0`) không bao giờ thấy → Journey không hiện icon khiên ngày 22/09, 07–10/10.
+- [ ] **Shield phiên dài quá gắt**: `floor(hours/24) - 1` → phiên "48h" thiếu vài giây (47.99h) không được shield.
+- [ ] **Streak không nhất quán**: phiên đầu tiên +1, phiên đầu sau khi mất streak +2 (do `streak_date` = hôm qua).
+- [ ] ResultModal hiện `+3.9%` khi habit 98.1 → 100 (thực tăng 1.9).
+- [ ] FullHabitModal ("Đã hiểu") không thấy hiện khi chạm 100% ngày 16/10 — cần kiểm tra lại thủ công.
+- [ ] `MIN_FAST_DURATION = 16h` tuyệt đối: 15h59 là thất bại; phiên thất bại không có phản hồi nào sau khi xác nhận.
+
+### Đúng như thiết kế
+- Nghỉ 06/09 không shield: habit −6, streak về 0. Nghỉ 22/09 có shield: shield −1, streak giữ.
+- Mốc 35% (18/09), 70% (30/09), 100% (16/10) mỗi mốc +1 shield, cờ mốc lưu đúng sau khi app khởi động lại.
+- Vắng 07–10/10 với 1 shield: phạt −8.6, retain về 0, mốc không mở lại (habit vẫn ≥ 70).
+- Retain đủ vòng 23/10: +1 shield, giữ phần dư 2.3.
+
+### UX
+- [ ] Home không hiện streak; badge góc phải là habit % nhưng không có ký hiệu %.
+- [ ] Achievement phải bấm "Nhận" từng mốc (sau 2 tháng có ~35 mốc chờ) → cần "Nhận tất cả"; "1 / 8 unlocked" dễ hiểu nhầm.
+- [ ] Lịch sử Habit: phiên ở 100% hiện "Rest 0 days" và "—", không thấy retain tăng.
+- [ ] Trộn ngôn ngữ: "Finish / This session will marked as FAILED", "Fast Completed!", "Set your current weight"…
+
+## 9. Phát hành
 
 - [ ] IAP thật cho premium/theme (hiện `togglePremium` chỉ đổi cờ trong DB).
 - [ ] `saveToGallery` lưu thật (cần Development Build cho `expo-media-library`) + watermark.
