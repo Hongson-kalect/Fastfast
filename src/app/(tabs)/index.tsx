@@ -1,9 +1,11 @@
+import { TAB_BAR_SPACE } from "@/constants/design";
 import HomeBodyProgress from "@/components/home/BodyProgress";
 import CircleCounter from "@/components/home/CircleCounter";
 import HomeHeader from "@/components/home/Header";
 import { RecentFastCard } from "@/components/home/LastFastLog";
 import { SwapButton } from "@/components/home/SwapButton";
-import { ThemedText } from "@/components/themed-text";
+import { SectionTitle } from "@/components/SectionTitle";
+import { RADIUS } from "@/constants/design";
 import {
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
@@ -147,63 +149,59 @@ const HomeScreen = () => {
       {/* Tối ưu StatusBar bằng SafeAreaView chuẩn xác */}
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: TAB_BAR_SPACE }}
           keyboardShouldPersistTaps="handled"
         >
           {/* Header chứa Profile + Streak Badge */}
           <HomeHeader />
 
-          {/* Hero Section: Circle Counter & Floating Action Button */}
-          <View className="items-center justify-center my-4 relative">
+          {/* Hero: vòng tròn đếm giờ */}
+          <View className="mt-5">
             <CircleCounter
               finishFasting={handleFinishFast}
               isCounting={isCounting}
               counter={counter}
               currentFast={currentFastSession}
             />
-            {/* Tận dụng absolute positioning để cân bằng chính xác center */}
-            <View className="absolute -bottom-2 align-center">
-              <SwapButton
-                isCounting={isCounting}
-                toggleCounting={toggleCounting}
-              />
-            </View>
           </View>
 
-          {/* Gamified Body Phase Progress (Đưa lên vị trí cao hơn để tăng Dopamine) */}
+          {/* Hành động chính trong tầm ngón cái */}
           <View className="mt-4">
-            <View className="flex-row items-center justify-between mb-3">
-              <ThemedText
-                size="lg"
-                weight="bold"
-                color="primary"
-                className="tracking-tight"
-              >
-                {isFastingActive
-                  ? "Giai đoạn cơ thể "
-                  : currentFastSession?.end_time
-                    ? "Lần nhịn gần nhất"
-                    : "Chuẩn bị nhịn ăn"}
-              </ThemedText>
+            <SwapButton isCounting={isCounting} toggleCounting={toggleCounting} />
+          </View>
 
-              <TouchableOpacity
-                activeOpacity={0.7}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <FontAwesome6
-                  name="circle-question"
-                  size={20}
-                  color={theme.text + "80"}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Historical / Recent Activity Card */}
-            {!isFastingActive && currentFastSession?.end_time && (
+          {/* Lần nhịn gần nhất (khi chưa nhịn) */}
+          {!isFastingActive && currentFastSession?.end_time && (
+            <View className="mt-7">
+              <SectionTitle title="Lần nhịn gần nhất" />
               <RecentFastCard session={currentFastSession} />
-            )}
+            </View>
+          )}
 
-            <HomeBodyProgress counter={counter} />
+          {/* Giai đoạn cơ thể */}
+          <View className="mt-7">
+            <SectionTitle
+              title={isFastingActive ? "Giai đoạn cơ thể" : "Các giai đoạn khi nhịn"}
+              right={
+                <TouchableOpacity activeOpacity={0.7} hitSlop={10}>
+                  <FontAwesome6
+                    name="circle-question"
+                    size={16}
+                    color={theme.text + "66"}
+                  />
+                </TouchableOpacity>
+              }
+            />
+            <View
+              className="bg-card p-4"
+              style={{
+                borderRadius: RADIUS.lg,
+                borderWidth: 1,
+                borderColor: theme.text + "0F",
+              }}
+            >
+              <HomeBodyProgress counter={counter} />
+            </View>
           </View>
         </ScrollView>
     </View>

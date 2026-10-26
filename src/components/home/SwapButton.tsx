@@ -216,7 +216,7 @@ export const SwapButton = React.memo(
     };
 
     return (
-      <View className="h-28 flex-row items-end justify-center gap-4">
+      <View className="flex-row items-center">
         {/* Overlay */}
         <Animated.View
           style={overlayStyle}
@@ -226,11 +226,11 @@ export const SwapButton = React.memo(
           <Pressable className="flex-1" onPress={toggleMenu} />
         </Animated.View>
 
-        <View className="relative z-20 w-full flex-row items-center justify-center gap-7">
+        <View className="relative z-20 w-full flex-row items-center gap-3">
           {/* Image */}
           <Animated.View entering={ZoomIn.delay(0).duration(180)}>
             <Animated.View style={imageAnimatedStyle}>
-              <View className="rounded-full p-1 mt-4">
+              <View>
                 <SwapImageButton
                   image={todayData.image}
                   loading={loading}
@@ -251,7 +251,10 @@ export const SwapButton = React.memo(
           </Animated.View>
 
           {/* Fast */}
-          <Animated.View entering={ZoomIn.delay(50).duration(220)}>
+          <Animated.View
+            entering={ZoomIn.delay(50).duration(220)}
+            style={{ flex: 1 }}
+          >
             <Animated.View style={fastAnimatedStyle}>
               <SwapFastButton
                 isCounting={isCounting}
@@ -261,7 +264,7 @@ export const SwapButton = React.memo(
                 onPress={() => toggleCounting()}
                 onLongPress={showDelayModal}
                 onPressIn={() => {
-                  handlePressIn(fastScale, 0.92);
+                  handlePressIn(fastScale, 0.96);
                 }}
                 onPressOut={() => {
                   handlePressOut(fastScale);
@@ -273,7 +276,7 @@ export const SwapButton = React.memo(
           {/* Mood */}
           <Animated.View entering={ZoomIn.delay(100).duration(180)}>
             <Animated.View style={moodAnimatedStyle}>
-              <View className="rounded-full p-1 mt-4">
+              <View>
                 <SwapMoodButton
                   mood={todayData.mood}
                   note={todayData.note}

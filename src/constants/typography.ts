@@ -69,4 +69,16 @@ export const TextWeight = {
   medium: "500",
   semibold: "600",
   bold: "700",
+  extrabold: "800",
 } as const;
+
+// Font Mulish theo từng độ đậm. Android bỏ qua fontWeight khi dùng font custom,
+// nên mỗi độ đậm phải trỏ tới đúng file font.
+export const FontByWeight: Record<keyof typeof TextWeight, string> = {
+  light: "MulishLight",
+  regular: "MulishRegular",
+  medium: "MulishMedium",
+  semibold: "MulishSemiBold",
+  bold: "MulishBold",
+  extrabold: "MulishExtraBold",
+};

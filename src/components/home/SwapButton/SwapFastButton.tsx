@@ -1,5 +1,10 @@
+import { RADIUS, glow } from "@/constants/design";
+import { useAppStore } from "@/stores/appStore";
+import { getContrastTextColor } from "@/utils/color";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator, Pressable, View } from "react-native";
+import { ThemedText } from "../../themed-text";
 
 type SwapFastButtonProps = {
   isCounting: boolean;
@@ -12,6 +17,7 @@ type SwapFastButtonProps = {
   onLongPress?: () => void;
 };
 
+/** Nút hành động chính: viên thuốc gradient "Bắt đầu" / viền "Kết thúc". Nhấn giữ để chỉnh giờ. */
 export const SwapFastButton = ({
   isCounting,
   loading = false,
@@ -22,40 +28,64 @@ export const SwapFastButton = ({
   onPressOut,
   onLongPress,
 }: SwapFastButtonProps) => {
+  const { theme } = useAppStore();
+  const textColor = isCounting
+    ? color
+    : theme.buttonText || getContrastTextColor(color);
+
+  const content = loading ? (
+    <ActivityIndicator color={textColor} />
+  ) : (
+    <View className="flex-row items-center gap-2.5">
+      <FontAwesome6
+        name={isCounting ? "stop" : "play"}
+        size={18}
+        color={textColor}
+      />
+      <ThemedText size="lg" weight="extrabold" colorHex={textColor}>
+        {isCounting ? "Kết thúc" : "Bắt đầu nhịn"}
+      </ThemedText>
+    </View>
+  );
 
   return (
-    <View
-      className="rounded-full bg-background p-1.5 shadow-lg"
-      style={{ shadowColor: color }}
+    <Pressable
+      onLongPress={onLongPress}
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      disabled={loading}
+      hitSlop={8}
+      className={`${loading ? "opacity-60" : ""} ${className}`}
+      style={isCounting ? undefined : glow(color, 0.45)}
     >
-      <Pressable
-        onLongPress={onLongPress}
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        disabled={loading}
-        hitSlop={8}
-        className={`h-24 w-24 items-center justify-center rounded-full border-4 ${
-          loading ? "opacity-60" : ""
-        } ${className}`}
-        style={{
-          borderColor: color,
-          backgroundColor: isCounting ? "transparent" : color,
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator color={isCounting ? color : "white"} />
-        ) : isCounting ? (
-          <FontAwesome6 name="stop" size={40} color={color} />
-        ) : (
-          <FontAwesome6
-            name="play"
-            size={40}
-            color="white"
-            style={{ marginLeft: 6 }} // Căn lề icon Play cho cân thị giác
-          />
-        )}
-      </Pressable>
-    </View>
+      {isCounting ? (
+        <View
+          className="h-16 items-center justify-center border-2 px-6"
+          style={{
+            borderRadius: RADIUS.pill,
+            borderColor: color,
+            backgroundColor: color + "14",
+          }}
+        >
+          {content}
+        </View>
+      ) : (
+        <LinearGradient
+          colors={[color, theme.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            height: 64,
+            borderRadius: RADIUS.pill,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: 24,
+          }}
+        >
+          {content}
+        </LinearGradient>
+      )}
+    </Pressable>
   );
 };

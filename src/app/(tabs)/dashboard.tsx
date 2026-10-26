@@ -1,3 +1,4 @@
+import { TAB_BAR_SPACE } from "@/constants/design";
 import { FastLevelBarChart } from "@/components/dashboard/FastLevelChart";
 import { GoalCard } from "@/components/dashboard/GoalCard";
 import DashboardHeader from "@/components/dashboard/Header";
@@ -78,7 +79,7 @@ const DashboardScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 20,
-          paddingBottom: 40,
+          paddingBottom: TAB_BAR_SPACE,
         }}
         keyboardShouldPersistTaps="handled"
       >

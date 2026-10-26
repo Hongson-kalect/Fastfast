@@ -1,6 +1,11 @@
 import { Text, type TextProps } from "react-native";
 
-import { Opacity, TextSize, TextWeight } from "@/constants/typography";
+import {
+  FontByWeight,
+  Opacity,
+  TextSize,
+  TextWeight,
+} from "@/constants/typography";
 import { ThemeType } from "@/constants/themes";
 import { useAppStore } from "@/stores/appStore";
 import { useMemo } from "react";
@@ -30,7 +35,7 @@ export function ThemedText({
     <Text
       style={[
         {
-          fontWeight: TextWeight[weight],
+          fontFamily: FontByWeight[weight],
           ...TextSize[size],
           color: color ? colors[color] : colorHex || colors["text"],
           opacity: Opacity[rest.opacity || "full"],

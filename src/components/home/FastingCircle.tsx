@@ -116,23 +116,22 @@ export const FastingCircle = ({
                 start={0}
                 end={progress}
               >
+                {/* Vệt sáng quay: cùng tông màu, đuôi dài và mềm, chỉ ánh trắng nhẹ ở đỉnh */}
                 <SweepGradient
                   c={vec(centerX, centerY)}
                   matrix={animatedMatrix}
                   colors={[
-                    color + "10",
-                    color + "30",
-                    color + "50",
-                    color,
-                    "#FFFFFF",
-                    color,
-                    color + "50",
-                    color + "30",
-                    color + "10",
+                    color + "00",
+                    color + "00",
+                    color + "40",
+                    color + "AA",
+                    "#FFFFFF99",
+                    color + "AA",
+                    color + "00",
                   ]}
-                  positions={[0, 0.45, 0.75, 0.86, 0.9, 0.94, 0.97, 0.99, 1]}
+                  positions={[0, 0.55, 0.75, 0.86, 0.9, 0.94, 1]}
                 />
-                <BlurMask blur={10} style="solid" />
+                <BlurMask blur={8} style="solid" />
               </Path>
             </>
           )}

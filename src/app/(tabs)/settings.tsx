@@ -1,3 +1,4 @@
+import { TAB_BAR_SPACE } from "@/constants/design";
 import { Alert, Linking, ScrollView, View } from "react-native";
 
 import { SettingsItem } from "@/components/settings/SettingsItem";
@@ -273,7 +274,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 10,
-          paddingBottom: 40,
+          paddingBottom: TAB_BAR_SPACE,
         }}
       >
         {/* Header */}

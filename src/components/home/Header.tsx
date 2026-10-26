@@ -1,31 +1,99 @@
+import { RADIUS } from "@/constants/design";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import { feedback } from "@/utils/feedback";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import CircularProgress from "../CircleProgress";
 import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
 
+const greeting = (date = new Date()) => {
+  const hour = date.getHours();
+  if (hour < 11) return "Chào buổi sáng";
+  if (hour < 14) return "Chào buổi trưa";
+  if (hour < 18) return "Chào buổi chiều";
+  return "Chào buổi tối";
+};
+
+const Pill = ({
+  icon,
+  value,
+  color,
+}: {
+  icon: React.ReactNode;
+  value: string | number;
+  color: string;
+}) => (
+  <View
+    className="flex-row items-center gap-1.5 px-3 py-1.5"
+    style={{ borderRadius: RADIUS.pill, backgroundColor: color + "1F" }}
+  >
+    {icon}
+    <ThemedText size="sm" weight="bold" colorHex={color}>
+      {value}
+    </ThemedText>
+  </View>
+);
+
 const HomeHeader = () => {
-  const {  habit } = useAppStore();
+  const { habit, userProfile, theme } = useAppStore();
   const { present } = useBottomSheet();
 
   const openHabitModal = () => {
-      return present(<HabitBottomSheet />, {
-        isRaw: true,
-        snapPoints: ["100%"],
-      });
+    feedback("tap");
+    present(<HabitBottomSheet />, {
+      isRaw: true,
+      snapPoints: ["100%"],
+    });
   };
 
+  const habitValue = Math.round(habit?.habit_snap || 0);
+
   return (
-    <View className="flex-row justify-between items-center">
-      <View>
-        <ThemedText size="xxxl" weight="semibold">
-          {/* Hi, Kalect */}
-          FastFast
+    <View className="flex-row items-center justify-between pt-2">
+      <View className="gap-2">
+        <ThemedText size="sm" color="text" opacity="medium">
+          {greeting()} 👋
         </ThemedText>
+
+        <View className="flex-row gap-2">
+          <Pill
+            icon={<Ionicons name="flame" size={15} color={theme.warning} />}
+            value={`${userProfile?.current_streak ?? 0} ngày`}
+            color={theme.warning}
+          />
+          <Pill
+            icon={<FontAwesome5 name="shield-alt" size={12} color={theme.info} />}
+            value={habit?.shield_snap ?? 0}
+            color={theme.info}
+          />
+        </View>
       </View>
-      <Pressable className="z-10" hitSlop={10} onPress={openHabitModal}>
-        <CircularProgress value={habit?.habit_snap || 0} />
+
+      {/* Độ bền thói quen */}
+      <Pressable
+        className="z-10 items-center"
+        hitSlop={10}
+        onPress={openHabitModal}
+      >
+        <CircularProgress
+          value={habitValue}
+          size={64}
+          strokeWidth={6}
+          strokeColor={theme.primary}
+          inactiveStrokeColor={theme.text + "14"}
+          renderCenter={(_, animated) => (
+            <View className="items-center">
+              <ThemedText size="md" weight="extrabold" color="title">
+                {animated}
+                <ThemedText size="xxs" weight="bold" color="text" opacity="medium">
+                  %
+                </ThemedText>
+              </ThemedText>
+            </View>
+          )}
+        />
       </Pressable>
     </View>
   );

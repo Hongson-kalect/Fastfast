@@ -38,8 +38,10 @@ const Counter = ({
           >
             <ThemedText
               className={itemClassName}
-              size="displayLarge"
-              weight="semibold"
+              size={type === "large" ? "displayLarge" : "xs"}
+              weight={type === "large" ? "extrabold" : "semibold"}
+              color="title"
+              style={{ fontVariant: ["tabular-nums"] }}
             >
               {item}
             </ThemedText>

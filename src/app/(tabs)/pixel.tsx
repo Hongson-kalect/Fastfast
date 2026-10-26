@@ -1,3 +1,4 @@
+import { TAB_BAR_SPACE } from "@/constants/design";
 import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
@@ -289,7 +290,7 @@ const PixelScreen = () => {
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={
-        isHorizontal ? { paddingRight: 20 } : { paddingBottom: 40 }
+        isHorizontal ? { paddingRight: 20 } : { paddingBottom: TAB_BAR_SPACE }
       }
       scrollEventThrottle={32}
       onScroll={handleScroll}

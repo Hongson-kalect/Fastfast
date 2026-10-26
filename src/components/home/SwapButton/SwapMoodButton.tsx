@@ -3,6 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
+import { RADIUS } from "@/constants/design";
 import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 
@@ -30,7 +31,7 @@ export const SwapMoodButton = ({
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
   const color = mood
     ? emotions[mood].color[isDark ? "dark" : "light"]
-    : theme.background;
+    : theme.card;
 
   return (
     <TouchableOpacity
@@ -42,9 +43,10 @@ export const SwapMoodButton = ({
       disabled={loading}
       style={{
         backgroundColor: color,
-        borderColor: color + "80",
+        borderColor: mood ? color : theme.text + "1A",
+        borderRadius: RADIUS.md,
       }}
-      className={`h-18 w-18 flex-row items-center justify-center rounded-full border shadow-inner shadow-text-base/10 ${loading ? "opacity-60" : ""} ${className}`}
+      className={`h-16 w-16 flex-row items-center justify-center border ${loading ? "opacity-60" : ""} ${className}`}
     >
       {loading ? (
         <ActivityIndicator color={theme.primary} />
@@ -55,16 +57,12 @@ export const SwapMoodButton = ({
               {emotions[mood].icon[isDark ? "dark" : "light"]}
             </ThemedText>
           ) : (
-            <Feather name="edit-2" size={28} color={theme.text} />
+            <Feather name="smile" size={22} color={theme.text + "CC"} />
           )}
 
           {note && (
-            <View className="absolute -top-4 right-0 bg-background/80 rounded">
-              <Ionicons
-                name="chatbox-ellipses-outline"
-                size={24}
-                color={color}
-              />
+            <View className="absolute -top-3 -right-3 rounded-full bg-background p-0.5">
+              <Ionicons name="chatbubble-ellipses" size={16} color={theme.primary} />
             </View>
           )}
         </View>

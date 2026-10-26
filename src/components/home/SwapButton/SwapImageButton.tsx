@@ -1,3 +1,4 @@
+import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import Feather from "@expo/vector-icons/Feather";
 import { ActivityIndicator, Image, TouchableOpacity } from "react-native";
@@ -29,18 +30,17 @@ export const SwapImageButton = ({
       onPressOut={onPressOut}
       disabled={loading}
       hitSlop={8}
-      className={`h-18 w-18 flex-row items-center justify-center rounded-full overflow-hidden border shadow-inner ${
-        image
-          ? "shadow-primary/50 border-primary/50"
-          : "shadow-text-base/10 border-text-base/10"
+      style={{ borderRadius: RADIUS.md }}
+      className={`h-16 w-16 flex-row items-center justify-center overflow-hidden border bg-card ${
+        image ? "border-primary/50" : "border-text-base/10"
       } ${loading ? "opacity-60" : ""} ${className}`}
     >
       {loading ? (
         <ActivityIndicator color={theme.primary} />
       ) : image ? (
-        <Image source={{ uri: image }} className="h-18 w-18" />
+        <Image source={{ uri: image }} className="h-16 w-16" />
       ) : (
-        <Feather name="image" size={28} color={theme.text} />
+        <Feather name="camera" size={22} color={theme.text + "CC"} />
       )}
     </TouchableOpacity>
   );

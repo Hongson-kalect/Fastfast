@@ -1,17 +1,13 @@
+import { RADIUS } from "@/constants/design";
 import { FASTING_TARGETS } from "@/constants/data";
 import { ThemeType } from "@/constants/themes";
 import { AppSettings, FastSession } from "@/interfaces/db.type";
 import { getRelativeDate, getRelativeTime } from "@/utils/timer";
-import {
-  Pressable,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { Pressable, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
-  FadeInUp,
   FadeOutUp,
   LinearTransition,
 } from "react-native-reanimated";
@@ -29,7 +25,34 @@ type Props = {
   openFastingSheet: () => void;
   openTargetSheet: () => void;
   showHistory: () => void;
+  phaseTitle?: string;
+  ringColor: string;
+  diameter: number;
 };
+
+/** Chip mục tiêu: chạm để đổi mục tiêu. */
+const TargetChip = ({
+  label,
+  color,
+  onPress,
+}: {
+  label: string;
+  color: string;
+  onPress: () => void;
+}) => (
+  <Pressable
+    onPress={onPress}
+    hitSlop={10}
+    className="flex-row items-center gap-1.5 px-3 py-1.5"
+    style={{ borderRadius: RADIUS.pill, backgroundColor: color + "22" }}
+  >
+    <Feather name="target" size={13} color={color} />
+    <ThemedText size="xs" weight="bold" colorHex={color}>
+      {label}
+    </ThemedText>
+    <Feather name="chevron-down" size={13} color={color} />
+  </Pressable>
+);
 
 export const CircleCounterContent = ({
   isCounting,
@@ -42,191 +65,101 @@ export const CircleCounterContent = ({
   openFastingSheet,
   openTargetSheet,
   showHistory,
+  phaseTitle,
+  ringColor,
+  diameter,
 }: Props) => {
-  const strokeWidth = 20;
-  const padding = 48;
-  const { width } = useWindowDimensions();
+  const active = isCounting && !!currentFast;
+  const targetHours = Number(settings?.target || 0);
+  const targetLabel = currentTarget
+    ? `${currentTarget.label} · ${targetHours}h`
+    : "Chọn mục tiêu";
+  const reached = active && targetHours > 0 && counter >= targetHours * 3_600;
+
+  let subtitle: string;
+  if (active) {
+    if (reached) subtitle = "🎉 Đã đạt mục tiêu";
+    else if (finishEstimate) subtitle = `Xong lúc ${getRelativeDate(finishEstimate)}`;
+    else subtitle = "Chế độ tự do";
+  } else {
+    subtitle = finishEstimate
+      ? `Nếu bắt đầu bây giờ: ${getRelativeDate(finishEstimate)}`
+      : "Chế độ tự do";
+  }
+
   return (
     <View
-      className="absolute items-center justify-center overflow-hidden rounded-full bg-background"
-      style={{
-        width: width - strokeWidth - padding * 2,
-        height: width - strokeWidth - padding * 2,
-      }}
+      className="absolute items-center justify-center overflow-hidden"
+      style={{ width: diameter, height: diameter, borderRadius: diameter / 2 }}
     >
-      {isCounting && currentFast ? (
-        <View className="h-full w-full items-center justify-between px-4 pb-10 pt-8">
-          {/* Top */}
-          <Animated.View
-            key={`active-top-${currentTarget?.id ?? "free"}`}
-            entering={FadeInDown.duration(250)}
-            exiting={FadeOutUp.duration(150)}
-            className="items-center gap-1"
-          >
-            <TouchableOpacity
-              className="items-center px-2 pt-1"
-              hitSlop={10}
-              onPress={openTargetSheet}
-            >
-              <ThemedText
-                weight="bold"
-                colorHex={currentTarget?.colors.accent ?? theme.primary}
-                className="uppercase"
-              >
-                {currentTarget
-                  ? `${currentTarget.label} ${settings?.target || 16}h`
-                  : "Choose a target"}
-              </ThemedText>
-            </TouchableOpacity>
-
-            <ThemedText size="xs" opacity="half">
-              Bắt đầu: {getRelativeTime(new Date(currentFast.start_time))}
-            </ThemedText>
-          </Animated.View>
-
-          {/* Center */}
-          <Pressable
-            onPress={openFastingSheet}
-            hitSlop={10}
-            className="my-auto items-center justify-center"
-          >
-            <Counter
-              itemClassName="text-white font-bold text-2xl"
-              counter={counter}
-              type="large"
-            />
-
-            <Animated.View
-              layout={LinearTransition.springify().duration(250)}
-              className="mt-1 min-h-4 items-center justify-center"
-            >
-              {settings?.target && finishEstimate ? (
-                counter > settings.target * 3_600 ? (
-                  <Animated.View
-                    key="completed"
-                    entering={FadeInUp.duration(300)}
-                  >
-                    <ThemedText size="xxs" color="success" weight="semibold">
-                      Đã hoàn thành
-                    </ThemedText>
-                  </Animated.View>
-                ) : (
-                  <Animated.View key="estimate" entering={FadeIn.duration(200)}>
-                    <ThemedText size="xxs" color="text" opacity="half">
-                      Hoàn thành: {getRelativeDate(finishEstimate)}
-                    </ThemedText>
-                  </Animated.View>
-                )
-              ) : (
-                <Animated.View key="free" entering={FadeIn.duration(200)}>
-                  <ThemedText size="xxs" color="text" opacity="half">
-                    Free mode
-                  </ThemedText>
-                </Animated.View>
-              )}
-            </Animated.View>
-          </Pressable>
-
-          {/* Bottom */}
-          <Pressable
-            onPress={showHistory}
-            hitSlop={8}
-            className="flex-row items-center gap-2 rounded-xl bg-text-base/10 px-3 py-1.5 active:bg-text-base/15"
-          >
-            <ThemedText size="xs" color="text" opacity="half">
-              Fasts history
-            </ThemedText>
-          </Pressable>
-        </View>
-      ) : (
-        <View className="h-full w-full items-center justify-between px-4 pb-10 pt-8">
-          {/* Top */}
-          <Animated.View
-            key={`idle-top-${currentTarget?.id ?? "none"}`}
-            entering={FadeInDown.duration(250)}
-            exiting={FadeOutUp.duration(150)}
-            className="items-center gap-1"
-          >
-            {currentTarget ? (
-              <>
-                <ThemedText
-                  size="sm"
-                  weight="bold"
-                  colorHex={currentTarget.colors.accent}
-                  style={{
-                    textTransform: "uppercase",
-                    textDecorationLine: "underline",
-                  }}
-                >
-                  {currentTarget.label} {settings?.target || 16}h
-                </ThemedText>
-
-                <ThemedText size="xxs" color="text" opacity="medium">
-                  {currentTarget.title}
-                </ThemedText>
-              </>
-            ) : (
-              <>
-                <ThemedText
-                  size="sm"
-                  weight="bold"
-                  color="primary"
-                  style={{
-                    textTransform: "uppercase",
-                    textDecorationLine: "underline",
-                  }}
-                >
-                  Choose a target
-                </ThemedText>
-
-                <ThemedText size="xxs" color="text" opacity="medium">
-                  No target selected
-                </ThemedText>
-              </>
-            )}
-          </Animated.View>
-
-          {/* Center */}
-          <Pressable
+      <View className="h-full w-full items-center justify-between px-4 pb-9 pt-9">
+        {/* Top: mục tiêu */}
+        <Animated.View
+          key={`top-${active}-${currentTarget?.id ?? "none"}`}
+          entering={FadeInDown.duration(250)}
+          exiting={FadeOutUp.duration(150)}
+          className="items-center gap-1.5"
+        >
+          <TargetChip
+            label={targetLabel}
+            color={currentTarget?.colors.accent ?? theme.primary}
             onPress={openTargetSheet}
-            hitSlop={10}
-            className="my-auto items-center justify-center"
-          >
-            <Counter
-              itemClassName="text-white font-bold text-2xl"
-              counter={settings?.target ? Number(settings.target) * 3_600 : 0}
-              type="large"
-            />
+          />
+        </Animated.View>
 
-            <Animated.View
-              key={`idle-estimate-${finishEstimate ? "estimate" : "free"}`}
-              entering={FadeIn.duration(250)}
-              className="mt-1 min-h-4 items-center justify-center"
-            >
-              {finishEstimate ? (
-                <ThemedText size="xxs" color="text" opacity="half">
-                  Dự kiến: {getRelativeDate(finishEstimate)}
-                </ThemedText>
-              ) : (
-                <ThemedText size="xxs" color="text" opacity="half">
-                  Free mode
-                </ThemedText>
-              )}
+        {/* Center: đồng hồ */}
+        <Pressable
+          onPress={active ? openFastingSheet : openTargetSheet}
+          hitSlop={10}
+          className="my-auto items-center justify-center"
+        >
+          <ThemedText
+            size="xs"
+            weight="bold"
+            colorHex={active ? ringColor : theme.text}
+            opacity={active ? "full" : "half"}
+            style={{ letterSpacing: 1.5, textTransform: "uppercase" }}
+          >
+            {active ? (phaseTitle ?? "Đang nhịn") : "Sẵn sàng"}
+          </ThemedText>
+
+          <Counter
+            counter={active ? counter : targetHours * 3_600}
+            type="large"
+          />
+
+          <Animated.View
+            layout={LinearTransition.springify().duration(250)}
+            className="mt-1 min-h-4 items-center justify-center"
+          >
+            <Animated.View key={subtitle} entering={FadeIn.duration(200)}>
+              <ThemedText
+                size="xs"
+                weight={reached ? "bold" : "medium"}
+                color={reached ? "success" : "text"}
+                opacity={reached ? "full" : "medium"}
+              >
+                {subtitle}
+              </ThemedText>
             </Animated.View>
-          </Pressable>
+          </Animated.View>
+        </Pressable>
 
-          {/* Bottom */}
-          <Pressable
-            onPress={showHistory}
-            hitSlop={8}
-            className="flex-row items-center gap-2 rounded-xl bg-text-base/10 px-3 py-1.5 active:bg-text-base/15"
-          >
-            <ThemedText size="xs" color="text" opacity="medium">
-              Fasts history
-            </ThemedText>
-          </Pressable>
-        </View>
-      )}
+        {/* Bottom: bắt đầu lúc / lịch sử */}
+        <Pressable
+          onPress={showHistory}
+          hitSlop={8}
+          className="flex-row items-center gap-1.5 px-3 py-1.5 active:opacity-70"
+          style={{ borderRadius: RADIUS.pill, backgroundColor: theme.text + "0D" }}
+        >
+          <Feather name="clock" size={12} color={theme.text + "99"} />
+          <ThemedText size="xs" color="text" opacity="medium">
+            {active
+              ? `Bắt đầu ${getRelativeTime(new Date(currentFast!.start_time))}`
+              : "Lịch sử nhịn"}
+          </ThemedText>
+        </Pressable>
+      </View>
     </View>
   );
 };

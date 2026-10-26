@@ -17,6 +17,9 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { RADIUS, heroGradient } from "@/constants/design";
+import { getCurrentPhase } from "@/utils/home/phase";
+import { LinearGradient } from "expo-linear-gradient";
 import { FastDetail } from "../FastDetail";
 import { CircleCounterContent } from "./CircleCounterContent";
 import FastHistorySheet from "./FastHistorySheet";
@@ -31,9 +34,12 @@ type Props = {
   finishFasting: () => void;
 };
 
-const padding = 48;
+// Khoảng cách từ mép card hero tới vòng tròn
+const padding = 36;
 const MIN_ANGLE = 3;
-const strokeWidth = 20;
+const strokeWidth = 16;
+// Card hero nằm trong lề màn hình 20 mỗi bên
+const CARD_INSET = 40;
 
 export const CircleCounter = ({
   isCounting,
@@ -61,7 +67,8 @@ export const CircleCounter = ({
 
   const progress = target ? Math.min(Math.max(counter / target, 0.05), 1) : 1;
 
-  const { width } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
+  const width = screenWidth - CARD_INSET;
 
   const centerX = width / 2;
   const centerY = width / 2;
@@ -71,7 +78,9 @@ export const CircleCounter = ({
     ? FASTING_TARGETS.find((item) => item.hours === settings.target) || null
     : null;
 
-  const color = currentTarget?.colors.accent || theme.primary;
+  // Đang nhịn: vòng tròn mang màu giai đoạn cơ thể hiện tại; chưa nhịn: màu mục tiêu/theme
+  const phase = isCounting ? getCurrentPhase(counter) : null;
+  const color = phase?.color || currentTarget?.colors.accent || theme.primary;
 
   // 6. Logic Animation xoay với Reanimated
   const rotation = useSharedValue(0);
@@ -173,11 +182,21 @@ export const CircleCounter = ({
   }, [selectedHistory]);
 
   return (
-    <View className="items-center justify-center">
+    <LinearGradient
+      colors={heroGradient(theme)}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{
+        borderRadius: RADIUS.xl,
+        borderWidth: 1,
+        borderColor: theme.text + "0F",
+        overflow: "hidden",
+      }}
+    >
       <View
         key="skia-counter-render"
-        style={{ width: width, height: width, marginTop: -padding + 12 }}
-        className="justify-center items-center rounded-full relative"
+        style={{ width: width, height: width }}
+        className="justify-center items-center relative"
       >
         {/* CANVAS SKIA RENDER VÒNG TRÒN PROGRESS & EFFECT */}
         <FastingCircle
@@ -188,7 +207,7 @@ export const CircleCounter = ({
           progress={progress}
           isCounting={isCounting}
           color={color}
-          backgroundColor={theme.text + "40"}
+          backgroundColor={theme.text + "14"}
           strokeWidth={strokeWidth}
         />
 
@@ -203,9 +222,12 @@ export const CircleCounter = ({
           openFastingSheet={openFastingSheet}
           openTargetSheet={openTargetSheet}
           showHistory={showHistory}
+          phaseTitle={phase?.title}
+          ringColor={color}
+          diameter={radius * 2 - strokeWidth}
         />
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
