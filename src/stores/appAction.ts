@@ -114,8 +114,6 @@ export async function initializeApp(
       dbService.getLastHabitLog(),
     ]);
 
-  console.log("weight on init", weightObj);
-
   const { lastFast, profile, habitLog, streak, modal } = await handleLogin({
     db,
     lastFast: currentFast,

@@ -59,7 +59,7 @@ export const WeightModal = ({
       } catch (error) {
         if (cancelled) return;
 
-        console.log("Error loading weight", error);
+        console.warn("Error loading weight", error);
 
         const fallback = currentWeight ?? undefined;
         setInitialWeight(fallback);

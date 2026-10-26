@@ -115,7 +115,7 @@ export const getFastStatsSummary = async (
       }
     );
   } catch (e) {
-    console.log("error on getFastStatsSummary", e);
+    console.warn("error on getFastStatsSummary", e);
     return {
       total_hours: 0,
       avg_hours: 0,
@@ -140,7 +140,7 @@ export const getLastFastSession = async (
     );
     return row;
   } catch (e) {
-    console.log("error on getLastFastSession", e);
+    console.warn("error on getLastFastSession", e);
     return null;
   }
 };
@@ -156,7 +156,7 @@ export const getSessionById = async (
     );
     return row;
   } catch (e) {
-    console.log("error on getActiveSession", e);
+    console.warn("error on getActiveSession", e);
     return null;
   }
 };
@@ -178,7 +178,7 @@ export const getFastSessionByIds = async (
 
     return rows;
   } catch (e) {
-    console.log("error on getFastSessionByIds", e);
+    console.warn("error on getFastSessionByIds", e);
     return [];
   }
 };
@@ -193,7 +193,7 @@ export const getYearFastSession = async (
     );
     return row;
   } catch (e) {
-    console.log("error on getYearFastSession", e);
+    console.warn("error on getYearFastSession", e);
     return null;
   }
 };
@@ -266,11 +266,7 @@ export const finishLastSession = async ({
       throw new Error("UserProfile not found");
     }
 
-    const streak = createStreakContext(profile, habitLog);
-
-    console.log("prev handleFast: ", { profile, habitLog, streak });
-
-    // --------------------------------------------------
+    const streak = createStreakContext(profile, habitLog);    // --------------------------------------------------
     // 4. Too quick
     // --------------------------------------------------
 
@@ -591,7 +587,7 @@ export const startNewSession = async (
     const res = await getLastFastSession(db);
     return res;
   } catch (e) {
-    console.log("error on startNewSession", e);
+    console.warn("error on startNewSession", e);
     return null;
   }
 };
@@ -613,19 +609,17 @@ export const updateSessionTarget = async (
     );
     return res;
   } catch (e) {
-    console.log("error on updateSessionTarget", e);
+    console.warn("error on updateSessionTarget", e);
     return null;
   }
 };
 
-export const deleteSession = async (db: SQLiteDatabase, id: string) => {
-  console.log("xóa chít mợ m, ", id);
-  try {
+export const deleteSession = async (db: SQLiteDatabase, id: string) => {  try {
     await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
       id,
     ]);
   } catch (e) {
-    console.log("error on deleteSession", e);
+    console.warn("error on deleteSession", e);
   }
 };
 
@@ -640,7 +634,7 @@ export const fastFail = async (
     );
     return await getLastFastSession(db);
   } catch (e) {
-    console.log("error on fastFail", e);
+    console.warn("error on fastFail", e);
     return null;
   }
 };
@@ -651,7 +645,7 @@ export const deleteFast = async (db: SQLiteDatabase, id: string) => {
       id,
     ]);
   } catch (e) {
-    console.log("error on deleteFast", e);
+    console.warn("error on deleteFast", e);
   }
 };
 

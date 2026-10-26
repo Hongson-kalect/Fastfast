@@ -110,7 +110,7 @@ export const getUserProfile = async (
     };
   }
   catch (e){
-    console.log('get user profile error', e);
+    console.warn('get user profile error', e);
     return null;
   }
 };
@@ -140,7 +140,7 @@ export const increaseStreak = async (
     return newProfile!;
   }
   catch (e){
-    console.log('increaseStreak error', e);
+    console.warn('increaseStreak error', e);
     return null;
   }
 };
@@ -179,7 +179,7 @@ export const gainShield = async (db: SQLiteDatabase, num:number,  habit:number, 
       }
   }
   catch (e){
-    console.log('gainShield error', e);
+    console.warn('gainShield error', e);
     return {
       profile: null,
       habitShield: 0,
@@ -233,7 +233,7 @@ export const clearStreak = async (
     const newProfile = await getUserProfile(db);
     return newProfile;
   } catch (e) {
-    console.log("clearStreak error", e);
+    console.warn("clearStreak error", e);
     return null;
   }
 };
@@ -244,7 +244,7 @@ export const updateLastLoginDate = async (db: SQLiteDatabase, profile: UserProfi
     const newProfile = await getUserProfile(db);
     return newProfile;
   } catch (e) {
-    console.log("error on updateLastUserLogin", e);
+    console.warn("error on updateLastUserLogin", e);
     return null
   }
 };
@@ -255,7 +255,7 @@ export const updateStreakDate = async (db: SQLiteDatabase, profile: UserProfile,
     const newProfile = await getUserProfile(db);
     return newProfile;
   } catch (e) {
-    console.log("error on updateLastUserLogin", e);
+    console.warn("error on updateLastUserLogin", e);
     return null
   }
 };

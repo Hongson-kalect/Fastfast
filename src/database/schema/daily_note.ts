@@ -23,7 +23,7 @@ export const getDailyNotes = async (
     const rows = await db.getAllAsync<DailyNote>(`SELECT * FROM daily_notes;`);
     return rows;
   } catch (e) {
-    console.log("error on getDailyNotes", e);
+    console.warn("error on getDailyNotes", e);
     return null;
   }
 };
@@ -39,7 +39,7 @@ export const getDailyNote = async (
     );
     return row;
   } catch (e) {
-    console.log("error on getDailyNote", e);
+    console.warn("error on getDailyNote", e);
     return null;
   }
 };
@@ -92,7 +92,7 @@ export const setDailyNote = async (
       hasImage ? 1 : 0,
     ]);
   } catch (e) {
-    console.log("error on setDailyNote", e);
+    console.warn("error on setDailyNote", e);
   }
 };
 
@@ -114,7 +114,7 @@ export const getPixelNoteData = async (
 
     return rows;
   } catch (e) {
-    console.log("error on getPixelNoteData", e);
+    console.warn("error on getPixelNoteData", e);
     return [];
   }
 };

@@ -108,7 +108,7 @@ export const getPixelShielLog = async (
 
     return rows;
   } catch (e) {
-    console.log("error on getPixelShielLog", e);
+    console.warn("error on getPixelShielLog", e);
     return [];
   }
 };
@@ -225,7 +225,7 @@ export const reduceShield = async (
     const lastHabit = await getLastHabitLog(db);
     return lastHabit;
   } catch (e) {
-    console.log("error on reduceShield", e);
+    console.warn("error on reduceShield", e);
     return null;
   }
 };
@@ -258,7 +258,7 @@ export const reduceHabit = async (
     const lastHabit = await getLastHabitLog(db);
     return lastHabit;
   } catch (e) {
-    console.log("error on reduceHabit", e);
+    console.warn("error on reduceHabit", e);
     return null;
   }
 };
@@ -285,7 +285,7 @@ export const getShieldUsedLog = async (
     const rows = await db.getAllAsync<HabitLog>(query, [startDate, startDate]);
     return rows;
   } catch (e) {
-    console.log("error on getShieldUsed", e);
+    console.warn("error on getShieldUsed", e);
     return [];
   }
 };

@@ -79,6 +79,6 @@ export const updateWeight = async (
     );
     return row;
   } catch (e) {
-    console.log("error on updateWeight", e);
+    console.warn("error on updateWeight", e);
   }
 };

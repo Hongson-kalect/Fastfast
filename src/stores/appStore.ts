@@ -80,7 +80,6 @@ export const useAppStore = create<AppState>((set) => ({
    * Store chỉ nhận kết quả và lưu vào RAM.
    */
   hydrate: (data) => {
-    console.log("hydrate data", data);
     set({
       userProfile: data.userProfile,
       habit: data.habit,

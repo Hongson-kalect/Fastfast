@@ -118,10 +118,7 @@ export const selectPhoto = async (): Promise<string | null> => {
  * Không xóa file nằm ngoài thư mục ảnh của app.
  */
 export const deleteSavedImage = (uri?: string | null): void => {
-  if (!uri) return;
-
-  console.log("delete saved image", uri);
-
+  if (!uri) return;
   const imagesDir = new FileSystem.Directory(
     FileSystem.Paths.document,
     "images",

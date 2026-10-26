@@ -40,7 +40,7 @@ export const getDailyLogs = async (
     // const rows = await db.getAllAsync<DailyLog>(`SELECT * FROM daily_logs;`);
     return rows;
   }catch(e){
-    console.log('error on getDailyLogs', e);
+    console.warn('error on getDailyLogs', e);
     return [];
   }
 };
@@ -57,7 +57,7 @@ export const getTodayLog = async (
     );
     return rows;
   }catch(e){
-    console.log('error on getTodayLog', e);
+    console.warn('error on getTodayLog', e);
     return null;
   }
 };
@@ -88,7 +88,7 @@ export const addDailyLogs = async (
     // const res = await db.getFirstAsync<DailyLog>(`SELECT * FROM daily_logs WHERE log_date = ? AND fast_id = ?;`, [data.log_date, data.fast_id]);
     // return res;
   }catch(e){
-    console.log('error on addDailyLogs', e);
+    console.warn('error on addDailyLogs', e);
 
     return null
   }
@@ -113,7 +113,7 @@ export const getPixelLogData = async (
 
     return rows;
   } catch (e) {
-    console.log("error on getPixelLogData", e);
+    console.warn("error on getPixelLogData", e);
     return [];
   }
 };

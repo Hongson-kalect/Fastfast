@@ -71,8 +71,6 @@ export const handleLogin = async ({
     };
   }
 
-  console.log("dates", profile.streak_date, profile.last_login_date);
-
   // Mỗi ngày chỉ reconcile một lần
   if (
     profile.streak_date === todayStr ||

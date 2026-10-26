@@ -41,7 +41,7 @@ export const getThemes = async (db: SQLiteDatabase): Promise<ThemeType[]> => {
     ...row,
     color_palette: JSON.parse(row.color_palette || "{}"),
   }));
-}catch(e){console.log('error on getThemes', e); return [];}
+}catch(e){console.warn('error on getThemes', e); return [];}
 };
 
 export const getActiveTheme = async (
@@ -59,7 +59,7 @@ export const getActiveTheme = async (
       ...row,
       color_palette: JSON.parse(row.color_palette || "{}"),
     };
-  }catch(e){console.log('error on getActiveTheme', e); return null;}
+  }catch(e){console.warn('error on getActiveTheme', e); return null;}
 };
 
 const lightTheme = {

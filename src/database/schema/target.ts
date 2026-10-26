@@ -34,7 +34,7 @@ export const getActiveWeightTarget = async (
     return row;
   }
   catch (error) {
-    console.log("error on getActiveWeightTarget", error);
+    console.warn("error on getActiveWeightTarget", error);
     return null;
   }
 };
@@ -72,7 +72,7 @@ export const checkAndUpdateActiveTarget = async (
     return false;
   }
   catch (error) {
-    console.log("error on checkAndUpdateActiveTarget", error);
+    console.warn("error on checkAndUpdateActiveTarget", error);
     return false;
   }
 };
@@ -120,7 +120,7 @@ export const createWeightTarget = async (
   });
 }
 catch (error) {
-  console.log("error on createWeightTarget", error);
+  console.warn("error on createWeightTarget", error);
 }
 };
 /**
@@ -136,7 +136,7 @@ export const getAllWeightTargets = async (
     );
     return rows;
   }catch (error) {
-    console.log("error on getAllWeightTargets", error);
+    console.warn("error on getAllWeightTargets", error);
     return [];
 
   }

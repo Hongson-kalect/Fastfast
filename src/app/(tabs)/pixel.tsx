@@ -224,7 +224,6 @@ const PixelScreen = () => {
 
   const numberOfColumns = viewType === "week" ? 7 : 12;
   const pixelSize = (width - 40 - 60 - numberOfColumns) / numberOfColumns;
-  console.log("pixelSize", pixelSize);
 
   return (
     <View

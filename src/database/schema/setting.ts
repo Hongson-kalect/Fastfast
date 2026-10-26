@@ -39,7 +39,7 @@ export const getUserSettings = async (
     });
     return settingsObj;
   } catch (e) {
-    console.log("error on getUserSettings", e);
+    console.warn("error on getUserSettings", e);
     return null;
   }
 };
