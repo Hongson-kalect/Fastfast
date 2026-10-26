@@ -161,7 +161,6 @@ const FastLevelItem = React.memo(
 );
 
 export const FastLevelBarChart = ({ fastStatistics }: Props) => {
-  const { theme } = useAppStore();
   const levels = [
     {
       label: "16-20 hrs",

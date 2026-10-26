@@ -1,4 +1,3 @@
-import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";

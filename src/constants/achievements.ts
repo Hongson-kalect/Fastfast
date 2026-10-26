@@ -1,6 +1,5 @@
 import { createDBService } from "@/database";
 import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
-import { SQLiteDatabase } from "expo-sqlite";
 
 export type AchievementItem = {
   id: string;
@@ -64,7 +63,7 @@ export const checkAchievements = async (
   const progresses: AchievementProgressUpdate[] = [];
   const milestones: AchievementMilestoneUnlock[] = [];
 
-  const {userAchievements, currentMilestones} = await getUserAchievements(dbService,userId, Object.keys(userStats));
+  const {userAchievements, currentMilestones} = await getUserAchievements(dbService,userId, Object.keys(userStats) as AchievementInput[]);
   const unlockedIds = new Set(
   currentMilestones.map((milestone) => milestone.achievement_item_id),
 );

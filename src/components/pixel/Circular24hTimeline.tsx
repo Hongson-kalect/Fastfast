@@ -109,7 +109,6 @@ const TimelineSegmentItem = React.memo(
     animated,
   }: SegmentItemProps) => {
     const { theme } = useAppStore();
-    const colors = [theme.primary, theme.warning];
 
     const rawStartAngle = segment.startAngle;
 

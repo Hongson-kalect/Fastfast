@@ -23,7 +23,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
   isDarkMode,
   onSelect,
 }) => {
-  const { theme, userProfile, settings, updateProfile } = useAppStore();
+  const { theme, userProfile, updateProfile } = useAppStore();
   const { hide } = useBottomSheet();
 
   // TODO: thay bằng API/store thật
@@ -94,7 +94,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
       title: "Giả định",
       message: "Xác nhận premium=" + !isPremium,
       onOk: async () => {
-        const res = await dbService.togglePremium(!isPremium);
+        await dbService.togglePremium(!isPremium);
         updateProfile({
           ...userProfile,
           account_type: !isPremium ? "premium" : "free",

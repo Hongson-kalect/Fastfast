@@ -11,7 +11,6 @@ import {
     View,
 } from "react-native";
 import ReactNativeModal from "react-native-modal";
-import { Divider, RadioButton } from "react-native-paper";
 import Animated from "react-native-reanimated";
 
 type ListModalProps = {

@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 
 type StatCardProps = {
-  icon: string;
+  icon: React.ComponentProps<typeof Ionicons>["name"];
   title: string;
   value: string | number;
   unit?: string;
@@ -122,7 +122,7 @@ type Props = {
 export const StatisticsSection = ({ fastStatistics }: Props) => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
   const { userProfile, theme } = useAppStore();
-  const heroStat = {
+  const heroStat: StatCardProps = {
     icon: "flame",
     title: "Current streak",
     value: userProfile?.current_streak || 0,
@@ -130,7 +130,7 @@ export const StatisticsSection = ({ fastStatistics }: Props) => {
     color: theme.warning,
   };
 
-  const gridStats = [
+  const gridStats: StatCardProps[] = [
     {
       icon: "timer-outline",
       title: "Total fasting",

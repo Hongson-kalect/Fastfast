@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import { useColorScheme, VariableContextProvider } from "nativewind";
+import { VariableContextProvider } from "nativewind";
 import React from "react";
 import { View } from "react-native";
 

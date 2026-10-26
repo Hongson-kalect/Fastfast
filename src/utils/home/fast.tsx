@@ -5,7 +5,6 @@ import { FASTING_TARGETS, processData } from "@/constants/data";
 import { createDBService } from "@/database";
 import {
   MIN_FAST_DURATION,
-  TOO_QUICK_DURATION,
 } from "@/database/schema/fast_sessions";
 import { SHIELD_LIMIT } from "@/database/schema/habit_logs";
 import { DBService } from "@/hooks/useDBService";
@@ -35,14 +34,13 @@ export const finishFast = async ({
   const duration = Math.floor(
     Math.abs(endTime - currentFast?.start_time) / 1000,
   );
-  const isTooFast = duration < TOO_QUICK_DURATION;
   const isValid = duration > MIN_FAST_DURATION;
   const { result, achievement } = await dbService?.finishLastSession({
     id: currentFast?.id,
     endTime,
   });
 
-  const { lastSession, habitLog, profile, streak } = result;
+  const { lastSession, habitLog, profile } = result;
 
   // update zustand
   const tempProfile = { ...userProfile!, ...profile! };

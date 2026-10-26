@@ -19,14 +19,11 @@ import { SQLiteDatabase } from "expo-sqlite";
 import {
   addHabitLogs,
   calculatePenaltyEffect,
-  calculateStreakPenalties,
   getLastHabitLog,
-  reduceHabit,
-  reduceShield,
   RETAIN_LIMIT,
   SHIELD_LIMIT,
 } from "./habit_logs";
-import { clearStreak, getUserProfile, shield_rewards } from "./user";
+import { getUserProfile, shield_rewards } from "./user";
 
 // Bảng 3: Phiên nhịn ăn gốc (Fast Sessions)
 export const generateString = /*sql*/ `
@@ -577,94 +574,7 @@ export const calculateFastReward = (
   };
 };
 
-const reconcileStreakAfterInvalidFast = async (
-  db: SQLiteDatabase,
-  profile: UserProfile,
-  habitLog: HabitLog | null,
-  todayStr: string,
-) => {
-  const referenceDate = profile.streak_date || profile.last_login_date;
 
-  if (!referenceDate) {
-    return;
-  }
-
-  const currentShield = habitLog?.shield_snap || 0;
-
-  const {
-    gap,
-    reduceShieldNumber,
-    reduceHabitNumber,
-    overRestDays,
-    isStreakSavedByShield,
-  } = calculateStreakPenalties(referenceDate, todayStr, currentShield);
-
-  if (gap <= 1) {
-    return;
-  }
-
-  if (isStreakSavedByShield) {
-    if (habitLog && reduceShieldNumber > 0) {
-      await reduceShield(db, habitLog, reduceShieldNumber);
-    }
-
-    return;
-  }
-
-  await clearStreak(
-    db,
-    profile,
-    reduceHabitNumber,
-    reduceShieldNumber,
-    habitLog?.habit_snap || 0,
-  );
-
-  if (habitLog) {
-    await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
-  }
-};
-
-const reconcileStreakAfterCompletedFast = async (
-  db: SQLiteDatabase,
-  profile: UserProfile,
-  habitLog: HabitLog | null,
-  endDate: string,
-  todayStr: string,
-) => {
-  const currentShield = habitLog?.shield_snap || 0;
-
-  const {
-    gap,
-    reduceShieldNumber,
-    reduceHabitNumber,
-    overRestDays,
-    isStreakSavedByShield,
-  } = calculateStreakPenalties(endDate, todayStr, currentShield);
-
-  if (gap <= 1) {
-    return;
-  }
-
-  if (isStreakSavedByShield) {
-    if (habitLog && reduceShieldNumber > 0) {
-      await reduceShield(db, habitLog, reduceShieldNumber);
-    }
-
-    return;
-  }
-
-  await clearStreak(
-    db,
-    profile,
-    reduceHabitNumber,
-    reduceShieldNumber,
-    habitLog?.habit_snap || 0,
-  );
-
-  if (habitLog) {
-    await reduceHabit(db, habitLog, reduceHabitNumber, overRestDays);
-  }
-};
 
 export const startNewSession = async (
   db: SQLiteDatabase,

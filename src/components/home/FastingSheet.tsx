@@ -2,7 +2,6 @@ import { FastingTargetItem } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/utils/numberLimit";
 import { getRelativeTime, timeString } from "@/utils/timer";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,7 +28,6 @@ const FastingSheet = ({
   onChangeTarget,
 }: FastingSheetProps) => {
   const { theme, settings } = useAppStore();
-  const { addModal } = useModalStore();
   const { hide } = useBottomSheet();
 
   const [fastCounter, setFastCounter] = useState(counter);
@@ -77,16 +75,6 @@ const FastingSheet = ({
 
   const accentColor = fastTarget?.colors.accent || theme.primary;
 
-  const changeTargetConfirm = () => {
-    addModal({
-      type: "confirm",
-      title: "Change Target",
-      message: "Are you sure to change target?",
-      onOk: async () => {
-        onChangeTarget();
-      },
-    });
-  };
 
   const finishFasting = () => {
     hide();

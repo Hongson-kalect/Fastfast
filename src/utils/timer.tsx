@@ -38,7 +38,6 @@ export const hourFormat = (duration: number, isLong = false) => {
   const timeCheck = Math.floor(duration / 1);
   const hours = Math.floor(timeCheck / 60 / 60);
   const minutes = Math.floor(timeCheck / 60) % 60;
-  const seconds = timeCheck % 60;
   if (!hours) {
     if (isLong) return `${minutes.toString().padStart(2, "0")}Minutes`;
     return `${minutes.toString().padStart(2, "0")}m`;

@@ -1,11 +1,9 @@
 import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import useModalStore from "@/stores/modalStore";
 import { fixed } from "@/utils/numberLimit";
 import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
-import React, { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
@@ -29,8 +27,6 @@ export const HabitDetailModal = ({
   const isPositiveRetain = Number(log.retain_delta) >= 0;
   const isPositiveShield = Number(log.shield_delta) >= 0;
 
-  const isShieldEvent =
-    log.shield_delta !== undefined && log.shield_delta !== 0;
 
   const hasFastDetail = Boolean(
     log.duration || log.target_duration,

@@ -13,19 +13,7 @@ type FastDetailProps = {
 
 const S_PER_HOUR = 60 * 60;
 
-const formatDate = (date: Date) =>
-  date.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 
-const formatTime = (date: Date) =>
-  date.toLocaleTimeString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
 
 const formatDuration = (hours: number) => {
   if (hours <= 0) return "0m";
@@ -50,7 +38,7 @@ function formatDayDuration(hours: number) {
   return `${Number(hours.toFixed(1))}h`;
 }
 function formatTimelineDate(date: string) {
-  const [year, month, day] = date.split("-");
+  const [, month, day] = date.split("-");
   return `${month}/${day}`;
 }
 

@@ -6,8 +6,8 @@ import { useAppStore } from "@/stores/appStore";
 import { DissectedDay } from "@/utils/home/timespliter";
 import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { FlatList, Pressable, View } from "react-native";
 import PixelDetailSheet from "./PixelDetailSheet";
 import { DayItem, WeekItem } from "@/interfaces/pixel";
 
@@ -134,10 +134,7 @@ type Props = {
 };
 
 const PixelGridManager = (props: Props) => {
-  const [inputYear, setInputYear] = useState<string>(
-    new Date().getFullYear().toString(),
-  );
-  const [renderedYear, setRenderedYear] = useState<number>(
+  const [renderedYear] = useState<number>(
     new Date().getFullYear(),
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -436,28 +433,7 @@ const FastPixel = ({
 );
 };
 
-type PixelType =
-  | {
-      type: "note";
-      data: DailyNote;
-    }
-  | {
-      type: "log";
-      data: DailyLog | DissectedDay;
-    }
-  | {
-      type: "shield";
-      data: HabitLog;
-    };
 
-const NoteContent = ({ note }: { note: DailyNote }) => {};
 
-const ShieldContent = ({ shieldLogs }: { shieldLogs: HabitLog }) => {
-  return (
-    <View>
-      <ThemedText>{JSON.stringify(shieldLogs)}</ThemedText>
-    </View>
-  );
-};
 
 export default PixelGridManager;

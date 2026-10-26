@@ -8,8 +8,7 @@ import {
   Foundation,
   Ionicons,
 } from "@expo/vector-icons";
-import { useMemo } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";

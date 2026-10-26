@@ -34,7 +34,6 @@ const WeightLineChart = ({
   const font = useFont(fonts.MulishRegular, 7);
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
-  const font4 = useFont(fonts.MulishBold, 15);
   const { theme, settings } = useAppStore();
   const { width } = useWindowDimensions();
   const { present } = useBottomSheet();
@@ -49,9 +48,6 @@ const WeightLineChart = ({
     present(<ChartRangeSheet />);
   };
 
-  const xPosition = useDerivedValue(() => {
-    return state.x.position.value;
-  });
 
   const isDenseData = data.length > 15;
   const activeBarFont = isDenseData ? font : font3;
@@ -497,7 +493,6 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
 
   const font = useFont(fonts.MulishBold, 9);
   const font2 = useFont(fonts.MulishBold, 12);
-  const font4 = useFont(fonts.MulishBold, 15);
 
   // 3. Tùy chọn Opacity cho Bar nếu bạn muốn animation ẩn/hiện mượt mà
   // 1. Tọa độ X trung tâm của cột active

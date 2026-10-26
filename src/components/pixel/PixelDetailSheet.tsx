@@ -8,7 +8,6 @@ import {
 } from "@/interfaces/db.type";
 import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
-import useModalStore from "@/stores/modalStore";
 import { updatePixelNote } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
 import { DissectedDay } from "@/utils/home/timespliter";
@@ -97,7 +96,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
 
   const [fastObj, setFastObj] = useState<FastMap>({});
   const [isLoadingFasts, setIsLoadingFasts] = useState(false);
-  const [weight, setWeight] = useState(0);
   const viewMode = usePixelStore((state) => state.viewMode);
   const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
   const [moodModalVisible, setMoodModalVisible] = useState(false);
@@ -109,10 +107,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     [log],
   );
 
-  const totalFastHoursInDay = useMemo(
-    () => log.reduce((acc, item) => acc + (item.hours_in_day || 0), 0),
-    [log],
-  );
 
   const getFasts = useCallback(async () => {
     if (fastIds.length === 0) {
@@ -185,13 +179,6 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
     [timelineSegments],
   );
 
-  const { addModal } = useModalStore();
-  const onEditNote = () => {
-    addModal({
-      type: "prompt",
-      onOk(value) {},
-    });
-  };
 
   const updateMood = async (mood: MoodLevel) => {
     await dbService.setDailyNote(mood, undefined, undefined, dateString);

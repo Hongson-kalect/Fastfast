@@ -1,17 +1,10 @@
-import { FASTING_TARGETS } from "@/constants/data";
-import { useDBService } from "@/hooks/useDBService";
-import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import useModalStore from "@/stores/modalStore";
-import { useEffect, useMemo, useState } from "react";
-import { Dimensions, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import CircularProgress from "../CircleProgress";
 import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
-import { HabitDetailModal } from "./HabitDetailModal";
 
-const radius = 50;
 
 const HomeHeader = () => {
   const {  habit } = useAppStore();

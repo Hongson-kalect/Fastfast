@@ -99,7 +99,6 @@ export const AchievementCard = ({
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
 
   const { theme } = useAppStore();
-  const dbService = useDBService();
 
   // --------------------------------------------------
   // Progress animation

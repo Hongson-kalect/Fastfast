@@ -9,7 +9,6 @@ import { ThemedText } from "@/components/themed-text";
 import { SettingsAccountCard } from "@/components/settings/SettingsAccountCard";
 import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
 import { ThemeKey } from "@/constants/themes";
-import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { toggleDarkMode, updateTheme } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
@@ -19,12 +18,11 @@ import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
-  const { theme, settings, updateSetting, setDarkMode, setTheme } =
+  const { settings } =
     useAppStore();
   const { present } = useBottomSheet();
 
   const [isDarkMode, setIsDarkMode] = useState(settings?.is_dark_mode ?? true);
-  const dbService = useDBService();
   const db = useSQLiteContext();
 
   const openThemeModal = () => {

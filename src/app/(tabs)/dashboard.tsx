@@ -12,16 +12,15 @@ import { useDashboardStore } from "@/stores/dashboardStore";
 import { getLocalTodayStr, getStartDateFromRange } from "@/utils/timer";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DashboardScreen = () => {
-  const { width } = useWindowDimensions();
   const { currentFastSession, settings, userProfile } = useAppStore();
 
   const dbService = useDBService();
-  const [enableScroll, setEnableScroll] = useState(true);
+  const [, setEnableScroll] = useState(true);
 
   const chartRange: ChartRangeKey = settings?.chart_range || "7d";
 

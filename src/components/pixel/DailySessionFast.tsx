@@ -1,8 +1,8 @@
 import { DailyLog, FastSession } from "@/interfaces/db.type";
 import useModalStore from "@/stores/modalStore";
 import { DissectedDay } from "@/utils/home/timespliter";
-import { formatHour, getLocalTodayStr } from "@/utils/timer";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { formatHour } from "@/utils/timer";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { DEBUG_COLORS } from "./Circular24hTimeline";
 import { ThemedText } from "../themed-text";
@@ -73,9 +73,6 @@ export function DailyFastSessionCard({
       : null
     : null;
 
-  const startDate = getLocalTodayStr(start);
-  const endDate = end ? getLocalTodayStr(end) : null;
-  const dateLabel = crossesDay ? `${startDate} → ${endDate}` : "Hôm nay";
   const accentColor = isActive
     ? "#34D399"
     : isFailed

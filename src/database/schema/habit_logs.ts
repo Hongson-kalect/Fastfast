@@ -84,7 +84,6 @@ export const getHabitLogs = async (
 export const getLastHabitLog = async (
   db: SQLiteDatabase,
 ): Promise<HabitLog | null> => {
-  const today = getLocalTodayStr();
   const rows = await db.getFirstAsync<HabitLog>(
     `SELECT * FROM habit_logs ORDER BY updated_at DESC LIMIT 1;`,
   );

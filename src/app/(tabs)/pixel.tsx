@@ -10,7 +10,6 @@ import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import useModalStore from "@/stores/modalStore";
 import {
   loadPixelYear,
   updatePixelNote,
@@ -37,12 +36,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 
-// 1. Định nghĩa các chế độ xem (View Options)
-
-interface EmojiGuide {
-  emoji: string;
-  label: string;
-}
 
 const ITEM_HEIGHT = 40;
 const HEADER_HEIGHT = 60;
@@ -50,11 +43,11 @@ const EXPORT_WIDTH = 600;
 
 const PixelScreen = () => {
   const dbService = useDBService();
-  const { present, hide } = useBottomSheet();
+  const { present } = useBottomSheet();
   const { width, height } = useWindowDimensions();
   const { updateSetting, theme, weight, updateWeight, settings } =
     useAppStore();
-  const { isLoading, stats, year, yearPixelData, viewMode } = usePixelStore();
+  const { stats, year, yearPixelData, viewMode } = usePixelStore();
 
   const viewType = settings?.pixel_view_type ?? "week";
   const orientation = settings?.pixel_view_orientation ?? "vertical";
@@ -110,11 +103,7 @@ const PixelScreen = () => {
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dateNote, setDateNote] = useState<DailyNote | null>(null);
-  const [dateWeight, setDateWeight] = useState<number | null>(null);
 
-  const openAddMoodModal = async (date: string) => {
-    setMoodModalVisible(true);
-  };
 
   const handleSelectMood = async (
     mood?: MoodLevel,
@@ -170,8 +159,6 @@ const PixelScreen = () => {
     [yearPixelData, present],
   );
 
-  const { addModal } = useModalStore();
-  const handleAddNewNote = () => {};
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {

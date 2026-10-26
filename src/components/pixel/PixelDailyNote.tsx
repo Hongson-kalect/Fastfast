@@ -28,10 +28,9 @@ export default function PixelDailyNote({
   updateSheetNote,
   date = getLocalTodayStr(),
 }: Props) {
-  const { theme, weight } = useAppStore();
+  const { theme } = useAppStore();
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
-  const [imageModalVisible, setImageModalVisible] = useState(false);
 
   // const getActiveWeight = async () => {
   //   const weight = await getWeight(dbService, date);

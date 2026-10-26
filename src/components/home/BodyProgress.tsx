@@ -1,9 +1,8 @@
-import { FASTING_TARGETS, getProcessLevelTitle, processData } from "@/constants/data";
+import { getProcessLevelTitle, processData } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
 import { getProcessProgress } from "@/utils/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useState } from "react";
-import { LayoutChangeEvent, useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -20,22 +19,8 @@ type Props = {
 };
 
 const HomeBodyProgress = ({ counter }: Props) => {
-  const [labelWidth, setLabelWidth] = useState(0);
-  const { width: screenWidth } = useWindowDimensions();
   const { theme } = useAppStore();
 
-  const detectLabelWidth = (e: LayoutChangeEvent) => {
-    // 🌟 Bốc width ra ngay lập tức
-    const width = e.nativeEvent?.layout?.width || 0;
-
-    // Chỉ cập nhật nếu tìm thấy label có kích thước lớn hơn kích thước cũ
-    setLabelWidth((prev) => {
-      return Math.min(Math.max(prev, width), screenWidth / 2);
-    });
-    // if (width > labelWidth) {
-    //   setLabelWidth(width);
-    // }
-  };
 
   return (
     <View className="gap-3">

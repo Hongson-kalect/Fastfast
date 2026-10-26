@@ -70,7 +70,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
     hide();
   };
 
-  const [isScrolling, setIsScrolling] = useState(false);
+  const [, setIsScrolling] = useState(false);
 
   const CARD_WIDTH = width - 34;
   const GAP = 6;

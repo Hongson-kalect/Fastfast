@@ -176,7 +176,7 @@ export const handleLogin = async ({
 
   const previousLoginDate = profile.last_login_date || profile.streak_date;
 
-  const { isFastFail, referenceDate } = evaluateFastStatus(
+  const { isFastFail } = evaluateFastStatus(
     lastFast,
     previousLoginDate,
     todayStr,

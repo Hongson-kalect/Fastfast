@@ -4,7 +4,6 @@ import { fixed } from "@/utils/numberLimit";
 import { hourFormat } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";

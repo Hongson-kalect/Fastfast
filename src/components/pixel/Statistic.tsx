@@ -11,7 +11,6 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
 
-const moodCount = [102, 25, 5, 2, 0, 10, 10];
 
 type Props = {
   trackingType: "mood" | "fasting";

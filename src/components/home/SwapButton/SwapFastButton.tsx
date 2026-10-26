@@ -1,4 +1,3 @@
-import { useAppStore } from "@/stores/appStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { ActivityIndicator, Pressable, View } from "react-native";
 
@@ -23,7 +22,6 @@ export const SwapFastButton = ({
   onPressOut,
   onLongPress,
 }: SwapFastButtonProps) => {
-  const { theme } = useAppStore();
 
   return (
     <View

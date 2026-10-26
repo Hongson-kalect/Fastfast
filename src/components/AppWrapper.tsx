@@ -21,7 +21,6 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);
 
-  const theme = useAppStore((state) => state.theme);
   const isDarkMode = useAppStore(
     (state) => state.settings?.is_dark_mode ?? true,
   );

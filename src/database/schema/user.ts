@@ -38,8 +38,6 @@ CREATE TABLE IF NOT EXISTS user_profile (
 );
 `;
 
-const today = new Date().toISOString().split("T")[0]; // Format 'YYYY-MM-DD'
-const nowTimestamp = Math.floor(Date.now() / 1000);
 
 // Mặc định bản ghi seed cơ bản
 const seedProfile = {

@@ -1,5 +1,4 @@
 import { timeString } from "@/utils/timer";
-import { useMemo } from "react";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 

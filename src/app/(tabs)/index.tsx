@@ -9,21 +9,14 @@ import {
   TOO_QUICK_DURATION,
 } from "@/database/schema/fast_sessions";
 import { useDBService } from "@/hooks/useDBService";
-import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { finishFast } from "@/utils/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const rating = [
-  {
-    rating: "0",
-    hours: 0,
-  },
-];
 
 const HomeScreen = () => {
   const setCurrentFastSession = useAppStore(
@@ -35,8 +28,7 @@ const HomeScreen = () => {
 
   const currentFastSession = useAppStore((state) => state.currentFastSession);
   const startTime = currentFastSession?.start_time ?? null;
-  const { addModal, modalQueue } = useModalStore();
-  const { hide } = useBottomSheet();
+  const { addModal } = useModalStore();
   const dbService = useDBService();
 
   const isCounting = !!currentFastSession && !currentFastSession.end_time;

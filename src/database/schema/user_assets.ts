@@ -35,7 +35,7 @@ export const createUserAsset = async (
   >,
 ) => {
   const id = uuidv7();
-  const userId = await db.runAsync(
+  await db.runAsync(
     `
       INSERT INTO user_asset (
         id,

@@ -32,7 +32,6 @@ const FastEndTimeModal = ({
   currentFast,
 }: Props) => {
   const { theme } = useAppStore();
-  const [isMaxRange] = useState(Date.now() >= startTime + LIMIT_SLIDER_RANGE);
 
   const { now, sliderMin, effectiveMax, today } = useMemo(() => {
     const now = Date.now();

@@ -1,4 +1,3 @@
-import { useDBService } from "@/hooks/useDBService";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { useDashboardStore } from "@/stores/dashboardStore";
@@ -11,9 +10,8 @@ import { AchievementBottomSheet } from "./AchievementBottomSheet";
 const DashboardHeader = () => {
   const { theme } = useAppStore();
   const userId = useAppStore((state) => state.userProfile)?.id;
-  const { userAchievements, currentMilestones, hasUnclaimedMilestones } =
+  const { currentMilestones, hasUnclaimedMilestones } =
     useDashboardStore();
-  const dbService = useDBService();
 
   const { present } = useBottomSheet();
   const openAchievement = () => {

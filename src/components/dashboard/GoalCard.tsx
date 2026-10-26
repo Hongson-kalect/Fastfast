@@ -23,7 +23,7 @@ import { ThemedText } from "../themed-text";
 
 export const GoalCard = () => {
   const dbService = useDBService();
-  const { weight, settings, theme, updateSetting, updateWeight } =
+  const { weight, theme, updateSetting, updateWeight } =
     useAppStore();
 
   const { weightTarget, setWeightTarget } = useDashboardStore();

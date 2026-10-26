@@ -189,7 +189,7 @@ const EmotionPackCard = ({
                 style={{ backgroundColor }}
                 className="h-10 w-10 items-center justify-center rounded-xl"
               >
-                <ThemedText>{item.icon}</ThemedText>
+                <ThemedText>{isDark ? item.icon.dark : item.icon.light}</ThemedText>
               </View>
 
               {/* <ThemedText

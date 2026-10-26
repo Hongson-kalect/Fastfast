@@ -93,16 +93,13 @@ export const PhotoPickerModal = ({
     ]);
   };
 
-  const [previewVisible, setPreviewVisible] = useState(false);
+  const [, setPreviewVisible] = useState(false);
 
   const openImagePreview = () => {
     if (!photoUri) return;
     setPreviewVisible(true);
   };
 
-  const closeImagePreview = () => {
-    setPreviewVisible(false);
-  };
 
   const { addModal } = useModalStore();
   const handleAddPhoto = () => {
