@@ -136,16 +136,32 @@ export const applyShieldReward = (
   stats.shield.current = Math.min(reward.newShieldScore, SHIELD_LIMIT);
 };
 
+/**
+ * Cộng streak cho phiên hoàn thành: đếm các ngày lịch mà phiên chạm tới
+ * (từ ngày bắt đầu tới ngày kết thúc) nhưng chưa được tính.
+ *
+ * Mốc đã tính (baseline):
+ * - Đang có streak: streak_date (ngày cuối đã tính, kể cả ngày được shield che).
+ * - Chưa có streak / vừa mất streak: ngày trước ngày bắt đầu phiên.
+ *   Trước đây baseline luôn là streak_date nên phiên đầu tiên kết thúc trong ngày
+ *   cài app (streak_date = hôm nay) được +0 streak và +0 active days.
+ */
 export const applyStreakReward = (
   context: StreakContext,
+  startTime: number,
   endTime: number,
 ) => {
   const { profile: oldProfile, stats } = context;
   const endDate = getLocalTodayStr(new Date(endTime));
+  const dayBeforeStart = getYesterdayStr(getLocalTodayStr(new Date(startTime)));
 
-  const streakGain = oldProfile.streak_date
-    ? Math.max(getDaysDiff(oldProfile.streak_date, endDate), 0)
-    : 0;
+  const hasStreak = oldProfile.current_streak > 0 && !!oldProfile.streak_date;
+  const baseline =
+    hasStreak && oldProfile.streak_date! > dayBeforeStart
+      ? oldProfile.streak_date!
+      : dayBeforeStart;
+
+  const streakGain = Math.max(getDaysDiff(baseline, endDate), 0);
 
   oldProfile.active_days = oldProfile.active_days + streakGain;
   // Phiên nhập lùi (kết thúc trước mốc streak hiện tại) không được kéo streak_date lùi lại,

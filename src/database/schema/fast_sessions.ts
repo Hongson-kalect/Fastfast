@@ -431,7 +431,11 @@ const handleCompletedFast = async (
 
   applyShieldReward(streak, reward);
 
-  const { streakGain, currentStreak } = applyStreakReward(streak, endTime);
+  const { streakGain, currentStreak } = applyStreakReward(
+    streak,
+    session.start_time,
+    endTime,
+  );
   achievement.streakGain = streakGain;
   achievement.streakMax = currentStreak;
 
