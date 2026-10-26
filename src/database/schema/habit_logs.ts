@@ -177,7 +177,8 @@ export const addHabitLogs = async (
       logDate,
       data.fast_id || null,
 
-      numberLimit(habitDelta, 0, 100),
+      // Delta âm là bị phạt, không được kẹp về 0
+      numberLimit(habitDelta, -100, 100),
       numberLimit(habitSnap, 0, 100),
 
       retainDelta,
