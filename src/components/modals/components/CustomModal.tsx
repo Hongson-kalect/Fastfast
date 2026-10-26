@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { BasicModalOptions, CustomModalOptions } from "@/provider/Modal";
+import { BasicModalOptions, CustomModalOptions } from "@/providers/Modal";
 import { View } from "react-native";
 
 type Props = CustomModalOptions & BasicModalOptions;

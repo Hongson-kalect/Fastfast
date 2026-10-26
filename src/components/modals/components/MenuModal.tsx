@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { BasicModalOptions, MenuModalOptions } from "@/provider/Modal";
+import { BasicModalOptions, MenuModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { ScrollView, TouchableOpacity, View } from "react-native";

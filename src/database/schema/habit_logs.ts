@@ -1,8 +1,8 @@
 import { FastSession, HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
-import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
-import { uuidv7 } from "@/util/uuidv7";
+import { getDaysDiff, getLocalTodayStr } from "@/utils/timer";
+import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
-import { fixed, numberLimit } from "./../../util/numberLimit";
+import { fixed, numberLimit } from "@/utils/numberLimit";
 import { shield_rewards } from "./user";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Habit Logs) để vẽ Chart và Grid

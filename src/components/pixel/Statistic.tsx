@@ -1,10 +1,10 @@
 import { EMOTION_PACKS } from "@/constants/emotions";
 import { TARGET_PACKS } from "@/constants/fasting_targets";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
-import { getContrastTextColor } from "@/util/color";
-import { fixed } from "@/util/numberLimit";
+import { getContrastTextColor } from "@/utils/color";
+import { fixed } from "@/utils/numberLimit";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, View } from "react-native";

@@ -6,8 +6,8 @@ import { createDBService } from "@/database";
 import {
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
-} from "@/database/shema/fast_sessions";
-import { SHIELD_LIMIT } from "@/database/shema/habit_logs";
+} from "@/database/schema/fast_sessions";
+import { SHIELD_LIMIT } from "@/database/schema/habit_logs";
 import { DBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";

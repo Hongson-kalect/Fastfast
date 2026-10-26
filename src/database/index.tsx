@@ -12,14 +12,14 @@ import {
   getDailyLogs,
   getPixelLogData,
   getTodayLog,
-} from "./shema/daily_logs";
+} from "./schema/daily_logs";
 import {
   generateString as daily_noteGenerateString,
   getDailyNote,
   getDailyNotes,
   getPixelNoteData,
   setDailyNote,
-} from "./shema/daily_note";
+} from "./schema/daily_note";
 import {
   deleteSession,
   generateString as fast_sessionsGenerateString,
@@ -32,38 +32,38 @@ import {
   reconcileStreak,
   startNewSession,
   updateSessionTarget,
-} from "./shema/fast_sessions";
+} from "./schema/fast_sessions";
 import {
   changeTheme,
   getUserSettings,
   setAppSetting,
   generateString as settingGenerateString,
   toggleTheme,
-} from "./shema/setting";
+} from "./schema/setting";
 import {
   checkAndUpdateActiveTarget,
   createWeightTarget,
   getActiveWeightTarget,
   getAllWeightTargets,
   generateString as target_GenerateString,
-} from "./shema/target";
+} from "./schema/target";
 import {
   getActiveTheme,
   getThemes,
   generateString as themeGenerateString,
-} from "./shema/theme";
+} from "./schema/theme";
 import {
   getUserProfile,
   togglePremium,
   generateString as userGenerateString,
   userSeedData,
-} from "./shema/user";
+} from "./schema/user";
 import {
   getCurrentWeight,
   getWeightLogs,
   updateWeight,
   generateString as weight_trackerGenerateString,
-} from "./shema/weight_tracker";
+} from "./schema/weight_tracker";
 
 import {
   AchievementInput,
@@ -77,7 +77,7 @@ import {
   getPixelShielLog,
   getShieldUsedLog,
   generateString as habit_logsGenerateString,
-} from "./shema/habit_logs";
+} from "./schema/habit_logs";
 import {
   confirmAchievementMilestone,
   getUserAchievements,
@@ -86,13 +86,13 @@ import {
   updateUserAchievements,
   generateString as userAchievementsGenerateString,
   itemGenerateString as userArchivementsItemGenerateString,
-} from "./shema/user_achievements";
+} from "./schema/user_achievements";
 import {
   createUserAsset,
   getUserAssets,
   removeUserAsset,
   generateString as userAssetsGenerateString,
-} from "./shema/user_assets";
+} from "./schema/user_assets";
 
 export const DATABASE_NAME = "fast_fast";
 

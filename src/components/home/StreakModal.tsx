@@ -1,7 +1,7 @@
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
+import { fixed } from "@/utils/numberLimit";
 import {
   Feather,
   FontAwesome5,
@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 interface Props {
   data: StreakCheckResult | null;

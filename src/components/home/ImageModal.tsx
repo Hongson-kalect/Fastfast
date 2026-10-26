@@ -1,7 +1,7 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
-import { deleteSavedImage, selectPhoto, takePhoto } from "@/util/image";
+import { getContrastTextColor } from "@/utils/color";
+import { deleteSavedImage, selectPhoto, takePhoto } from "@/utils/image";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {

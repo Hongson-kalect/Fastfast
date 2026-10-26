@@ -6,9 +6,9 @@ import { checkWeightError } from "@/components/home/NoteModal";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
-import { getContrastTextColor } from "@/util/color";
-import { getWeight } from "@/util/home/fast";
-import { getLocalTodayStr } from "@/util/timer";
+import { getContrastTextColor } from "@/utils/color";
+import { getWeight } from "@/utils/home/fast";
+import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
 
 type Props = {

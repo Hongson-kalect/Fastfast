@@ -7,12 +7,12 @@ import { ThemedText } from "@/components/themed-text";
 import {
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
-} from "@/database/shema/fast_sessions";
+} from "@/database/schema/fast_sessions";
 import { useDBService } from "@/hooks/useDBService";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { finishFast } from "@/util/home/fast";
+import { finishFast } from "@/utils/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";

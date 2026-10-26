@@ -1,11 +1,11 @@
 import {
   evaluateFastStatus,
   MAX_FAST_HOURS,
-} from "@/database/shema/fast_sessions";
+} from "@/database/schema/fast_sessions";
 import {
   addHabitLogs,
   calculatePenaltyEffect,
-} from "@/database/shema/habit_logs";
+} from "@/database/schema/habit_logs";
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import {
   applyClearStreak,
@@ -14,8 +14,8 @@ import {
   createStreakContext,
   getYesterdayStr,
   saveStreakContext,
-} from "@/util/streak";
-import { getLocalTodayStr } from "@/util/timer";
+} from "@/utils/streak";
+import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
 type HandleLoginParams = {

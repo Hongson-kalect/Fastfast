@@ -2,19 +2,19 @@ import {
   MAX_FAST_HOURS,
   MIN_FAST_DURATION,
   TOO_QUICK_DURATION,
-} from "@/database/shema/fast_sessions";
+} from "@/database/schema/fast_sessions";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { finishFast } from "@/util/home/fast";
-import { getLocalTodayStr, getRelativeTime } from "@/util/timer";
+import { finishFast } from "@/utils/home/fast";
+import { getLocalTodayStr, getRelativeTime } from "@/utils/timer";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useMemo, useRef, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 type Props = {
   startTime: number;

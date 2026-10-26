@@ -1,6 +1,6 @@
 import { Achievement, AchievementInput, AchievementItem, AchievementMilestoneUnlock, AchievementProgressUpdate } from "@/constants/achievements";
 import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
-import { uuidv7 } from "@/util/uuidv7";
+import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const generateString = /*sql*/ `

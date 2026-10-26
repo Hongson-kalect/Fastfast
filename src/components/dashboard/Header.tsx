@@ -1,5 +1,5 @@
 import { useDBService } from "@/hooks/useDBService";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import { Ionicons } from "@expo/vector-icons";

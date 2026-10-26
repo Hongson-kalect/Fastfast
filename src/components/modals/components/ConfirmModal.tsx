@@ -1,8 +1,8 @@
 import { ThemedText } from "@/components/themed-text";
-import { BasicModalOptions, ConfirmModalOptions } from "@/provider/Modal";
+import { BasicModalOptions, ConfirmModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 import { TouchableOpacity, View } from "react-native";
 
 type Props = ConfirmModalOptions & BasicModalOptions;

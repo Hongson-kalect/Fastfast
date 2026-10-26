@@ -1,5 +1,5 @@
-import { calculateFastReward } from "@/database/shema/fast_sessions";
-import { RETAIN_LIMIT, SHIELD_LIMIT } from "@/database/shema/habit_logs";
+import { calculateFastReward } from "@/database/schema/fast_sessions";
+import { RETAIN_LIMIT, SHIELD_LIMIT } from "@/database/schema/habit_logs";
 import { HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import { SQLiteDatabase } from "expo-sqlite";

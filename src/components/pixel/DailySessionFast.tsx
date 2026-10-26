@@ -1,9 +1,9 @@
 import { DailyLog, FastSession } from "@/interfaces/db.type";
 import useModalStore from "@/stores/modalStore";
-import { DissectedDay } from "@/util/home/timespliter";
-import { formatHour, getLocalTodayStr } from "@/util/timer";
+import { DissectedDay } from "@/utils/home/timespliter";
+import { formatHour, getLocalTodayStr } from "@/utils/timer";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { FastDetail } from "../fast_detail";
+import { FastDetail } from "../FastDetail";
 import { DEBUG_COLORS } from "./Circular24hTimeline";
 import { ThemedText } from "../themed-text";
 import { useAppStore } from "@/stores/appStore";

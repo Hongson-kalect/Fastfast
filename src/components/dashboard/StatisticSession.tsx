@@ -1,4 +1,4 @@
-import { FastStatsSummary } from "@/database/shema/fast_sessions";
+import { FastStatsSummary } from "@/database/schema/fast_sessions";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";

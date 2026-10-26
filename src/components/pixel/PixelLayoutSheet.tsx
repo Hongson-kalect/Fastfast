@@ -1,5 +1,5 @@
 import { useDBService } from "@/hooks/useDBService";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";

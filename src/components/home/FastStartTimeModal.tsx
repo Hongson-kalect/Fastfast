@@ -1,11 +1,11 @@
 import { useAppStore } from "@/stores/appStore";
-import { getLocalTodayStr } from "@/util/timer";
+import { getLocalTodayStr } from "@/utils/timer";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 type Props = {
   minTime?: number | null;

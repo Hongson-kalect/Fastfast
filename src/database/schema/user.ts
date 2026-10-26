@@ -1,6 +1,6 @@
 import { UserProfile } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/util/timer";
-import { uuidv7 } from "@/util/uuidv7";
+import { getLocalTodayStr } from "@/utils/timer";
+import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const shield_rewards = [35, 70, 100];

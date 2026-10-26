@@ -2,8 +2,8 @@ import { EMOTION_PACKS } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import { getWeight } from "@/util/home/fast";
-import { getLocalTodayStr } from "@/util/timer";
+import { getWeight } from "@/utils/home/fast";
+import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {

@@ -1,6 +1,6 @@
 import { CHART_RANGES, ChartRangeKey } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";

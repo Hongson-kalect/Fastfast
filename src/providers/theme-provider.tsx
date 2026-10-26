@@ -1,4 +1,3 @@
-// src/components/ThemeProvider.tsx
 import { useAppStore } from "@/stores/appStore";
 import { useColorScheme, VariableContextProvider } from "nativewind";
 import React from "react";

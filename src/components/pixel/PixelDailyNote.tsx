@@ -1,9 +1,9 @@
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
-import { deleteSavedImage, selectPhoto, takePhoto } from "@/util/image";
-import { getLocalTodayStr } from "@/util/timer";
+import { getContrastTextColor } from "@/utils/color";
+import { deleteSavedImage, selectPhoto, takePhoto } from "@/utils/image";
+import { getLocalTodayStr } from "@/utils/timer";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, Pressable, View } from "react-native";

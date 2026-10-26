@@ -1,8 +1,8 @@
 import { ThemedText } from "@/components/themed-text";
-import { BasicModalOptions, TabsModalOptions } from "@/provider/Modal";
+import { BasicModalOptions, TabsModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 import { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 

@@ -1,5 +1,5 @@
 import { fonts } from "@/configs/fonts";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
 import {

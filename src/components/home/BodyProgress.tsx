@@ -1,6 +1,6 @@
 import { FASTING_TARGETS, getProcessLevelTitle, processData } from "@/constants/data";
 import { useAppStore } from "@/stores/appStore";
-import { getProcessProgress } from "@/util/home/fast";
+import { getProcessProgress } from "@/utils/home/fast";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useState } from "react";
 import { LayoutChangeEvent, useWindowDimensions, View } from "react-native";

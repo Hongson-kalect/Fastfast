@@ -5,12 +5,12 @@ import { ThemedText } from "@/components/themed-text";
 import { getThemeAccess, ThemeItem, themes } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { UserAsset } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 type ThemeBottomSheetProps = {
   currentThemeId: keyof typeof themes;

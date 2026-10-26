@@ -1,5 +1,5 @@
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/util/timer";
+import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const generateString = /*sql*/ `

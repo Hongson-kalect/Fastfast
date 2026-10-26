@@ -1,8 +1,8 @@
 import { ThemedText } from "@/components/themed-text";
-import { AlertModalOptions, BasicModalOptions } from "@/provider/Modal";
+import { AlertModalOptions, BasicModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 import { Pressable, View } from "react-native";
 
 type Props = AlertModalOptions & BasicModalOptions;

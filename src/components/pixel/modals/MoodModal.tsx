@@ -3,7 +3,7 @@ import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
-import { getLocalTodayStr } from "@/util/timer";
+import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
 
 type Props = {

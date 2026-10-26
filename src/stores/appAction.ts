@@ -1,5 +1,3 @@
-// src/store/appActions.ts
-
 import * as Localization from "expo-localization";
 import { SQLiteDatabase } from "expo-sqlite";
 
@@ -17,7 +15,7 @@ import {
   UserProfile,
 } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
-import { handleLogin } from "@/util/login";
+import { handleLogin } from "@/utils/login";
 import { useAppStore } from "./appStore";
 
 const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];

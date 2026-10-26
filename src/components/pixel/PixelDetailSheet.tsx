@@ -11,7 +11,7 @@ import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { updatePixelNote } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
-import { DissectedDay } from "@/util/home/timespliter";
+import { DissectedDay } from "@/utils/home/timespliter";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";

@@ -8,7 +8,7 @@ import YearExportView from "@/components/pixel/YearExportView";
 import { ThemedText } from "@/components/themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import {
@@ -17,9 +17,9 @@ import {
   updatePixelViewMode,
 } from "@/stores/pixelAction";
 import { usePixelStore } from "@/stores/pixelStore";
-import { getContrastTextColor } from "@/util/color";
-import { saveToGallery } from "@/util/image";
-import { getLocalTodayStr } from "@/util/timer";
+import { getContrastTextColor } from "@/utils/color";
+import { saveToGallery } from "@/utils/image";
+import { getLocalTodayStr } from "@/utils/timer";
 import { Feather } from "@expo/vector-icons";
 import { getWeek } from "date-fns";
 import { useFocusEffect } from "expo-router";

@@ -1,13 +1,13 @@
 import { ChartRangeConfig } from "@/constants/data";
-import { FastStatsSummary } from "@/database/shema/fast_sessions";
+import { FastStatsSummary } from "@/database/schema/fast_sessions";
 import {
   FastSession,
   UserAchievement,
   UserAchievementMilestone,
   WeightTarget,
 } from "@/interfaces/db.type";
-import { getBucketKey, initChartData } from "@/util/dashboard/utils";
-import { splitSessionIntoDays } from "@/util/home/timespliter";
+import { getBucketKey, initChartData } from "@/utils/dashboard/utils";
+import { splitSessionIntoDays } from "@/utils/home/timespliter";
 
 export type ChartType = {
   key: string;

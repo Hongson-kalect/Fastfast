@@ -3,8 +3,8 @@ import { TextInput, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAppStore } from "@/stores/appStore";
-import { getContrastTextColor } from "@/util/color";
-import { getLocalTodayStr } from "@/util/timer";
+import { getContrastTextColor } from "@/utils/color";
+import { getLocalTodayStr } from "@/utils/timer";
 import { Ionicons } from "@expo/vector-icons";
 import { NoteModalShell } from "./NoteModalShell";
 

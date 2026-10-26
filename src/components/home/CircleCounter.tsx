@@ -1,7 +1,7 @@
 import { FASTING_TARGETS } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import {
@@ -31,7 +31,7 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { FastDetail } from "../fast_detail";
+import { FastDetail } from "../FastDetail";
 import { CircleCounterContent } from "./CircleCounterContent";
 import FastHistorySheet from "./FastHistorySheet";
 import { FastingCircle } from "./FastingCircle";

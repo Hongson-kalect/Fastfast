@@ -1,6 +1,6 @@
 import { WeekItem } from "@/interfaces/pixel";
 import { usePixelStore } from "@/stores/pixelStore";
-import { getLocalTodayStr } from "@/util/timer";
+import { getLocalTodayStr } from "@/utils/timer";
 import { View } from "react-native";
 import WeekRow from "./WeekPixel";
 

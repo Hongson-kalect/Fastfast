@@ -2,7 +2,7 @@ import { FASTING_TARGETS, FastingTargetItem } from "@/constants/data";
 import { settingKey } from "@/constants/key";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -13,7 +13,7 @@ import { useMemo, useRef, useState } from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;

@@ -1,6 +1,6 @@
 import { DBService } from "@/hooks/useDBService";
 import { ViewMode } from "@/interfaces/pixel";
-import { buildPixelYearData } from "@/util/dashboard/utils";
+import { buildPixelYearData } from "@/utils/dashboard/utils";
 import { useAppStore } from "./appStore";
 import { usePixelStore } from "./pixelStore";
 

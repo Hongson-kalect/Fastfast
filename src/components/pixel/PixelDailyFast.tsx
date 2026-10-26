@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import Circular24hTimeline, { CircularTimelineSegment } from "./Circular24hTimeline";
 import { DailyLog, DailyNote, FastSession } from "@/interfaces/db.type";
-import { DissectedDay } from "@/util/home/timespliter";
+import { DissectedDay } from "@/utils/home/timespliter";
 import { TimelineSegment } from "./PixelDetailSheet";
 import { ThemedText } from "../themed-text";
 import { DailyFastSessionCard } from "./DailySessionFast";

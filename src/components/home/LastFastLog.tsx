@@ -2,13 +2,13 @@ import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getRelativeTime } from "@/util/timer";
+import { getRelativeTime } from "@/utils/timer";
 import { format } from "date-fns";
 import { Pressable, View } from "react-native";
-import { FastDetail } from "../fast_detail";
+import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
-import { getTargetInfo } from "@/util/home/fast";
-import { MIN_FAST_DURATION } from "@/database/shema/fast_sessions";
+import { getTargetInfo } from "@/utils/home/fast";
+import { MIN_FAST_DURATION } from "@/database/schema/fast_sessions";
 
 interface Props {
   session: FastSession;

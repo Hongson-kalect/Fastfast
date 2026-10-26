@@ -1,5 +1,3 @@
-// src/store/appStore.ts
-
 import { defaultDark, extractTheme, ThemeType } from "@/constants/themes";
 import {
   AppSettings,

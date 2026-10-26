@@ -10,10 +10,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AppWrapper } from "@/components/AppWrapper";
 import { DATABASE_NAME, initDatabase } from "@/database";
-import { BottomSheetProvider } from "@/provider/BottomSheet";
-import { LanguageProvider } from "@/provider/Language";
-import { GlobalModal } from "@/provider/Modal";
-import { ThemeProvider } from "@/provider/theme-provider";
+import { BottomSheetProvider } from "@/providers/BottomSheet";
+import { LanguageProvider } from "@/providers/Language";
+import { GlobalModal } from "@/providers/Modal";
+import { ThemeProvider } from "@/providers/theme-provider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { SQLiteProvider } from "expo-sqlite";
 import { Suspense } from "react";

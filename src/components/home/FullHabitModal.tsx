@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import LiquidCircle from "./Waterball";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 const FullHabitModal = ({ habitName }: { habitName: string }) => {
   const { theme } = useAppStore();

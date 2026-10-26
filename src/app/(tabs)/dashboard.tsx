@@ -9,7 +9,7 @@ import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import { ChartType, refreshDashboard } from "@/stores/dashboardAction";
 import { useDashboardStore } from "@/stores/dashboardStore";
-import { getLocalTodayStr, getStartDateFromRange } from "@/util/timer";
+import { getLocalTodayStr, getStartDateFromRange } from "@/utils/timer";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";

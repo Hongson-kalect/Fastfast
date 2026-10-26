@@ -1,10 +1,10 @@
 import { ThemedText } from "@/components/themed-text";
 import { EMOTIONS, FASTING_TARGETS } from "@/constants/data";
 import { DailyLog, DailyNote, HabitLog } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { DissectedDay } from "@/util/home/timespliter";
-import { getLocalTodayStr } from "@/util/timer";
+import { DissectedDay } from "@/utils/home/timespliter";
+import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";

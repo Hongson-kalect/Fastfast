@@ -3,7 +3,7 @@ import { useAppStore } from "@/stores/appStore";
 import { loadActiveTarget } from "@/stores/dashboardAction";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
+import { fixed } from "@/utils/numberLimit";
 import {
   Feather,
   MaterialCommunityIcons,

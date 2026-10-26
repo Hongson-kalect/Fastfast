@@ -1,7 +1,5 @@
-// @/interfaces/db.type.ts
-
 import { ChartRangeKey } from "@/constants/data";
-import { ColorPalette } from "@/database/shema/theme";
+import { ColorPalette } from "@/database/schema/theme";
 
 export type SyncStatus = "synced" | "pending" | "failed";
 export type AccountType = "free" | "premium";

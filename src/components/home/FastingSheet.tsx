@@ -1,16 +1,16 @@
 import { FastingTargetItem } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
-import { getRelativeTime, timeString } from "@/util/timer";
+import { fixed } from "@/utils/numberLimit";
+import { getRelativeTime, timeString } from "@/utils/timer";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 interface FastingSheetProps {
   counter: number;

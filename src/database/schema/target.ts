@@ -1,6 +1,6 @@
 import { WeightTarget } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/util/timer";
-import { uuidv7 } from "@/util/uuidv7";
+import { getLocalTodayStr } from "@/utils/timer";
+import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const generateString = /*sql*/ `

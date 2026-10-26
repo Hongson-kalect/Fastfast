@@ -1,8 +1,8 @@
 import { ThemedText } from "@/components/themed-text";
-import { BasicModalOptions, PromptModalOptions } from "@/provider/Modal";
+import { BasicModalOptions, PromptModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, TextInput, TouchableOpacity, View } from "react-native";
 

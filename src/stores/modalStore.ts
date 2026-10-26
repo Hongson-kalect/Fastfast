@@ -1,4 +1,4 @@
-import { GlobalModalOptions, ListModalOptions } from "@/provider/Modal";
+import { GlobalModalOptions, ListModalOptions } from "@/providers/Modal";
 import { create } from "zustand";
 
 const MODAL_TRANSITION_DELAY = 500;

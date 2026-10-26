@@ -1,5 +1,5 @@
 import { DailyLog } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/util/timer";
+import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Daily Logs) để vẽ Chart và Grid

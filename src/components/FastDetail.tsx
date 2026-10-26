@@ -1,8 +1,8 @@
 import { getTarget } from "@/constants/data";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
-import { splitSessionIntoDays } from "@/util/home/timespliter";
-import { getLocalTodayStr } from "@/util/timer";
+import { splitSessionIntoDays } from "@/utils/home/timespliter";
+import { getLocalTodayStr } from "@/utils/timer";
 import { useMemo } from "react";
 import { View } from "react-native";
 import { ThemedText } from "./themed-text";

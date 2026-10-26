@@ -5,7 +5,7 @@ import { ScrollView, TouchableOpacity, View } from "react-native";
 // Import các định nghĩa pack đã tạo ở bước trước
 import { useDBService } from "@/hooks/useDBService";
 import { ViewMode } from "@/interfaces/pixel";
-import { useBottomSheet } from "@/provider/BottomSheet";
+import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import {

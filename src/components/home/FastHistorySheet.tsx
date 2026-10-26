@@ -3,12 +3,12 @@ import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { hourFormat } from "@/util/timer";
+import { hourFormat } from "@/utils/timer";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { FastDetail } from "../fast_detail";
+import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
 
 type HeaderProps = {

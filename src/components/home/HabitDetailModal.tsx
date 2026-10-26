@@ -2,12 +2,12 @@ import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
-import { getLocalTodayStr } from "@/util/timer";
+import { fixed } from "@/utils/numberLimit";
+import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { Pressable, View } from "react-native";
-import { FastDetail } from "../fast_detail";
+import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
 
 interface HabitDetailModalProps {

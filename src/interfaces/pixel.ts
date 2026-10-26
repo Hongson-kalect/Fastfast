@@ -1,4 +1,4 @@
-import { DissectedDay } from "@/util/home/timespliter";
+import { DissectedDay } from "@/utils/home/timespliter";
 import { DailyLog, DailyNote, HabitLog } from "./db.type";
 
 export type DailyPixelData = {

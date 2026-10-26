@@ -1,12 +1,12 @@
-import { RETAIN_LIMIT } from "@/database/shema/habit_logs";
+import { RETAIN_LIMIT } from "@/database/schema/habit_logs";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { getTargetInfo } from "@/util/home/fast";
-import { getMotivationalText } from "@/util/home/timespliter";
-import { fixed } from "@/util/numberLimit";
-import { getLocalTodayStr } from "@/util/timer";
+import { getTargetInfo } from "@/utils/home/fast";
+import { getMotivationalText } from "@/utils/home/timespliter";
+import { fixed } from "@/utils/numberLimit";
+import { getLocalTodayStr } from "@/utils/timer";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useEffect, useState } from "react";

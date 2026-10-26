@@ -1,7 +1,7 @@
 import { AchievementInput, UserStats } from "@/constants/achievements";
 import { FastSession, HabitLog, UserProfile } from "@/interfaces/db.type";
 import { StreakCheckResult } from "@/interfaces/home.type";
-import { fixed, numberLimit } from "@/util/numberLimit";
+import { fixed, numberLimit } from "@/utils/numberLimit";
 import {
   applyClearStreak,
   applyHabitReward,
@@ -12,9 +12,9 @@ import {
   getYesterdayStr,
   saveStreakContext,
   StreakContext,
-} from "@/util/streak";
-import { getDaysDiff, getLocalTodayStr } from "@/util/timer";
-import { uuidv7 } from "@/util/uuidv7";
+} from "@/utils/streak";
+import { getDaysDiff, getLocalTodayStr } from "@/utils/timer";
+import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
   addHabitLogs,

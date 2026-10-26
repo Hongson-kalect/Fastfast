@@ -1,7 +1,7 @@
 import { FASTING_TARGETS } from "@/constants/data";
 import { ThemeType } from "@/constants/themes";
 import { AppSettings, FastSession } from "@/interfaces/db.type";
-import { getRelativeDate, getRelativeTime } from "@/util/timer";
+import { getRelativeDate, getRelativeTime } from "@/utils/timer";
 import {
   Pressable,
   TouchableOpacity,

@@ -1,14 +1,14 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import { fixed } from "@/util/numberLimit";
-import { hourFormat } from "@/util/timer";
+import { fixed } from "@/utils/numberLimit";
+import { hourFormat } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
-import { getContrastTextColor } from "@/util/color";
+import { getContrastTextColor } from "@/utils/color";
 
 export type FastResultStatus = "COMPLETED" | "ENDED_EARLY" | "OVERACHIEVED";
 
