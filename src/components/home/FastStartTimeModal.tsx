@@ -11,6 +11,9 @@ type Props = {
   minTime?: number | null;
   onSubmit: (startTime: number) => void;
 };
+// Bản phát hành chỉ cho bắt đầu sớm tối đa 24 giờ; bản dev không giới hạn để test lịch sử dài
+const MAX_DELAY_MS = __DEV__ ? Infinity : 24 * 60 * 60 * 1000;
+
 const START_PRESETS = [
   { label: "2h", minutes: 120 },
   { label: "6h", minutes: 360 },
@@ -46,6 +49,11 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const validateTime = (time: number) => {
     if (minTime && time < minTime) {
       showError("Trùng thời gian với phiên trước đó!");
+      return false;
+    }
+
+    if (time < now.getTime() - MAX_DELAY_MS) {
+      showError("Chỉ được phép bắt đầu sớm tối đa 24 giờ!");
       return false;
     }
 
