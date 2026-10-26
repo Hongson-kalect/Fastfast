@@ -5,6 +5,7 @@ import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/utils/color";
 import { fixed } from "@/utils/numberLimit";
+import { RADIUS } from "@/constants/design";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, View } from "react-native";
@@ -94,71 +95,63 @@ const PixelStatistic = React.memo(
           <Pressable
             hitSlop={10}
             onPress={openIconPackSelector}
-            style={{ borderWidth: 0.5, borderColor: theme.warning }}
-            className="items-center flex-row px-3 py-1.5 rounded-lg gap-2"
+            style={{
+              borderRadius: RADIUS.pill,
+              backgroundColor: theme.warning + "1F",
+            }}
+            className="items-center flex-row px-3.5 py-2 gap-2"
           >
-            <ThemedText size="xs" color="warning">
-              Style
-            </ThemedText>
             <Ionicons
               name="color-palette-outline"
               size={14}
               color={theme.warning}
             />
+            <ThemedText size="xs" weight="bold" color="warning">
+              Style
+            </ThemedText>
           </Pressable>
 
-          <View className="flex-row items-center gap-1">
-            <Pressable
-              hitSlop={10}
-              style={{
-                borderWidth: 0.5,
-                borderColor:
-                  trackingType === "mood" ? theme.primary : theme.text + "80",
-              }}
-              onPress={() => setTrackingType("mood")}
-              className={`items-center px-3 py-2 ${
-                trackingType === "mood" ? "bg-primary" : "bg-background/60"
-              } rounded-lg`}
-            >
-              <ThemedText
-                size="xs"
-                weight="medium"
-                colorHex={
-                  trackingType === "mood"
-                    ? getContrastTextColor(theme.primary)
-                    : theme.text + "aa"
-                }
-              >
-                Emotion
-              </ThemedText>
-            </Pressable>
-
-            <Pressable
-              hitSlop={10}
-              style={{
-                borderWidth: 0.5,
-                borderColor:
-                  trackingType === "fasting"
-                    ? theme.primary
-                    : theme.text + "80",
-              }}
-              onPress={() => setTrackingType("fasting")}
-              className={`items-center px-3 py-2 ${
-                trackingType === "fasting" ? "bg-primary" : "bg-background/60"
-              } rounded-lg`}
-            >
-              <ThemedText
-                size="xs"
-                weight="medium"
-                colorHex={
-                  trackingType === "fasting"
-                    ? getContrastTextColor(theme.primary)
-                    : theme.text + "aa"
-                }
-              >
-                Fast process
-              </ThemedText>
-            </Pressable>
+          {/* Segmented control dạng viên thuốc */}
+          <View
+            className="flex-row items-center bg-card p-1"
+            style={{
+              borderRadius: RADIUS.pill,
+              borderWidth: 1,
+              borderColor: theme.text + "0F",
+            }}
+          >
+            {(
+              [
+                { value: "mood", label: "Emotion" },
+                { value: "fasting", label: "Fast process" },
+              ] as const
+            ).map((option) => {
+              const active = trackingType === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  hitSlop={6}
+                  onPress={() => setTrackingType(option.value)}
+                  className="items-center px-3.5 py-1.5"
+                  style={{
+                    borderRadius: RADIUS.pill,
+                    backgroundColor: active ? theme.primary : "transparent",
+                  }}
+                >
+                  <ThemedText
+                    size="xs"
+                    weight={active ? "bold" : "medium"}
+                    colorHex={
+                      active
+                        ? getContrastTextColor(theme.primary)
+                        : theme.text + "aa"
+                    }
+                  >
+                    {option.label}
+                  </ThemedText>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
@@ -174,7 +167,7 @@ const PixelStatistic = React.memo(
                       ? item.color.dark
                       : item.color.light,
                   }}
-                  className="flex-1 px-2 py-1 rounded"
+                  className="flex-1 rounded-xl px-2 py-1.5"
                 >
                   <View className="items-center justify-between">
                     <ThemedText>
@@ -199,7 +192,7 @@ const PixelStatistic = React.memo(
                       ? item.color.dark
                       : item.color.light,
                   }}
-                  className="flex-1 px-2 py-1 rounded"
+                  className="flex-1 rounded-xl px-2 py-1.5"
                 >
                   <View className="items-center justify-between">
                     <ThemedText>{item.icon}</ThemedText>
