@@ -336,7 +336,7 @@ const PixelScreen = () => {
                     (day) => (
                       <View
                         key={day}
-                        className="flex-1 items-center justify-center pt-4 bg-blue-400"
+                        className="flex-1 items-center justify-center pt-4"
                       >
                         <ThemedText size="xxs" color="text" opacity="medium">
                           {day}
@@ -364,13 +364,13 @@ const PixelScreen = () => {
                   </ThemedText>
                 </TouchableOpacity>
 
-                <View className="gap-0.5">
+                <View className="gap-1">
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
                     (day) => (
                       <View
                         key={day}
                         style={{ height: pixelSize }}
-                        className="items-center justify-center w-15 bg-blue-400"
+                        className="items-center justify-center w-15"
                       >
                         <ThemedText size="xxs" color="text" opacity="medium">
                           {day}

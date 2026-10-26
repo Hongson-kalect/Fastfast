@@ -71,7 +71,7 @@ const WeekPixel = React.memo(
         {/* Week number / month label */}
         <View
           style={{ width: size }}
-          className="h-12 bg-red-400 items-center justify-center"
+          className="h-12 items-center justify-center"
         >
           {week.isMonthHeader && (
             <View className="absolute top-0 left-0">
