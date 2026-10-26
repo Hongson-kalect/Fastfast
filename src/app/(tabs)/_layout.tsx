@@ -69,11 +69,15 @@ const MainTab = () => {
           paddingTop: 6,
           paddingBottom: 6,
           borderRadius: RADIUS.lg,
-          borderTopWidth: 0,
+          // Nổi rõ cả khi nằm trên card/background2: viền sáng hơn + bóng đậm
+          borderTopWidth: 1,
           borderWidth: 1,
-          borderColor: theme.text + "12",
+          borderColor: theme.text + "26",
+          borderTopColor: theme.text + "33",
           backgroundColor: theme.card,
-          ...glow("#000", 0.35),
+          ...glow("#000", 0.6),
+          shadowRadius: 20,
+          elevation: 16,
         },
         tabBarItemStyle: {
           paddingVertical: 2,

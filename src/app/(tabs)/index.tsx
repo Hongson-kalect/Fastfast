@@ -123,7 +123,8 @@ const HomeScreen = () => {
 
     const endTime = currentFastSession?.end_time ?? Date.now();
 
-    setCounter(Math.floor((endTime - startTime) / 1000));
+    // Giờ bắt đầu ở tương lai (chỉnh giờ máy, đổi múi giờ) không được thành đếm ngược
+    setCounter(Math.max(0, Math.floor((endTime - startTime) / 1000)));
   };
 
   const isFastingActive = isCounting && !currentFastSession?.end_time;
