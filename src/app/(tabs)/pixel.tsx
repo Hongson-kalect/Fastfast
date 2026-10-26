@@ -45,9 +45,8 @@ const EXPORT_WIDTH = 600;
 // Khoảng cách giữa các ô, phải khớp gap-1 trong WeekPixel/MonthPixel
 const CELL_GAP = 4;
 const H_PADDING = 20;
-// Cột nhãn bên trái (nút Week, w-15) và hàng nhãn phía trên ở layout ngang (h-12)
+// Cột nhãn bên trái (nút Week, w-15)
 const LABEL_WIDTH = 60;
-const LABEL_HEIGHT = 48;
 // Số hàng hiển thị trước hàng hiện tại khi cuộn tới
 const ROWS_BEFORE_CURRENT = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -75,14 +74,10 @@ const PixelScreen = () => {
   const todayStr = getLocalTodayStr();
   const isMonth = viewType === "month";
 
-  // Ô vuông: số ô cố định (7 ngày hoặc 12 tháng) chia đều theo chiều không cuộn.
-  // Dọc: chiều rộng màn hình − padding − cột nhãn. Ngang: chiều cao vùng lưới − hàng nhãn.
+  // Ô vuông lấy layout dọc làm chuẩn: 7 ngày hoặc 12 tháng chia đều chiều rộng
+  // (màn hình − padding − cột nhãn). Layout ngang dùng cùng kích thước cho nhất quán.
   const cellCount = isMonth ? 12 : 7;
-  const [gridHeight, setGridHeight] = useState(0);
-  const widthSize = fitCells(width - H_PADDING * 2 - LABEL_WIDTH, cellCount);
-  const heightSize = fitCells(gridHeight - LABEL_HEIGHT - CELL_GAP * 2, cellCount);
-  const pixelSize =
-    isHorizontal && gridHeight > 0 ? Math.min(widthSize * 2, heightSize) : widthSize;
+  const pixelSize = fitCells(width - H_PADDING * 2 - LABEL_WIDTH, cellCount);
   // Chiều dài một hàng/cột theo trục cuộn
   const itemLength = pixelSize + CELL_GAP;
 
@@ -396,11 +391,7 @@ const PixelScreen = () => {
 
       {isHorizontal ? (
         // Lịch ngang: cột thứ cố định bên trái, các tuần cuộn ngang bên phải
-        <View
-          className="flex-1 flex-row"
-          style={{ paddingLeft: H_PADDING }}
-          onLayout={(e) => setGridHeight(e.nativeEvent.layout.height)}
-        >
+        <View className="flex-1 flex-row" style={{ paddingLeft: H_PADDING }}>
           <View className="bg-background">
             {weekButton}
             <View className="gap-1">
