@@ -12,6 +12,7 @@ import {
 } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { claimAchievementMilestone } from "@/stores/dashboardAction";
+import { feedback } from "@/utils/feedback";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import Animated, {
   Easing,
@@ -141,6 +142,7 @@ export const AchievementCard = ({
 
   const handleClaim = () => {
     if (!unclaimedItem) return;
+    feedback("reward");
 
     // 1. Chạy Animation mờ/thu nhỏ dần (Out)
     cardProgress.value = withTiming(

@@ -19,6 +19,19 @@ export interface AppSettings {
   target_pack?: string;
   language?: string;
   onboarding_done?: boolean;
+
+  // Sound & haptics (mặc định bật)
+  vibration_enabled?: boolean;
+  sound_enabled?: boolean;
+  touch_sound_enabled?: boolean;
+
+  week_starts_on?: "monday" | "sunday";
+
+  // Notifications
+  notify_target_reached?: boolean;
+  daily_reminder?: { hour: number; minute: number } | null;
+  target_notification_id?: string | null;
+  daily_reminder_id?: string | null;
 }
 
 // 2. Interface cho bảng user_profile

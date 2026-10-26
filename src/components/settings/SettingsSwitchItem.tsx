@@ -1,4 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
+import { feedback } from "@/utils/feedback";
 import { Switch } from "react-native";
 import { SettingsItem } from "./SettingsItem";
 
@@ -19,17 +20,22 @@ export function SettingsSwitchItem({
 }: Props) {
   const { theme } = useAppStore();
 
+  const handleChange = (next: boolean) => {
+    onChange(next);
+    feedback("toggle");
+  };
+
   return (
     <SettingsItem
       icon={icon}
       title={title}
       description={description}
       showChevron={false}
-      onPress={() => onChange(!value)}
+      onPress={() => handleChange(!value)}
     >
       <Switch
         value={value}
-        onValueChange={onChange}
+        onValueChange={handleChange}
         trackColor={{
           false: theme.text + "25",
           true: theme.primary + "80",

@@ -5,6 +5,7 @@ import { initializeAppState } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
 import { initializeDashboard } from "@/stores/dashboardAction";
 import useModalStore from "@/stores/modalStore";
+import { feedback } from "@/utils/feedback";
 import { initializePixel } from "@/stores/pixelAction";
 import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
@@ -65,6 +66,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       if (!usedShield && !lostStreak) return;
 
       setTimeout(() => {
+        feedback(lostStreak ? "streakLost" : "fastFailed");
         addModal({
           type: "custom",
           render: (

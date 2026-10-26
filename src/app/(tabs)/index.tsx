@@ -11,7 +11,9 @@ import {
 import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { feedback } from "@/utils/feedback";
 import { finishFast } from "@/utils/home/fast";
+import { scheduleTargetReached } from "@/utils/notifications";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -98,6 +100,8 @@ const HomeScreen = () => {
 
     const newSession = await dbService?.startNewSession(now, settings?.target);
     setCurrentFastSession(newSession);
+    feedback("fastStart");
+    if (newSession) scheduleTargetReached(dbService, newSession);
   };
 
   const toggleCounting = useCallback(

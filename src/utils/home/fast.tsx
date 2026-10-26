@@ -11,6 +11,8 @@ import { DBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { feedback } from "../feedback";
+import { cancelTargetReached } from "../notifications";
 import { getLocalTodayStr } from "../timer";
 import { checkStreak } from "./checkStreak";
 import { splitSessionIntoDays } from "./timespliter";
@@ -52,6 +54,9 @@ export const finishFast = async ({
   }
 
   setCurrentFastSession(lastSession || null);
+  cancelTargetReached(dbService);
+  feedback(lastSession?.status === "completed" ? "fastComplete" : "fastFailed");
+
   if (achievement) {
     const { milestones, progresses } = await checkAchievements(
       dbService,

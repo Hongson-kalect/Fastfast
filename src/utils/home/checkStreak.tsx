@@ -1,6 +1,7 @@
 import { StreakCheckModal } from "@/components/home/StreakModal";
 import { StreakCheckResult } from "@/interfaces/home.type";
 import useModalStore from "@/stores/modalStore";
+import { feedback } from "../feedback";
 
 export const checkStreak = (result: StreakCheckResult) => {
   const { addModal } = useModalStore.getState();
@@ -16,6 +17,7 @@ export const checkStreak = (result: StreakCheckResult) => {
   if (!usedShield && !lostStreak) return;
 
   setTimeout(() => {
+    feedback(lostStreak ? "streakLost" : "fastFailed");
     addModal({
       type: "custom",
       render: (

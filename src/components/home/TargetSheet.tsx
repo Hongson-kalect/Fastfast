@@ -14,6 +14,10 @@ import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import {
+  cancelTargetReached,
+  scheduleTargetReached,
+} from "@/utils/notifications";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
@@ -55,16 +59,19 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
         selected.hours,
       );
       setCurrentFastSession(res);
+      if (res) scheduleTargetReached(dbService, res);
     }
     hide();
   };
 
-  const handleClearTarget = () => {
+  const handleClearTarget = async () => {
     updateSetting({ [settingKey.target]: null });
     dbService.setting(settingKey.target, null);
 
     if (currentFast) {
-      dbService.updateSessionTarget(currentFast.id, null);
+      const res = await dbService.updateSessionTarget(currentFast.id, null);
+      setCurrentFastSession(res);
+      cancelTargetReached(dbService);
     }
 
     hide();
