@@ -109,26 +109,15 @@ export const StreakCheckModal = ({ data }: Props) => {
             weight="bold"
             color="primary"
           >
-            {data.shield.current}
+            {data.shield.current}/3
           </ThemedText>
 
           {data.shield.previous !== data.shield.current ? (
-            <ThemedText
-              size="xxs"
-              weight="medium"
-              color="error"
-            >
-              -{data.shield.previous - data.shield.current}
+            <ThemedText size="xxs" weight="bold" color="error">
+              {data.shield.current > data.shield.previous ? "+" : "−"}
+              {Math.abs(data.shield.previous - data.shield.current)}
             </ThemedText>
           ) : null}
-
-          <ThemedText
-            size="xxs"
-            weight="bold"
-            color="primary"
-          >
-            /3
-          </ThemedText>
         </View>
       </View>
 
@@ -373,7 +362,7 @@ export const StreakCheckModal = ({ data }: Props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onClose}
-        className="mt-6 items-center justify-center rounded-2xl py-3.5"
+        className="mt-6 items-center justify-center rounded-full py-4"
         style={{
           backgroundColor: color,
           boxShadow: `0px 3px 6px ${color}40`,

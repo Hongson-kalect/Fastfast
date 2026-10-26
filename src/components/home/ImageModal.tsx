@@ -274,7 +274,7 @@ export const PhotoPickerModal = ({
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={handleTakePhoto}
-                className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-text-base/10 bg-background"
+                className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-full border border-text-base/10 bg-background"
               >
                 <MaterialIcons
                   name="photo-camera"
@@ -290,7 +290,7 @@ export const PhotoPickerModal = ({
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={handleSelectPhoto}
-                className="h-16 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
+                className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-full bg-primary"
               >
                 <MaterialIcons
                   name="photo-library"

@@ -139,7 +139,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
               key={preset.label}
               activeOpacity={0.7}
               onPress={() => handleQuickPreset(preset.minutes)}
-              className="flex-1 items-center justify-center rounded-xl border border-text-base/10 bg-background2 py-2.5"
+              className="flex-1 items-center justify-center rounded-full border border-text-base/10 bg-background2 py-2.5"
             >
               <ThemedText size="xs" weight="bold" color="primary">
                 -{preset.label}
@@ -198,7 +198,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           activeOpacity={0.7}
           hitSlop={10}
           onPress={() => setPickerMode("date")}
-          className="mt-3 rounded-lg px-3 py-1"
+          className="mt-3 rounded-full bg-text-base/5 px-3 py-1"
         >
           <ThemedText
             size="xs"
@@ -228,7 +228,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={handleSubmit}
-        className="mt-5 items-center justify-center rounded-2xl bg-primary py-3.5"
+        className="mt-5 items-center justify-center rounded-full bg-primary py-4"
         style={{
           boxShadow: `0px 4px 8px ${theme.primary}40`,
         }}

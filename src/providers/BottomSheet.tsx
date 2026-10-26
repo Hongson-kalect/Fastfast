@@ -1,3 +1,4 @@
+import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import {
   BottomSheetBackdrop,
@@ -193,12 +194,17 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
           backgroundStyle={[
             styles.background,
             {
+              // Nội dung các sheet dùng bg-background nên giữ nền này; chỉ bo lớn + viền nhẹ
               backgroundColor: theme.background,
-              borderTopColor: theme.text + "33",
+              borderTopColor: theme.text + "1F",
+              borderTopLeftRadius: RADIUS.xl,
+              borderTopRightRadius: RADIUS.xl,
             },
           ]}
           handleIndicatorStyle={{
-            backgroundColor: theme.text,
+            backgroundColor: theme.text + "40",
+            width: 44,
+            height: 5,
           }}
         >
           {renderContent()}

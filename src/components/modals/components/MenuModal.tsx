@@ -53,7 +53,7 @@ const MenuModal = (modal: Props) => {
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={closeCurrentModal}
-          className="mt-3 h-11 items-center justify-center rounded-2xl"
+          className="mt-3 h-12 items-center justify-center rounded-full"
         >
           <ThemedText
             size="sm"

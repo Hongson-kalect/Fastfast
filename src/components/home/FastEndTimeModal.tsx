@@ -271,7 +271,7 @@ const FastEndTimeModal = ({
         style={{
           boxShadow: `0px 4px 8px ${theme.error}`,
         }}
-        className="mt-5 items-center justify-center rounded-2xl bg-error py-3.5"
+        className="mt-5 items-center justify-center rounded-full bg-error py-4"
       >
         <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.error)}>
           Xác nhận kết thúc Fast

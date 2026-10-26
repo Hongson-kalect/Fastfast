@@ -50,7 +50,7 @@ const AlertModal = (modal: Props) => {
       {/* Action */}
       <Pressable
         onPress={handleOk}
-        className="mt-6 h-12 items-center justify-center rounded-2xl"
+        className="mt-6 h-12 items-center justify-center rounded-full"
         style={{
           backgroundColor: theme.primary,
         }}

@@ -129,7 +129,7 @@ const PromptModal = (modal: Props) => {
               modal.onCancel?.();
               closeCurrentModal();
             }}
-            className="h-12 flex-1 items-center justify-center rounded-2xl bg-text-base/10"
+            className="h-12 flex-1 items-center justify-center rounded-full bg-text-base/10"
           >
             <ThemedText
               size="sm"
@@ -145,7 +145,7 @@ const PromptModal = (modal: Props) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={submit}
-          className="h-12 flex-1 items-center justify-center rounded-2xl"
+          className="h-12 flex-1 items-center justify-center rounded-full"
           style={{
             backgroundColor: theme.primary,
           }}

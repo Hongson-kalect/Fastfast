@@ -1,3 +1,4 @@
+import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
@@ -233,9 +234,13 @@ export default function ModalWrapper({
                 style={contentStyle}
               >
                 <View
-                  className="overflow-hidden rounded-3xl"
+                  className="overflow-hidden"
                   style={{
-                    backgroundColor: theme.background,
+                    // Nền card + viền mảnh để modal nổi khỏi nền tối, bo góc theo design tokens
+                    backgroundColor: theme.card,
+                    borderRadius: RADIUS.xl,
+                    borderWidth: 1,
+                    borderColor: theme.text + "14",
                   }}
                 >
                   {/* Header */}

@@ -360,7 +360,7 @@ export const ResultModal = ({ data = testData }: Props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => closeCurrentModal()}
-        className="mt-5 items-center justify-center rounded-2xl bg-primary py-3.5"
+        className="mt-5 items-center justify-center rounded-full bg-primary py-4"
       >
         <ThemedText
           size="sm"

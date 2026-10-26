@@ -104,7 +104,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
       <Pressable
         onPress={closeCurrentModal}
         hitSlop={10}
-        className="mt-6 h-12 items-center justify-center rounded-xl bg-primary"
+        className="mt-6 h-14 items-center justify-center rounded-full bg-primary"
       >
         <ThemedText size="md" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
           Đã hiểu

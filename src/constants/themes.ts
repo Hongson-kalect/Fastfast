@@ -28,24 +28,25 @@ export type ThemeItem = {
   dark: ThemeType;
 } & (PremiumThemeType | NormalThemeType | LimitedThemeType);
 
+// Nền xanh than nhẹ thay vì xám trung tính để có chiều sâu; card sáng hơn nền một bậc
 export const defaultDark = {
   primary: "#3B82F6",
-  secondary: "#64B5F6",
-  tertiary: "#BBDEFB",
+  secondary: "#60A5FA",
+  tertiary: "#93C5FD",
 
-  success: "#81C784",
-  error: "#E60000",
-  warning: "#FFB74D",
-  info: "#64B5F6",
+  success: "#4ADE80",
+  error: "#F87171",
+  warning: "#FBBF24",
+  info: "#60A5FA",
 
-  title: "#E3F2FD",
-  text: "#FFFFFF",
+  title: "#EEF2FF",
+  text: "#E2E8F0",
 
   buttonText: "#FFFFFF",
 
-  background: "#111111",
-  background2: "#282828",
-  card: "#1E1E1E",
+  background: "#0E1117",
+  background2: "#1A1F2B",
+  card: "#161B24",
 };
 
 export const themes: { [key: string]: ThemeItem } = {
@@ -258,6 +259,190 @@ export const themes: { [key: string]: ThemeItem } = {
       background: "#180F12",
       background2: "#211519",
       card: "#2A1B20",
+    },
+  },
+
+  // ─────────────────────────────────────────────
+  // EMBER — cam lửa, hợp chủ đề "đốt mỡ"
+  // ─────────────────────────────────────────────
+  ember: {
+    type: "normal",
+    light: {
+      primary: "#F2652A",
+      secondary: "#FB923C",
+      tertiary: "#F43F5E",
+
+      success: "#16A34A",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#0EA5E9",
+
+      title: "#2A1608",
+      text: "#4A3428",
+
+      buttonText: "#FFFFFF",
+
+      background: "#FFF8F3",
+      background2: "#FCEDE3",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#FF7A45",
+      secondary: "#FFB547",
+      tertiary: "#FF4D6D",
+
+      success: "#34D399",
+      error: "#F87171",
+      warning: "#FBBF24",
+      info: "#60A5FA",
+
+      title: "#FFF1E8",
+      text: "#F3E6DD",
+
+      buttonText: "#1A0B04",
+
+      background: "#140E0B",
+      background2: "#22170F",
+      card: "#1C1410",
+    },
+  },
+
+  // ─────────────────────────────────────────────
+  // OCEAN — xanh ngọc, mát và tỉnh táo
+  // ─────────────────────────────────────────────
+  ocean: {
+    type: "normal",
+    light: {
+      primary: "#0891B2",
+      secondary: "#06B6D4",
+      tertiary: "#14B8A6",
+
+      success: "#16A34A",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#0284C7",
+
+      title: "#082F3A",
+      text: "#2F4A52",
+
+      buttonText: "#FFFFFF",
+
+      background: "#F3FBFC",
+      background2: "#E5F5F8",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#22D3EE",
+      secondary: "#2DD4BF",
+      tertiary: "#67E8F9",
+
+      success: "#34D399",
+      error: "#F87171",
+      warning: "#FBBF24",
+      info: "#38BDF8",
+
+      title: "#E0FAFF",
+      text: "#D5EEF2",
+
+      buttonText: "#04161B",
+
+      background: "#071317",
+      background2: "#0E2128",
+      card: "#0B1B21",
+    },
+  },
+
+  // ─────────────────────────────────────────────
+  // SAKURA — hồng anh đào (premium)
+  // ─────────────────────────────────────────────
+  sakura: {
+    type: "premium",
+    light: {
+      primary: "#EC4899",
+      secondary: "#F472B6",
+      tertiary: "#A855F7",
+
+      success: "#16A34A",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#8B5CF6",
+
+      title: "#3B0A25",
+      text: "#57304A",
+
+      buttonText: "#FFFFFF",
+
+      background: "#FFF7FB",
+      background2: "#FCE7F3",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#F472B6",
+      secondary: "#F9A8D4",
+      tertiary: "#C084FC",
+
+      success: "#86EFAC",
+      error: "#FB7185",
+      warning: "#FBBF24",
+      info: "#C084FC",
+
+      title: "#FFE4F1",
+      text: "#F5DCEA",
+
+      buttonText: "#2A0A1B",
+
+      background: "#170D13",
+      background2: "#24141E",
+      card: "#1E1119",
+    },
+  },
+
+  // ─────────────────────────────────────────────
+  // MIDNIGHT — chàm đêm (premium)
+  // ─────────────────────────────────────────────
+  midnight: {
+    type: "premium",
+    light: {
+      primary: "#4F46E5",
+      secondary: "#6366F1",
+      tertiary: "#0EA5E9",
+
+      success: "#16A34A",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#0EA5E9",
+
+      title: "#1E1B4B",
+      text: "#3A3B5C",
+
+      buttonText: "#FFFFFF",
+
+      background: "#F6F7FF",
+      background2: "#ECEEFE",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#818CF8",
+      secondary: "#A5B4FC",
+      tertiary: "#38BDF8",
+
+      success: "#4ADE80",
+      error: "#F87171",
+      warning: "#FBBF24",
+      info: "#38BDF8",
+
+      title: "#EEF0FF",
+      text: "#DADCF5",
+
+      buttonText: "#0B0D1E",
+
+      background: "#0B0D1E",
+      background2: "#151935",
+      card: "#11142A",
     },
   },
 } satisfies Record<string, ThemeItem>;
