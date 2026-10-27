@@ -11,10 +11,12 @@ import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+import { BeginnerTip } from "../BeginnerTip";
 import { ThemedText } from "../themed-text";
 import { HabitDetailModal } from "./HabitDetailModal";
 import HabitMilestone from "./HabitMilestone";
 import Waterball from "./Waterball";
+import { useShallow } from "zustand/react/shallow";
 
 interface HabitBottomSheetProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -69,7 +71,13 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
 const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
   habitCount,
 }) => {
-  const { theme, userProfile, habit } = useAppStore();
+  const { theme, userProfile, habit } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      userProfile: state.userProfile,
+      habit: state.habit,
+    })),
+  );
 
   const habitPercent = habit?.habit_snap || 0;
   const shieldCount = habit?.shield_snap || 0;
@@ -133,7 +141,20 @@ const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
         textColor={theme.text}
       />
 
-      {/* 4. HISTORY */}
+      {/* 4. TIP CÁCH TÍNH */}
+      <View className="mb-4">
+        <BeginnerTip
+          title="Habit được tính thế nào?"
+          lines={[
+            "Mỗi phiên nhịn từ 16h trở lên: +3%, cộng thêm 0,2% cho mỗi giờ quá 16h (nhịn 20h → +3,8%).",
+            "Phiên dưới 16h không được cộng.",
+            "Mỗi ngày bỏ trống giữa hai phiên dùng 1 shield. Hết shield thì Habit bị trừ, nghỉ càng lâu trừ càng nhiều.",
+            "Đạt 100%: điểm chuyển sang Retain, đủ 25 Retain đổi 1 shield.",
+          ]}
+        />
+      </View>
+
+      {/* 5. HISTORY */}
       <View className="flex-1">
         <View className="mb-3 flex-row items-center justify-between">
           <ThemedText size="sm" weight="semibold" opacity="medium">
@@ -153,8 +174,8 @@ type HabitLogComProps = {
   log: HabitLog & FastSession;
 };
 export const HabitLogComponent = ({ log }: HabitLogComProps) => {
-  const { theme } = useAppStore();
-  const { addModal } = useModalStore();
+  const theme = useAppStore((state) => state.theme);
+  const addModal = useModalStore((state) => state.addModal);
 
   if (!log) return null;
 

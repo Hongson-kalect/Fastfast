@@ -10,8 +10,8 @@ type Props = TabsModalOptions & BasicModalOptions;
 const TabsModal = (modal: Props) => {
   const [width, setWidth] = useState(0);
   const [tabIndex, setTabIndex] = useState(0);
-  const { closeCurrentModal } = useModalStore();
-  const { theme } = useAppStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
+  const theme = useAppStore((state) => state.theme);
 
   const showCancel = modal.isShowCancelButton !== false;
 

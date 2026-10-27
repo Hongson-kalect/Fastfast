@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { RADIUS } from "@/constants/design";
 import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
+import { useShallow } from "zustand/react/shallow";
 
 type SwapMoodButtonProps = {
   mood?: MoodLevel;
@@ -26,7 +27,9 @@ export const SwapMoodButton = ({
   onPressIn,
   onPressOut,
 }: SwapMoodButtonProps) => {
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   const isDark = settings?.is_dark_mode ?? true;
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
   const color = mood

@@ -108,7 +108,7 @@ const TimelineSegmentItem = React.memo(
     animationDuration,
     animated,
   }: SegmentItemProps) => {
-    const { theme } = useAppStore();
+    const theme = useAppStore((state) => state.theme);
 
     const rawStartAngle = segment.startAngle;
 
@@ -205,7 +205,7 @@ export default function Circular24hTimeline({
   animationDuration = 1000,
   isLoading = false,
 }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const center = size / 2;
   const anchorRadius = size * 0.4;

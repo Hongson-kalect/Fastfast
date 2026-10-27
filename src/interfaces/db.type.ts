@@ -27,6 +27,13 @@ export interface AppSettings {
 
   week_starts_on?: "monday" | "sunday";
 
+  // Mẹo giải thích cho người mới (mặc định bật)
+  beginner_tips?: boolean;
+
+  // Huy hiệu chọn để khoe (id mốc thành tựu) và có in vào ảnh Journey không
+  showcase_achievements?: string[];
+  showcase_in_export?: boolean;
+
   // Notifications
   notify_target_reached?: boolean;
   daily_reminder?: { hour: number; minute: number } | null;

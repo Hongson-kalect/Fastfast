@@ -26,7 +26,7 @@ export const DailyNoteModal = ({
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const [tempText, setTempText] = useState(note ?? "");
 
   useEffect(() => {

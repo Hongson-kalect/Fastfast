@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 type HeaderProps = {
   data: FastSession[];
@@ -82,7 +83,7 @@ function FastHistorySheet() {
 /* Header                                                                     */
 /* -------------------------------------------------------------------------- */
 export const FastHistoryHeader = ({ data }: HeaderProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const stats = useMemo(() => {
     const sessions = data.filter((item) => !item.is_deleted);
@@ -209,8 +210,13 @@ const StatCard = ({ value, label, color }: StatCardProps) => {
 /* Item                                                                       */
 /* -------------------------------------------------------------------------- */
 export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
-  const { theme } = useAppStore();
-  const { addModal, closeCurrentModal } = useModalStore();
+  const theme = useAppStore((state) => state.theme);
+  const { addModal, closeCurrentModal } = useModalStore(
+    useShallow((state) => ({
+      addModal: state.addModal,
+      closeCurrentModal: state.closeCurrentModal,
+    })),
+  );
 
   const durationSeconds = Number(item.duration ?? 0);
   const durationHours = durationSeconds / S_PER_HOUR;

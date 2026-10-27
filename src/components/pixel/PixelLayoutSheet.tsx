@@ -4,6 +4,7 @@ import { useAppStore } from "@/stores/appStore";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 type PixelViewType = "week" | "month";
 type PixelOrientation = "vertical" | "horizontal";
@@ -53,7 +54,7 @@ const PixelLayoutPreview = ({
   orientation,
   selected,
 }: PixelLayout & { selected: boolean }) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const isHorizontal = orientation === "horizontal";
   const isWeek = type === "week";
@@ -134,7 +135,13 @@ const PixelLayoutPreview = ({
 const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
   const { hide } = useBottomSheet();
   const dbService = useDBService();
-  const { theme, settings, updateSetting } = useAppStore();
+  const { theme, settings, updateSetting } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      settings: state.settings,
+      updateSetting: state.updateSetting,
+    })),
+  );
 
   const [selected, setSelected] = useState<PixelLayout>({
     type: settings?.pixel_view_type ?? "week",

@@ -31,7 +31,7 @@ const FastEndTimeModal = ({
   targetFinishTime,
   currentFast,
 }: Props) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const { now, sliderMin, effectiveMax, today } = useMemo(() => {
     const now = Date.now();
@@ -132,7 +132,7 @@ const FastEndTimeModal = ({
   const finishStatus = getFinishStatus();
 
   const dbService = useDBService();
-  const { closeCurrentModal } = useModalStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
   const handleSubmit = async () => {
     const finalTime = selectedTimeRef.current;
 

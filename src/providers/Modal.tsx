@@ -4,6 +4,10 @@ import CustomModal from "@/components/modals/components/CustomModal";
 import InputModal from "@/components/modals/components/InputModal";
 import MenuModal from "@/components/modals/components/MenuModal";
 import PromptModal from "@/components/modals/components/PromptModal";
+import {
+  CheckboxModal,
+  RadioModal,
+} from "@/components/modals/components/SelectModal";
 import TabsModal from "@/components/modals/components/TabModal";
 import ModalWrapper from "@/components/modals/ModalWrapper";
 import "@/global.css";
@@ -11,6 +15,7 @@ import useModalStore from "@/stores/modalStore";
 import React, { memo, ReactNode, useEffect, useState } from "react";
 import { View } from "react-native";
 import { Toast } from "toastify-react-native";
+import { useShallow } from "zustand/react/shallow";
 
 export type AlertModalOptions = {
   type: "alert";
@@ -95,6 +100,37 @@ export type TabsModalOptions = {
   onCancel?: () => void;
 };
 
+export type SelectValue = string | number;
+
+export type SelectOption = {
+  label: string;
+  value: SelectValue;
+  description?: string;
+  icon?: React.ReactNode;
+};
+
+/** Chọn một: bấm vào lựa chọn là gọi onSelect và đóng modal. */
+export type RadioModalOptions = {
+  type: "radio";
+  options: SelectOption[];
+  value?: SelectValue;
+  onSelect: (value: SelectValue) => void;
+};
+
+/** Chọn nhiều: đánh dấu rồi bấm OK để gọi onConfirm. */
+export type CheckboxModalOptions = {
+  type: "checkbox";
+  options: SelectOption[];
+  values?: SelectValue[];
+  // Số lựa chọn tối thiểu để bật nút OK / tối đa được đánh dấu
+  min?: number;
+  max?: number;
+  okText?: string;
+  cancelText?: string;
+  onConfirm: (values: SelectValue[]) => void;
+  onCancel?: () => void;
+};
+
 export type CustomModalOptions = {
   type: "custom";
 };
@@ -122,20 +158,17 @@ export type GlobalModalOptions = BasicModalOptions &
     | MenuModalOptions
     | CustomModalOptions
     | TabsModalOptions
+    | RadioModalOptions
+    | CheckboxModalOptions
   );
 
-export type ListModalOptions = {
-  title: string;
-  value: number | string;
-  type?: "checkbox" | "radio";
-  options: { label: string; value: number | string }[];
-  onDismiss?: () => void;
-  onSubmit: (val: number | string) => void;
-  inAnimation?: "fadeIn" | "slideInDown" | "slideInUp" | "zoomIn";
-  outAnimation?: "fadeOut" | "slideOutDown" | "slideOutUp" | "zoomOut";
-};
 const GlobalModalComponent = () => {
-  const { currentModal, closeCurrentModal } = useModalStore();
+  const { currentModal, closeCurrentModal } = useModalStore(
+    useShallow((state) => ({
+      currentModal: state.currentModal,
+      closeCurrentModal: state.closeCurrentModal,
+    })),
+  );
   const [placeholder, setPlaceholder] = useState<GlobalModalOptions | null>(
     currentModal,
   );
@@ -204,6 +237,12 @@ const RenderContent = ({ modal }: { modal: GlobalModalOptions }) => {
 
     case "custom":
       return <CustomModal {...modal} />;
+
+    case "radio":
+      return <RadioModal {...modal} />;
+
+    case "checkbox":
+      return <CheckboxModal {...modal} />;
 
     default:
       return null;

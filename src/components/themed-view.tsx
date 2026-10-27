@@ -16,7 +16,7 @@ export function ThemedView({
   type,
   ...otherProps
 }: ThemedViewProps) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   return (
     <View

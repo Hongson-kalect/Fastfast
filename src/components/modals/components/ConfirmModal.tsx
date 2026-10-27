@@ -8,8 +8,8 @@ import { TouchableOpacity, View } from "react-native";
 type Props = ConfirmModalOptions & BasicModalOptions;
 
 const ConfirmModal = (modal: Props) => {
-  const { closeCurrentModal } = useModalStore();
-  const { theme } = useAppStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
+  const theme = useAppStore((state) => state.theme);
 
   const cancelText = modal.cancelText || "Cancel";
   const okText = modal.okText || "OK";

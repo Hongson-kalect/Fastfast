@@ -1,8 +1,5 @@
-import { EMOTION_PACKS } from "@/constants/emotions";
-import { TARGET_PACKS } from "@/constants/fasting_targets";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
-import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/utils/color";
 import { fixed } from "@/utils/numberLimit";
 import { RADIUS } from "@/constants/design";
@@ -11,6 +8,7 @@ import React from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
+import PixelLegend from "./PixelLegend";
 
 type Props = {
   trackingType: "mood" | "fasting";
@@ -25,23 +23,13 @@ type Props = {
 };
 const PixelStatistic = React.memo(
   ({ setTrackingType, trackingType, stats, onSaveImage }: Props) => {
-    const { theme, settings } = useAppStore();
-    const { counter } = usePixelStore();
-
-    const emotionPack = EMOTION_PACKS[settings?.emotion_pack ?? "default"];
-
-    const targetPack = TARGET_PACKS[settings?.target_pack ?? "default"];
-
-    const emotions = emotionPack.emotions;
-    const targets = targetPack.targets;
+    const theme = useAppStore((state) => state.theme);
 
     const { present } = useBottomSheet();
 
     const openIconPackSelector = () => {
       present(<PackPickerBottomSheet />);
     };
-
-    const isDark = settings?.is_dark_mode ?? true;
 
     return (
       <View className="gap-4">
@@ -86,8 +74,19 @@ const PixelStatistic = React.memo(
             </View>
           </View>
 
-          <Pressable hitSlop={10} onPress={onSaveImage} className="flex-row items-center justify-center p-2 rounded-xl border border-primary/60 shadow-primary">
-            <Ionicons name="save" size={15} color={theme.text} />
+          <Pressable
+            hitSlop={10}
+            onPress={onSaveImage}
+            style={{
+              borderRadius: RADIUS.pill,
+              backgroundColor: theme.primary + "1F",
+            }}
+            className="items-center flex-row px-3.5 py-2 gap-1.5"
+          >
+            <Ionicons name="image-outline" size={14} color={theme.primary} />
+            <ThemedText size="xs" weight="bold" color="primary">
+              Lưu ảnh
+            </ThemedText>
           </Pressable>
         </View>
 
@@ -155,56 +154,9 @@ const PixelStatistic = React.memo(
           </View>
         </View>
 
-        {trackingType === "mood" && (
-          <View className="flex-row gap-4 mt-2">
-            {emotions.map((item, index) => {
-              const moodIndex = index as 0 | 1 | 2 | 3 | 4;
-              return (
-                <View
-                  key={item.label}
-                  style={{
-                    backgroundColor: isDark
-                      ? item.color.dark
-                      : item.color.light,
-                  }}
-                  className="flex-1 rounded-xl px-2 py-1.5"
-                >
-                  <View className="items-center justify-between">
-                    <ThemedText>
-                      {item.icon[isDark ? "dark" : "light"]}
-                    </ThemedText>
-                    <ThemedText size="xs">{counter.mood[moodIndex]}</ThemedText>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        )}
-        {trackingType === "fasting" && (
-          <View className="flex-row gap-2 mt-2">
-            {targets.map((item, index) => {
-              const targetIndex = index as 0 | 1 | 2 | 3 | 4 | 5 | 6;
-              return (
-                <View
-                  key={item.label}
-                  style={{
-                    backgroundColor: isDark
-                      ? item.color.dark
-                      : item.color.light,
-                  }}
-                  className="flex-1 rounded-xl px-2 py-1.5"
-                >
-                  <View className="items-center justify-between">
-                    <ThemedText>{item.icon}</ThemedText>
-                    <ThemedText size="xs">
-                      {counter.fast[targetIndex]}
-                    </ThemedText>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        )}
+        <View className="mt-2">
+          <PixelLegend viewMode={trackingType} />
+        </View>
       </View>
     );
   },

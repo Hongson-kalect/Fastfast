@@ -11,6 +11,7 @@ import useModalStore from "@/stores/modalStore";
 import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
 import { getContrastTextColor } from "@/utils/color";
+import { useShallow } from "zustand/react/shallow";
 
 type ThemeBottomSheetProps = {
   currentThemeId: keyof typeof themes;
@@ -23,7 +24,13 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
   isDarkMode,
   onSelect,
 }) => {
-  const { theme, userProfile, updateProfile } = useAppStore();
+  const { theme, userProfile, updateProfile } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      userProfile: state.userProfile,
+      updateProfile: state.updateProfile,
+    })),
+  );
   const { hide } = useBottomSheet();
 
   // TODO: thay bằng API/store thật
@@ -63,7 +70,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
   };
 
   const dbService = useDBService();
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const onPurchased = async (themeId: string) => {
     // Check time server
     // CH trả về true, giả định mua thành công bằng modal

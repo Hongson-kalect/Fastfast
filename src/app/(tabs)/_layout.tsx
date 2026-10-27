@@ -21,7 +21,7 @@ const TAB_ICONS = {
 } as const;
 
 const MainTab = () => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const inset = useSafeAreaInsets();
 
   return (

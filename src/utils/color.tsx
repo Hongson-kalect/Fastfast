@@ -57,16 +57,45 @@ const compositeColor = (foreground: RGB, background: RGB): RGB => {
   };
 };
 
-const getLuminance = ({ r, g, b }: RGB): number => {
-  const linearize = (value: number) => {
-    const channel = value / 255;
-    return channel <= 0.04045
-      ? channel / 12.92
-      : ((channel + 0.055) / 1.055) ** 2.4;
-  };
-
-  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+// APCA (SAPC 0.0.98G-4g): đo tương phản theo cảm nhận, hợp hơn công thức
+// WCAG 2 với các màu bão hoà tầm trung (cam, xanh dương, hồng...) vốn bị
+// WCAG 2 chọn chữ đen dù chữ trắng dễ đọc hơn.
+const APCA = {
+  blackThreshold: 0.022,
+  blackClamp: 1.414,
+  scale: 1.14,
+  offset: 0.027,
+  loClip: 0.1,
 };
+
+// Độ sáng theo APCA: gamma 2.4 đơn giản, kẹp vùng gần đen
+const getApcaLuminance = ({ r, g, b }: RGB): number => {
+  const channel = (value: number) => (value / 255) ** 2.4;
+  const y =
+    0.2126729 * channel(r) + 0.7151522 * channel(g) + 0.072175 * channel(b);
+
+  return y > APCA.blackThreshold
+    ? y
+    : y + (APCA.blackThreshold - y) ** APCA.blackClamp;
+};
+
+/** Độ tương phản Lc (giá trị tuyệt đối, 0–~108) của chữ trên nền. */
+const getApcaContrast = (text: RGB, background: RGB): number => {
+  const yText = getApcaLuminance(text);
+  const yBackground = getApcaLuminance(background);
+
+  // Chữ tối trên nền sáng và ngược lại dùng số mũ khác nhau
+  const sapc =
+    yBackground > yText
+      ? (yBackground ** 0.56 - yText ** 0.57) * APCA.scale
+      : (yBackground ** 0.65 - yText ** 0.62) * APCA.scale;
+
+  const magnitude = Math.abs(sapc);
+  return magnitude < APCA.loClip ? 0 : (magnitude - APCA.offset) * 100;
+};
+
+const BLACK: RGB = { r: 0, g: 0, b: 0, a: 1 };
+const WHITE: RGB = { r: 255, g: 255, b: 255, a: 1 };
 
 export const getContrastTextColor = (
   backgroundColor: string,
@@ -80,10 +109,7 @@ export const getContrastTextColor = (
   const background =
     foreground.a < 1 ? compositeColor(foreground, underlay) : foreground;
 
-  const luminance = getLuminance(background);
-
-  const blackContrast = (luminance + 0.05) / 0.05;
-  const whiteContrast = 1.05 / (luminance + 0.05);
-
-  return blackContrast >= whiteContrast ? "#000000" : "#FFFFFF";
+  return getApcaContrast(WHITE, background) > getApcaContrast(BLACK, background)
+    ? "#FFFFFF"
+    : "#000000";
 };

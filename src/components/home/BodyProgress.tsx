@@ -12,14 +12,12 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { useFastCounter } from "@/hooks/useFastCounter";
 import Counter from "./Counter";
 
-type Props = {
-  counter: number;
-};
-
-const HomeBodyProgress = ({ counter }: Props) => {
-  const { theme } = useAppStore();
+const HomeBodyProgress = () => {
+  const counter = useFastCounter();
+  const theme = useAppStore((state) => state.theme);
 
   return (
     <View className="gap-3">
@@ -88,7 +86,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
               )}
             </View>
 
-            {/* Progress / Available after */}
+            {/* Progress / Effect after */}
             <Animated.View
               layout={LinearTransition.springify().duration(300)}
               className="ml-10 h-4"
@@ -101,7 +99,7 @@ const HomeBodyProgress = ({ counter }: Props) => {
                   className="flex-row items-center justify-between"
                 >
                   <ThemedText size="xs" opacity="low">
-                    Available after
+                    Effect after
                   </ThemedText>
 
                   <Counter

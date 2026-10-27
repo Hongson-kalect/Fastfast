@@ -1,4 +1,4 @@
-import { GlobalModalOptions, ListModalOptions } from "@/providers/Modal";
+import { GlobalModalOptions } from "@/providers/Modal";
 import { create } from "zustand";
 
 const MODAL_TRANSITION_DELAY = 500;
@@ -7,20 +7,14 @@ interface ModalState {
   currentModal: GlobalModalOptions | null;
   modalQueue: GlobalModalOptions[];
 
-  listModal: ListModalOptions | null;
-
   addModal: (modal: GlobalModalOptions) => void;
   closeCurrentModal: () => void;
   clearModalQueue: () => void;
-
-  setListModal: (modal: ListModalOptions | null) => void;
 }
 
 const useModalStore = create<ModalState>((set, get) => ({
   currentModal: null,
   modalQueue: [],
-
-  listModal: null,
 
   /**
    * Add a modal to the global modal system.
@@ -85,15 +79,6 @@ const useModalStore = create<ModalState>((set, get) => ({
     set({
       currentModal: null,
       modalQueue: [],
-    });
-  },
-
-  /**
-   * List modal is separate from the normal global modal queue.
-   */
-  setListModal: (modal) => {
-    set({
-      listModal: modal,
     });
   },
 }));

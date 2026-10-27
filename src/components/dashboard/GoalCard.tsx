@@ -20,14 +20,26 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 export const GoalCard = () => {
   const dbService = useDBService();
-  const { weight, theme, updateSetting, updateWeight } =
-    useAppStore();
+  const { weight, theme, updateSetting, updateWeight } = useAppStore(
+    useShallow((state) => ({
+      weight: state.weight,
+      theme: state.theme,
+      updateSetting: state.updateSetting,
+      updateWeight: state.updateWeight,
+    })),
+  );
 
-  const { weightTarget, setWeightTarget } = useDashboardStore();
-  const { addModal } = useModalStore();
+  const { weightTarget, setWeightTarget } = useDashboardStore(
+    useShallow((state) => ({
+      weightTarget: state.weightTarget,
+      setWeightTarget: state.setWeightTarget,
+    })),
+  );
+  const addModal = useModalStore((state) => state.addModal);
 
   const targetWeight = weightTarget?.target_weight;
 

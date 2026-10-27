@@ -19,6 +19,7 @@ import { useDerivedValue } from "react-native-reanimated";
 import { Bar, CartesianChart, Line, useChartPressState } from "victory-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
   data: { x: string; fast: number; weight: number | null }[];
@@ -34,7 +35,9 @@ const WeightLineChart = ({
   const font = useFont(fonts.MulishRegular, 7);
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   const { width } = useWindowDimensions();
   const { present } = useBottomSheet();
 
@@ -455,7 +458,7 @@ type TooltipProps = {
   length: number;
 };
 const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const width = useWindowDimensions().width;
   const p1 = useDerivedValue(() =>
     vec(state.x.position.value, chartBounds.top),

@@ -2,6 +2,7 @@ import { TAB_BAR_SPACE } from "@/constants/design";
 import HomeBodyProgress from "@/components/home/BodyProgress";
 import CircleCounter from "@/components/home/CircleCounter";
 import HomeHeader from "@/components/home/Header";
+import { BodyProgressInfo } from "@/components/home/InfoContent";
 import { RecentFastCard } from "@/components/home/LastFastLog";
 import { SwapButton } from "@/components/home/SwapButton";
 import { SectionTitle } from "@/components/SectionTitle";
@@ -17,7 +18,7 @@ import { feedback } from "@/utils/feedback";
 import { finishFast } from "@/utils/home/fast";
 import { scheduleTargetReached } from "@/utils/notifications";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -31,7 +32,7 @@ const HomeScreen = () => {
 
   const currentFastSession = useAppStore((state) => state.currentFastSession);
   const startTime = currentFastSession?.start_time ?? null;
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const dbService = useDBService();
 
   const isCounting = !!currentFastSession && !currentFastSession.end_time;
@@ -97,9 +98,6 @@ const HomeScreen = () => {
         message: "Start time must be greater than the last session",
       });
     }
-    // Bắt đầu đếm
-    setCounter(0);
-
     const newSession = await dbService?.startNewSession(now, settings?.target);
     setCurrentFastSession(newSession);
     feedback("fastStart");
@@ -117,31 +115,18 @@ const HomeScreen = () => {
     [isCounting, startTime, currentFastSession, handleFinishFast, startFast],
   );
 
-  const [counter, setCounter] = useState(0);
-  const handleCounter = () => {
-    if (!startTime) return;
-
-    const endTime = currentFastSession?.end_time ?? Date.now();
-
-    // Giờ bắt đầu ở tương lai (chỉnh giờ máy, đổi múi giờ) không được thành đếm ngược
-    setCounter(Math.max(0, Math.floor((endTime - startTime) / 1000)));
+  const openBodyProgressInfo = () => {
+    feedback("tap");
+    addModal({
+      type: "alert",
+      title: "Các thanh này nói gì?",
+      message:
+        "Mỗi thanh cho biết việc nhịn ăn đang hỗ trợ một cơ chế sẵn có của cơ thể ở mức nào.",
+      middle: <BodyProgressInfo />,
+      okText: "Đã hiểu",
+    });
   };
-
   const isFastingActive = isCounting && !currentFastSession?.end_time;
-
-  useEffect(() => {
-    let interval = undefined;
-    handleCounter();
-    if (!isCounting) {
-      return;
-    }
-
-    interval = setInterval(() => {
-      handleCounter();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [startTime, isCounting]);
 
     const inset = useSafeAreaInsets();
 
@@ -161,7 +146,6 @@ const HomeScreen = () => {
             <CircleCounter
               finishFasting={handleFinishFast}
               isCounting={isCounting}
-              counter={counter}
               currentFast={currentFastSession}
             />
           </View>
@@ -184,7 +168,11 @@ const HomeScreen = () => {
             <SectionTitle
               title={isFastingActive ? "Giai đoạn cơ thể" : "Các giai đoạn khi nhịn"}
               right={
-                <TouchableOpacity activeOpacity={0.7} hitSlop={10}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  hitSlop={10}
+                  onPress={openBodyProgressInfo}
+                >
                   <FontAwesome6
                     name="circle-question"
                     size={16}
@@ -201,7 +189,7 @@ const HomeScreen = () => {
                 borderColor: theme.text + "0F",
               }}
             >
-              <HomeBodyProgress counter={counter} />
+              <HomeBodyProgress />
             </View>
           </View>
         </ScrollView>

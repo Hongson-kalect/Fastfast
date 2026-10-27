@@ -14,7 +14,7 @@ export function SettingsAccountCard({
   email,
   onPress,
 }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const isGuest = !email;
 

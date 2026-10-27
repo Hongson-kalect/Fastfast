@@ -52,7 +52,7 @@ const FastLevelItem = React.memo(
     index: number;
   }) => {
     const [trackWidth, setTrackWidth] = useState(0);
-    const { theme } = useAppStore();
+    const theme = useAppStore((state) => state.theme);
 
     const progress = useSharedValue(0);
 

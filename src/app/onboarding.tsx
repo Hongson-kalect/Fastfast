@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
 type Slide = {
   key: "welcome" | "habit" | "shield" | "pixel" | "health";
@@ -31,7 +32,9 @@ const SLIDES: Slide[] = [
 const OnboardingScreen = () => {
   const t = useT();
   const dbService = useDBService();
-  const { theme, updateSetting } = useAppStore();
+  const { theme, updateSetting } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, updateSetting: state.updateSetting })),
+  );
   const { width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
 

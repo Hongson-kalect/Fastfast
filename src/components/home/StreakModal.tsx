@@ -46,8 +46,8 @@ const MODAL_THEME = {
   },
 };
 export const StreakCheckModal = ({ data }: Props) => {
-  const { theme } = useAppStore();
-  const { closeCurrentModal } = useModalStore();
+  const theme = useAppStore((state) => state.theme);
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
 
   if (!data) return null;
 

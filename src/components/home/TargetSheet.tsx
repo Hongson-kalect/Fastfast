@@ -18,6 +18,7 @@ import {
   cancelTargetReached,
   scheduleTargetReached,
 } from "@/utils/notifications";
+import { useShallow } from "zustand/react/shallow";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
@@ -26,8 +27,14 @@ interface TargetSheetProps {
 
 const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
   const dbService = useDBService();
-  const { settings, updateSetting, theme, setCurrentFastSession } =
-    useAppStore();
+  const { settings, updateSetting, theme, setCurrentFastSession } = useAppStore(
+    useShallow((state) => ({
+      settings: state.settings,
+      updateSetting: state.updateSetting,
+      theme: state.theme,
+      setCurrentFastSession: state.setCurrentFastSession,
+    })),
+  );
   const { hide } = useBottomSheet();
   const { width } = useWindowDimensions();
   const [selectIndex, setSelectIndex] = useState(() => {

@@ -28,7 +28,7 @@ export const SwapFastButton = ({
   onPressOut,
   onLongPress,
 }: SwapFastButtonProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const textColor = isCounting
     ? color
     : theme.buttonText || getContrastTextColor(color);

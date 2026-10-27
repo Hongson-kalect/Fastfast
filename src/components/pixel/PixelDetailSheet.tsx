@@ -17,6 +17,7 @@ import { ThemedText } from "../themed-text";
 import PixelDailyFast from "./PixelDailyFast";
 import PixelDailyNote, { ModalNote } from "./PixelDailyNote";
 import { MoodModal } from "./modals/MoodModal";
+import { useShallow } from "zustand/react/shallow";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -83,7 +84,9 @@ const getFastSegmentsForDay = (
 
 const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const dbService = useDBService();
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   const isDark = settings?.is_dark_mode ?? true;
 
   const [sheetNote, setSheetNote] = useState({

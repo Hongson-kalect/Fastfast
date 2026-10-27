@@ -22,6 +22,7 @@ import { SwapImageButton } from "./SwapButton/SwapImageButton";
 import { SwapMoodButton } from "./SwapButton/SwapMoodButton";
 import { runDbTask } from "@/utils/dbError";
 import { useFocusEffect } from "expo-router";
+import { useShallow } from "zustand/react/shallow";
 
 type SwapButtonProps = {
   isCounting: boolean;
@@ -42,8 +43,15 @@ export const SwapButton = React.memo(
 
     const [todayNote, setTodayNote] = useState<DailyNote | null>(null);
 
-    const { updateWeight, weight, currentFastSession, theme, settings } =
-      useAppStore();
+    const { updateWeight, weight, currentFastSession, theme, settings } = useAppStore(
+      useShallow((state) => ({
+        updateWeight: state.updateWeight,
+        weight: state.weight,
+        currentFastSession: state.currentFastSession,
+        theme: state.theme,
+        settings: state.settings,
+      })),
+    );
 
     const [todayData, setTodayData] = useState<{
       note?: string;
@@ -129,7 +137,12 @@ export const SwapButton = React.memo(
       setTempImage(uri);
     };
 
-    const { addModal, closeCurrentModal } = useModalStore();
+    const { addModal, closeCurrentModal } = useModalStore(
+      useShallow((state) => ({
+        addModal: state.addModal,
+        closeCurrentModal: state.closeCurrentModal,
+      })),
+    );
 
     const handleDelaySubmit = (selectedTime: number) => {
       closeCurrentModal();

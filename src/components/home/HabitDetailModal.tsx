@@ -19,7 +19,7 @@ export const HabitDetailModal = ({
   onClose,
   targetInfo,
 }: HabitDetailModalProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   if (!log) return null;
 

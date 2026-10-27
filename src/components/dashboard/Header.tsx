@@ -6,12 +6,17 @@ import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { AchievementBottomSheet } from "./AchievementBottomSheet";
+import { useShallow } from "zustand/react/shallow";
 
 const DashboardHeader = () => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const userId = useAppStore((state) => state.userProfile)?.id;
-  const { currentMilestones, hasUnclaimedMilestones } =
-    useDashboardStore();
+  const { currentMilestones, hasUnclaimedMilestones } = useDashboardStore(
+    useShallow((state) => ({
+      currentMilestones: state.currentMilestones,
+      hasUnclaimedMilestones: state.hasUnclaimedMilestones,
+    })),
+  );
 
   const { present } = useBottomSheet();
   const openAchievement = () => {

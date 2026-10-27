@@ -103,4 +103,5 @@ export const updatePixelViewMode = async (
   await db.setting("pixel_view_mode", viewMode);
 
   usePixelStore.getState().setViewMode(viewMode);
+  useAppStore.getState().updateSetting({ pixel_view_mode: viewMode });
 };

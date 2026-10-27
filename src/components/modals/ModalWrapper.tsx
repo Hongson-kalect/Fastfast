@@ -25,7 +25,16 @@ import { ThemedText } from "../themed-text";
 
 type Props = {
   show: boolean;
-  type?: "input" | "alert" | "confirm" | "prompt" | "custom" | "menu" | "tabs";
+  type?:
+    | "input"
+    | "alert"
+    | "confirm"
+    | "prompt"
+    | "custom"
+    | "menu"
+    | "tabs"
+    | "radio"
+    | "checkbox";
   title?: string | React.ReactNode;
   bottom?: React.ReactNode;
   titlePosition?: "center" | "left" | "right";

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<defs>
+<linearGradient id="rim_active_days_2" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#FFFFFF"/><stop offset="0.5" stop-color="#C3CCD7"/><stop offset="1" stop-color="#6E7B8B"/>
+</linearGradient>
+<radialGradient id="face_active_days_2" cx="0.4" cy="0.35" r="0.75">
+<stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C3CCD7"/>
+</radialGradient>
+</defs>
+
+
+
+<circle cx="64" cy="64" r="42" fill="url(#rim_active_days_2)"/>
+<circle cx="64" cy="64" r="38.5" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.8"/>
+<circle cx="64" cy="64" r="34" fill="url(#face_active_days_2)" stroke="#6E7B8B" stroke-opacity="0.35" stroke-width="1"/>
+<ellipse cx="52" cy="46" rx="16" ry="9" fill="#FFFFFF" opacity="0.3" transform="rotate(-25 52 46)"/>
+<g transform="translate(44 44) scale(1.666)"><path d="M7 14h3v3H7z" fill="#6E7B8B"/><path d="M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM3 11h18M8 3v5M16 3v5" fill="none" stroke="#6E7B8B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+
+</svg>

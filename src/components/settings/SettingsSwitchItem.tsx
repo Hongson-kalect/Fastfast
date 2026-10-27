@@ -18,7 +18,7 @@ export function SettingsSwitchItem({
   value,
   onChange,
 }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const handleChange = (next: boolean) => {
     onChange(next);

@@ -18,7 +18,7 @@ import { StreakCheckModal } from "./home/StreakModal";
 SplashScreen.preventAutoHideAsync();
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
 
   const [isDBReady, setDBReady] = useState(false);
   const [isFontReady, setFontReady] = useState(false);

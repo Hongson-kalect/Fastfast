@@ -6,6 +6,7 @@ import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 interface Props {
   currentTargetHours?: number;
@@ -15,7 +16,13 @@ interface Props {
 const ChartRangeSheet = ({ onSelectTarget }: Props) => {
   const { hide } = useBottomSheet();
   const dbService = useDBService();
-  const { theme, settings, updateSetting } = useAppStore();
+  const { theme, settings, updateSetting } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      settings: state.settings,
+      updateSetting: state.updateSetting,
+    })),
+  );
   const [selectedRange, setSelectedRange] = useState<ChartRangeKey>(
     settings?.chart_range || "7d",
   );

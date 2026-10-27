@@ -17,9 +17,16 @@ import { useCallback, useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
 const DashboardScreen = () => {
-  const { currentFastSession, settings, userProfile } = useAppStore();
+  const { currentFastSession, settings, userProfile } = useAppStore(
+    useShallow((state) => ({
+      currentFastSession: state.currentFastSession,
+      settings: state.settings,
+      userProfile: state.userProfile,
+    })),
+  );
 
   const dbService = useDBService();
   const [, setEnableScroll] = useState(true);
@@ -35,7 +42,12 @@ const DashboardScreen = () => {
       86400000,
   );
 
-  const { weightData: baseWeightData, fastStatistics } = useDashboardStore();
+  const { weightData: baseWeightData, fastStatistics } = useDashboardStore(
+    useShallow((state) => ({
+      weightData: state.weightData,
+      fastStatistics: state.fastStatistics,
+    })),
+  );
   const [weightData, setWeightData] = useState(() => {
     const data: ChartType[] = baseWeightData.map((item) => ({
       fast: 0,

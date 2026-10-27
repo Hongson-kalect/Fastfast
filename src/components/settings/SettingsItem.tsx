@@ -27,7 +27,7 @@ export function SettingsItem({
   showChevron = true,
   children,
 }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const content = (
     <View className="min-h-16 flex-row items-center px-4 py-3">

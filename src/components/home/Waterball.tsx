@@ -29,7 +29,7 @@ const LiquidCircle: React.FC<LiquidCircleProps> = ({
   retainColor = "#3B82F6",
   size = 100,
 }) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const waveOffset = useSharedValue(0);
   const fillLevel = useSharedValue(0);
   const retainLevel = useSharedValue(0);

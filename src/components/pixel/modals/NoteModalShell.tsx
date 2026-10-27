@@ -13,6 +13,7 @@ import { FontAwesome6 } from "@expo/vector-icons";
 
 import { useAppStore } from "@/stores/appStore";
 import { ThemedText } from "@/components/themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
   visible: boolean;
@@ -29,7 +30,9 @@ export const NoteModalShell = ({
   icon,
   children,
 }: Props) => {
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   const isDark = settings?.is_dark_mode ?? true;
 
   return (

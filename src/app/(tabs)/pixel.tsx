@@ -1,4 +1,8 @@
-import { TAB_BAR_SPACE } from "@/constants/design";
+import {
+  TAB_BAR_BOTTOM_GAP,
+  TAB_BAR_HEIGHT,
+  TAB_BAR_SPACE,
+} from "@/constants/design";
 import NoteModal from "@/components/home/NoteModal";
 import PixelHeader from "@/components/pixel/Header";
 import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
@@ -42,8 +46,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
+import { useShallow } from "zustand/react/shallow";
 
-const EXPORT_WIDTH = 600;
 // Khoảng cách giữa các ô, phải khớp gap-1 trong WeekPixel/MonthPixel
 const CELL_GAP = 4;
 const H_PADDING = 20;
@@ -53,7 +57,8 @@ const LABEL_WIDTH = 60;
 const ROWS_BEFORE_CURRENT = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-type ScrollButton = "back" | "current" | null;
+// Hướng của hàng hôm nay so với vùng đang nhìn thấy; null = đang thấy
+type ScrollButton = "back" | "forward" | null;
 type GridItem = WeekItem | MonthDayItem;
 
 // Chia đều chiều dài còn lại cho `count` ô vuông
@@ -63,10 +68,23 @@ const fitCells = (length: number, count: number) =>
 const PixelScreen = () => {
   const dbService = useDBService();
   const { present } = useBottomSheet();
-  const { width, height } = useWindowDimensions();
-  const { updateSetting, theme, weight, updateWeight, settings } =
-    useAppStore();
-  const { stats, year, yearPixelData, viewMode } = usePixelStore();
+  const { width } = useWindowDimensions();
+  const { theme, weight, updateWeight, settings } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      weight: state.weight,
+      updateWeight: state.updateWeight,
+      settings: state.settings,
+    })),
+  );
+  const { stats, year, yearPixelData, viewMode } = usePixelStore(
+    useShallow((state) => ({
+      stats: state.stats,
+      year: state.year,
+      yearPixelData: state.yearPixelData,
+      viewMode: state.viewMode,
+    })),
+  );
 
   const viewType = settings?.pixel_view_type ?? "week";
   const orientation = settings?.pixel_view_orientation ?? "vertical";
@@ -94,8 +112,8 @@ const PixelScreen = () => {
   const monthGrid = useMemo(() => generateMonthGrid(), []);
   const listData: GridItem[] = isMonth ? monthGrid : gridData;
 
-  // Hàng/cột hiện tại lấy từ chính grid, năm khác thì về đầu năm
-  const scrollTargetIndex = useMemo(() => {
+  // Hàng/cột chứa hôm nay, năm khác thì neo về đầu năm
+  const anchorIndex = useMemo(() => {
     const index = isMonth
       ? todayStr.startsWith(`${year}-`)
         ? Number(todayStr.slice(8)) - 1
@@ -103,40 +121,37 @@ const PixelScreen = () => {
       : gridData.findIndex((week) =>
           week.days.some((day) => day.dateString === todayStr),
         );
-    return Math.max(0, index - ROWS_BEFORE_CURRENT);
+    return Math.max(0, index);
   }, [isMonth, gridData, todayStr, year]);
+  const scrollTargetIndex = Math.max(0, anchorIndex - ROWS_BEFORE_CURRENT);
 
   const [scrollButton, setScrollButton] = useState<ScrollButton>(null);
 
-  const lastOffset = useRef(0);
+  // List mở ở initialScrollIndex mà không bắn onScroll → offset khởi đầu là vị trí đó
+  const lastOffset = useRef(scrollTargetIndex * itemLength);
   const scrollButtonRef = useRef<ScrollButton>(null);
+  // Chiều dài thật của vùng lưới theo trục cuộn (đo bằng onLayout)
+  const listLength = useRef(0);
 
+  // Chỉ hiện nút khi hàng neo nằm ngoài vùng nhìn thấy, mũi tên chỉ về phía nó
   const updateScrollButton = useCallback(
     (offset: number) => {
-      const viewport = isHorizontal ? width : height;
-      const targetOffset = scrollTargetIndex * itemLength;
-      const scrollingBack = offset < lastOffset.current;
+      lastOffset.current = offset;
+      if (!listLength.current) return;
+
+      const start = anchorIndex * itemLength;
+      const end = start + itemLength;
 
       let nextButton: ScrollButton = null;
-
-      if (scrollingBack && offset > viewport) {
-        nextButton = "back";
-      } else if (
-        !scrollingBack &&
-        offset > itemLength &&
-        offset < targetOffset - viewport
-      ) {
-        nextButton = "current";
-      }
+      if (end <= offset) nextButton = "back";
+      else if (start >= offset + listLength.current) nextButton = "forward";
 
       if (nextButton !== scrollButtonRef.current) {
         scrollButtonRef.current = nextButton;
         setScrollButton(nextButton);
       }
-
-      lastOffset.current = offset;
     },
-    [isHorizontal, width, height, scrollTargetIndex, itemLength],
+    [anchorIndex, itemLength],
   );
 
   const scrollToWeek = useCallback((index: number) => {
@@ -205,19 +220,13 @@ const PixelScreen = () => {
     [updateScrollButton, isHorizontal],
   );
 
+  // List được remount khi đổi layout/năm nên trạng thái nút cuộn phải reset theo
   useEffect(() => {
-    runDbTask("save pixel view mode", () =>
-      dbService.setting("pixel_view_mode", viewMode || "fasting"),
-    );
-    updateSetting({ pixel_view_mode: viewMode });
-  }, [viewMode, dbService, updateSetting]);
-
-  // List được remount khi đổi chiều/năm nên trạng thái nút cuộn phải reset theo
-  useEffect(() => {
-    lastOffset.current = 0;
+    lastOffset.current = scrollTargetIndex * itemLength;
     scrollButtonRef.current = null;
     setScrollButton(null);
-  }, [orientation, viewType, year]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orientation, viewType, year, pixelSize, sundayFirst]);
 
   // Refetch data on screen focus
   useFocusEffect(
@@ -234,12 +243,20 @@ const PixelScreen = () => {
   );
 
   const exportRef = useRef<ViewShotRef>(null);
+  // Ảnh export vẽ cả năm nên chỉ mount khi bấm lưu, chụp xong thì gỡ ra
+  const [isExporting, setIsExporting] = useState(false);
+  const isCapturing = useRef(false);
 
-  const handleExport = async () => {
+  const handleExport = () => setIsExporting(true);
+
+  const captureExport = async () => {
+    if (isCapturing.current) return;
+    isCapturing.current = true;
     try {
-      if (!exportRef.current) return;
+      // Chờ ảnh huy hiệu (expo-image) tải xong trước khi chụp
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const uri = await exportRef.current.capture();
+      const uri = await exportRef.current?.capture?.();
       if (!uri) return;
 
       await saveToGallery(uri);
@@ -248,6 +265,9 @@ const PixelScreen = () => {
     } catch (error) {
       console.error("Export image error:", error);
       Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
+    } finally {
+      isCapturing.current = false;
+      setIsExporting(false);
     }
   };
 
@@ -294,6 +314,11 @@ const PixelScreen = () => {
       }
       scrollEventThrottle={32}
       onScroll={handleScroll}
+      onLayout={(e) => {
+        const { width: w, height: h } = e.nativeEvent.layout;
+        listLength.current = isHorizontal ? w : h;
+        updateScrollButton(lastOffset.current);
+      }}
       initialScrollIndex={scrollTargetIndex}
       getItemLayout={(_, index) => ({
         length: itemLength,
@@ -339,19 +364,30 @@ const PixelScreen = () => {
       style={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
       className="flex-1 bg-background"
     >
-      <View
-        style={{
-          position: "absolute",
-          left: -10000,
-          top: 0,
-          width: EXPORT_WIDTH,
-        }}
-        pointerEvents="none"
-      >
-        <ViewShot ref={exportRef} options={{ format: "png", quality: 1 }}>
-          <YearExportView gridData={gridData} />
-        </ViewShot>
-      </View>
+      {isExporting && (
+        <View
+          style={{
+            position: "absolute",
+            left: -10000,
+            top: 0,
+          }}
+          pointerEvents="none"
+        >
+          <ViewShot
+            ref={exportRef}
+            options={{ format: "png", quality: 1 }}
+            onLayout={captureExport}
+          >
+            <YearExportView
+              gridData={gridData}
+              monthGrid={monthGrid}
+              viewType={viewType}
+              orientation={orientation}
+              weekdays={weekdays}
+            />
+          </ViewShot>
+        </View>
+      )}
       <NoteModal
         dateStr={selectedDate ?? undefined}
         visible={moodModalVisible}
@@ -360,33 +396,32 @@ const PixelScreen = () => {
         note={dateNote?.note}
         mood={dateNote?.mood_level}
       />
-      <View className="absolute bottom-12 right-2 z-10">
-        {scrollButton === "back" && (
-          <Pressable
-            onPress={() => scrollToWeek(0)}
-            className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
-          >
-            <Feather
-              name={isHorizontal ? "arrow-left" : "arrow-up"}
-              size={20}
-              color={theme.background}
-            />
-          </Pressable>
-        )}
-
-        {scrollButton === "current" && (
-          <Pressable
-            onPress={() => scrollToWeek(scrollTargetIndex)}
-            className="h-12 w-12 items-center justify-center rounded-full bg-primary/60"
-          >
-            <Feather
-              name={isHorizontal ? "arrow-right" : "arrow-down"}
-              size={20}
-              color={theme.background}
-            />
-          </Pressable>
-        )}
-      </View>
+      {scrollButton && (
+        <Pressable
+          onPress={() => scrollToWeek(scrollTargetIndex)}
+          hitSlop={8}
+          className="absolute right-5 z-10 h-12 w-12 items-center justify-center rounded-full bg-primary"
+          style={{
+            // Nằm ngay trên tab bar nổi
+            bottom: inset.bottom + TAB_BAR_BOTTOM_GAP + TAB_BAR_HEIGHT + 12,
+            boxShadow: `0px 4px 12px ${theme.primary}55`,
+          }}
+        >
+          <Feather
+            name={
+              isHorizontal
+                ? scrollButton === "back"
+                  ? "arrow-left"
+                  : "arrow-right"
+                : scrollButton === "back"
+                  ? "arrow-up"
+                  : "arrow-down"
+            }
+            size={20}
+            color={getContrastTextColor(theme.primary)}
+          />
+        </Pressable>
+      )}
 
       <View style={{ paddingHorizontal: 20 }}>
         <PixelHeader

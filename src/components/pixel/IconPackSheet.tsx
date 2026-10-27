@@ -19,12 +19,18 @@ import {
   TargetPack,
 } from "../../constants/fasting_targets";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 export const PackPickerBottomSheet = () => {
-  const { viewMode } = usePixelStore();
+  const viewMode = usePixelStore((state) => state.viewMode);
   const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
 
-  const { settings, updateSetting } = useAppStore();
+  const { settings, updateSetting } = useAppStore(
+    useShallow((state) => ({
+      settings: state.settings,
+      updateSetting: state.updateSetting,
+    })),
+  );
   const dbService = useDBService();
   const { hide } = useBottomSheet();
 
@@ -150,7 +156,7 @@ const EmotionPackCard = ({
   isSelected,
   onSelect,
 }: EmotionPackCardProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
 
   return (

@@ -23,7 +23,7 @@ const START_PRESETS = [
 ];
 
 const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const [now] = useState(() => new Date());
   const [startTime, setStartTime] = useState(now.getTime());

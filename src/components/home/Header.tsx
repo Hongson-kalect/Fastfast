@@ -1,12 +1,15 @@
 import { RADIUS } from "@/constants/design";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import { feedback } from "@/utils/feedback";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import CircularProgress from "../CircleProgress";
 import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
+import { ShieldInfo } from "./InfoContent";
+import { useShallow } from "zustand/react/shallow";
 
 const greeting = (date = new Date()) => {
   const hour = date.getHours();
@@ -20,12 +23,17 @@ const Pill = ({
   icon,
   value,
   color,
+  onPress,
 }: {
   icon: React.ReactNode;
   value: string | number;
   color: string;
+  onPress?: () => void;
 }) => (
-  <View
+  <Pressable
+    disabled={!onPress}
+    hitSlop={6}
+    onPress={onPress}
     className="flex-row items-center gap-1.5 px-3 py-1.5"
     style={{ borderRadius: RADIUS.pill, backgroundColor: color + "1F" }}
   >
@@ -33,18 +41,36 @@ const Pill = ({
     <ThemedText size="sm" weight="bold" colorHex={color}>
       {value}
     </ThemedText>
-  </View>
+  </Pressable>
 );
 
 const HomeHeader = () => {
-  const { habit, userProfile, theme } = useAppStore();
+  const { habit, userProfile, theme } = useAppStore(
+    useShallow((state) => ({
+      habit: state.habit,
+      userProfile: state.userProfile,
+      theme: state.theme,
+    })),
+  );
   const { present } = useBottomSheet();
+  const addModal = useModalStore((state) => state.addModal);
 
   const openHabitModal = () => {
     feedback("tap");
     present(<HabitBottomSheet />, {
       isRaw: true,
       snapPoints: ["100%"],
+    });
+  };
+
+  const openShieldInfo = () => {
+    feedback("tap");
+    addModal({
+      type: "alert",
+      title: "Shield",
+      message: "Shield giữ chuỗi của bạn hợp lệ trong những ngày nghỉ không nhịn.",
+      middle: <ShieldInfo />,
+      okText: "Đã hiểu",
     });
   };
 
@@ -67,6 +93,7 @@ const HomeHeader = () => {
             icon={<FontAwesome5 name="shield-alt" size={12} color={theme.info} />}
             value={habit?.shield_snap ?? 0}
             color={theme.info}
+            onPress={openShieldInfo}
           />
         </View>
       </View>

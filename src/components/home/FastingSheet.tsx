@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import { useShallow } from "zustand/react/shallow";
 
 interface FastingSheetProps {
   counter: number;
@@ -27,7 +28,9 @@ const FastingSheet = ({
   onStopFasting,
   onChangeTarget,
 }: FastingSheetProps) => {
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   const { hide } = useBottomSheet();
 
   const [fastCounter, setFastCounter] = useState(counter);

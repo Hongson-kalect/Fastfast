@@ -51,7 +51,7 @@ export const getSessionSummary = (session: FastSession) => {
 };
 
 export const RecentFastCard = ({ session }: Props) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const summary = getSessionSummary(session);
 
@@ -66,7 +66,7 @@ export const RecentFastCard = ({ session }: Props) => {
 
   const progress = Math.min(summary.percent, 100);
 
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const handlePress = () => {
     addModal({
       type: "custom",

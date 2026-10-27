@@ -1,11 +1,13 @@
 import { createDBService } from "@/database";
 import { UserAchievement, UserAchievementMilestone } from "@/interfaces/db.type";
+import { ACHIEVEMENT_IMAGES } from "./achievementImages";
 
 export type AchievementItem = {
   id: string;
   target: number | boolean;
   title: string;
-  image?: string;
+  // Ảnh huy hiệu SVG (require), sinh bởi scripts/generate-achievement-badges.js
+  image?: number;
 };
 export type AchievementType = "progress" | "max" | "boolean";
 
@@ -269,6 +271,7 @@ const steps = (
     id: `${prefix}_${n}`,
     target: n * scale,
     title: title(n),
+    image: ACHIEVEMENT_IMAGES[`${prefix}_${n}`],
   }));
 
 // Nhịp tham chiếu: 16:8 mỗi ngày ≈ 1 phiên, +3 habit, ~16 giờ/ngày.

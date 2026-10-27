@@ -19,6 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { useDBService } from "@/hooks/useDBService";
+import { useShallow } from "zustand/react/shallow";
 
 interface PhotoPickerModalProps {
   visible: boolean;
@@ -33,7 +34,9 @@ export const PhotoPickerModal = ({
   photoUri,
   updateImage,
 }: PhotoPickerModalProps) => {
-  const { theme, settings } = useAppStore();
+  const { theme, settings } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, settings: state.settings })),
+  );
   // 1. Hàm xử lý lưu ảnh vĩnh viễn vào thư mục ứng dụng
   const handleSelectPhoto = async () => {
     try {
@@ -100,7 +103,7 @@ export const PhotoPickerModal = ({
     setPreviewVisible(true);
   };
 
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const handleAddPhoto = () => {
     addModal({
       type: "confirm",

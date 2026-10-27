@@ -5,6 +5,7 @@ import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 type StatCardProps = {
   icon: React.ComponentProps<typeof Ionicons>["name"];
@@ -24,7 +25,7 @@ const StatCard = ({
   color = "#7F92F8",
   isHero,
 }: StatCardProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   if (isHero) {
     return (
       <View
@@ -128,7 +129,9 @@ type Props = {
 
 export const StatisticsSection = ({ fastStatistics }: Props) => {
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
-  const { userProfile, theme } = useAppStore();
+  const { userProfile, theme } = useAppStore(
+    useShallow((state) => ({ userProfile: state.userProfile, theme: state.theme })),
+  );
   const gridStats: StatCardProps[] = [
     {
       icon: "timer-outline",

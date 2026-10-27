@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<defs>
+<linearGradient id="rim_retain_circles_2" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#FFFFFF"/><stop offset="0.5" stop-color="#C3CCD7"/><stop offset="1" stop-color="#6E7B8B"/>
+</linearGradient>
+<radialGradient id="face_retain_circles_2" cx="0.4" cy="0.35" r="0.75">
+<stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C3CCD7"/>
+</radialGradient>
+</defs>
+
+
+
+<circle cx="64" cy="64" r="42" fill="url(#rim_retain_circles_2)"/>
+<circle cx="64" cy="64" r="38.5" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.8"/>
+<circle cx="64" cy="64" r="34" fill="url(#face_retain_circles_2)" stroke="#6E7B8B" stroke-opacity="0.35" stroke-width="1"/>
+<ellipse cx="52" cy="46" rx="16" ry="9" fill="#FFFFFF" opacity="0.3" transform="rotate(-25 52 46)"/>
+<g transform="translate(44 44) scale(1.666)"><path d="M12 3c3.2 4.2 6.2 7.4 6.2 10.8a6.2 6.2 0 0 1-12.4 0C5.8 10.4 8.8 7.2 12 3z" fill="#6E7B8B"/></g>
+
+
+</svg>

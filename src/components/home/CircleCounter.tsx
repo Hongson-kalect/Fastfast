@@ -22,14 +22,15 @@ import { getCurrentPhase } from "@/utils/home/phase";
 import { LinearGradient } from "expo-linear-gradient";
 import { FastDetail } from "../FastDetail";
 import { CircleCounterContent } from "./CircleCounterContent";
+import { useFastCounter } from "@/hooks/useFastCounter";
 import FastHistorySheet from "./FastHistorySheet";
 import { FastingCircle } from "./FastingCircle";
 import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
   isCounting: boolean;
-  counter: number;
   currentFast: FastSession | null;
   finishFasting: () => void;
 };
@@ -43,14 +44,16 @@ const CARD_INSET = 40;
 
 export const CircleCounter = ({
   isCounting,
-  counter,
   currentFast,
   finishFasting,
 }: Props) => {
-  const { settings, theme } = useAppStore();
+  const counter = useFastCounter();
+  const { settings, theme } = useAppStore(
+    useShallow((state) => ({ settings: state.settings, theme: state.theme })),
+  );
   const dbService = useDBService();
   const { present, hide } = useBottomSheet();
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const [now, setNow] = useState(() => Date.now());
   useFocusEffect(
     useCallback(() => {

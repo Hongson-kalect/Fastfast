@@ -302,7 +302,7 @@ const PixelGridManager = (props: Props) => {
 };
 
 const EmptyPixel = ({ isToday }: { isToday: boolean }) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   return (
     <View
       style={{
@@ -323,7 +323,7 @@ const ShieldPixel = ({
   shieldLogs: HabitLog;
   onPress: () => void;
 }) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   return (
     <Pressable
       onPress={onPress}
@@ -350,7 +350,7 @@ const MoodPixel = ({
   onPress: () => void;
 }) => {
   const pixel = EMOTIONS[data?.mood_level || 0];
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   return (
   <Pressable
@@ -397,7 +397,7 @@ const FastPixel = ({
   const progress = data.elapsed_hours / data.hours_in_fast;
   const baseOpacity = 0.5;
   const opacity = baseOpacity + (1 - baseOpacity) * progress;
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   if (!pixel) return <EmptyPixel isToday={isToday} />;
 

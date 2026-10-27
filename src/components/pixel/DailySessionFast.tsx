@@ -18,8 +18,8 @@ export function DailyFastSessionCard({
   fast,
   dailyLog,
 }: DailyFastSessionCardProps) {
-  const { addModal } = useModalStore();
-  const {theme} = useAppStore();
+  const addModal = useModalStore((state) => state.addModal);
+  const theme = useAppStore((state) => state.theme);
   if (!fast) {
   return (
     <View className="rounded-2xl border border-text-base/5 bg-background2/80 px-4 py-3">

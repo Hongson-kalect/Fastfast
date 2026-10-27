@@ -28,11 +28,11 @@ export default function PixelDailyNote({
   updateSheetNote,
   date = getLocalTodayStr(),
 }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
 
-  const { addModal } = useModalStore();
+  const addModal = useModalStore((state) => state.addModal);
   const dbService = useDBService();
 
   const updateNote = async (noteText: string) => {

@@ -10,6 +10,7 @@ import { getContrastTextColor } from "@/utils/color";
 import { getWeight } from "@/utils/home/fast";
 import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
   visible: boolean;
@@ -29,7 +30,9 @@ export const WeightModal = ({
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
-  const { theme, weight: currentWeight } = useAppStore();
+  const { theme, weight: currentWeight } = useAppStore(
+    useShallow((state) => ({ theme: state.theme, weight: state.weight })),
+  );
   const db = useDBService();
 
   const [tempWeight, setTempWeight] = useState("");

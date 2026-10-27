@@ -5,11 +5,17 @@ import useModalStore from "@/stores/modalStore";
 import { getContrastTextColor } from "@/utils/color";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, TextInput, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = InputModalOptions & BasicModalOptions;
 const InputModal = (modal: Props) => {
-  const { closeCurrentModal, currentModal } = useModalStore();
-  const { theme } = useAppStore();
+  const { closeCurrentModal, currentModal } = useModalStore(
+    useShallow((state) => ({
+      closeCurrentModal: state.closeCurrentModal,
+      currentModal: state.currentModal,
+    })),
+  );
+  const theme = useAppStore((state) => state.theme);
 
   const [value, setValue] = useState("");
   const textRef = useRef<TextInput>(null);

@@ -74,8 +74,8 @@ const STATUS_CONFIG = {
 };
 
 export const ResultModal = ({ data = testData }: Props) => {
-  const { closeCurrentModal } = useModalStore();
-  const { theme } = useAppStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
+  const theme = useAppStore((state) => state.theme);
 
   const fastingHours = data.fastingTime / 3600;
   const isCompleted =

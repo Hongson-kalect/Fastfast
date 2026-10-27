@@ -7,8 +7,8 @@ import LiquidCircle from "./Waterball";
 import { getContrastTextColor } from "@/utils/color";
 
 const FullHabitModal = ({ habitName }: { habitName: string }) => {
-  const { theme } = useAppStore();
-  const { closeCurrentModal } = useModalStore();
+  const theme = useAppStore((state) => state.theme);
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
 
   return (
     <View>

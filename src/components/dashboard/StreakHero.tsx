@@ -4,6 +4,7 @@ import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 const MiniStat = ({
   icon,
@@ -31,7 +32,13 @@ const MiniStat = ({
 
 /** Card nổi bật đầu Dashboard: streak hiện tại + kỷ lục, khiên, độ bền thói quen. */
 export const StreakHero = () => {
-  const { userProfile, habit, theme } = useAppStore();
+  const { userProfile, habit, theme } = useAppStore(
+    useShallow((state) => ({
+      userProfile: state.userProfile,
+      habit: state.habit,
+      theme: state.theme,
+    })),
+  );
   const streak = userProfile?.current_streak ?? 0;
 
   return (

@@ -211,7 +211,7 @@ function Timeline({
 export function FastDetail({ fast }: FastDetailProps) {
   const durationHours = fast.duration / S_PER_HOUR;
   const targetHours = fast.target_duration;
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const target = useMemo(() => getTarget(targetHours), [targetHours]);
   const targetColor = target?.colors.accent ?? "#34D399";

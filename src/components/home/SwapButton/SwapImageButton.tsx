@@ -20,7 +20,7 @@ export const SwapImageButton = ({
   onPressIn,
   onPressOut,
 }: SwapImageButtonProps) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   return (
     <TouchableOpacity

@@ -63,7 +63,7 @@ const BottomSheetContext = createContext<BottomSheetContextType | undefined>(
 
 export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
   const { top } = useSafeAreaInsets();
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   const [isShowing, setIsShowing] = useState(false);
   const [content, setContent] = useState<React.ReactElement | null>(null);

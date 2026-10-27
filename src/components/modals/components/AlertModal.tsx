@@ -8,8 +8,8 @@ import { Pressable, View } from "react-native";
 type Props = AlertModalOptions & BasicModalOptions;
 
 const AlertModal = (modal: Props) => {
-  const { closeCurrentModal } = useModalStore();
-  const { theme } = useAppStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
+  const theme = useAppStore((state) => state.theme);
 
   const handleOk = () => {
     modal.onOk?.();

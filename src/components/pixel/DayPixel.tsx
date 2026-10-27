@@ -25,9 +25,11 @@ const DayPixel = memo(
     onPress: (date: string) => void;
   }) => {
     const theme = useAppStore((state) => state.theme);
-    const settings = useAppStore((state) => state.settings);
+    // Chỉ theo dõi đúng trường cần: ~370 ô không render lại khi setting khác đổi
+    const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
+    const emotionPackId = useAppStore((state) => state.settings?.emotion_pack);
+    const targetPackId = useAppStore((state) => state.settings?.target_pack);
 
-    const isDark = settings?.is_dark_mode ?? true;
     const isToday = day.dateString === todayStr;
     const isFuture = day.dateString > todayStr;
 
@@ -61,7 +63,7 @@ const DayPixel = memo(
 
     if (viewMode === "mood") {
       if (note) {
-        const emotionPack = EMOTION_PACKS[settings?.emotion_pack || "default"];
+        const emotionPack = EMOTION_PACKS[emotionPackId || "default"];
 
         const mood = note.mood_level && emotionPack.emotions[note.mood_level];
 
@@ -87,7 +89,7 @@ const DayPixel = memo(
         );
 
         if (pixel >= 0) {
-          const targetPack = TARGET_PACKS[settings?.target_pack || "default"];
+          const targetPack = TARGET_PACKS[targetPackId || "default"];
 
           const target = targetPack.targets[pixel];
           const progress = Math.min(fast.elapsed_hours / fast.hours_in_fast, 1);

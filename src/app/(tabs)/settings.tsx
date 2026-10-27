@@ -1,5 +1,5 @@
 import { TAB_BAR_SPACE } from "@/constants/design";
-import { Alert, Linking, ScrollView, View } from "react-native";
+import { Alert, Linking, Pressable, ScrollView, View } from "react-native";
 
 import { SettingsItem } from "@/components/settings/SettingsItem";
 import { SettingsSection } from "@/components/settings/SettingsSection";
@@ -7,7 +7,12 @@ import { SettingsSwitchItem } from "@/components/settings/SettingsSwitchItem";
 import { SettingsValueItem } from "@/components/settings/SettingsValueItem";
 import { ThemedText } from "@/components/themed-text";
 
+import AchievementBadge from "@/components/AchievementBadge";
+import AchievementShowcase, {
+  SHOWCASE_LIMIT,
+} from "@/components/AchievementShowcase";
 import { SettingsAccountCard } from "@/components/settings/SettingsAccountCard";
+import { ACHIEVEMENTS } from "@/constants/achievements";
 import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
 import { ThemeKey } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
@@ -16,6 +21,7 @@ import { useBottomSheet } from "@/providers/BottomSheet";
 import { useT } from "@/providers/Language";
 import { reloadAppData, toggleDarkMode, updateTheme } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
+import useModalStore from "@/stores/modalStore";
 import {
   exportBackup,
   pickBackup,
@@ -39,24 +45,33 @@ import { useSQLiteContext } from "expo-sqlite";
 import i18n from "i18next";
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
 // Điền email hỗ trợ trước khi phát hành; để trống thì người dùng tự nhập người nhận
 const FEEDBACK_EMAIL = "";
 const DEFAULT_REMINDER = { hour: 20, minute: 0 };
 
 const LANGUAGES = [
-  { value: "vi", label: "Tiếng Việt" },
-  { value: "en", label: "English" },
+  { value: "vi", label: "Tiếng Việt", description: "Vietnamese" },
+  { value: "en", label: "English", description: "Tiếng Anh" },
 ];
 
 const WEEK_STARTS = [
-  { value: "monday", label: "Monday" },
-  { value: "sunday", label: "Sunday" },
+  { value: "monday", label: "Monday", description: "Weeks run Monday → Sunday" },
+  { value: "sunday", label: "Sunday", description: "Weeks run Sunday → Saturday" },
 ] as const;
 
 export default function SettingsScreen() {
-  const { settings, updateSetting, currentFastSession } = useAppStore();
+  const { settings, updateSetting, currentFastSession, userProfile } = useAppStore(
+    useShallow((state) => ({
+      settings: state.settings,
+      updateSetting: state.updateSetting,
+      currentFastSession: state.currentFastSession,
+      userProfile: state.userProfile,
+    })),
+  );
   const { present } = useBottomSheet();
+  const addModal = useModalStore((state) => state.addModal);
   const t = useT();
 
   const [isDarkMode, setIsDarkMode] = useState(settings?.is_dark_mode ?? true);
@@ -76,18 +91,20 @@ export default function SettingsScreen() {
     await dbService.setting(key, value);
   };
 
+  // Chọn một giá trị qua radio modal dùng chung
   const chooseOption = <T extends string>(
     title: string,
-    options: readonly { value: T; label: string }[],
+    options: readonly { value: T; label: string; description?: string }[],
+    value: T,
     onSelect: (value: T) => void,
   ) => {
-    Alert.alert(title, undefined, [
-      ...options.map((option) => ({
-        text: option.label,
-        onPress: () => onSelect(option.value),
-      })),
-      { text: "Cancel", style: "cancel" as const },
-    ]);
+    addModal({
+      type: "radio",
+      title,
+      options: [...options],
+      value,
+      onSelect: (selected) => onSelect(selected as T),
+    });
   };
 
   const openThemeModal = () => {
@@ -106,14 +123,75 @@ export default function SettingsScreen() {
   };
 
   const handleLanguage = () =>
-    chooseOption("Language", LANGUAGES, async (value) => {
-      await saveSetting("language", value);
-      i18n.changeLanguage(value);
+    chooseOption(
+      "Language",
+      LANGUAGES,
+      settings?.language || i18n.language,
+      async (value) => {
+        await saveSetting("language", value);
+        i18n.changeLanguage(value);
+      },
+    );
+
+  // Mỗi thành tựu chỉ đưa ra huy hiệu cao nhất đã nhận để chọn khoe
+  const handleShowcase = async () => {
+    const milestones = userProfile?.id
+      ? await dbService.getUserMilestones(userProfile.id)
+      : [];
+    const confirmed = new Set(
+      milestones
+        .filter((item) => item.is_confirmed === 1)
+        .map((item) => item.achievement_item_id),
+    );
+
+    const options = ACHIEVEMENTS.flatMap((achievement) => {
+      const item = [...achievement.items]
+        .reverse()
+        .find((entry) => confirmed.has(entry.id));
+      if (!item) return [];
+      return [
+        {
+          value: item.id,
+          label: achievement.name,
+          description: item.title,
+          icon: (
+            <AchievementBadge achievement={achievement} item={item} size={40} />
+          ),
+        },
+      ];
     });
 
+    if (!options.length) {
+      addModal({
+        type: "alert",
+        title: "Showcase",
+        message:
+          "Chưa có huy hiệu nào. Đạt mốc thành tựu và bấm Nhận trong tab Stats để mở khoá.",
+      });
+      return;
+    }
+
+    addModal({
+      type: "checkbox",
+      title: "Showcase",
+      message: `Chọn tối đa ${SHOWCASE_LIMIT} huy hiệu để khoe.`,
+      options,
+      values: (settings?.showcase_achievements ?? []).filter((id) =>
+        confirmed.has(id),
+      ),
+      max: SHOWCASE_LIMIT,
+      okText: "Lưu",
+      onConfirm: (values) =>
+        saveSetting("showcase_achievements", values as string[]),
+    });
+  };
+
   const handleWeekStart = () =>
-    chooseOption("Week starts on", WEEK_STARTS, (value) =>
-      saveSetting("week_starts_on", value),
+    chooseOption(
+      "Week starts on",
+      WEEK_STARTS,
+      settings?.week_starts_on ?? "monday",
+      (value) => saveSetting("week_starts_on", value),
     );
 
   const showNotificationUnsupported = () =>
@@ -295,6 +373,24 @@ export default function SettingsScreen() {
           }}
         />
 
+        {/* Showcase */}
+        <SettingsSection title="Showcase">
+          <Pressable onPress={handleShowcase} className="px-4 py-4 active:opacity-80">
+            <AchievementShowcase
+              itemIds={settings?.showcase_achievements ?? []}
+              showEmpty
+            />
+          </Pressable>
+
+          <SettingsSwitchItem
+            icon="image"
+            title="Show in Journey export"
+            description="Add your showcase badges to the saved image"
+            value={settings?.showcase_in_export ?? true}
+            onChange={(value) => saveSetting("showcase_in_export", value)}
+          />
+        </SettingsSection>
+
         {/* Appearance */}
         <SettingsSection title="Appearance">
           <SettingsSwitchItem
@@ -333,6 +429,14 @@ export default function SettingsScreen() {
             title="Week starts on"
             value={settings?.week_starts_on === "sunday" ? "Sunday" : "Monday"}
             onPress={handleWeekStart}
+          />
+
+          <SettingsSwitchItem
+            icon="help-circle"
+            title="Beginner tips"
+            description="Show short explanations of how habit and shields work"
+            value={settings?.beginner_tips ?? true}
+            onChange={(value) => saveSetting("beginner_tips", value)}
           />
         </SettingsSection>
 

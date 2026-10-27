@@ -104,7 +104,7 @@ export default function CircularProgress({
 
   style,
 }: CircularProgressProps) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const r = radius ?? (size - strokeWidth) / 2;
   const actualSize = radius ? radius * 2 + strokeWidth : size;
 

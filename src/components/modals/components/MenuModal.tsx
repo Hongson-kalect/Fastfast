@@ -6,7 +6,7 @@ import { ScrollView, TouchableOpacity, View } from "react-native";
 
 type Props = MenuModalOptions & BasicModalOptions;
 const MenuModal = (modal: Props) => {
-  const { closeCurrentModal } = useModalStore();
+  const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
 
   const hasRightContent = modal.menuOptions.some(
     (item) => item.rightContent,
@@ -80,7 +80,7 @@ type AppMenuType = {
 };
 
 export const AppMenu = (props: AppMenuType) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
 
   return (
     <TouchableOpacity

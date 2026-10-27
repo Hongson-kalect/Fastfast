@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function SettingsSection({ title, children }: Props) {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const items = React.Children.toArray(children).filter(Boolean);
 
   return (

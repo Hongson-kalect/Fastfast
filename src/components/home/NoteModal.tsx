@@ -20,6 +20,7 @@ import Animated, {
   SlideOutDown,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { useShallow } from "zustand/react/shallow";
 
 export const checkWeightError = (text: string): string => {
   if (!text) return "";
@@ -69,7 +70,13 @@ const NoteModal = ({
   onSelectMood,
 }: Props) => {
   const today = getLocalTodayStr();
-  const { theme, settings, weight } = useAppStore();
+  const { theme, settings, weight } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      settings: state.settings,
+      weight: state.weight,
+    })),
+  );
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
 
   const [tempText, setTempText] = useState(note ?? "");

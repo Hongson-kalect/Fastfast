@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from "react";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
+import AchievementBadge from "@/components/AchievementBadge";
 import { Achievement } from "@/constants/achievements";
 import { RADIUS } from "@/constants/design";
 import { useDBService } from "@/hooks/useDBService";
@@ -28,7 +29,7 @@ export type AchievementItem = {
   id: string;
   target: number | boolean;
   title: string;
-  image?: string;
+  image?: number;
 };
 
 export type AchievementType = "progress" | "max" | "boolean";
@@ -65,8 +66,6 @@ export const AchievementCard = ({
   onPress,
   onClaim,
 }: Props) => {
-  if (!achievement?.items.length) return null;
-
   const currentValue = userAchievement?.current_value ?? 0;
 
   const numericItems = achievement.items.filter(
@@ -98,9 +97,20 @@ export const AchievementCard = ({
 
   const hasUnclaimed = !!unclaimedItem;
 
+  // Huy hiệu hiển thị: mốc cao nhất đã nhận, chưa nhận mốc nào thì mốc 1 (mờ)
+  const confirmedIds = new Set(
+    userMilestone
+      .filter((item) => item.is_confirmed === 1)
+      .map((item) => item.achievement_item_id),
+  );
+  const badgeItem =
+    [...achievement.items].reverse().find((item) => confirmedIds.has(item.id)) ??
+    achievement.items[0];
+  const isBadgeLocked = !badgeItem || !confirmedIds.has(badgeItem.id);
+
   const nextItem = numericItems.find((item: any) => currentValue < item.target);
 
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   const tier = getTier(completedCount, totalCount);
   const tierColor = tier?.color ?? theme.text;
 
@@ -177,6 +187,9 @@ export const AchievementCard = ({
     });
   };
 
+  // Đặt sau mọi hook để thứ tự hook không đổi giữa các lần render
+  if (!badgeItem) return null;
+
   return (
     <Animated.View
       className="overflow-hidden border bg-card"
@@ -198,25 +211,17 @@ export const AchievementCard = ({
           {/* Main row */}
           <View className="flex-row items-center">
             {/* Huy hiệu */}
-            <View
-              className="relative mr-3.5 h-12 w-12 items-center justify-center"
-              style={{
-                borderRadius: RADIUS.md,
-                backgroundColor: hasUnclaimed
-                  ? theme.success + "1F"
-                  : tierColor + (tier ? "26" : "0D"),
-              }}
-            >
-              <Ionicons
-                name={hasUnclaimed ? "gift" : tier ? "medal" : "medal-outline"}
-                size={22}
-                color={hasUnclaimed ? theme.success : tierColor}
-                style={{ opacity: tier || hasUnclaimed ? 1 : 0.4 }}
+            <View className="relative mr-3.5">
+              <AchievementBadge
+                achievement={achievement}
+                item={badgeItem}
+                size={52}
+                locked={isBadgeLocked}
               />
 
               {hasUnclaimed && (
                 <View
-                  className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2"
+                  className="absolute -right-0.5 top-0 h-3 w-3 rounded-full border-2"
                   style={{
                     backgroundColor: theme.success,
                     borderColor: theme.background2,
@@ -279,7 +284,11 @@ export const AchievementCard = ({
                     backgroundColor: theme.success,
                   }}
                 >
-                  <Ionicons name="gift" size={11} color="white" />
+                  <Ionicons
+                    name="gift"
+                    size={11}
+                    color={getContrastTextColor(theme.success)}
+                  />
 
                   <ThemedText size="xs" weight="bold" colorHex={getContrastTextColor(theme.success)}>
                     Nhận
@@ -407,7 +416,7 @@ export const AchievementBottomSheet = ({
     });
   }, [achievements]);
 
-  const { userProfile } = useAppStore();
+  const userProfile = useAppStore((state) => state.userProfile);
 
   const handleClaimMilestone = useCallback(
     async (milestoneId: string) => {

@@ -4,7 +4,7 @@ import React from "react";
 import { View } from "react-native";
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { theme } = useAppStore();
+  const theme = useAppStore((state) => state.theme);
   
   return (
     <VariableContextProvider

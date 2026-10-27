@@ -24,7 +24,7 @@ export const MoodModal = ({
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
-  const { settings } = useAppStore();
+  const settings = useAppStore((state) => state.settings);
   const isDark = settings?.is_dark_mode ?? true;
 
   const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;

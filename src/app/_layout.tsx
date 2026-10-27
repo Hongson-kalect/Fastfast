@@ -3,7 +3,6 @@ import { Stack } from "expo-router";
 import "react-native-reanimated";
 import "../global.css";
 
-import { ListModal } from "@/components/modals/OptionModal";
 import { Portal, Provider } from "react-native-paper";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -70,7 +69,6 @@ export default function TabLayout() {
                     </BottomSheetModalProvider>
                   </BottomSheetProvider>
                   <Portal>
-                    <ListModal />
                     <GlobalModal />
                   </Portal>
                 </LanguageProvider>
