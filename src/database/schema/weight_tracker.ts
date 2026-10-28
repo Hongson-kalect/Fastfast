@@ -1,6 +1,6 @@
 import { logDbError } from "@/utils/dbError";
 import { WeightLog } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/utils/timer";
+import { parseLocalDate, getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 
@@ -22,7 +22,7 @@ export const getWeightLogs = async (
   days: number = 30,
 ): Promise<WeightLog[]> => {
   const today = getLocalTodayStr();
-  const startDay = new Date(today);
+  const startDay = parseLocalDate(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
 

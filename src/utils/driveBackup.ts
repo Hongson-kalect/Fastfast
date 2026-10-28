@@ -20,16 +20,26 @@ const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3";
 const BACKUP_NAME = "fastfast-backup.json";
 
-type DriveFile = { id: string; name: string; modifiedTime: string };
+// size là chuỗi số byte; file rỗng (0) là file tạo xong nhưng chưa ghi được nội dung
+type DriveFile = { id: string; name: string; modifiedTime: string; size?: string };
 
 class DriveAuthError extends Error {}
 
-const ensureOk = (status: number, action: string) => {
+/** Bộ nhớ Google của người dùng đã đầy (Drive, Gmail, Photos dùng chung). */
+export class DriveQuotaError extends Error {}
+
+const ensureOk = (status: number, action: string, body?: string) => {
   if (status === 401) throw new DriveAuthError(action);
+  if (status === 403 && body?.includes("storageQuotaExceeded")) {
+    throw new DriveQuotaError(action);
+  }
   if (status < 200 || status >= 300) {
     throw new Error(`Drive ${action} failed (${status})`);
   }
 };
+
+const hasContent = (file: DriveFile | undefined) =>
+  !!file && file.size !== "0";
 
 /** Chạy với access token; token bị từ chối thì lấy token mới và thử lại một lần. */
 const withToken = async <T>(run: (token: string) => Promise<T>): Promise<T> => {
@@ -60,7 +70,7 @@ const listFiles = async (token: string): Promise<DriveFile[]> => {
   do {
     const params = new URLSearchParams({
       spaces: "appDataFolder",
-      fields: "nextPageToken,files(id,name,modifiedTime)",
+      fields: "nextPageToken,files(id,name,modifiedTime,size)",
       pageSize: "1000",
       ...(pageToken ? { pageToken } : {}),
     });
@@ -91,20 +101,26 @@ const uploadFile = async (
       headers: { ...authHeader(token), "Content-Type": "application/json" },
       body: JSON.stringify({ name, parents: ["appDataFolder"] }),
     });
-    ensureOk(res.status, "create");
+    ensureOk(res.status, "create", res.ok ? undefined : await res.text());
     id = (await res.json()).id as string;
   }
 
-  const result = await LegacyFS.uploadAsync(
-    `${DRIVE_UPLOAD}/files/${id}?uploadType=media`,
-    localUri,
-    {
-      httpMethod: "PATCH",
-      uploadType: LegacyFS.FileSystemUploadType.BINARY_CONTENT,
-      headers: { ...authHeader(token), "Content-Type": mimeOf(name) },
-    },
-  );
-  ensureOk(result.status, "upload");
+  try {
+    const result = await LegacyFS.uploadAsync(
+      `${DRIVE_UPLOAD}/files/${id}?uploadType=media`,
+      localUri,
+      {
+        httpMethod: "PATCH",
+        uploadType: LegacyFS.FileSystemUploadType.BINARY_CONTENT,
+        headers: { ...authHeader(token), "Content-Type": mimeOf(name) },
+      },
+    );
+    ensureOk(result.status, "upload", result.body);
+  } catch (error) {
+    // Không để lại file rỗng vừa tạo: lần sau sẽ tưởng file đã được tải lên
+    if (!existingId) await deleteFile(token, id).catch(() => {});
+    throw error;
+  }
 };
 
 const downloadFile = async (token: string, id: string, localUri: string) => {
@@ -128,7 +144,7 @@ const deleteFile = async (token: string, id: string) => {
 export const getDriveBackupTime = () =>
   withToken(async (token) => {
     const backup = (await listFiles(token)).find((f) => f.name === BACKUP_NAME);
-    return backup ? new Date(backup.modifiedTime) : null;
+    return backup && hasContent(backup) ? new Date(backup.modifiedTime) : null;
   });
 
 /**
@@ -145,10 +161,12 @@ export const backupToDrive = (db: SQLiteDatabase) =>
 
     let uploadedImages = 0;
     for (const name of images) {
-      if (remoteByName.has(name)) continue;
+      const remoteImage = remoteByName.get(name);
+      if (hasContent(remoteImage)) continue;
       const local = new File(imagesDir, name);
       if (!local.exists) continue;
-      await uploadFile(token, name, local.uri);
+      // File rỗng còn sót từ lần lỗi trước: ghi lại nội dung vào chính file đó
+      await uploadFile(token, name, local.uri, remoteImage?.id);
       uploadedImages++;
     }
 
@@ -171,7 +189,7 @@ export const backupToDrive = (db: SQLiteDatabase) =>
 export const fetchDriveBackup = () =>
   withToken(async (token): Promise<BackupFile | null> => {
     const backup = (await listFiles(token)).find((f) => f.name === BACKUP_NAME);
-    if (!backup) return null;
+    if (!backup || !hasContent(backup)) return null;
 
     const json = new File(Paths.cache, BACKUP_NAME);
     await downloadFile(token, backup.id, json.uri);
@@ -198,7 +216,7 @@ export const restoreFromDrive = async (
       if (local.exists) continue;
 
       const remote = remoteByName.get(name);
-      if (!remote) {
+      if (!remote || !hasContent(remote)) {
         missingImages++;
         continue;
       }

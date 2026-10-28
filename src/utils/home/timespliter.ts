@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import { fixed } from "../numberLimit";
 
 export interface DissectedDay {
@@ -68,12 +69,10 @@ export const splitSessionIntoDays = (
   return result;
 };
 
-export  const getMotivationalText = (percent: number) => {
-    if (percent >= 100)
-      return "👑 Bậc thầy kỷ luật! Bạn đã duy trì phong độ hoàn hảo.";
-    if (percent >= 70)
-      return "🔥 Thói quen cực kỳ vững chắc, tiếp tục phát huy nhé!";
-    if (percent >= 35) return "🌱 Bạn đang hình thành thói quen rất tốt!";
-    return "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!";
-  };
+export const getMotivationalText = (percent: number) => {
+  if (percent >= 100) return i18n.t("habitSheet.motivation.full");
+  if (percent >= 70) return i18n.t("habitSheet.motivation.strong");
+  if (percent >= 35) return i18n.t("habitSheet.motivation.forming");
+  return i18n.t("habitSheet.motivation.start");
+};
 

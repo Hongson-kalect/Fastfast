@@ -48,6 +48,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/providers/Language";
+import { useSwitchFade } from "@/hooks/useSwitchFade";
+import Animated from "react-native-reanimated";
 
 // Khoảng cách giữa các ô, phải khớp gap-1 trong WeekPixel/MonthPixel
 const CELL_GAP = 4;
@@ -89,6 +91,10 @@ const PixelScreen = () => {
       viewMode: state.viewMode,
     })),
   );
+
+  const heatmap = useAppStore((state) => state.settings?.pixel_heatmap ?? false);
+  // Mờ rồi hiện lại khi đổi kiểu hiển thị; chỉ animate view bọc ngoài, không animate từng ô
+  const gridFade = useSwitchFade(`${viewMode}-${heatmap}`);
 
   const viewType = settings?.pixel_view_type ?? "week";
   const orientation = settings?.pixel_view_orientation ?? "vertical";
@@ -202,19 +208,18 @@ const PixelScreen = () => {
         // Chưa có dữ liệu - Mở modal add dữ liệu ngày
       }
 
-      if (data.note || data.logs.length > 0) {
+      if (data.note || data.logs.length > 0 || data.shieldLog) {
         present(
           <PixelDetailSheet
             dateString={date}
             note={data.note}
             log={data.logs}
+            restDay={!!data.shieldLog}
           />,
           {
             snapPoints: ["100%"],
           },
         );
-      } else if (data.shieldLog) {
-        // TODO: Show shield log detail
       }
     },
     [yearPixelData, present],
@@ -461,7 +466,7 @@ const PixelScreen = () => {
               ))}
             </View>
           </View>
-          {list}
+          <Animated.View style={[{ flex: 1 }, gridFade]}>{list}</Animated.View>
         </View>
       ) : (
         // Lịch dọc: hàng nhãn cố định phía trên, các hàng cuộn dọc bên dưới
@@ -482,7 +487,7 @@ const PixelScreen = () => {
               ))}
             </View>
           </View>
-          {list}
+          <Animated.View style={[{ flex: 1 }, gridFade]}>{list}</Animated.View>
         </View>
       )}
     </View>

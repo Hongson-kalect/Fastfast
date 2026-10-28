@@ -12,6 +12,8 @@ export interface AppSettings {
   chart_range?: ChartRangeKey;
   is_dark_mode?: boolean;
   pixel_view_mode?: "fasting" | "mood";
+  /** Chế độ fast của Journey tô theo tổng giờ nhịn trong ngày thay vì theo loại phiên */
+  pixel_heatmap?: boolean;
   pixel_view_type?: "week" | "month";
   pixel_view_orientation?: "horizontal" | "vertical";
   theme?: string;

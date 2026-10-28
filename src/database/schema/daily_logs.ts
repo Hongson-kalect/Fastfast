@@ -1,6 +1,6 @@
 import { logDbError } from "@/utils/dbError";
 import { DailyLog } from "@/interfaces/db.type";
-import { getLocalTodayStr } from "@/utils/timer";
+import { parseLocalDate, getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
 // Bảng 4: Phân rã dữ liệu theo ngày dương lịch (Daily Logs) để vẽ Chart và Grid
@@ -29,13 +29,13 @@ export const getDailyLogs = async (
   days: number = 30,
 ): Promise<DailyLog[]> => {
   const today = getLocalTodayStr();
-  const startDay = new Date(today);
+  const startDay = parseLocalDate(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
   try{
 
     const rows = await db.getAllAsync<DailyLog>(
-      `SELECT * FROM daily_logs WHERE log_date >= ?;`,
+      `SELECT * FROM daily_logs WHERE log_date >= ? AND is_deleted = 0;`,
       [startDate],
     );
     return rows;

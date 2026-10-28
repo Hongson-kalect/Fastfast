@@ -2,7 +2,6 @@ import { FASTING_TARGETS } from "@/constants/data";
 import { FastSession, HabitLog } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import { fixed } from "@/utils/numberLimit";
-import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { FastDetail } from "../FastDetail";
@@ -62,9 +61,7 @@ export const HabitDetailModal = ({
                 letterSpacing: 1,
               }}
             >
-              {log.log_date
-                ? getLocalTodayStr(new Date(log.log_date))
-                : "N/A"}
+              {log.log_date || "N/A"}
             </ThemedText>
           </View>
 

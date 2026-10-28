@@ -26,6 +26,8 @@ type LimitedThemeType = {
 export type ThemeItem = {
   light: ThemeType;
   dark: ThemeType;
+  /** Bộ icon đi kèm theme (key trong EMOTION_PACKS / TARGET_PACKS); chọn theme sẽ hỏi có đổi không */
+  iconPacks?: { emotion?: string; target?: string };
 } & (PremiumThemeType | NormalThemeType | LimitedThemeType);
 
 // Nền xanh than nhẹ thay vì xám trung tính để có chiều sâu; card sáng hơn nền một bậc

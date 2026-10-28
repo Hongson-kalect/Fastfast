@@ -1,3 +1,5 @@
+import { useDBService } from "@/hooks/useDBService";
+import { useSwitchFade } from "@/hooks/useSwitchFade";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { getContrastTextColor } from "@/utils/color";
@@ -6,6 +8,7 @@ import { RADIUS } from "@/constants/design";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
 import PixelLegend from "./PixelLegend";
@@ -26,6 +29,15 @@ const PixelStatistic = React.memo(
   ({ setTrackingType, trackingType, stats, onSaveImage }: Props) => {
   const t = useT();
     const theme = useAppStore((state) => state.theme);
+    const heatmap = useAppStore((state) => state.settings?.pixel_heatmap ?? false);
+    const updateSetting = useAppStore((state) => state.updateSetting);
+    const dbService = useDBService();
+    const legendFade = useSwitchFade(`${trackingType}-${heatmap}`);
+
+    const toggleHeatmap = () => {
+      updateSetting({ pixel_heatmap: !heatmap });
+      dbService.setting("pixel_heatmap", !heatmap);
+    };
 
     const { present } = useBottomSheet();
 
@@ -93,6 +105,7 @@ const PixelStatistic = React.memo(
         </View>
 
         <View className="flex-row justify-between items-center mt-6">
+          <View className="flex-row items-center gap-2">
           <Pressable
             hitSlop={10}
             onPress={openIconPackSelector}
@@ -111,6 +124,30 @@ const PixelStatistic = React.memo(
               {t("journey.style")}
             </ThemedText>
           </Pressable>
+
+          {/* Chỉ chế độ fast: tô theo tổng giờ nhịn trong ngày thay vì loại phiên */}
+          {trackingType === "fasting" && (
+            // Chỉ icon: hàng này còn nút Style và Mood | Fast, chữ dài (ja, de…) sẽ tràn
+            <Pressable
+              hitSlop={8}
+              onPress={toggleHeatmap}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: heatmap }}
+              accessibilityLabel={t("journey.heatmap")}
+              style={{
+                borderRadius: RADIUS.pill,
+                backgroundColor: heatmap ? theme.primary : theme.primary + "1F",
+              }}
+              className="h-9 w-9 items-center justify-center"
+            >
+              <Ionicons
+                name="grid-outline"
+                size={15}
+                color={heatmap ? getContrastTextColor(theme.primary) : theme.primary}
+              />
+            </Pressable>
+          )}
+          </View>
 
           {/* Segmented control dạng viên thuốc */}
           <View
@@ -156,9 +193,9 @@ const PixelStatistic = React.memo(
           </View>
         </View>
 
-        <View className="mt-2">
+        <Animated.View className="mt-2" style={legendFade}>
           <PixelLegend viewMode={trackingType} />
-        </View>
+        </Animated.View>
       </View>
     );
   },

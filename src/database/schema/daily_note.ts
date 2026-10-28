@@ -1,12 +1,13 @@
 import { logDbError } from "@/utils/dbError";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
+import { emitMoodChange } from "@/utils/moodEvents";
 import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
 export const generateString = /*sql*/ `
 CREATE TABLE IF NOT EXISTS daily_notes (
     log_date TEXT PRIMARY KEY,         -- 🌟 Định dạng 'YYYY-MM-DD', làm Khóa chính để đảm bảo mỗi ngày duy nhất 1 bản ghi
-    mood_level INTEGER CHECK (mood_level BETWEEN 1 AND 5), -- Mức độ cảm xúc từ 1 đến 5
+    mood_level INTEGER CHECK (mood_level BETWEEN 0 AND 4), -- Mức cảm xúc 0–4, khớp chỉ số mảng emotions
     note TEXT,
     image_uri TEXT,                 -- Đường dẫn ảnh lưu cục bộ trong ngày (nếu có)
     sync_status TEXT DEFAULT 'pending', -- 'synced', 'pending' cho Local-first
@@ -80,6 +81,8 @@ export const setDailyNote = async (
       hasNote ? 1 : 0,
       hasImage ? 1 : 0,
     ]);
+
+    if (hasMood) emitMoodChange(dateStr, mood ?? null);
   } catch (e) {
     logDbError("error on setDailyNote", e);
   }

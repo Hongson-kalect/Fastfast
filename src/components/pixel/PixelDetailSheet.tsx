@@ -1,4 +1,4 @@
-import { EMOTION_PACKS } from "@/constants/emotions";
+import { getEmotionPack } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import {
   DailyLog,
@@ -24,6 +24,8 @@ type DetailType = {
   dateString: string; // YYYY-MM-DD
   log?: (DailyLog | DissectedDay)[];
   note?: DailyNote;
+  /** Ngày nghỉ được khiên giữ chuỗi */
+  restDay?: boolean;
 };
 
 type FastMap = Record<string, FastSession>;
@@ -83,7 +85,12 @@ const getFastSegmentsForDay = (
   ];
 };
 
-const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
+const PixelDetailSheet = ({
+  dateString,
+  log = [],
+  note,
+  restDay = false,
+}: DetailType) => {
   const t = useT();
   const dbService = useDBService();
   const { theme, settings } = useAppStore(
@@ -105,7 +112,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
   const [moodModalVisible, setMoodModalVisible] = useState(false);
 
-  const EMOTIONS = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
+  const EMOTIONS = getEmotionPack(settings?.emotion_pack).emotions;
 
   const fastIds = useMemo(
     () => [...new Set(log.map((item) => item.fast_id).filter(Boolean))],
@@ -164,7 +171,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
   }, [log, fastObj, dateString]);
 
   const currentMood = useMemo(() => {
-    return sheetNote.mood_level ? EMOTIONS[sheetNote.mood_level] : null;
+    return sheetNote.mood_level != null ? EMOTIONS[sheetNote.mood_level] : null;
   }, [sheetNote.mood_level]);
 
   const circularSegments = useMemo(
@@ -345,6 +352,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
             fastIds={fastIds}
             log={log}
             fastObj={fastObj}
+            restDay={restDay}
           />
         ) : (
           <PixelDailyNote

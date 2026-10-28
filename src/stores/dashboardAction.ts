@@ -57,6 +57,7 @@ import {
 } from "@/constants/achievements";
 import { DBService } from "@/hooks/useDBService";
 import { logDbError } from "@/utils/dbError";
+import { parseLocalDate } from "@/utils/timer";
 import { useAppStore } from "./appStore";
 import { useDashboardStore } from "./dashboardStore";
 
@@ -98,13 +99,13 @@ async function loadChartData(
   const fastMap: Record<string, number> = {};
 
   weights.forEach((item) => {
-    const key = getBucketKey(new Date(item.log_date), chartType.unit);
+    const key = getBucketKey(parseLocalDate(item.log_date), chartType.unit);
 
     weightMap[key] = item.weight;
   });
 
   dayFasts.forEach((item) => {
-    const key = getBucketKey(new Date(item.log_date), chartType.unit);
+    const key = getBucketKey(parseLocalDate(item.log_date), chartType.unit);
 
     fastMap[key] = (fastMap[key] ?? 0) + item.hours_in_day;
   });
@@ -121,7 +122,7 @@ async function loadChartData(
     );
 
     fasts.forEach((fast) => {
-      const key = getBucketKey(new Date(fast.log_date), chartType.unit);
+      const key = getBucketKey(parseLocalDate(fast.log_date), chartType.unit);
 
       fastMap[key] = (fastMap[key] ?? 0) + fast.hours_in_day;
     });

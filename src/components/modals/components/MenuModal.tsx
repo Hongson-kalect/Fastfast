@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, MenuModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
+import { getContrastTextColor } from "@/utils/color";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
 type Props = MenuModalOptions & BasicModalOptions;
@@ -104,7 +105,13 @@ export const AppMenu = (props: AppMenuType) => {
           <ThemedText
             size="sm"
             weight="semibold"
-            colorHex={props.color || theme.text}
+            // Mục có nền màu riêng (VD nút Xoá đỏ): chữ đen/trắng theo nền, khớp icon
+            colorHex={
+              props.color ||
+              (props.backgroundColor
+                ? getContrastTextColor(props.backgroundColor)
+                : theme.text)
+            }
             numberOfLines={1}
             className="flex-1"
           >

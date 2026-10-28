@@ -63,7 +63,7 @@ export interface AppInitResult {
 /**
  * Lấy language từ AppSettings hoặc system locale.
  */
-function resolveLanguage(settings: AppSettings | null): string {
+export function resolveLanguage(settings: AppSettings | null): string {
   return toSupportedLanguage(
     settings?.language || Localization.getLocales()[0]?.languageCode,
   );

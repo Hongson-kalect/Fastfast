@@ -19,6 +19,7 @@ import {
 } from "react-native-reanimated";
 import { RADIUS, heroGradient } from "@/constants/design";
 import { getCurrentPhase } from "@/utils/home/phase";
+import { getTargetFrameColor } from "@/utils/targetColor";
 import { LinearGradient } from "expo-linear-gradient";
 import { FastDetail } from "../FastDetail";
 import { CircleCounterContent } from "./CircleCounterContent";
@@ -42,6 +43,12 @@ const MIN_ANGLE = 3;
 const strokeWidth = 16;
 // Card hero nằm trong lề màn hình 20 mỗi bên
 const CARD_INSET = 40;
+
+const TARGET_FRAMES = FASTING_TARGETS.map((item) => ({
+  hours: item.hours,
+  toHours: item.toHours,
+  color: item.colors.accent,
+}));
 
 export const CircleCounter = ({
   isCounting,
@@ -83,9 +90,14 @@ export const CircleCounter = ({
     ? FASTING_TARGETS.find((item) => item.hours === settings.target) || null
     : null;
 
-  // Đang nhịn: vòng tròn mang màu giai đoạn cơ thể hiện tại; chưa nhịn: màu mục tiêu/theme
   const phase = isCounting ? getCurrentPhase(counter) : null;
-  const color = phase?.color || currentTarget?.colors.accent || theme.primary;
+  // Màu mục tiêu cho tới hết khung của nó, vượt thì theo khung mục tiêu hiện tại
+  const color = getTargetFrameColor(
+    isCounting ? counter / 3600 : 0,
+    settings?.target,
+    TARGET_FRAMES,
+    theme.primary,
+  );
 
   // 6. Logic Animation xoay với Reanimated
   const rotation = useSharedValue(0);

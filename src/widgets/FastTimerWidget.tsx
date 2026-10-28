@@ -2,44 +2,76 @@
 "use no memo";
 
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import type { FastWidgetState, WidgetLabels } from "./widgetState";
+import { getLocalTodayStr } from "@/utils/timer";
+import {
+  DEFAULT_LABELS,
+  FINISH_URI,
+  formatClock,
+  formatDuration,
+  formatElapsedShort,
+  getIdleDisplay,
+  getWidgetColors,
+  HexColor,
+  isFastingState,
+  WIDGET_ACTIONS,
+} from "./widgetDisplay";
+import type { FastWidgetState } from "./widgetState";
 
-type HexColor = `#${string}`;
+const DEFAULT_MOODS = ["😫", "😮‍💨", "🙂", "😃", "🥰"].map((emoji) => ({
+  emoji,
+  color: "#88888833",
+}));
 
-// Dùng khi trạng thái cũ chưa có nhãn (ghi trước khi có đa ngôn ngữ)
-const DEFAULT_LABELS: WidgetLabels = {
-  fasting: "FASTING",
-  ready: "READY",
-  notFasting: "Not fasting",
-  tapToOpen: "Tap to open FastFast",
-  started: "Started",
-  done: "Done",
-};
+// Đủ cao mới hiện hàng chọn mood, widget thấp chỉ còn phần thời gian
+const MOOD_ROW_MIN_HEIGHT = 150;
 
-const pad = (n: number) => String(n).padStart(2, "0");
+const PillButton = ({
+  label,
+  color,
+  textColor,
+  clickAction,
+  clickActionData,
+}: {
+  label: string;
+  color: HexColor;
+  textColor: HexColor;
+  clickAction: string;
+  clickActionData?: Record<string, unknown>;
+}) => (
+  <FlexWidget
+    clickAction={clickAction}
+    clickActionData={clickActionData}
+    style={{
+      backgroundColor: color,
+      borderRadius: 999,
+      paddingHorizontal: 14,
+      paddingVertical: 7,
+    }}
+  >
+    <TextWidget
+      text={label}
+      style={{ fontSize: 13, fontWeight: "bold", color: textColor }}
+    />
+  </FlexWidget>
+);
 
-const formatClock = (time: number) => {
-  const date = new Date(time);
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
+/** Widget màn hình chính: trạng thái phiên nhịn, nút bắt đầu/kết thúc, chọn mood hôm nay. */
+export function FastTimerWidget({
+  state,
+  height = 0,
+}: {
+  state: FastWidgetState | null;
+  width?: number;
+  height?: number;
+}) {
+  const colors = getWidgetColors(state);
+  const labels = { ...DEFAULT_LABELS, ...state?.labels };
+  const moods = state?.moods ?? DEFAULT_MOODS;
+  const todayMood =
+    state?.mood && state.mood.date === getLocalTodayStr() ? state.mood.level : null;
 
-// Widget Android không tự đếm từng giây: hiển thị giờ:phút, cập nhật khi app
-// đổi trạng thái và theo chu kỳ 30 phút của hệ thống.
-const formatElapsed = (ms: number) => {
-  const minutes = Math.max(0, Math.floor(ms / 60000));
-  return `${Math.floor(minutes / 60)}h ${pad(minutes % 60)}m`;
-};
-
-/** Widget màn hình chính: trạng thái phiên nhịn, thời gian đã nhịn, giờ xong. */
-export function FastTimerWidget({ state }: { state: FastWidgetState | null }) {
-  const colors = {
-    background: (state?.colors.card ?? "#FFFFFF") as HexColor,
-    text: (state?.colors.text ?? "#262626") as HexColor,
-    primary: (state?.colors.primary ?? "#F2652A") as HexColor,
-  };
-
-  const labels = state?.labels ?? DEFAULT_LABELS;
-  const isFasting = !!state?.startTime && !state.endTime;
+  const isFasting = isFastingState(state);
+  const idle = getIdleDisplay(state);
   const now = Date.now();
 
   const targetEnd =
@@ -53,6 +85,30 @@ export function FastTimerWidget({ state }: { state: FastWidgetState | null }) {
       ? Math.min(1, (now - state!.startTime!) / (targetEnd - state!.startTime!))
       : 1;
 
+  // Không nhịn: hiện thời lượng phiên trước (làm mờ, như bị đóng băng) > mục tiêu > 0
+  const mainText = isFasting
+    ? formatDuration(now - state!.startTime!)
+    : idle.kind === "last"
+      ? formatDuration(idle.durationMs)
+      : idle.kind === "target"
+        ? `${idle.hours}h`
+        : formatDuration(0);
+
+  const subText = isFasting
+    ? `${labels.started} ${formatClock(state!.startTime!)}${
+        targetEnd ? ` · ${labels.done} ${formatClock(targetEnd)}` : ""
+      }`
+    : idle.kind === "last"
+      ? `${labels.lastFast} · ${labels.endedAgo.replace(
+          "{time}",
+          formatElapsedShort(now - idle.endTime),
+        )}`
+      : idle.kind === "target"
+        ? labels.target
+        : labels.tapToOpen;
+
+  const showMoods = height >= MOOD_ROW_MIN_HEIGHT;
+
   return (
     <FlexWidget
       clickAction="OPEN_APP"
@@ -61,58 +117,146 @@ export function FastTimerWidget({ state }: { state: FastWidgetState | null }) {
         width: "match_parent",
         backgroundColor: colors.background,
         borderRadius: 24,
-        padding: 16,
+        padding: 14,
         justifyContent: "space-between",
       }}
     >
-      <TextWidget
-        text={isFasting ? labels.fasting : labels.ready}
-        style={{
-          fontSize: 12,
-          fontWeight: "bold",
-          letterSpacing: 0.1,
-          color: isFasting ? colors.primary : colors.text,
-        }}
-      />
-
-      <TextWidget
-        text={isFasting ? formatElapsed(now - state!.startTime!) : labels.notFasting}
-        style={{ fontSize: 30, fontWeight: "bold", color: colors.text }}
-      />
-
-      {/* Thanh tiến độ, luôn hiện để bố cục widget không bị trống */}
+      {/* Nhãn trạng thái + streak, nút thao tác bên phải */}
       <FlexWidget
         style={{
           width: "match_parent",
-          height: 6,
-          borderRadius: 3,
-          backgroundColor: `${colors.text}22` as HexColor,
           flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {progress > 0 ? (
-          <FlexWidget
+        <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
+          <TextWidget
+            text={isFasting ? labels.fasting : labels.ready}
             style={{
-              height: 6,
-              borderRadius: 3,
-              flex: Math.max(progress, 0.02),
-              backgroundColor: colors.primary,
+              fontSize: 12,
+              fontWeight: "bold",
+              letterSpacing: 0.1,
+              color: isFasting ? colors.primary : colors.text,
             }}
           />
-        ) : null}
-        <FlexWidget style={{ height: 6, flex: Math.max(1 - progress, 0) }} />
+          {state?.streak ? (
+            <TextWidget
+              text={`  🔥 ${state.streak}`}
+              style={{ fontSize: 12, fontWeight: "bold", color: colors.text }}
+            />
+          ) : null}
+        </FlexWidget>
+
+        {isFasting ? (
+          <PillButton
+            label={`■ ${labels.end}`}
+            color={`${colors.text}1A` as HexColor}
+            textColor={colors.text}
+            clickAction="OPEN_URI"
+            clickActionData={{ uri: FINISH_URI }}
+          />
+        ) : (
+          <PillButton
+            label={`▶ ${labels.start}`}
+            color={colors.primary}
+            textColor="#FFFFFF"
+            clickAction={WIDGET_ACTIONS.startFast}
+          />
+        )}
       </FlexWidget>
 
-      <TextWidget
-        text={
-          isFasting
-            ? `${labels.started} ${formatClock(state!.startTime!)}${
-                targetEnd ? ` · ${labels.done} ${formatClock(targetEnd)}` : ""
-              }`
-            : labels.tapToOpen
-        }
-        style={{ fontSize: 12, color: `${colors.text}AA` as HexColor }}
-      />
+      <FlexWidget style={{ width: "match_parent" }}>
+        <FlexWidget
+          style={{
+            width: "match_parent",
+            flexDirection: "row",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+          }}
+        >
+          <TextWidget
+            text={mainText}
+            style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              color: isFasting ? colors.text : (`${colors.text}66` as HexColor),
+            }}
+          />
+          {isFasting && targetEnd ? (
+            <TextWidget
+              text={`${Math.floor(progress * 100)}%`}
+              style={{ fontSize: 13, fontWeight: "bold", color: colors.primary }}
+            />
+          ) : null}
+        </FlexWidget>
+
+        {/* Thanh tiến độ, luôn hiện để bố cục widget không bị trống */}
+        <FlexWidget
+          style={{
+            width: "match_parent",
+            height: 6,
+            borderRadius: 3,
+            marginTop: 6,
+            backgroundColor: `${colors.text}22` as HexColor,
+            flexDirection: "row",
+          }}
+        >
+          {progress > 0 ? (
+            <FlexWidget
+              style={{
+                height: 6,
+                borderRadius: 3,
+                flex: Math.max(progress, 0.02),
+                backgroundColor: colors.primary,
+              }}
+            />
+          ) : null}
+          <FlexWidget style={{ height: 6, flex: Math.max(1 - progress, 0) }} />
+        </FlexWidget>
+
+        <TextWidget
+          text={subText}
+          style={{
+            fontSize: 12,
+            marginTop: 6,
+            color: `${colors.text}AA` as HexColor,
+          }}
+        />
+      </FlexWidget>
+
+      {/* Chạm để lưu mood hôm nay, mood đang chọn được tô màu */}
+      {showMoods ? (
+        <FlexWidget
+          style={{
+            width: "match_parent",
+            flexDirection: "row",
+            flexGap: 6,
+          }}
+        >
+          {moods.map((mood, level) => (
+            <FlexWidget
+              key={level}
+              clickAction={WIDGET_ACTIONS.setMood}
+              clickActionData={{ level }}
+              style={{
+                flex: 1,
+                height: 34,
+                borderRadius: 12,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: (level === todayMood
+                  ? mood.color
+                  : `${colors.text}0D`) as HexColor,
+                borderWidth: level === todayMood ? 2 : 0,
+                borderColor: colors.primary,
+              }}
+            >
+              <TextWidget text={mood.emoji} style={{ fontSize: 17 }} />
+            </FlexWidget>
+          ))}
+        </FlexWidget>
+      ) : null}
     </FlexWidget>
   );
 }

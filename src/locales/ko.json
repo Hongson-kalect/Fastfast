@@ -86,7 +86,9 @@
     "fastingPhases": "단식 중 단계",
     "effectAfter": "효과까지",
     "startFast": "단식 시작",
-    "endFast": "종료"
+    "endFast": "종료",
+    "longPressStart": "버튼을 길게 누르면 더 이른 시작 시간을 고를 수 있어요",
+    "longPressEnd": "버튼을 길게 누르면 종료 시간을 고를 수 있어요"
   },
   "counter": {
     "chooseTarget": "목표 선택",
@@ -378,7 +380,9 @@
       "reached": "목표 달성",
       "notReached": "미달성"
     },
-    "actions": "작업"
+    "actions": "작업",
+    "deleteTitle": "이 단식을 삭제할까요?",
+    "deleteBody": "기록, 여정, 통계에서 삭제돼요. 이미 얻은 습관, 실드, 연속 기록은 그대로예요."
   },
   "startTime": {
     "invalid": "잘못된 시간",
@@ -502,8 +506,10 @@
       "actionsTitle": "조작",
       "action1": "빈 날을 누르면 기분과 메모를 추가하고, 기록이 있는 날을 누르면 상세를 볼 수 있어요.",
       "action2": "아이콘 아래 숫자는 올해 그 단계에 해당하는 날 수예요.",
-      "action3": "격자 모서리의 주/일 버튼으로 배치를 바꿔요. 저장한 이미지는 현재 배치를 따라요."
-    }
+      "action3": "격자 모서리의 주/일 버튼으로 배치를 바꿔요. 저장한 이미지는 현재 배치를 따라요.",
+      "fast4": "히트맵을 켜면 각 칸은 그날 단식한 시간을 보여줘요. 진할수록 오래 단식한 날이에요."
+    },
+    "heatmap": "히트맵"
   },
   "layout": {
     "title": "픽셀 배치",
@@ -547,7 +553,11 @@
     "photoHint": "이 날의 사진을 추가하세요",
     "updatePhoto": "사진 업데이트",
     "changePhoto": "사진 변경",
-    "photoFrom": "사진 가져오기"
+    "photoFrom": "사진 가져오기",
+    "restTitle": "휴식일",
+    "restBody": "실드가 오늘 연속 기록을 지켜줬어요. 쉬는 것도 습관의 일부예요. 내일 더 힘차게 돌아와요.",
+    "sessionCount_one": "{{count}}회",
+    "sessionCount_other": "{{count}}회"
   },
   "dayModal": {
     "todayMood": "오늘의 기분",
@@ -723,7 +733,7 @@
     "mondayDesc": "월요일 → 일요일",
     "sundayDesc": "일요일 → 토요일",
     "beginnerTips": "초보자 팁",
-    "beginnerTipsDesc": "습관과 실드의 작동 방식을 짧게 설명해요",
+    "beginnerTipsDesc": "앱 곳곳에 짧은 힌트와 설명을 보여줘요",
     "vibration": "진동",
     "sound": "소리",
     "soundDesc": "시작, 종료, 보상 소리",
@@ -815,7 +825,13 @@
     "restoreFile": "파일에서 복원",
     "restoreFileDesc": "FastFast 백업 파일을 선택하세요",
     "importFailedTitle": "가져오기 실패",
-    "importFailedBody": "유효한 FastFast 백업 파일이 아니에요."
+    "importFailedBody": "유효한 FastFast 백업 파일이 아니에요.",
+    "permTitle": "Google 드라이브 연결",
+    "permBody": "FastFast는 백업을 저장할 때만 Google 드라이브를 사용하며, 앱 전용 숨김 폴더에 저장해요.\n\n드라이브의 사진, 문서 등 다른 파일은 보거나 바꾸거나 삭제할 수 없어요.\n\n다음 화면에서 Google이 허용 여부를 물어봐요.",
+    "permContinue": "계속",
+    "permLater": "나중에",
+    "quotaTitle": "Google 저장용량이 가득 찼어요",
+    "quotaBody": "Google 저장용량(드라이브, Gmail, 포토 공용)이 가득 찼어요. 이전 백업은 그대로 안전해요. 공간을 확보하거나 백업 파일 내보내기로 다른 곳에 저장하세요."
   },
   "theme": {
     "title": "테마",
@@ -827,7 +843,11 @@
     "premium": "프리미엄",
     "limited": "한정",
     "dark": "어두움",
-    "light": "밝음"
+    "light": "밝음",
+    "iconsTitle": "어울리는 아이콘을 쓸까요?",
+    "iconsBody": "{{theme}} 테마에는 전용 기분·단식 아이콘이 있어요. 바꿀까요? 여정에서 언제든 바꿀 수 있어요.",
+    "iconsUse": "사용",
+    "iconsKeep": "유지"
   },
   "notify": {
     "targetTitle": "🎉 목표 달성!",
@@ -847,7 +867,12 @@
     "notFasting": "단식 전",
     "tapToOpen": "눌러서 FastFast 열기",
     "started": "시작",
-    "done": "종료"
+    "done": "종료",
+    "start": "시작",
+    "end": "종료",
+    "lastFast": "지난 단식",
+    "endedAgo": "{{time}} 전 종료",
+    "target": "목표"
   },
   "notFound": {
     "title": "앗!",

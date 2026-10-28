@@ -1,10 +1,14 @@
 import { SHIELD_LIMIT } from "@/database/schema/habit_logs";
 import { useT } from "@/providers/Language";
 import { useAppStore } from "@/stores/appStore";
+import { ReactNode } from "react";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 
-type Section = { title: string; lines: string[] };
+/** Một dòng giải thích; `icon` là hình thu nhỏ của nút/icon mà dòng đó nhắc tới. */
+export type InfoLine = string | { text: string; icon: ReactNode };
+
+type Section = { title: string; lines: InfoLine[] };
 
 /** Danh sách các mục giải thích, dùng làm phần `middle` của modal. */
 export const InfoSections = ({ sections }: { sections: Section[] }) => (
@@ -15,22 +19,31 @@ export const InfoSections = ({ sections }: { sections: Section[] }) => (
           {title}
         </ThemedText>
         <View className="gap-1.5">
-          {lines.map((line) => (
-            <View key={line} className="flex-row gap-2">
-              <ThemedText size="xs" color="text" opacity="medium">
-                •
-              </ThemedText>
-              <ThemedText
-                size="xs"
-                color="text"
-                opacity="medium"
-                className="flex-1"
-                style={{ lineHeight: 18 }}
-              >
-                {line}
-              </ThemedText>
-            </View>
-          ))}
+          {lines.map((line) => {
+            const { text, icon } =
+              typeof line === "string" ? { text: line, icon: null } : line;
+            return (
+              <View key={text} className="flex-row items-start gap-2">
+                {/* Dòng nhắc tới một nút/icon: hiện đúng hình đó thay cho dấu chấm */}
+                {icon ? (
+                  <View className="mt-0.5 min-w-5 items-center">{icon}</View>
+                ) : (
+                  <ThemedText size="xs" color="text" opacity="medium">
+                    •
+                  </ThemedText>
+                )}
+                <ThemedText
+                  size="xs"
+                  color="text"
+                  opacity="medium"
+                  className="flex-1"
+                  style={{ lineHeight: 18 }}
+                >
+                  {text}
+                </ThemedText>
+              </View>
+            );
+          })}
         </View>
       </View>
     ))}

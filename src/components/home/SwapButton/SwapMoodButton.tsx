@@ -4,7 +4,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { RADIUS } from "@/constants/design";
-import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
+import { getEmotionPack, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -31,8 +31,10 @@ export const SwapMoodButton = ({
     useShallow((state) => ({ theme: state.theme, settings: state.settings })),
   );
   const isDark = settings?.is_dark_mode ?? true;
-  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
-  const color = mood
+  const emotions = getEmotionPack(settings?.emotion_pack).emotions;
+  // Mood 0 là mức hợp lệ, chỉ null/undefined mới là chưa chọn
+  const hasMood = mood != null;
+  const color = hasMood
     ? emotions[mood].color[isDark ? "dark" : "light"]
     : theme.card;
 
@@ -46,7 +48,7 @@ export const SwapMoodButton = ({
       disabled={loading}
       style={{
         backgroundColor: color,
-        borderColor: mood ? color : theme.text + "1A",
+        borderColor: hasMood ? color : theme.text + "1A",
         borderRadius: RADIUS.md,
       }}
       className={`h-16 w-16 flex-row items-center justify-center border ${loading ? "opacity-60" : ""} ${className}`}
@@ -55,7 +57,7 @@ export const SwapMoodButton = ({
         <ActivityIndicator color={theme.primary} />
       ) : (
         <View className="flex-1 items-center justify-center">
-          {mood ? (
+          {hasMood ? (
             <ThemedText size="lg">
               {emotions[mood].icon[isDark ? "dark" : "light"]}
             </ThemedText>

@@ -212,7 +212,7 @@ const generateSeedData = `
 ${userSeedData}
 `;
 
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 4;
 
 /**
  * Đổi đường dẫn ảnh tuyệt đối (kiểu cũ) thành tên file. Đường dẫn tuyệt đối
@@ -287,6 +287,28 @@ const handleMigrate = async (db: SQLiteDatabase, version: number) => {
 
     if (version === 2) {
       await normalizeImagePaths(db);
+    }
+
+    if (version === 4) {
+      // Cột dùng để sắp xếp / lọc thường xuyên; dữ liệu tích luỹ nhiều năm vẫn nhanh
+      await db.execAsync(`
+        CREATE INDEX IF NOT EXISTS idx_fast_sessions_deleted_id ON fast_sessions(is_deleted, id);
+        CREATE INDEX IF NOT EXISTS idx_habit_logs_date ON habit_logs(log_date);
+        CREATE INDEX IF NOT EXISTS idx_daily_logs_fast ON daily_logs(fast_id);
+      `);
+    }
+
+    if (version === 3) {
+      // CHECK cũ (1–5) chặn mood 0. SQLite không sửa được CHECK nên dựng lại bảng
+      await db.execAsync(`
+        ALTER TABLE daily_notes RENAME TO daily_notes_old;
+        DROP INDEX IF EXISTS idx_daily_notes_date;
+        ${daily_noteGenerateString}
+        INSERT INTO daily_notes (log_date, mood_level, note, image_uri, sync_status, created_at, updated_at)
+          SELECT log_date, mood_level, note, image_uri, sync_status, created_at, updated_at
+          FROM daily_notes_old;
+        DROP TABLE daily_notes_old;
+      `);
     }
 
     // Cập nhật version trong cùng transaction

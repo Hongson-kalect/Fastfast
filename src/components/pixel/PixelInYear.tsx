@@ -218,7 +218,8 @@ const PixelGridManager = (props: Props) => {
                 if (props.displayType === "mood") {
                   const pixelData = props.noteData[day.dateString];
 
-                  if (!pixelData) {
+                  // Ngày chỉ có ghi chú/ảnh mà chưa chọn mood: để ô trống
+                  if (!pixelData || pixelData.mood_level == null) {
                     return (
                       <EmptyPixel
                         isToday={isToday}
@@ -337,7 +338,7 @@ const MoodPixel = ({
   isToday: boolean;
   onPress: () => void;
 }) => {
-  const pixel = EMOTIONS[data?.mood_level || 0];
+  const pixel = EMOTIONS[data.mood_level ?? 0];
   const theme = useAppStore((state) => state.theme);
 
   return (

@@ -86,7 +86,9 @@
     "fastingPhases": "Fase saat berpuasa",
     "effectAfter": "Efek dalam",
     "startFast": "Mulai puasa",
-    "endFast": "Selesai"
+    "endFast": "Selesai",
+    "longPressStart": "Tahan tombol untuk memilih waktu mulai lebih awal",
+    "longPressEnd": "Tahan tombol untuk memilih waktu selesai"
   },
   "counter": {
     "chooseTarget": "Pilih target",
@@ -378,7 +380,9 @@
       "reached": "Target tercapai",
       "notReached": "Belum tercapai"
     },
-    "actions": "Tindakan"
+    "actions": "Tindakan",
+    "deleteTitle": "Hapus puasa ini?",
+    "deleteBody": "Akan dihapus dari riwayat, perjalanan, dan statistik. Kebiasaan, perisai, dan streak yang sudah didapat tetap sama."
   },
   "startTime": {
     "invalid": "Waktu tidak valid",
@@ -502,8 +506,10 @@
       "actionsTitle": "Tindakan",
       "action1": "Ketuk hari kosong untuk menambah suasana hati dan catatan; ketuk hari berisi data untuk melihat detail.",
       "action2": "Angka di bawah tiap ikon adalah jumlah hari dalam setahun pada level itu.",
-      "action3": "Gunakan tombol Mgg/Hari di sudut kisi untuk mengganti tata letak. Gambar yang disimpan mengikuti tata letak saat ini."
-    }
+      "action3": "Gunakan tombol Mgg/Hari di sudut kisi untuk mengganti tata letak. Gambar yang disimpan mengikuti tata letak saat ini.",
+      "fast4": "Dengan Heatmap aktif, tiap kotak menunjukkan berapa jam kamu berpuasa pada hari itu: makin pekat, makin lama."
+    },
+    "heatmap": "Heatmap"
   },
   "layout": {
     "title": "Tata letak piksel",
@@ -547,7 +553,11 @@
     "photoHint": "Tambahkan foto untuk hari ini",
     "updatePhoto": "Perbarui foto",
     "changePhoto": "Ganti foto",
-    "photoFrom": "Foto dari"
+    "photoFrom": "Foto dari",
+    "restTitle": "Hari istirahat",
+    "restBody": "Perisai menjaga streak-mu hari ini. Istirahat juga bagian dari kebiasaan — besok kembali lebih kuat.",
+    "sessionCount_one": "{{count}} puasa",
+    "sessionCount_other": "{{count}} puasa"
   },
   "dayModal": {
     "todayMood": "Suasana hati hari ini",
@@ -723,7 +733,7 @@
     "mondayDesc": "Senin → Minggu",
     "sundayDesc": "Minggu → Sabtu",
     "beginnerTips": "Tips pemula",
-    "beginnerTipsDesc": "Tampilkan penjelasan singkat soal kebiasaan dan perisai",
+    "beginnerTipsDesc": "Tampilkan petunjuk dan penjelasan singkat di aplikasi",
     "vibration": "Getar",
     "sound": "Suara",
     "soundDesc": "Suara saat mulai, selesai, dan hadiah",
@@ -815,7 +825,13 @@
     "restoreFile": "Pulihkan dari file",
     "restoreFileDesc": "Pilih file cadangan FastFast",
     "importFailedTitle": "Gagal mengimpor",
-    "importFailedBody": "File ini bukan cadangan FastFast yang valid."
+    "importFailedBody": "File ini bukan cadangan FastFast yang valid.",
+    "permTitle": "Hubungkan Google Drive",
+    "permBody": "FastFast hanya memakai Google Drive untuk menyimpan cadanganmu, di folder tersembunyi milik aplikasi.\n\nAplikasi tidak bisa melihat, mengubah, atau menghapus foto, dokumen, atau file lain di Drive-mu.\n\nSelanjutnya, Google akan meminta izinmu.",
+    "permContinue": "Lanjutkan",
+    "permLater": "Nanti saja",
+    "quotaTitle": "Penyimpanan Google penuh",
+    "quotaBody": "Penyimpanan Google-mu (dipakai bersama Drive, Gmail, dan Foto) sudah penuh. Cadangan sebelumnya tetap aman. Kosongkan ruang, atau gunakan Ekspor file cadangan untuk menyimpan salinan di tempat lain."
   },
   "theme": {
     "title": "Tema",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Terbatas",
     "dark": "Gelap",
-    "light": "Terang"
+    "light": "Terang",
+    "iconsTitle": "Pakai ikon yang serasi?",
+    "iconsBody": "Tema {{theme}} punya ikon suasana hati dan puasa sendiri. Ganti ke ikon itu? Kamu bisa mengubahnya kapan saja di Perjalanan.",
+    "iconsUse": "Pakai",
+    "iconsKeep": "Tetap"
   },
   "notify": {
     "targetTitle": "🎉 Target tercapai!",
@@ -847,7 +867,12 @@
     "notFasting": "Belum puasa",
     "tapToOpen": "Ketuk untuk membuka FastFast",
     "started": "Mulai",
-    "done": "Selesai"
+    "done": "Selesai",
+    "start": "Mulai",
+    "end": "Akhiri",
+    "lastFast": "Puasa terakhir",
+    "endedAgo": "selesai {{time}} lalu",
+    "target": "Target"
   },
   "notFound": {
     "title": "Ups!",

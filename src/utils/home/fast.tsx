@@ -15,7 +15,6 @@ import { feedback } from "../feedback";
 import { cancelTargetReached } from "../notifications";
 import { getLocalTodayStr } from "../timer";
 import { checkStreak } from "./checkStreak";
-import { splitSessionIntoDays } from "./timespliter";
 
 type FinishFastProps = {
   dbService: ReturnType<typeof createDBService>;
@@ -53,7 +52,9 @@ export const finishFast = async ({
     });
   }
 
-  setCurrentFastSession(lastSession || null);
+  // Phiên quá ngắn bị xoá: quay về phiên gần nhất còn lại để Home và widget
+  // vẫn hiện phiên trước thay vì trống
+  setCurrentFastSession(lastSession || (await dbService.getLastFastSession()));
   cancelTargetReached(dbService);
   feedback(lastSession?.status === "completed" ? "fastComplete" : "fastFailed");
 
@@ -107,24 +108,7 @@ export const finishFast = async ({
     });
   }
 
-  if (isValid) {
-    const parsedDays = splitSessionIntoDays(
-      currentFast.start_time,
-      endTime,
-      currentFast.id,
-    );
-
-    for (const dayData of parsedDays) {
-      await dbService?.addDailyLogs({
-        log_date: dayData.log_date,
-        fast_id: currentFast.id,
-        hours_in_day: dayData.hours_in_day,
-        elapsed_times: dayData.elapsed_hours,
-        hour_in_fast: parseFloat((duration / 60 / 60).toFixed(1)),
-        // user_id, mood_level, note có thể bổ sung tùy thuộc form điền sau khi nhịn
-      });
-    }
-  }
+  // daily_logs đã được ghi trong transaction của finishLastSession
   if (habitLog) {
     updateHabit(habitLog);
   }

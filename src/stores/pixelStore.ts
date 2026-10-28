@@ -16,7 +16,9 @@ export type PixelCounter={
     4: number,
     5: number,
     6: number,
-  }
+  },
+  /** Số ngày theo mức heatmap (tổng giờ nhịn trong ngày) */
+  day: Record<number, number>,
 }
 type PixelStore = {
   year: number;
@@ -78,7 +80,8 @@ export const usePixelStore = create<PixelStore>((set) => ({
       4: 0,
       5: 0,
       6: 0,
-    }
+    },
+    day: {},
   },
   yearPixelData: {},
   stats: initialStats,

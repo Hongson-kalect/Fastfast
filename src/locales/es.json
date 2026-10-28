@@ -86,7 +86,9 @@
     "fastingPhases": "Fases durante el ayuno",
     "effectAfter": "Efecto en",
     "startFast": "Empezar ayuno",
-    "endFast": "Terminar"
+    "endFast": "Terminar",
+    "longPressStart": "Mantén pulsado el botón para elegir una hora de inicio anterior",
+    "longPressEnd": "Mantén pulsado el botón para elegir la hora de fin"
   },
   "counter": {
     "chooseTarget": "Elegir meta",
@@ -378,7 +380,9 @@
       "reached": "Meta alcanzada",
       "notReached": "No alcanzada"
     },
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "deleteTitle": "¿Eliminar este ayuno?",
+    "deleteBody": "Se quitará del historial, el trayecto y las estadísticas. El hábito, los escudos y la racha ya obtenidos no cambian."
   },
   "startTime": {
     "invalid": "Hora no válida",
@@ -502,8 +506,10 @@
       "actionsTitle": "Acciones",
       "action1": "Toca un día vacío para añadir ánimo y nota; toca un día con datos para ver detalles.",
       "action2": "El número bajo cada icono es cuántos días del año caen en ese nivel.",
-      "action3": "Usa el botón Sem/Día de la esquina para cambiar el diseño. Las imágenes guardadas siguen el diseño actual."
-    }
+      "action3": "Usa el botón Sem/Día de la esquina para cambiar el diseño. Las imágenes guardadas siguen el diseño actual.",
+      "fast4": "Con el Mapa de calor activado, cada celda muestra cuántas horas ayunaste ese día: cuanto más oscura, más horas."
+    },
+    "heatmap": "Mapa de calor"
   },
   "layout": {
     "title": "Diseño de píxeles",
@@ -547,7 +553,11 @@
     "photoHint": "Añade una foto para este día",
     "updatePhoto": "Actualizar foto",
     "changePhoto": "Cambiar foto",
-    "photoFrom": "Foto desde"
+    "photoFrom": "Foto desde",
+    "restTitle": "Día de descanso",
+    "restBody": "Un escudo mantuvo tu racha hoy. Descansar también forma parte del hábito: vuelve mañana con más fuerza.",
+    "sessionCount_one": "{{count}} ayuno",
+    "sessionCount_other": "{{count}} ayunos"
   },
   "dayModal": {
     "todayMood": "Ánimo de hoy",
@@ -723,7 +733,7 @@
     "mondayDesc": "Semanas de lunes → domingo",
     "sundayDesc": "Semanas de domingo → sábado",
     "beginnerTips": "Consejos de inicio",
-    "beginnerTipsDesc": "Muestra breves explicaciones sobre el hábito y los escudos",
+    "beginnerTipsDesc": "Muestra pistas y explicaciones breves en la app",
     "vibration": "Vibración",
     "sound": "Sonido",
     "soundDesc": "Sonidos al empezar, terminar y recibir recompensas",
@@ -815,7 +825,13 @@
     "restoreFile": "Restaurar desde archivo",
     "restoreFileDesc": "Elige un archivo de copia de FastFast",
     "importFailedTitle": "Error al importar",
-    "importFailedBody": "Este archivo no es una copia válida de FastFast."
+    "importFailedBody": "Este archivo no es una copia válida de FastFast.",
+    "permTitle": "Conectar Google Drive",
+    "permBody": "FastFast solo usa Google Drive para guardar tus copias, en una carpeta oculta propia de la app.\n\nNo puede ver, cambiar ni borrar tus fotos, documentos ni otros archivos de tu Drive.\n\nA continuación, Google te pedirá permiso.",
+    "permContinue": "Continuar",
+    "permLater": "Ahora no",
+    "quotaTitle": "El almacenamiento de Google está lleno",
+    "quotaBody": "Tu almacenamiento de Google (compartido por Drive, Gmail y Fotos) no tiene espacio. Tu copia anterior sigue a salvo. Libera espacio o usa Exportar archivo de copia para guardarla en otro sitio."
   },
   "theme": {
     "title": "Tema",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Limitado",
     "dark": "Oscuro",
-    "light": "Claro"
+    "light": "Claro",
+    "iconsTitle": "¿Usar los iconos a juego?",
+    "iconsBody": "El tema {{theme}} trae sus propios iconos de ánimo y ayuno. ¿Cambiar a ellos? Puedes cambiarlos cuando quieras en Trayecto.",
+    "iconsUse": "Usar iconos",
+    "iconsKeep": "Mantener"
   },
   "notify": {
     "targetTitle": "🎉 ¡Meta alcanzada!",
@@ -847,7 +867,12 @@
     "notFasting": "Sin ayuno",
     "tapToOpen": "Toca para abrir FastFast",
     "started": "Inicio",
-    "done": "Fin"
+    "done": "Fin",
+    "start": "Empezar",
+    "end": "Terminar",
+    "lastFast": "Último ayuno",
+    "endedAgo": "terminó hace {{time}}",
+    "target": "Meta"
   },
   "notFound": {
     "title": "¡Vaya!",

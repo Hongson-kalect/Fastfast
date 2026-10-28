@@ -42,7 +42,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: "😫",
           dark: "😫",
@@ -55,7 +55,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
           light: "😮‍💨",
           dark: "😮‍💨",
@@ -68,7 +68,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
           light: "🙂",
           dark: "🙂",
@@ -81,7 +81,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
           light: "😃",
           dark: "😃",
@@ -94,7 +94,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
           light: "🥰",
           dark: "🥰",
@@ -116,7 +116,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: <Ionicons name="sad-outline" size={20} color="#DC2626" />, // Đỏ đậm sắc nét
           dark: <Ionicons name="sad-outline" size={20} color="#F87171" />, // Đỏ sáng nổi bật trên nền tối
@@ -126,40 +126,40 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
-          light: <Ionicons name="ellipse-outline" size={20} color="#D97706" />, // Cam vàng đậm
-          dark: <Ionicons name="ellipse-outline" size={20} color="#FBBF24" />, // Vàng sáng
+          light: <Ionicons name="trending-down-outline" size={20} color="#D97706" />, // Cam vàng đậm
+          dark: <Ionicons name="trending-down-outline" size={20} color="#FBBF24" />, // Vàng sáng
         },
         color: { light: "#FEF3C7", dark: "#451A03" },
       },
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
-          light: <Ionicons name="happy-outline" size={20} color="#2563EB" />, // Xanh dương rõ nét
-          dark: <Ionicons name="happy-outline" size={20} color="#60A5FA" />, // Xanh dương sáng
+          light: <Ionicons name="remove-outline" size={20} color="#2563EB" />, // Xanh dương rõ nét
+          dark: <Ionicons name="remove-outline" size={20} color="#60A5FA" />, // Xanh dương sáng
         },
         color: { light: "#DBEAFE", dark: "#1E3A8A" },
       },
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
-          light: <Ionicons name="flame-outline" size={20} color="#059669" />, // Xanh lá đậm
-          dark: <Ionicons name="flame-outline" size={20} color="#34D399" />, // Xanh lá sáng
+          light: <Ionicons name="happy-outline" size={20} color="#059669" />, // Xanh lá đậm
+          dark: <Ionicons name="happy-outline" size={20} color="#34D399" />, // Xanh lá sáng
         },
         color: { light: "#D1FAE5", dark: "#064E3B" },
       },
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
-          light: <Ionicons name="sparkles-outline" size={20} color="#7C3AED" />, // Tím đậm
-          dark: <Ionicons name="sparkles-outline" size={20} color="#A78BFA" />, // Tím sáng
+          light: <Ionicons name="heart-outline" size={20} color="#7C3AED" />, // Tím đậm
+          dark: <Ionicons name="heart-outline" size={20} color="#A78BFA" />, // Tím sáng
         },
         color: { light: "#EDE9FE", dark: "#2E1065" },
       },
@@ -175,18 +175,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="emoticon-dead-outline"
+              name="emoticon-cry-outline"
               size={22}
               color="#DC2626"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="emoticon-dead-outline"
+              name="emoticon-cry-outline"
               size={22}
               color="#F87171"
             />
@@ -197,18 +197,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="emoticon-neutral-outline"
+              name="emoticon-sad-outline"
               size={22}
               color="#D97706"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="emoticon-neutral-outline"
+              name="emoticon-sad-outline"
               size={22}
               color="#FBBF24"
             />
@@ -219,18 +219,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="emoticon-happy-outline"
+              name="emoticon-neutral-outline"
               size={22}
               color="#2563EB"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="emoticon-happy-outline"
+              name="emoticon-neutral-outline"
               size={22}
               color="#60A5FA"
             />
@@ -241,18 +241,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="emoticon-cool-outline"
+              name="emoticon-happy-outline"
               size={22}
               color="#059669"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="emoticon-cool-outline"
+              name="emoticon-happy-outline"
               size={22}
               color="#34D399"
             />
@@ -263,7 +263,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
           light: (
             <MaterialCommunityIcons
@@ -294,7 +294,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: <Feather name="cloud-lightning" size={20} color="#4B5563" />, // Xám chì rõ nét
           dark: <Feather name="cloud-lightning" size={20} color="#9CA3AF" />, // Xám sáng trên nền tối
@@ -304,7 +304,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
           light: <Feather name="cloud-rain" size={20} color="#2563EB" />, // Xanh mưa đậm
           dark: <Feather name="cloud-rain" size={20} color="#60A5FA" />, // Xanh mưa sáng
@@ -314,7 +314,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
           light: <Feather name="cloud" size={20} color="#0284C7" />, // Xanh mây
           dark: <Feather name="cloud" size={20} color="#38BDF8" />,
@@ -324,7 +324,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
           light: <Feather name="sun" size={20} color="#D97706" />, // Vàng nắng ấm
           dark: <Feather name="sun" size={20} color="#FBBF24" />, // Vàng rực trên nền tối
@@ -334,7 +334,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
           light: <FontAwesome5 name="rainbow" size={18} color="#DB2777" />, // Cầu vồng hồng tươi
           dark: <FontAwesome5 name="rainbow" size={18} color="#F472B6" />,
@@ -353,7 +353,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: (
             <MaterialCommunityIcons
@@ -375,18 +375,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="battery-medium"
+              name="battery-low"
               size={22}
               color="#D97706"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="battery-medium"
+              name="battery-low"
               size={22}
               color="#FBBF24"
             />
@@ -397,18 +397,18 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
           light: (
             <MaterialCommunityIcons
-              name="battery-high"
+              name="battery-medium"
               size={22}
               color="#2563EB"
             />
           ),
           dark: (
             <MaterialCommunityIcons
-              name="battery-high"
+              name="battery-medium"
               size={22}
               color="#60A5FA"
             />
@@ -419,17 +419,29 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
-          light: <Ionicons name="flash-outline" size={20} color="#059669" />,
-          dark: <Ionicons name="flash-outline" size={20} color="#34D399" />,
+          light: (
+            <MaterialCommunityIcons
+              name="battery-high"
+              size={22}
+              color="#059669"
+            />
+          ),
+          dark: (
+            <MaterialCommunityIcons
+              name="battery-high"
+              size={22}
+              color="#34D399"
+            />
+          ),
         },
         color: { light: "#D1FAE5", dark: "#064E3B" },
       },
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
           light: (
             <MaterialCommunityIcons
@@ -460,7 +472,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_0",
         level: 0,
-        label: "Exhausted",
+        label: "Awful",
         icon: {
           light: "💀",
           dark: "💀",
@@ -473,7 +485,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_1",
         level: 1,
-        label: "Neutral",
+        label: "Bad",
         icon: {
           light: "🌧️",
           dark: "🌧️",
@@ -486,7 +498,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_2",
         level: 2,
-        label: "Good",
+        label: "Okay",
         icon: {
           light: "🌱",
           dark: "🌱",
@@ -499,7 +511,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_3",
         level: 3,
-        label: "Focused",
+        label: "Good",
         icon: {
           light: "🔥",
           dark: "🔥",
@@ -512,7 +524,7 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       {
         id: "mood_4",
         level: 4,
-        label: "Peak",
+        label: "Great",
         icon: {
           light: "👑",
           dark: "👑",
@@ -527,5 +539,9 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
 };
 
 // Pack mặc định ban đầu
-export const DEFAULT_PACK_ID = "default_emoji";
+export const DEFAULT_PACK_ID = "default";
 export const EMOTIONS = EMOTION_PACKS["default"].emotions;
+
+/** Pack theo id; id không còn tồn tại (pack bị gỡ/đổi tên) thì dùng pack mặc định. */
+export const getEmotionPack = (id?: string | null) =>
+  EMOTION_PACKS[id ?? "default"] ?? EMOTION_PACKS.default;

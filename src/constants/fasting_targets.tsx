@@ -70,7 +70,7 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
         id: "target_36",
         targetHours: 36,
         label: "36 Hours",
-        description: "Monk Fast / Extended",
+        description: "Monk Fast",
         icon: "🧘",
         color: { light: "#FCE7F3", dark: "#521838" },
       },
@@ -86,7 +86,7 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
         id: "target_72",
         targetHours: 72,
         label: "72 Hours",
-        description: "Deep Autophagy / Master",
+        description: "Prolonged Fast",
         icon: "👑",
         color: { light: "#EDE9FE", dark: "#381E66" },
       },
@@ -145,7 +145,7 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
         id: "target_48",
         targetHours: 48,
         label: "48 Hours",
-        description: "Prolonged Fast",
+        description: "Extended Fast",
         icon: <Ionicons name="flame-outline" size={20} color="#DC2626" />,
         color: { light: "#FEE2E2", dark: "#7F1D1D" },
       },
@@ -234,7 +234,7 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
         id: "target_48",
         targetHours: 48,
         label: "48 Hours",
-        description: "Autophagy Peak",
+        description: "Extended Fast",
         icon: <MaterialCommunityIcons name="fire" size={22} color="#EF4444" />,
         color: { light: "#FCA5A5", dark: "#991B1B" },
       },
@@ -242,7 +242,7 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
         id: "target_72",
         targetHours: 72,
         label: "72 Hours",
-        description: "Immune System Reset",
+        description: "Prolonged Fast",
         icon: (
           <MaterialCommunityIcons
             name="crown-circle-outline"
@@ -322,4 +322,8 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
 };
 
 // Target Pack mặc định
-export const DEFAULT_TARGET_PACK_ID = "default_emoji_targets";
+export const DEFAULT_TARGET_PACK_ID = "default";
+
+/** Pack theo id; id không còn tồn tại (pack bị gỡ/đổi tên) thì dùng pack mặc định. */
+export const getTargetPack = (id?: string | null) =>
+  TARGET_PACKS[id ?? "default"] ?? TARGET_PACKS.default;

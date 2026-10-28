@@ -86,7 +86,9 @@
     "fastingPhases": "Các giai đoạn khi nhịn",
     "effectAfter": "Hiệu quả sau",
     "startFast": "Bắt đầu nhịn",
-    "endFast": "Kết thúc"
+    "endFast": "Kết thúc",
+    "longPressStart": "Nhấn giữ nút để chọn giờ bắt đầu sớm hơn",
+    "longPressEnd": "Nhấn giữ nút để chọn giờ kết thúc"
   },
   "counter": {
     "chooseTarget": "Chọn mục tiêu",
@@ -378,7 +380,9 @@
       "reached": "Đạt mục tiêu",
       "notReached": "Chưa đạt"
     },
-    "actions": "Thao tác"
+    "actions": "Thao tác",
+    "deleteTitle": "Xoá phiên nhịn này?",
+    "deleteBody": "Phiên sẽ bị xoá khỏi lịch sử, Hành trình và thống kê. Habit, khiên và streak đã nhận vẫn giữ nguyên."
   },
   "startTime": {
     "invalid": "Thời gian không hợp lệ",
@@ -493,7 +497,7 @@
       }
     },
     "info": {
-      "title": "Đọc lịch Journey",
+      "title": "Đọc lịch Hành trình",
       "message": "Những điểm mà dải chú thích icon chưa nói hết.",
       "fast1": "Mỗi ô lấy màu theo tổng độ dài của phiên nhịn dài nhất có mặt trong ngày đó.",
       "fast2": "Phiên kéo qua nhiều ngày tô màu cho tất cả các ngày đó, nhạt ở ngày đầu và đậm dần tới ngày kết thúc.",
@@ -502,8 +506,10 @@
       "actionsTitle": "Thao tác",
       "action1": "Bấm ngày trống để thêm cảm xúc và ghi chú, bấm ngày đã có dữ liệu để xem chi tiết.",
       "action2": "Số dưới mỗi icon là số ngày trong năm rơi vào mức đó.",
-      "action3": "Nút Week/Day ở góc lưới để đổi bố cục. Ảnh lưu ra sẽ theo đúng bố cục đang chọn."
-    }
+      "action3": "Nút Tuần/Ngày ở góc lưới để đổi bố cục. Ảnh lưu ra sẽ theo đúng bố cục đang chọn.",
+      "fast4": "Khi bật Heatmap, mỗi ô cho biết bạn đã nhịn bao nhiêu giờ trong chính ngày đó: càng đậm càng nhiều."
+    },
+    "heatmap": "Heatmap"
   },
   "layout": {
     "title": "Bố cục pixel",
@@ -547,7 +553,11 @@
     "photoHint": "Thêm hình ảnh cho ngày này",
     "updatePhoto": "Cập nhật ảnh",
     "changePhoto": "Đổi ảnh",
-    "photoFrom": "Hình ảnh từ"
+    "photoFrom": "Hình ảnh từ",
+    "restTitle": "Ngày nghỉ",
+    "restBody": "Một chiếc khiên đã giữ chuỗi của bạn hôm nay. Nghỉ ngơi cũng là một phần của thói quen — ngày mai quay lại mạnh mẽ hơn nhé.",
+    "sessionCount_one": "{{count}} phiên",
+    "sessionCount_other": "{{count}} phiên"
   },
   "dayModal": {
     "todayMood": "Cảm xúc hôm nay",
@@ -723,7 +733,7 @@
     "mondayDesc": "Tuần từ Thứ Hai → Chủ nhật",
     "sundayDesc": "Tuần từ Chủ nhật → Thứ Bảy",
     "beginnerTips": "Mẹo cho người mới",
-    "beginnerTipsDesc": "Hiện giải thích ngắn về cách habit và khiên hoạt động",
+    "beginnerTipsDesc": "Hiện gợi ý và giải thích ngắn trong app",
     "vibration": "Rung",
     "sound": "Âm thanh",
     "soundDesc": "Âm thanh khi bắt đầu, kết thúc và nhận thưởng",
@@ -815,7 +825,13 @@
     "restoreFile": "Khôi phục từ file",
     "restoreFileDesc": "Chọn một file sao lưu FastFast",
     "importFailedTitle": "Nhập file thất bại",
-    "importFailedBody": "File này không phải bản sao lưu FastFast hợp lệ."
+    "importFailedBody": "File này không phải bản sao lưu FastFast hợp lệ.",
+    "permTitle": "Kết nối Google Drive",
+    "permBody": "FastFast chỉ dùng Google Drive để lưu bản sao lưu của bạn, trong một thư mục ẩn riêng của app.\n\nApp không thể xem, sửa hay xoá ảnh, tài liệu hay bất kỳ file nào khác trong Drive của bạn.\n\nTiếp theo, Google sẽ hỏi bạn cho phép việc này.",
+    "permContinue": "Tiếp tục",
+    "permLater": "Để sau",
+    "quotaTitle": "Bộ nhớ Google đã đầy",
+    "quotaBody": "Bộ nhớ Google của bạn (dùng chung cho Drive, Gmail và Photos) đã hết chỗ. Bản sao lưu trước đó vẫn an toàn. Hãy giải phóng bớt dung lượng, hoặc dùng Xuất file sao lưu để lưu một bản ở nơi khác."
   },
   "theme": {
     "title": "Chủ đề",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Giới hạn",
     "dark": "Tối",
-    "light": "Sáng"
+    "light": "Sáng",
+    "iconsTitle": "Dùng icon đi kèm?",
+    "iconsBody": "Theme {{theme}} có bộ icon mood và fast riêng. Đổi sang bộ này không? Bạn có thể đổi lại bất cứ lúc nào trong Hành trình.",
+    "iconsUse": "Dùng icon",
+    "iconsKeep": "Giữ nguyên"
   },
   "notify": {
     "targetTitle": "🎉 Đã đạt mục tiêu!",
@@ -847,7 +867,12 @@
     "notFasting": "Chưa nhịn",
     "tapToOpen": "Chạm để mở FastFast",
     "started": "Bắt đầu",
-    "done": "Xong"
+    "done": "Xong",
+    "start": "Bắt đầu",
+    "end": "Kết thúc",
+    "lastFast": "Phiên trước",
+    "endedAgo": "kết thúc {{time}} trước",
+    "target": "Mục tiêu"
   },
   "notFound": {
     "title": "Ối!",

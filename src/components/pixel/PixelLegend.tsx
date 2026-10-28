@@ -1,12 +1,14 @@
 import { FASTING_TARGETS } from "@/constants/data";
-import { EMOTION_PACKS } from "@/constants/emotions";
-import { TARGET_PACKS } from "@/constants/fasting_targets";
+import { getEmotionPack } from "@/constants/emotions";
+import { getTargetPack } from "@/constants/fasting_targets";
+import { HEATMAP_LEVELS, heatmapLabel, withOpacity } from "@/constants/heatmap";
 import { ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { useT } from "@/providers/Language";
+import { getContrastTextColor } from "@/utils/color";
 
 
 // Ô của mức cuối không có giới hạn trên → "72h+"
@@ -22,13 +24,14 @@ const fastLabel = (index: number) => {
 const PixelLegend = ({ viewMode }: { viewMode: ViewMode }) => {
   const t = useT();
   const settings = useAppStore((state) => state.settings);
+  const theme = useAppStore((state) => state.theme);
   const counter = usePixelStore((state) => state.counter);
 
   const isDark = settings?.is_dark_mode ?? true;
   const isMood = viewMode === "mood";
 
   const items = isMood
-    ? EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions.map(
+    ? getEmotionPack(settings?.emotion_pack).emotions.map(
         (item, index) => ({
           key: item.label,
           icon: item.icon[isDark ? "dark" : "light"],
@@ -37,15 +40,24 @@ const PixelLegend = ({ viewMode }: { viewMode: ViewMode }) => {
           label: t(`journey.legend.mood.${index}`),
         }),
       )
-    : TARGET_PACKS[settings?.target_pack ?? "default"].targets.map(
-        (item, index) => ({
-          key: item.label,
-          icon: item.icon,
-          color: isDark ? item.color.dark : item.color.light,
-          count: counter.fast[index as 0 | 1 | 2 | 3 | 4 | 5 | 6],
-          label: fastLabel(index),
-        }),
-      );
+    : settings?.pixel_heatmap
+      ? // Heatmap đếm số ngày theo tổng giờ nhịn trong ngày
+        HEATMAP_LEVELS.map((level, index) => ({
+          key: `heat${index}`,
+          icon: null,
+          color: withOpacity(theme.primary, level.opacity),
+          count: counter.day?.[index] ?? 0,
+          label: heatmapLabel(index),
+        }))
+      : getTargetPack(settings?.target_pack).targets.map(
+          (item, index) => ({
+            key: item.label,
+            icon: item.icon,
+            color: isDark ? item.color.dark : item.color.light,
+            count: counter.fast[index as 0 | 1 | 2 | 3 | 4 | 5 | 6],
+            label: fastLabel(index),
+          }),
+        );
 
   return (
     <View className={`flex-row ${isMood ? "gap-4" : "gap-2"}`}>
@@ -56,7 +68,13 @@ const PixelLegend = ({ viewMode }: { viewMode: ViewMode }) => {
             className="w-full items-center rounded-xl px-2 py-1.5"
           >
             <ThemedText>{item.icon}</ThemedText>
-            <ThemedText size="xs">{item.count}</ThemedText>
+            {/* Ô heatmap nhạt/đậm khác nhau: chọn chữ đen/trắng theo nền thực tế */}
+            <ThemedText
+              size="xs"
+              colorHex={getContrastTextColor(item.color, theme.background)}
+            >
+              {item.count}
+            </ThemedText>
           </View>
           <ThemedText
             size="xxs"

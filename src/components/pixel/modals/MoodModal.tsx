@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
+import { getEmotionPack, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
@@ -29,7 +29,7 @@ export const MoodModal = ({
   const settings = useAppStore((state) => state.settings);
   const isDark = settings?.is_dark_mode ?? true;
 
-  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
+  const emotions = getEmotionPack(settings?.emotion_pack).emotions;
 
   const handleSave = (mood: MoodLevel) => {
     if (mood == null) return;

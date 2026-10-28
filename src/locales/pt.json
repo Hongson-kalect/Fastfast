@@ -86,7 +86,9 @@
     "fastingPhases": "Fases durante o jejum",
     "effectAfter": "Efeito em",
     "startFast": "Começar jejum",
-    "endFast": "Encerrar"
+    "endFast": "Encerrar",
+    "longPressStart": "Segure o botão para escolher um horário de início anterior",
+    "longPressEnd": "Segure o botão para escolher o horário de término"
   },
   "counter": {
     "chooseTarget": "Escolher meta",
@@ -378,7 +380,9 @@
       "reached": "Meta atingida",
       "notReached": "Não atingida"
     },
-    "actions": "Ações"
+    "actions": "Ações",
+    "deleteTitle": "Excluir este jejum?",
+    "deleteBody": "Ele será removido do histórico, da jornada e das estatísticas. Hábito, escudos e sequência já obtidos continuam iguais."
   },
   "startTime": {
     "invalid": "Horário inválido",
@@ -502,8 +506,10 @@
       "actionsTitle": "Ações",
       "action1": "Toque num dia vazio para adicionar humor e nota; toque num dia com dados para ver detalhes.",
       "action2": "O número sob cada ícone é quantos dias do ano caem naquele nível.",
-      "action3": "Use o botão Sem/Dia no canto para mudar o layout. As imagens salvas seguem o layout atual."
-    }
+      "action3": "Use o botão Sem/Dia no canto para mudar o layout. As imagens salvas seguem o layout atual.",
+      "fast4": "Com o Mapa de calor ativado, cada célula mostra quantas horas você jejuou naquele dia: quanto mais escura, mais horas."
+    },
+    "heatmap": "Mapa de calor"
   },
   "layout": {
     "title": "Layout de pixels",
@@ -547,7 +553,11 @@
     "photoHint": "Adicione uma foto para este dia",
     "updatePhoto": "Atualizar foto",
     "changePhoto": "Trocar foto",
-    "photoFrom": "Foto de"
+    "photoFrom": "Foto de",
+    "restTitle": "Dia de descanso",
+    "restBody": "Um escudo manteve sua sequência hoje. Descansar também faz parte do hábito — volte amanhã mais forte.",
+    "sessionCount_one": "{{count}} jejum",
+    "sessionCount_other": "{{count}} jejuns"
   },
   "dayModal": {
     "todayMood": "Humor de hoje",
@@ -723,7 +733,7 @@
     "mondayDesc": "Semanas de segunda → domingo",
     "sundayDesc": "Semanas de domingo → sábado",
     "beginnerTips": "Dicas para iniciantes",
-    "beginnerTipsDesc": "Mostra explicações curtas sobre hábito e escudos",
+    "beginnerTipsDesc": "Mostra dicas e explicações curtas no app",
     "vibration": "Vibração",
     "sound": "Som",
     "soundDesc": "Sons ao começar, terminar e ganhar recompensas",
@@ -815,7 +825,13 @@
     "restoreFile": "Restaurar do arquivo",
     "restoreFileDesc": "Escolha um arquivo de backup do FastFast",
     "importFailedTitle": "Falha ao importar",
-    "importFailedBody": "Este arquivo não é um backup válido do FastFast."
+    "importFailedBody": "Este arquivo não é um backup válido do FastFast.",
+    "permTitle": "Conectar Google Drive",
+    "permBody": "O FastFast só usa o Google Drive para guardar seus backups, em uma pasta oculta do próprio app.\n\nEle não pode ver, alterar nem apagar suas fotos, documentos ou outros arquivos do Drive.\n\nEm seguida, o Google pedirá sua permissão.",
+    "permContinue": "Continuar",
+    "permLater": "Agora não",
+    "quotaTitle": "O armazenamento do Google está cheio",
+    "quotaBody": "Seu armazenamento do Google (compartilhado por Drive, Gmail e Fotos) está sem espaço. Seu backup anterior continua seguro. Libere espaço ou use Exportar arquivo de backup para salvar uma cópia em outro lugar."
   },
   "theme": {
     "title": "Tema",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Limitado",
     "dark": "Escuro",
-    "light": "Claro"
+    "light": "Claro",
+    "iconsTitle": "Usar os ícones combinando?",
+    "iconsBody": "O tema {{theme}} tem seus próprios ícones de humor e jejum. Trocar para eles? Você pode mudar quando quiser em Jornada.",
+    "iconsUse": "Usar ícones",
+    "iconsKeep": "Manter"
   },
   "notify": {
     "targetTitle": "🎉 Meta atingida!",
@@ -847,7 +867,12 @@
     "notFasting": "Sem jejum",
     "tapToOpen": "Toque para abrir o FastFast",
     "started": "Início",
-    "done": "Fim"
+    "done": "Fim",
+    "start": "Começar",
+    "end": "Encerrar",
+    "lastFast": "Último jejum",
+    "endedAgo": "terminou há {{time}}",
+    "target": "Meta"
   },
   "notFound": {
     "title": "Ops!",

@@ -1,6 +1,6 @@
 import { logDbError } from "@/utils/dbError";
 import { FastSession, HabitEffect, HabitLog, UserProfile } from "@/interfaces/db.type";
-import { getDaysDiff, getLocalTodayStr } from "@/utils/timer";
+import { parseLocalDate, getDaysDiff, getLocalTodayStr } from "@/utils/timer";
 import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import { fixed, numberLimit } from "@/utils/numberLimit";
@@ -47,7 +47,7 @@ export const getHabitLogs = async (
   days: number = 30,
 ): Promise<(HabitLog & FastSession)[]> => {
   const today = getLocalTodayStr();
-  const startDay = new Date(today);
+  const startDay = parseLocalDate(today);
   startDay.setDate(startDay.getDate() - days);
   const startDate = getLocalTodayStr(startDay);
   const rows = await db.getAllAsync<HabitLog & FastSession>(
@@ -85,7 +85,8 @@ export const getLastHabitLog = async (
   db: SQLiteDatabase,
 ): Promise<HabitLog | null> => {
   const rows = await db.getFirstAsync<HabitLog>(
-    `SELECT * FROM habit_logs ORDER BY updated_at DESC LIMIT 1;`,
+    // id là uuidv7 nên tăng theo thời điểm tạo (mili giây); updated_at chỉ tới giây
+    `SELECT * FROM habit_logs WHERE is_deleted = 0 ORDER BY id DESC LIMIT 1;`,
   );
   return rows;
 };
@@ -201,71 +202,6 @@ export const addHabitLogs = async (
     `SELECT * FROM habit_logs WHERE id = ?`,
     [id],
   );
-};
-
-export const reduceShield = async (
-  db: SQLiteDatabase,
-  lastHabitLog: HabitLog,
-  reduce: number,
-) => {
-  const today = getLocalTodayStr();
-  const id = uuidv7();
-  try {
-    await db.runAsync(
-      `INSERT INTO habit_logs 
-    (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain) 
-    VALUES (?, ?, ?, ?, ?,?,?,?)`,
-      [
-        id,
-        today,
-        null,
-        0,
-        lastHabitLog.habit_snap,
-        -reduce,
-        lastHabitLog.shield_snap - reduce,
-        lastHabitLog.habit_retain || 0,
-      ],
-    );
-
-    const lastHabit = await getLastHabitLog(db);
-    return lastHabit;
-  } catch (e) {
-    logDbError("error on reduceShield", e);
-    return null;
-  }
-};
-export const reduceHabit = async (
-  db: SQLiteDatabase,
-  lastHabitLog: HabitLog,
-  reduce: number,
-  days: number,
-) => {
-  const today = getLocalTodayStr();
-  const id = uuidv7();
-  try {
-    await db.runAsync(
-      `INSERT INTO habit_logs 
-      (id, log_date, fast_id, habit_delta, habit_snap, shield_delta, shield_snap, habit_retain, overest) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        today,
-        null,
-        -reduce,
-        Math.max(fixed(lastHabitLog.habit_snap - reduce), 0),
-        -lastHabitLog.shield_snap,
-        0,
-        0,
-        days,
-      ],
-    );
-
-    const lastHabit = await getLastHabitLog(db);
-    return lastHabit;
-  } catch (e) {
-    logDbError("error on reduceHabit", e);
-    return null;
-  }
 };
 
 export const calculatePenaltyEffect = (

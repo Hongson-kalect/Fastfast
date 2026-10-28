@@ -86,7 +86,9 @@
     "fastingPhases": "Les phases du jeûne",
     "effectAfter": "Effet dans",
     "startFast": "Commencer le jeûne",
-    "endFast": "Terminer"
+    "endFast": "Terminer",
+    "longPressStart": "Maintenez le bouton pour choisir une heure de début antérieure",
+    "longPressEnd": "Maintenez le bouton pour choisir l'heure de fin"
   },
   "counter": {
     "chooseTarget": "Choisir un objectif",
@@ -378,7 +380,9 @@
       "reached": "Objectif atteint",
       "notReached": "Non atteint"
     },
-    "actions": "Actions"
+    "actions": "Actions",
+    "deleteTitle": "Supprimer ce jeûne ?",
+    "deleteBody": "Il sera retiré de l'historique, du parcours et des stats. L'habitude, les boucliers et la série déjà acquis restent inchangés."
   },
   "startTime": {
     "invalid": "Heure invalide",
@@ -502,8 +506,10 @@
       "actionsTitle": "Actions",
       "action1": "Touchez un jour vide pour ajouter humeur et note ; touchez un jour rempli pour voir le détail.",
       "action2": "Le nombre sous chaque icône indique combien de jours de l'année sont à ce niveau.",
-      "action3": "Le bouton Sem/Jour dans le coin change la disposition. Les images enregistrées suivent la disposition choisie."
-    }
+      "action3": "Le bouton Sem/Jour dans le coin change la disposition. Les images enregistrées suivent la disposition choisie.",
+      "fast4": "Avec la Heatmap, chaque case indique combien d'heures vous avez jeûné ce jour-là : plus elle est foncée, plus c'est long."
+    },
+    "heatmap": "Heatmap"
   },
   "layout": {
     "title": "Disposition des pixels",
@@ -547,7 +553,11 @@
     "photoHint": "Ajoutez une photo pour ce jour",
     "updatePhoto": "Modifier la photo",
     "changePhoto": "Changer la photo",
-    "photoFrom": "Photo depuis"
+    "photoFrom": "Photo depuis",
+    "restTitle": "Jour de repos",
+    "restBody": "Un bouclier a préservé votre série aujourd'hui. Le repos fait aussi partie de l'habitude : revenez plus fort demain.",
+    "sessionCount_one": "{{count}} jeûne",
+    "sessionCount_other": "{{count}} jeûnes"
   },
   "dayModal": {
     "todayMood": "Humeur du jour",
@@ -723,7 +733,7 @@
     "mondayDesc": "Semaines du lundi → dimanche",
     "sundayDesc": "Semaines du dimanche → samedi",
     "beginnerTips": "Conseils débutant",
-    "beginnerTipsDesc": "Affiche de courtes explications sur l'habitude et les boucliers",
+    "beginnerTipsDesc": "Affiche de courtes astuces et explications dans l'app",
     "vibration": "Vibration",
     "sound": "Son",
     "soundDesc": "Sons au début, à la fin et pour les récompenses",
@@ -815,7 +825,13 @@
     "restoreFile": "Restaurer depuis un fichier",
     "restoreFileDesc": "Choisissez un fichier de sauvegarde FastFast",
     "importFailedTitle": "Échec de l'import",
-    "importFailedBody": "Ce fichier n'est pas une sauvegarde FastFast valide."
+    "importFailedBody": "Ce fichier n'est pas une sauvegarde FastFast valide.",
+    "permTitle": "Connecter Google Drive",
+    "permBody": "FastFast utilise Google Drive uniquement pour stocker vos sauvegardes, dans un dossier caché propre à l'app.\n\nIl ne peut ni voir, ni modifier, ni supprimer vos photos, documents ou autres fichiers Drive.\n\nGoogle va ensuite vous demander votre autorisation.",
+    "permContinue": "Continuer",
+    "permLater": "Plus tard",
+    "quotaTitle": "Le stockage Google est plein",
+    "quotaBody": "Votre stockage Google (partagé entre Drive, Gmail et Photos) est plein. Votre sauvegarde précédente reste intacte. Libérez de l'espace ou utilisez Exporter un fichier de sauvegarde pour garder une copie ailleurs."
   },
   "theme": {
     "title": "Thème",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Limité",
     "dark": "Sombre",
-    "light": "Clair"
+    "light": "Clair",
+    "iconsTitle": "Utiliser les icônes assorties ?",
+    "iconsBody": "Le thème {{theme}} a ses propres icônes d'humeur et de jeûne. Les utiliser ? Vous pouvez les changer à tout moment dans Parcours.",
+    "iconsUse": "Utiliser",
+    "iconsKeep": "Garder"
   },
   "notify": {
     "targetTitle": "🎉 Objectif atteint !",
@@ -847,7 +867,12 @@
     "notFasting": "Pas de jeûne",
     "tapToOpen": "Touchez pour ouvrir FastFast",
     "started": "Début",
-    "done": "Fin"
+    "done": "Fin",
+    "start": "Démarrer",
+    "end": "Terminer",
+    "lastFast": "Dernier jeûne",
+    "endedAgo": "terminé il y a {{time}}",
+    "target": "Objectif"
   },
   "notFound": {
     "title": "Oups !",

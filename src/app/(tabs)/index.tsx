@@ -17,8 +17,10 @@ import useModalStore from "@/stores/modalStore";
 import { feedback } from "@/utils/feedback";
 import { finishFast } from "@/utils/home/fast";
 import { scheduleTargetReached } from "@/utils/notifications";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { useCallback } from "react";
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
+import { ThemedText } from "@/components/themed-text";
+import { router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useT } from "@/providers/Language";
@@ -30,6 +32,7 @@ const HomeScreen = () => {
 
   const settings = useAppStore((state) => state.settings);
   const theme = useAppStore((state) => state.theme);
+  const beginnerTips = settings?.beginner_tips ?? true;
 
   const currentFastSession = useAppStore((state) => state.currentFastSession);
   const startTime = currentFastSession?.start_time ?? null;
@@ -117,6 +120,15 @@ const HomeScreen = () => {
     [isCounting, startTime, currentFastSession, handleFinishFast, startFast],
   );
 
+  // Nút Kết thúc trên widget mở app qua fastfast://?widgetAction=finish
+  const { widgetAction } = useLocalSearchParams<{ widgetAction?: string }>();
+  useEffect(() => {
+    // Chờ app nạp xong dữ liệu mới biết có đang nhịn hay không
+    if (widgetAction !== "finish" || !settings) return;
+    router.setParams({ widgetAction: undefined });
+    if (isCounting) handleFinishFast();
+  }, [widgetAction, settings, isCounting]);
+
   const openBodyProgressInfo = () => {
     feedback("tap");
     addModal({
@@ -154,6 +166,19 @@ const HomeScreen = () => {
           {/* Hành động chính trong tầm ngón cái */}
           <View className="mt-4">
             <SwapButton isCounting={isCounting} toggleCounting={toggleCounting} />
+            {/* Nhấn giữ nút Fast mở chọn giờ bắt đầu / kết thúc: không có gợi ý thì khó biết */}
+            {beginnerTips && (
+              <View className="mt-2 flex-row items-center justify-center gap-1">
+                <MaterialCommunityIcons
+                  name="gesture-tap-hold"
+                  size={13}
+                  color={theme.text + "66"}
+                />
+                <ThemedText size="xxs" color="text" opacity="low">
+                  {isCounting ? t("home.longPressEnd") : t("home.longPressStart")}
+                </ThemedText>
+              </View>
+            )}
           </View>
 
           {/* Lần nhịn gần nhất (khi chưa nhịn) */}

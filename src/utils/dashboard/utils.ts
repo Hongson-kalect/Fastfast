@@ -1,4 +1,5 @@
 import { ChartRangeConfig, FASTING_TARGETS, MONTHS } from "@/constants/data";
+import { getHeatmapLevel } from "@/constants/heatmap";
 import { getMonth, getWeek } from "date-fns";
 import { getLocalTodayStr, getStartDateFromRange } from "../timer";
 import { DailyLog, DailyNote, FastSession, HabitLog } from "@/interfaces/db.type";
@@ -121,7 +122,7 @@ export const buildPixelYearData = ({
     dayNode.note = note;
     newStats.logDays += 1;
 
-    if(note.mood_level) counter.mood[note.mood_level] += 1
+    if (note.mood_level != null) counter.mood[note.mood_level] += 1
   });
 
   // 2. Process Logs
@@ -169,5 +170,13 @@ export const buildPixelYearData = ({
     }
   });
 
-  return { yearMap, stats: newStats, counter };
+  // Mức heatmap tính sau cùng vì một ngày có thể nhận giờ từ nhiều phiên
+  const day: Record<number, number> = {};
+  Object.values(yearMap).forEach((node) => {
+    if (node.totalHours <= 0) return;
+    const level = getHeatmapLevel(node.totalHours);
+    day[level] = (day[level] ?? 0) + 1;
+  });
+
+  return { yearMap, stats: newStats, counter: { ...counter, day } };
 };

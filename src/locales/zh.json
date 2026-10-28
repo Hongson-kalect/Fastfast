@@ -86,7 +86,9 @@
     "fastingPhases": "断食中的阶段",
     "effectAfter": "生效倒计时",
     "startFast": "开始断食",
-    "endFast": "结束"
+    "endFast": "结束",
+    "longPressStart": "长按按钮可选择更早的开始时间",
+    "longPressEnd": "长按按钮可选择结束时间"
   },
   "counter": {
     "chooseTarget": "选择目标",
@@ -378,7 +380,9 @@
       "reached": "达成目标",
       "notReached": "未达成"
     },
-    "actions": "操作"
+    "actions": "操作",
+    "deleteTitle": "要删除这次断食吗？",
+    "deleteBody": "将从历史、历程和统计中移除。已获得的习惯、护盾和连续天数保持不变。"
   },
   "startTime": {
     "invalid": "时间无效",
@@ -502,8 +506,10 @@
       "actionsTitle": "操作",
       "action1": "点按空白日期可添加心情和笔记，点按有数据的日期可查看详情。",
       "action2": "每个图标下的数字是一年中属于该等级的天数。",
-      "action3": "用网格角落的周/日按钮切换布局，保存的图片会采用当前布局。"
-    }
+      "action3": "用网格角落的周/日按钮切换布局，保存的图片会采用当前布局。",
+      "fast4": "开启热力图后，每个格子表示当天断食的小时数：颜色越深，时间越长。"
+    },
+    "heatmap": "热力图"
   },
   "layout": {
     "title": "像素布局",
@@ -547,7 +553,11 @@
     "photoHint": "为这一天添加照片",
     "updatePhoto": "更新照片",
     "changePhoto": "更换照片",
-    "photoFrom": "照片来源"
+    "photoFrom": "照片来源",
+    "restTitle": "休息日",
+    "restBody": "护盾帮你保住了今天的连续天数。休息也是习惯的一部分——明天更有力量地回来吧。",
+    "sessionCount_one": "{{count}} 次",
+    "sessionCount_other": "{{count}} 次"
   },
   "dayModal": {
     "todayMood": "今日心情",
@@ -723,7 +733,7 @@
     "mondayDesc": "周一 → 周日",
     "sundayDesc": "周日 → 周六",
     "beginnerTips": "新手提示",
-    "beginnerTipsDesc": "显示习惯与护盾机制的简短说明",
+    "beginnerTipsDesc": "在应用中显示简短提示和说明",
     "vibration": "振动",
     "sound": "声音",
     "soundDesc": "开始、结束和奖励时的声音",
@@ -815,7 +825,13 @@
     "restoreFile": "从文件恢复",
     "restoreFileDesc": "选择一个 FastFast 备份文件",
     "importFailedTitle": "导入失败",
-    "importFailedBody": "此文件不是有效的 FastFast 备份。"
+    "importFailedBody": "此文件不是有效的 FastFast 备份。",
+    "permTitle": "连接 Google 云端硬盘",
+    "permBody": "FastFast 仅使用 Google 云端硬盘存放你的备份，位置是应用专属的隐藏文件夹。\n\n它无法查看、修改或删除你云端硬盘中的照片、文档或其他任何文件。\n\n接下来 Google 会请你授权。",
+    "permContinue": "继续",
+    "permLater": "以后再说",
+    "quotaTitle": "Google 存储空间已满",
+    "quotaBody": "你的 Google 存储空间（云端硬盘、Gmail 和相册共用）已满。之前的备份仍然安全。请释放一些空间，或使用“导出备份文件”将副本保存到其他地方。"
   },
   "theme": {
     "title": "主题",
@@ -827,7 +843,11 @@
     "premium": "高级",
     "limited": "限定",
     "dark": "深色",
-    "light": "浅色"
+    "light": "浅色",
+    "iconsTitle": "使用配套图标吗？",
+    "iconsBody": "{{theme}} 主题自带心情和断食图标。要切换吗？随时可在历程中更改。",
+    "iconsUse": "使用",
+    "iconsKeep": "保持不变"
   },
   "notify": {
     "targetTitle": "🎉 已达成目标！",
@@ -847,7 +867,12 @@
     "notFasting": "未断食",
     "tapToOpen": "点按打开 FastFast",
     "started": "开始",
-    "done": "完成"
+    "done": "完成",
+    "start": "开始",
+    "end": "结束",
+    "lastFast": "上次断食",
+    "endedAgo": "{{time}}前结束",
+    "target": "目标"
   },
   "notFound": {
     "title": "哎呀！",

@@ -22,6 +22,15 @@ export const timeString = (time: number) => {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
+/**
+ * "YYYY-MM-DD" → Date lúc 00:00 giờ địa phương. Không dùng new Date("YYYY-MM-DD"):
+ * chuỗi đó được hiểu là 00:00 UTC, ở múi giờ âm (châu Mỹ) sẽ thành ngày hôm trước.
+ */
+export const parseLocalDate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const getLocalTodayStr = (dateParam?: Date | number): string => {
   const date = new Date(dateParam ?? Date.now());
 

@@ -1,8 +1,11 @@
 import { getTarget } from "@/constants/data";
 import { useDBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
+import { reloadAppData } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
+import { useSQLiteContext } from "expo-sqlite";
 import useModalStore from "@/stores/modalStore";
+import { getContrastTextColor } from "@/utils/color";
 import { hourFormat } from "@/utils/timer";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -10,7 +13,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
-import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/providers/Language";
 
 type HeaderProps = {
@@ -41,6 +43,7 @@ const formatTime = (seconds: number) => {
 
 function FastHistorySheet() {
   const dbService = useDBService();
+  const db = useSQLiteContext();
 
   const [history, setHistory] = useState<FastSession[]>([]);
 
@@ -56,6 +59,8 @@ function FastHistorySheet() {
   const deleteFast = async (id: string) => {
     await dbService.deleteSession(id);
     await loadHistory();
+    // Home, Journey và Thống kê đều đọc phiên này: nạp lại để không còn số liệu cũ
+    await reloadAppData(db);
   };
 
   return (
@@ -214,12 +219,7 @@ const StatCard = ({ value, label, color }: StatCardProps) => {
 export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const t = useT();
   const theme = useAppStore((state) => state.theme);
-  const { addModal, closeCurrentModal } = useModalStore(
-    useShallow((state) => ({
-      addModal: state.addModal,
-      closeCurrentModal: state.closeCurrentModal,
-    })),
-  );
+  const addModal = useModalStore((state) => state.addModal);
 
   const durationSeconds = Number(item.duration ?? 0);
   const durationHours = durationSeconds / S_PER_HOUR;
@@ -317,12 +317,29 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
         {
           label: t("common.delete"),
           onPress: () => {
-            onDelete(item.id);
-            closeCurrentModal();
+            // Xoá phiên kéo theo Journey và thống kê: hỏi lại trước khi xoá.
+            // Menu tự đóng sau khi bấm, hộp xác nhận chờ trong hàng đợi rồi hiện ngay sau
+            addModal({
+              type: "confirm",
+              title: t("history.deleteTitle"),
+              message: t("history.deleteBody"),
+              okText: t("common.delete"),
+              onOk: () => onDelete(item.id),
+            });
           },
-          icon: <Feather name="trash-2" size={20} color={theme.background} />,
+          icon: (
+            <Feather
+              name="trash-2"
+              size={20}
+              color={getContrastTextColor(theme.error)}
+            />
+          ),
           rightContent: (
-            <Feather name="chevron-right" size={20} color={theme.background} />
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={getContrastTextColor(theme.error)}
+            />
           ),
           backgroundColor: theme.error,
         },

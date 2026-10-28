@@ -1,16 +1,51 @@
 import type { WidgetTaskHandlerProps } from "react-native-android-widget";
+import { MoodLevel } from "@/interfaces/db.type";
+import { CompactFastWidget } from "./CompactFastWidget";
 import { FastTimerWidget } from "./FastTimerWidget";
-import { FAST_WIDGET_NAME, loadWidgetState } from "./widgetState";
+import { setMoodFromWidget, startFastFromWidget } from "./widgetActions";
+import { WIDGET_ACTIONS } from "./widgetDisplay";
+import {
+  COMPACT_WIDGET_NAME,
+  FAST_WIDGET_NAME,
+  FastWidgetState,
+  loadWidgetState,
+} from "./widgetState";
 
-/** Hệ thống gọi khi widget được thêm, đổi cỡ hoặc tới chu kỳ cập nhật 30 phút. */
+const WIDGETS = {
+  [FAST_WIDGET_NAME]: FastTimerWidget,
+  [COMPACT_WIDGET_NAME]: CompactFastWidget,
+};
+
+/**
+ * Hệ thống gọi khi widget được thêm, đổi cỡ, tới chu kỳ cập nhật 30 phút,
+ * hoặc khi người dùng bấm nút trên widget.
+ */
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
-  if (props.widgetInfo.widgetName !== FAST_WIDGET_NAME) return;
+  const Widget = WIDGETS[props.widgetInfo.widgetName as keyof typeof WIDGETS];
+  if (!Widget) return;
+
+  const render = (state: FastWidgetState | null) =>
+    props.renderWidget(
+      <Widget
+        state={state}
+        width={props.widgetInfo.width}
+        height={props.widgetInfo.height}
+      />,
+    );
 
   switch (props.widgetAction) {
     case "WIDGET_ADDED":
     case "WIDGET_UPDATE":
     case "WIDGET_RESIZED":
-      props.renderWidget(<FastTimerWidget state={await loadWidgetState()} />);
+      render(await loadWidgetState());
+      break;
+    case "WIDGET_CLICK":
+      if (props.clickAction === WIDGET_ACTIONS.startFast) {
+        render(await startFastFromWidget());
+      } else if (props.clickAction === WIDGET_ACTIONS.setMood) {
+        const level = Number(props.clickActionData?.level) as MoodLevel;
+        render(await setMoodFromWidget(level));
+      }
       break;
     default:
       break;

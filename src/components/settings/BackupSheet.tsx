@@ -11,6 +11,7 @@ import {
   restoreBackup,
 } from "@/utils/backup";
 import {
+  DriveQuotaError,
   backupToDrive,
   fetchDriveBackup,
   getDriveBackupTime,
@@ -96,7 +97,23 @@ export const BackupSheet = ({
     feedback("fastComplete");
   };
 
+  // Giải thích trước khi Google hiện màn xin quyền, để người dùng không bất ngờ
+  const confirmDriveAccess = () =>
+    new Promise<boolean>((resolve) =>
+      addModal({
+        type: "confirm",
+        title: t("backup.permTitle"),
+        message: t("backup.permBody"),
+        okText: t("backup.permContinue"),
+        cancelText: t("backup.permLater"),
+        onOk: () => resolve(true),
+        onCancel: () => resolve(false),
+        onDismiss: () => resolve(false),
+      }),
+    );
+
   const signIn = async (): Promise<GoogleAccount | null> => {
+    if (!(await confirmDriveAccess())) return null;
     setBusy("signin");
     try {
       const signedIn = await signInWithGoogle();
@@ -142,7 +159,11 @@ export const BackupSheet = ({
       });
     } catch (e) {
       console.warn("drive backup error", e);
-      showError(t("backup.failedTitle"), t("backup.failedBody"));
+      if (e instanceof DriveQuotaError) {
+        showError(t("backup.quotaTitle"), t("backup.quotaBody"));
+      } else {
+        showError(t("backup.failedTitle"), t("backup.failedBody"));
+      }
     } finally {
       setBusy(null);
     }

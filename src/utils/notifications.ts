@@ -41,8 +41,13 @@ const getNotifications = (): NotificationsModule | null => {
 
 let channelReady = false;
 
-/** Tạo channel Android (bắt buộc trước khi xin quyền trên Android 13+) rồi xin quyền. */
-export const ensureNotificationPermission = async (): Promise<boolean> => {
+/**
+ * Tạo channel Android (bắt buộc trước khi xin quyền trên Android 13+) rồi xin quyền.
+ * `request: false` chỉ kiểm tra, không hiện hộp xin quyền (VD khi chạy từ widget).
+ */
+export const ensureNotificationPermission = async (
+  request = true,
+): Promise<boolean> => {
   const Notifications = getNotifications();
   if (!Notifications) return false;
 
@@ -56,7 +61,7 @@ export const ensureNotificationPermission = async (): Promise<boolean> => {
     }
 
     const current = await Notifications.getPermissionsAsync();
-    if (current.granted) return true;
+    if (current.granted || !request) return current.granted;
 
     const { granted } = await Notifications.requestPermissionsAsync();
     return granted;
@@ -100,6 +105,7 @@ export const cancelTargetReached = async (dbService: DBService) => {
 export const scheduleTargetReached = async (
   dbService: DBService,
   session: FastSession,
+  { requestPermission = true } = {},
 ) => {
   await cancelTargetReached(dbService);
 
@@ -111,7 +117,9 @@ export const scheduleTargetReached = async (
   if (fireAt <= Date.now()) return;
 
   const Notifications = getNotifications();
-  if (!Notifications || !(await ensureNotificationPermission())) return;
+  if (!Notifications || !(await ensureNotificationPermission(requestPermission))) {
+    return;
+  }
 
   try {
     const id = await Notifications.scheduleNotificationAsync({

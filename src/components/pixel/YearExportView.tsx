@@ -51,6 +51,7 @@ const YearExportView = ({
     settings?.showcase_in_export === false
       ? []
       : (settings?.showcase_achievements ?? []);
+  const heatmap = useAppStore((state) => state.settings?.pixel_heatmap ?? false);
   const { viewMode, yearPixelData, year, stats } = usePixelStore(
     useShallow((state) => ({
       viewMode: state.viewMode,
@@ -174,7 +175,11 @@ const YearExportView = ({
             {`${t("tabs.journey")} ${year}`}
           </ThemedText>
           <ThemedText size="xs" color="text" opacity="medium">
-            {viewMode === "mood" ? t("journey.mode.mood") : t("journey.mode.fasting")}
+            {viewMode === "mood"
+              ? t("journey.mode.mood")
+              : heatmap
+                ? `${t("journey.mode.fasting")} · ${t("journey.heatmap")}`
+                : t("journey.mode.fasting")}
           </ThemedText>
         </View>
         <ThemedText size="xs" color="text" opacity="medium">

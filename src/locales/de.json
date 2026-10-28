@@ -86,7 +86,9 @@
     "fastingPhases": "Phasen beim Fasten",
     "effectAfter": "Wirkung nach",
     "startFast": "Fasten starten",
-    "endFast": "Beenden"
+    "endFast": "Beenden",
+    "longPressStart": "Taste gedrückt halten, um eine frühere Startzeit zu wählen",
+    "longPressEnd": "Taste gedrückt halten, um die Endzeit zu wählen"
   },
   "counter": {
     "chooseTarget": "Ziel wählen",
@@ -378,7 +380,9 @@
       "reached": "Ziel erreicht",
       "notReached": "Nicht erreicht"
     },
-    "actions": "Aktionen"
+    "actions": "Aktionen",
+    "deleteTitle": "Dieses Fasten löschen?",
+    "deleteBody": "Es wird aus Verlauf, Kalender und Statistik entfernt. Bereits erhaltene Gewohnheit, Schilde und Serie bleiben unverändert."
   },
   "startTime": {
     "invalid": "Ungültige Zeit",
@@ -502,8 +506,10 @@
       "actionsTitle": "Aktionen",
       "action1": "Tippe auf einen leeren Tag für Stimmung und Notiz, auf einen Tag mit Daten für Details.",
       "action2": "Die Zahl unter jedem Symbol zeigt, wie viele Tage des Jahres in diese Stufe fallen.",
-      "action3": "Mit der Woche/Tag-Taste in der Ecke änderst du das Layout. Gespeicherte Bilder folgen dem aktuellen Layout."
-    }
+      "action3": "Mit der Woche/Tag-Taste in der Ecke änderst du das Layout. Gespeicherte Bilder folgen dem aktuellen Layout.",
+      "fast4": "Mit Heatmap zeigt jedes Feld, wie viele Stunden du an diesem Kalendertag gefastet hast: je dunkler, desto mehr."
+    },
+    "heatmap": "Heatmap"
   },
   "layout": {
     "title": "Pixel-Layout",
@@ -547,7 +553,11 @@
     "photoHint": "Foto für diesen Tag hinzufügen",
     "updatePhoto": "Foto aktualisieren",
     "changePhoto": "Foto ändern",
-    "photoFrom": "Foto aus"
+    "photoFrom": "Foto aus",
+    "restTitle": "Ruhetag",
+    "restBody": "Ein Schild hat deine Serie heute gehalten. Pausen gehören zur Gewohnheit – morgen geht's gestärkt weiter.",
+    "sessionCount_one": "{{count}} Fasten",
+    "sessionCount_other": "{{count}} Fasten"
   },
   "dayModal": {
     "todayMood": "Stimmung heute",
@@ -723,7 +733,7 @@
     "mondayDesc": "Wochen von Montag → Sonntag",
     "sundayDesc": "Wochen von Sonntag → Samstag",
     "beginnerTips": "Einsteigertipps",
-    "beginnerTipsDesc": "Kurze Erklärungen zu Gewohnheit und Schilden anzeigen",
+    "beginnerTipsDesc": "Kurze Hinweise und Erklärungen in der App anzeigen",
     "vibration": "Vibration",
     "sound": "Ton",
     "soundDesc": "Töne für Start, Ende und Belohnungen",
@@ -815,7 +825,13 @@
     "restoreFile": "Aus Datei wiederherstellen",
     "restoreFileDesc": "Wähle eine FastFast-Backup-Datei",
     "importFailedTitle": "Import fehlgeschlagen",
-    "importFailedBody": "Diese Datei ist kein gültiges FastFast-Backup."
+    "importFailedBody": "Diese Datei ist kein gültiges FastFast-Backup.",
+    "permTitle": "Google Drive verbinden",
+    "permBody": "FastFast nutzt Google Drive nur, um deine Backups in einem versteckten App-Ordner zu speichern.\n\nDie App kann deine Fotos, Dokumente oder anderen Dateien in Drive weder sehen noch ändern oder löschen.\n\nAls Nächstes fragt Google nach deiner Erlaubnis.",
+    "permContinue": "Weiter",
+    "permLater": "Nicht jetzt",
+    "quotaTitle": "Google-Speicher ist voll",
+    "quotaBody": "Dein Google-Speicher (geteilt von Drive, Gmail und Fotos) ist voll. Dein vorheriges Backup bleibt erhalten. Gib Speicher frei oder nutze Backup-Datei exportieren, um eine Kopie woanders zu speichern."
   },
   "theme": {
     "title": "Design",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Limitiert",
     "dark": "Dunkel",
-    "light": "Hell"
+    "light": "Hell",
+    "iconsTitle": "Passende Icons verwenden?",
+    "iconsBody": "Das Design {{theme}} bringt eigene Stimmungs- und Fasten-Icons mit. Wechseln? Du kannst sie jederzeit im Verlauf ändern.",
+    "iconsUse": "Verwenden",
+    "iconsKeep": "Behalten"
   },
   "notify": {
     "targetTitle": "🎉 Ziel erreicht!",
@@ -847,7 +867,12 @@
     "notFasting": "Kein Fasten",
     "tapToOpen": "Tippen, um FastFast zu öffnen",
     "started": "Start",
-    "done": "Ende"
+    "done": "Ende",
+    "start": "Start",
+    "end": "Beenden",
+    "lastFast": "Letztes Fasten",
+    "endedAgo": "vor {{time}} beendet",
+    "target": "Ziel"
   },
   "notFound": {
     "title": "Hoppla!",

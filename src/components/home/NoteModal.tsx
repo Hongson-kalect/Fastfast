@@ -1,4 +1,4 @@
-import { EMOTION_PACKS } from "@/constants/emotions";
+import { getEmotionPack } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import { MoodLevel } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
@@ -79,7 +79,7 @@ const NoteModal = ({
       weight: state.weight,
     })),
   );
-  const emotions = EMOTION_PACKS[settings?.emotion_pack ?? "default"].emotions;
+  const emotions = getEmotionPack(settings?.emotion_pack).emotions;
 
   const [tempText, setTempText] = useState(note ?? "");
   const [tempWeight, setTempWeight] = useState(weight?.toString() ?? "");

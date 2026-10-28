@@ -107,34 +107,34 @@ export const handleLogin = async ({
       };
     }
 
-    // Có sao, áp dụng biến động
-    const returnedHabitLog = await addHabitLogs(db, {
-      log_date: todayStr,
-      ...data,
+    // Có sao, áp dụng biến động. Ghi log và hồ sơ trong một transaction:
+    // nếu app tắt giữa chừng, lần mở sau không bị phạt thêm lần nữa
+    await db.withTransactionAsync(async () => {
+      const returnedHabitLog = await addHabitLogs(db, {
+        log_date: todayStr,
+        ...data,
+      });
+      streak.habitLog = returnedHabitLog;
+      streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
+      streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
+      streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
+
+      applyStreakDate(streak, getYesterdayStr(todayStr));
+      applyPenaltyClaimables(streak, data);
+
+      // Shield used
+      if (data.shieldDelta) {
+        streak.profile.total_shield_used =
+          (streak.profile.total_shield_used || 0) + Math.abs(data.shieldDelta);
+      }
+
+      // Khiên không đủ cho mọi ngày nghỉ: mất streak
+      if (!isStreakSavedByShield) applyClearStreak(streak);
+
+      await saveStreakContext(db, streak);
     });
-    streak.habitLog = returnedHabitLog;
-    streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
-    streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
-    streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
-
-    applyStreakDate(streak, getYesterdayStr(todayStr));
-    applyPenaltyClaimables(streak, data);
-
-    // --------------------------------------------------
-    // Shield used
-    // --------------------------------------------------
-    if (data.shieldDelta) {
-      streak.profile.total_shield_used =
-        (streak.profile.total_shield_used || 0) + Math.abs(data.shieldDelta);
-    }
-
-    // --------------------------------------------------
-    // 5. Shield saves streak
-    // --------------------------------------------------
 
     if (isStreakSavedByShield) {
-      await saveStreakContext(db, streak);
-
       return {
         lastFast: lastFast,
         profile: streak.profile,
@@ -143,14 +143,6 @@ export const handleLogin = async ({
       };
     }
 
-    // --------------------------------------------------
-    // 6. Streak lost
-    // --------------------------------------------------
-
-    applyClearStreak(streak);
-
-    await saveStreakContext(db, streak);
-
     console.log(
       "handleLogin: no fast, penalty applied",
       {
@@ -158,7 +150,6 @@ export const handleLogin = async ({
         isStreakSavedByShield,
         ...data,
       },
-      returnedHabitLog,
       streak,
     );
 

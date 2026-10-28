@@ -86,7 +86,9 @@
     "fastingPhases": "ファスティング中のフェーズ",
     "effectAfter": "効果まで",
     "startFast": "ファスティング開始",
-    "endFast": "終了"
+    "endFast": "終了",
+    "longPressStart": "ボタンを長押しすると開始時刻をさかのぼって設定できます",
+    "longPressEnd": "ボタンを長押しすると終了時刻を設定できます"
   },
   "counter": {
     "chooseTarget": "目標を選ぶ",
@@ -378,7 +380,9 @@
       "reached": "目標達成",
       "notReached": "未達成"
     },
-    "actions": "操作"
+    "actions": "操作",
+    "deleteTitle": "このファスティングを削除しますか？",
+    "deleteBody": "履歴・ジャーニー・統計から削除されます。獲得済みの習慣・シールド・連続記録は変わりません。"
   },
   "startTime": {
     "invalid": "無効な時刻",
@@ -502,8 +506,10 @@
       "actionsTitle": "操作",
       "action1": "空の日をタップすると気分とメモを追加、記録のある日をタップすると詳細を表示します。",
       "action2": "各アイコンの下の数字は、その年にそのレベルだった日数です。",
-      "action3": "グリッド左上の週/日ボタンでレイアウトを変更。保存画像は現在のレイアウトになります。"
-    }
+      "action3": "グリッド左上の週/日ボタンでレイアウトを変更。保存画像は現在のレイアウトになります。",
+      "fast4": "ヒートマップをオンにすると、各マスはその日にファスティングした時間を表します。濃いほど長い時間です。"
+    },
+    "heatmap": "ヒートマップ"
   },
   "layout": {
     "title": "ピクセルのレイアウト",
@@ -547,7 +553,11 @@
     "photoHint": "この日の写真を追加",
     "updatePhoto": "写真を更新",
     "changePhoto": "写真を変更",
-    "photoFrom": "写真の取得元"
+    "photoFrom": "写真の取得元",
+    "restTitle": "休息日",
+    "restBody": "シールドが今日の連続記録を守りました。休むのも習慣の一部です。明日はもっと力強く再開しましょう。",
+    "sessionCount_one": "{{count}}件",
+    "sessionCount_other": "{{count}}件"
   },
   "dayModal": {
     "todayMood": "今日の気分",
@@ -723,7 +733,7 @@
     "mondayDesc": "月曜 → 日曜",
     "sundayDesc": "日曜 → 土曜",
     "beginnerTips": "ビギナーヒント",
-    "beginnerTipsDesc": "習慣とシールドの仕組みを短く説明",
+    "beginnerTipsDesc": "アプリ内で短いヒントや説明を表示",
     "vibration": "バイブレーション",
     "sound": "サウンド",
     "soundDesc": "開始・終了・報酬のサウンド",
@@ -815,7 +825,13 @@
     "restoreFile": "ファイルから復元",
     "restoreFileDesc": "FastFastのバックアップファイルを選択",
     "importFailedTitle": "読み込みに失敗しました",
-    "importFailedBody": "このファイルは有効なFastFastのバックアップではありません。"
+    "importFailedBody": "このファイルは有効なFastFastのバックアップではありません。",
+    "permTitle": "Googleドライブに接続",
+    "permBody": "FastFastはバックアップの保存にのみGoogleドライブを使います。保存先はアプリ専用の非表示フォルダです。\n\nドライブ内の写真・書類・その他のファイルを閲覧・変更・削除することはできません。\n\nこの後、Googleから許可を求める画面が表示されます。",
+    "permContinue": "続ける",
+    "permLater": "あとで",
+    "quotaTitle": "Googleの保存容量がいっぱいです",
+    "quotaBody": "Googleの保存容量（ドライブ・Gmail・フォトで共有）に空きがありません。前回のバックアップはそのまま残っています。容量を空けるか、「バックアップファイルを書き出す」で別の場所に保存してください。"
   },
   "theme": {
     "title": "テーマ",
@@ -827,7 +843,11 @@
     "premium": "プレミアム",
     "limited": "期間限定",
     "dark": "ダーク",
-    "light": "ライト"
+    "light": "ライト",
+    "iconsTitle": "テーマのアイコンを使いますか？",
+    "iconsBody": "{{theme}} テーマには専用の気分・ファスティングアイコンがあります。切り替えますか？ジャーニーでいつでも変更できます。",
+    "iconsUse": "使う",
+    "iconsKeep": "今のまま"
   },
   "notify": {
     "targetTitle": "🎉 目標達成！",
@@ -847,7 +867,12 @@
     "notFasting": "未開始",
     "tapToOpen": "タップしてFastFastを開く",
     "started": "開始",
-    "done": "終了"
+    "done": "目標",
+    "start": "開始",
+    "end": "終了",
+    "lastFast": "前回",
+    "endedAgo": "{{time}}前に終了",
+    "target": "目標"
   },
   "notFound": {
     "title": "おっと！",

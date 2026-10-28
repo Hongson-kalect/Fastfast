@@ -86,7 +86,9 @@
     "fastingPhases": "Phases while fasting",
     "effectAfter": "Effect after",
     "startFast": "Start fasting",
-    "endFast": "End"
+    "endFast": "End",
+    "longPressStart": "Hold the button to pick an earlier start time",
+    "longPressEnd": "Hold the button to pick the end time"
   },
   "counter": {
     "chooseTarget": "Choose a target",
@@ -378,7 +380,9 @@
       "reached": "Target reached",
       "notReached": "Not reached"
     },
-    "actions": "Fast actions"
+    "actions": "Fast actions",
+    "deleteTitle": "Delete this fast?",
+    "deleteBody": "It will be removed from your history, Journey and stats. Habit, shields and streak already earned stay the same."
   },
   "startTime": {
     "invalid": "Invalid time",
@@ -502,8 +506,10 @@
       "actionsTitle": "Actions",
       "action1": "Tap an empty day to add a mood and note; tap a day with data to see details.",
       "action2": "The number under each icon is how many days of the year fall into that level.",
-      "action3": "Use the Week/Day button in the grid corner to change the layout. Saved images follow the current layout."
-    }
+      "action3": "Use the Week/Day button in the grid corner to change the layout. Saved images follow the current layout.",
+      "fast4": "With Heatmap on, each cell shows how many hours you fasted on that calendar day: the darker, the more."
+    },
+    "heatmap": "Heatmap"
   },
   "layout": {
     "title": "Pixel layout",
@@ -547,7 +553,11 @@
     "photoHint": "Add a photo for this day",
     "updatePhoto": "Update photo",
     "changePhoto": "Change photo",
-    "photoFrom": "Photo from"
+    "photoFrom": "Photo from",
+    "restTitle": "Rest day",
+    "restBody": "A shield kept your streak going today. Rest is part of the habit too — come back stronger tomorrow.",
+    "sessionCount_one": "{{count}} fast",
+    "sessionCount_other": "{{count}} fasts"
   },
   "dayModal": {
     "todayMood": "Today's mood",
@@ -723,7 +733,7 @@
     "mondayDesc": "Weeks run Monday → Sunday",
     "sundayDesc": "Weeks run Sunday → Saturday",
     "beginnerTips": "Beginner tips",
-    "beginnerTipsDesc": "Show short explanations of how habit and shields work",
+    "beginnerTipsDesc": "Show short hints and explanations around the app",
     "vibration": "Vibration",
     "sound": "Sound",
     "soundDesc": "Sounds for starting, finishing and rewards",
@@ -815,7 +825,13 @@
     "restoreFile": "Restore from file",
     "restoreFileDesc": "Pick a FastFast backup file",
     "importFailedTitle": "Import failed",
-    "importFailedBody": "This file is not a valid FastFast backup."
+    "importFailedBody": "This file is not a valid FastFast backup.",
+    "permTitle": "Connect Google Drive",
+    "permBody": "FastFast only uses Google Drive to store your backups, in a hidden folder that belongs to the app.\n\nIt can't see, change or delete your photos, documents or any other files in your Drive.\n\nNext, Google will ask you to allow this.",
+    "permContinue": "Continue",
+    "permLater": "Not now",
+    "quotaTitle": "Google storage is full",
+    "quotaBody": "Your Google storage (shared by Drive, Gmail and Photos) has no space left. Your previous backup is still safe. Free up some space, or use Export backup file to save a copy elsewhere."
   },
   "theme": {
     "title": "Theme",
@@ -827,7 +843,11 @@
     "premium": "Premium",
     "limited": "Limited",
     "dark": "Dark",
-    "light": "Light"
+    "light": "Light",
+    "iconsTitle": "Use matching icons?",
+    "iconsBody": "The {{theme}} theme comes with its own mood and fast icons. Switch to them? You can change icons anytime in Journey.",
+    "iconsUse": "Use icons",
+    "iconsKeep": "Keep current"
   },
   "notify": {
     "targetTitle": "🎉 Target reached!",
@@ -847,7 +867,12 @@
     "notFasting": "Not fasting",
     "tapToOpen": "Tap to open FastFast",
     "started": "Started",
-    "done": "Done"
+    "done": "Done",
+    "start": "Start",
+    "end": "End",
+    "lastFast": "Last fast",
+    "endedAgo": "ended {{time}} ago",
+    "target": "Target"
   },
   "notFound": {
     "title": "Oops!",

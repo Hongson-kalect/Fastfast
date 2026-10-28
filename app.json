@@ -59,11 +59,24 @@
             {
               "name": "FastTimer",
               "label": "FastFast",
-              "description": "Trạng thái và thời gian của phiên nhịn hiện tại",
+              "description": "Fasting timer, start button and today's mood",
               "minWidth": "250dp",
               "minHeight": "110dp",
               "targetCellWidth": 4,
               "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "FastCompact",
+              "label": "FastFast mini",
+              "description": "Fasting timer with a start/stop button",
+              "minWidth": "40dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 1,
+              "targetCellHeight": 1,
+              "maxResizeWidth": "180dp",
+              "maxResizeHeight": "110dp",
               "resizeMode": "horizontal|vertical",
               "updatePeriodMillis": 1800000
             }

@@ -16,6 +16,7 @@ import {
   StreakContext,
 } from "@/utils/streak";
 import { getDaysDiff, getLocalTodayStr } from "@/utils/timer";
+import { splitSessionIntoDays } from "@/utils/home/timespliter";
 import { uuidv7 } from "@/utils/uuidv7";
 import { SQLiteDatabase } from "expo-sqlite";
 import {
@@ -138,7 +139,8 @@ export const getLastFastSession = async (
 ): Promise<FastSession | null> => {
   try {
     const row = await db.getFirstAsync<FastSession>(
-      `SELECT * FROM fast_sessions where is_deleted = 0  ORDER BY updated_at DESC LIMIT 1;`,
+      // id là uuidv7 nên tăng theo thời điểm tạo (mili giây); updated_at chỉ tới giây
+      `SELECT * FROM fast_sessions WHERE is_deleted = 0 ORDER BY id DESC LIMIT 1;`,
     );
     return row;
   } catch (e) {
@@ -174,7 +176,7 @@ export const getFastSessionByIds = async (
 
     const rows = await db.getAllAsync<FastSession>(
       `SELECT * FROM fast_sessions
-       WHERE id IN (${placeholders})`,
+       WHERE id IN (${placeholders}) AND is_deleted = 0`,
       fast_ids,
     );
 
@@ -412,6 +414,16 @@ const handleCompletedFast = async (
 
   const sessionUpdated = await getSessionById(db, session.id);
 
+  // Chia giờ nhịn theo ngày cho Journey / biểu đồ, cùng transaction để không bị thiếu
+  const hoursInFast = parseFloat((duration / 3600).toFixed(1));
+  for (const day of splitSessionIntoDays(session.start_time, endTime, session.id)) {
+    await db.runAsync(
+      `INSERT INTO daily_logs (log_date, fast_id, hours_in_day, elapsed_hours, hours_in_fast)
+       VALUES (?, ?, ?, ?, ?)`,
+      [day.log_date, session.id, day.hours_in_day, day.elapsed_hours, hoursInFast],
+    );
+  }
+
   // ----------------------------------------
   // Habit history
   // ----------------------------------------
@@ -585,8 +597,7 @@ export const startNewSession = async (
       [id, time, targetDuration],
     );
 
-    const res = await getLastFastSession(db);
-    return res;
+    return await getSessionById(db, id);
   } catch (e) {
     logDbError("error on startNewSession", e);
     return null;
@@ -615,28 +626,15 @@ export const updateSessionTarget = async (
   }
 };
 
-export const deleteSession = async (db: SQLiteDatabase, id: string) => {  try {
-    await db.runAsync(`Update fast_sessions SET is_deleted = 1 WHERE id = ?;`, [
-      id,
-    ]);
+export const deleteSession = async (db: SQLiteDatabase, id: string) => {
+  try {
+    // Xoá cả phần giờ đã chia theo ngày, nếu không Journey và biểu đồ vẫn tính phiên này
+    await db.withTransactionAsync(async () => {
+      await db.runAsync(`UPDATE fast_sessions SET is_deleted = 1 WHERE id = ?;`, [id]);
+      await db.runAsync(`UPDATE daily_logs SET is_deleted = 1 WHERE fast_id = ?;`, [id]);
+    });
   } catch (e) {
     logDbError("error on deleteSession", e);
-  }
-};
-
-export const fastFail = async (
-  db: SQLiteDatabase,
-  fastSession: FastSession,
-) => {
-  try {
-    await db.runAsync(
-      `Update fast_sessions SET status = 'failed', shield_point_clamable = 0 WHERE id = ?;`,
-      [fastSession.id],
-    );
-    return await getLastFastSession(db);
-  } catch (e) {
-    logDbError("error on fastFail", e);
-    return null;
   }
 };
 
@@ -747,43 +745,31 @@ export const reconcileStreak = async (
     };
   }
 
-  const returnedHabitLog = await addHabitLogs(db, {
-    log_date: todayStr,
-    ...data,
-  });
+  // Ghi log và hồ sơ trong một transaction: tắt app giữa chừng không bị phạt 2 lần
+  let returnedHabitLog: HabitLog | null = null;
+  await db.withTransactionAsync(async () => {
+    returnedHabitLog = await addHabitLogs(db, {
+      log_date: todayStr,
+      ...data,
+    });
 
-  streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
-  streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
-  streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
+    streak.stats.habit.currentPercent = returnedHabitLog?.habit_snap || 0;
+    streak.stats.shield.current = returnedHabitLog?.shield_snap || 0;
+    streak.stats.retain.current = returnedHabitLog?.habit_retain || 0;
 
-  applyStreakDate(streak, getYesterdayStr(todayStr));
-  applyPenaltyClaimables(streak, data);
+    applyStreakDate(streak, getYesterdayStr(todayStr));
+    applyPenaltyClaimables(streak, data);
 
-  // --------------------------------------------------
-  // 4. Shield saves streak
-  // --------------------------------------------------
-  if (data.shieldDelta) {
-    streak.profile.total_shield_used =
-      (streak.profile.total_shield_used || 0) + Math.abs(data.shieldDelta);
-  }
+    if (data.shieldDelta) {
+      streak.profile.total_shield_used =
+        (streak.profile.total_shield_used || 0) + Math.abs(data.shieldDelta);
+    }
 
-  if (isStreakSavedByShield) {
+    // Khiên không đủ cho mọi ngày nghỉ: mất streak
+    if (!isStreakSavedByShield) applyClearStreak(streak);
+
     await saveStreakContext(db, streak);
-
-    return {
-      profile: streak.profile,
-      habitLog: returnedHabitLog,
-      streak: streak.stats,
-    };
-  }
-
-  // --------------------------------------------------
-  // 5. Streak lost
-  // --------------------------------------------------
-
-  applyClearStreak(streak);
-
-  await saveStreakContext(db, streak);
+  });
 
   return {
     profile: streak.profile,

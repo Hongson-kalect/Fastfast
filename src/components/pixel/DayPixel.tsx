@@ -1,6 +1,7 @@
 import { FASTING_TARGETS } from "@/constants/data";
-import { EMOTION_PACKS } from "@/constants/emotions";
-import { TARGET_PACKS } from "@/constants/fasting_targets";
+import { getEmotionPack } from "@/constants/emotions";
+import { getTargetPack } from "@/constants/fasting_targets";
+import { getHeatmapLevel, HEATMAP_LEVELS, withOpacity } from "@/constants/heatmap";
 import { DailyPixelData, DayItem, ViewMode } from "@/interfaces/pixel";
 import { useAppStore } from "@/stores/appStore";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -29,6 +30,7 @@ const DayPixel = memo(
     const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
     const emotionPackId = useAppStore((state) => state.settings?.emotion_pack);
     const targetPackId = useAppStore((state) => state.settings?.target_pack);
+    const heatmap = useAppStore((state) => state.settings?.pixel_heatmap ?? false);
 
     const isToday = day.dateString === todayStr;
     const isFuture = day.dateString > todayStr;
@@ -63,9 +65,12 @@ const DayPixel = memo(
 
     if (viewMode === "mood") {
       if (note) {
-        const emotionPack = EMOTION_PACKS[emotionPackId || "default"];
+        const emotionPack = getEmotionPack(emotionPackId);
 
-        const mood = note.mood_level && emotionPack.emotions[note.mood_level];
+        const mood =
+          note.mood_level != null
+            ? emotionPack.emotions[note.mood_level]
+            : null;
 
         if (mood) {
           emoji = mood.icon[isDark ? "dark" : "light"];
@@ -77,7 +82,14 @@ const DayPixel = memo(
         }
       }
     } else {
-      if (logs.length > 0) {
+      const targetPack = getTargetPack(targetPackId);
+
+      if (logs.length > 0 && heatmap) {
+        // Heatmap: một màu, đậm dần theo tổng giờ nhịn trong chính ngày này
+        const level = getHeatmapLevel(pixelData?.totalHours ?? 0);
+        // Độ đậm nằm ở màu nền (opacity của ô chỉ áp lên icon bên trong)
+        backgroundColor = withOpacity(theme.primary, HEATMAP_LEVELS[level].opacity);
+      } else if (logs.length > 0) {
         const fast = logs.reduce((best, current) =>
           current.hours_in_fast > best.hours_in_fast ? current : best,
         );
@@ -89,8 +101,6 @@ const DayPixel = memo(
         );
 
         if (pixel >= 0) {
-          const targetPack = TARGET_PACKS[targetPackId || "default"];
-
           const target = targetPack.targets[pixel];
           const progress = Math.min(fast.elapsed_hours / fast.hours_in_fast, 1);
 

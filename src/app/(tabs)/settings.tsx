@@ -18,7 +18,7 @@ import { SettingsAccountCard } from "@/components/settings/SettingsAccountCard";
 import { BackupSheet } from "@/components/settings/BackupSheet";
 import { ACHIEVEMENTS } from "@/constants/achievements";
 import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
-import { ThemeKey } from "@/constants/themes";
+import { ThemeKey, themes } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { AppSettings } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
@@ -117,6 +117,33 @@ export default function SettingsScreen() {
     });
   };
 
+  // Theme có bộ icon riêng mà người dùng đang dùng bộ khác: hỏi có đổi theo không
+  const offerThemeIcons = (themeId: ThemeKey) => {
+    const packs = themes[themeId].iconPacks;
+    if (!packs) return;
+
+    const changes: Partial<AppSettings> = {};
+    if (packs.emotion && packs.emotion !== (settings?.emotion_pack || "default")) {
+      changes.emotion_pack = packs.emotion;
+    }
+    if (packs.target && packs.target !== (settings?.target_pack || "default")) {
+      changes.target_pack = packs.target;
+    }
+    if (!Object.keys(changes).length) return;
+
+    addModal({
+      type: "confirm",
+      title: t("theme.iconsTitle"),
+      message: t("theme.iconsBody", { theme: capitalize(String(themeId)) }),
+      okText: t("theme.iconsUse"),
+      cancelText: t("theme.iconsKeep"),
+      onOk: async () => {
+        if (changes.emotion_pack) await saveSetting("emotion_pack", changes.emotion_pack);
+        if (changes.target_pack) await saveSetting("target_pack", changes.target_pack);
+      },
+    });
+  };
+
   const openThemeModal = () => {
     present(
       <ThemeBottomSheet
@@ -124,6 +151,7 @@ export default function SettingsScreen() {
         isDarkMode={isDarkMode}
         onSelect={(themeId: ThemeKey) => {
           updateTheme(db, themeId);
+          offerThemeIcons(themeId);
         }}
       />,
       {
