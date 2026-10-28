@@ -12,6 +12,7 @@ import { TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 interface Props {
   data: StreakCheckResult | null;
@@ -22,30 +23,31 @@ export const MILESTONES = [3, 7, 14, 21, 30, 60, 90, 100, 180, 365];
 const MODAL_THEME = {
   STREAK_MILESTONE: {
     icon: "🎉",
-    title: "Streak Milestone Hit!",
-    subtitle: "You're building an unstoppable fasting habit!",
+    title: "streak.milestone.title",
+    subtitle: "streak.milestone.subtitle",
     bgColor: "from-success/20 to-success",
     borderColor: "border-success/30",
-    btnText: "Keep It Up! 🔥",
+    btnText: "streak.milestone.button",
   },
   SHIELD_USED: {
     icon: "🛡️",
-    title: "Rest Day Active!",
-    subtitle: "Recovery is part of the journey. Your streak stays strong!",
+    title: "streak.rest.title",
+    subtitle: "streak.rest.subtitle",
     bgColor: "from-primary/20 to-primary/10",
     borderColor: "border-primary/30",
-    btnText: "Keep going! 🌿",
+    btnText: "streak.rest.button",
   },
   STREAK_LOST: {
     icon: "💪",
-    title: "Fresh Start Ahead",
-    subtitle: "Every master failed before succeeding. Let's rebuild today!",
+    title: "streak.fresh.title",
+    subtitle: "streak.fresh.subtitle",
     bgColor: "from-error/20 to-error",
     borderColor: "border-error/30",
-    btnText: "Start Fresh Now 🚀",
+    btnText: "streak.fresh.button",
   },
 };
 export const StreakCheckModal = ({ data }: Props) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
 
@@ -169,7 +171,7 @@ export const StreakCheckModal = ({ data }: Props) => {
                       weight="bold"
                       color="warning"
                     >
-                      BEST
+                      {t("streak.best")}
                     </ThemedText>
                   </View>
                 </Animated.View>
@@ -201,7 +203,7 @@ export const StreakCheckModal = ({ data }: Props) => {
             opacity: 0.8,
           }}
         >
-          Days streak
+          {t("streak.daysStreak")}
         </ThemedText>
 
         {/* Title */}
@@ -218,8 +220,8 @@ export const StreakCheckModal = ({ data }: Props) => {
             style={{ textAlign: "center" }}
           >
             {milestone
-              ? `Streak over ${milestone} hits!`
-              : config.title}
+              ? t("streak.over", { count: milestone })
+              : t(config.title)}
           </ThemedText>
 
           <ThemedText
@@ -242,7 +244,7 @@ export const StreakCheckModal = ({ data }: Props) => {
             textAlign: "center",
           }}
         >
-          {data.message?.subtitle || config.subtitle}
+          {data.message?.subtitle || t(config.subtitle)}
         </ThemedText>
       </Animated.View>
 
@@ -271,7 +273,7 @@ export const StreakCheckModal = ({ data }: Props) => {
                 letterSpacing: 1,
               }}
             >
-              Habit
+              {t("term.habit")}
             </ThemedText>
           </View>
 
@@ -299,7 +301,7 @@ export const StreakCheckModal = ({ data }: Props) => {
               opacity="low"
               className="mt-0.5"
             >
-              Consistency
+              {t("streak.consistency")}
             </ThemedText>
           )}
         </View>
@@ -324,7 +326,7 @@ export const StreakCheckModal = ({ data }: Props) => {
                 letterSpacing: 1,
               }}
             >
-              Retain
+              {t("term.retain")}
             </ThemedText>
           </View>
 
@@ -343,7 +345,7 @@ export const StreakCheckModal = ({ data }: Props) => {
               color={retainDiff > 0 ? "success" : "error"}
             >
               {retainDiff > 0 ? "+" : "-"}
-              {fixed(Math.abs(retainDiff))} pts
+              {t("term.pts", { value: fixed(Math.abs(retainDiff)) })}
             </ThemedText>
           ) : (
             <ThemedText
@@ -352,7 +354,7 @@ export const StreakCheckModal = ({ data }: Props) => {
               opacity="low"
               className="mt-0.5"
             >
-              Points
+              {t("term.points")}
             </ThemedText>
           )}
         </View>
@@ -373,7 +375,7 @@ export const StreakCheckModal = ({ data }: Props) => {
           weight="bold"
           colorHex={getContrastTextColor(color)}
         >
-          {config.btnText}
+          {t(config.btnText)}
         </ThemedText>
       </TouchableOpacity>
     </View>

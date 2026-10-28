@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "跳过",
+    "next": "下一步",
+    "start": "开始使用",
+    "welcome": {
+      "title": "让间歇性断食更有趣",
+      "body": "停止进食时点开始，FastFast 会计时，并在达成目标时提醒你。"
+    },
+    "habit": {
+      "title": "连续天数与习惯强度",
+      "body": "每完成一次断食都会延续连续天数并填充习惯条。断食越久，填得越快。"
+    },
+    "shield": {
+      "title": "护盾——休息日也不断连续",
+      "body": "坚持打卡或完成一次长时断食即可获得护盾。休息的那天，护盾会自动保护你的连续天数。"
+    },
+    "pixel": {
+      "title": "多彩的一年",
+      "body": "每一天都是一个像素。记录心情和体重，一张图看完你的一整年。"
+    },
+    "health": {
+      "title": "倾听身体的声音",
+      "body": "FastFast 不能替代医疗建议。如果你正在怀孕、患有疾病或打算断食超过 48 小时，请先咨询医生。如感到头晕或异常不适，请立即停止。"
+    }
+  },
+  "tabs": {
+    "fast": "断食",
+    "stats": "统计",
+    "journey": "历程",
+    "settings": "设置"
+  },
+  "common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "gotIt": "知道了",
+    "confirm": "确认",
+    "delete": "删除",
+    "save": "保存",
+    "today": "今天",
+    "noData": "暂无数据",
+    "invalid": "无效",
+    "success": "完成",
+    "edit": "编辑",
+    "add": "添加",
+    "loading": "加载中…",
+    "close": "关闭",
+    "restore": "恢复",
+    "permission": "需要权限",
+    "error": "错误"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "today": "今天",
+    "tomorrow": "明天",
+    "yesterday": "昨天",
+    "dayAfterTomorrow": "后天",
+    "daysAgo_one": "{{count}} 天前",
+    "daysAgo_other": "{{count}} 天前",
+    "daysLater_one": "{{count}} 天后",
+    "daysLater_other": "{{count}} 天后",
+    "secondsAgo_one": "{{count}} 秒前",
+    "secondsAgo_other": "{{count}} 秒前",
+    "inSeconds_one": "{{count}} 秒后",
+    "inSeconds_other": "{{count}} 秒后",
+    "minutesAgo_one": "{{count}} 分钟前",
+    "minutesAgo_other": "{{count}} 分钟前",
+    "inMinutes_one": "{{count}} 分钟后",
+    "inMinutes_other": "{{count}} 分钟后",
+    "hoursAgo_one": "{{count}} 小时前",
+    "hoursAgo_other": "{{count}} 小时前",
+    "inHours_one": "{{count}} 小时后",
+    "inHours_other": "{{count}} 小时后"
+  },
+  "home": {
+    "greeting": {
+      "morning": "早上好",
+      "noon": "中午好",
+      "afternoon": "下午好",
+      "evening": "晚上好"
+    },
+    "streakDays_one": "{{count}} 天",
+    "streakDays_other": "{{count}} 天",
+    "lastFast": "最近一次断食",
+    "bodyPhases": "身体阶段",
+    "fastingPhases": "断食中的阶段",
+    "effectAfter": "生效倒计时",
+    "startFast": "开始断食",
+    "endFast": "结束"
+  },
+  "counter": {
+    "chooseTarget": "选择目标",
+    "reached": "🎉 已达成目标",
+    "finishAt": "完成于 {{time}}",
+    "freeMode": "自由模式",
+    "ifStartNow": "现在开始：{{time}}",
+    "fasting": "断食中",
+    "ready": "准备就绪",
+    "startedAt": "开始于 {{time}}",
+    "history": "断食记录"
+  },
+  "finish": {
+    "title": "结束",
+    "confirm": "确定要结束这次断食吗？",
+    "tooQuick": "本次断食太短，将被删除。继续吗？",
+    "tooQuickSub": "断食时间少于 2 小时。",
+    "failed": "本次断食将记为失败。继续吗？",
+    "failedSub": "断食时间少于 16 小时。",
+    "reached": "已达成目标，现在结束吗？",
+    "notReached": "尚未达成目标，仍要结束吗？",
+    "endBeforeStart": "结束时间必须晚于开始时间。",
+    "startBeforeLast": "开始时间必须晚于上一次断食。"
+  },
+  "info": {
+    "shield": {
+      "title": "护盾",
+      "message": "护盾可在不断食的休息日保持你的连续天数。",
+      "effectTitle": "作用 · 当前 {{count}}/{{max}}",
+      "effect1": "两次断食之间每空出一天消耗 1 个护盾，连续天数保持有效，习惯值不变。",
+      "effect2": "没有护盾还休息，连续天数会中断，习惯值下降，Retain 归零。",
+      "effect3": "最多持有 {{max}} 个护盾，超出部分会作废。",
+      "longTitle": "长时断食",
+      "long1": "断食 48 小时以上得 1 个护盾，72 小时以上得 2 个。",
+      "long2": "休息是长时断食的一部分：身体需要时间复食和恢复。护盾让你在这些天休息，同时保持连续天数。",
+      "milestoneTitle": "习惯里程碑",
+      "milestone1": "习惯达到 35%、70%、100% 时各得 1 个护盾。",
+      "milestone2": "习惯值下降后再回升，可再次获得该里程碑。",
+      "retainTitle": "Retain",
+      "retain1": "习惯达到 100% 后，每次断食的积分计入 Retain。",
+      "retain2": "Retain 满 25 自动兑换 1 个护盾。"
+    },
+    "body": {
+      "title": "这些进度条是什么意思？",
+      "message": "每条进度条表示断食对身体某个固有机制的支持程度。",
+      "alwaysTitle": "始终在运作",
+      "always1": "这些机制一直在体内运作，即使你没有断食。",
+      "always2": "它们不是到某个时间点才会“开启”的开关。",
+      "levelsTitle": "等级 1–5 的含义",
+      "levels1": "等级越高表示断食对该机制的支持越多，随断食时间逐步提升。",
+      "levels2": "进度条满并不代表该机制此刻最强，只表示断食带来的支持更高。",
+      "estimateTitle": "仅供参考",
+      "estimate1": "时间节点只是估算，因人而异：上一餐、运动、睡眠等。",
+      "estimate2": "这不是诊断或医疗建议。"
+    }
+  },
+  "tip": {
+    "disableHint": "可在 设置 → 新手提示 中关闭提示",
+    "habit": {
+      "title": "习惯值如何计算？",
+      "line1": "每次断食 16 小时以上：+3%，超过 16 小时每小时再加 0.2%（20 小时 → +3.8%）。",
+      "line2": "不足 16 小时的断食不计分。",
+      "line3": "两次断食间每空一天消耗 1 个护盾。没有护盾时习惯值下降，休息越久降得越多。",
+      "line4": "达到 100% 后积分转入 Retain，Retain 满 25 兑换 1 个护盾。"
+    }
+  },
+  "process": {
+    "glucoseControl": "血糖控制",
+    "fatBurning": "燃脂",
+    "growthHormone": "生长激素",
+    "ketosis": "酮症",
+    "autophagy": "细胞自噬",
+    "cellRenewal": "细胞更新",
+    "immuneRenewal": "免疫更新",
+    "level": {
+      "start": "开始",
+      "standard": "标准",
+      "good": "良好",
+      "high": "较高",
+      "peak": "峰值",
+      "max": "最高",
+      "drop": "下降",
+      "stable": "稳定",
+      "optimal": "最佳",
+      "init": "启动",
+      "warm": "预热",
+      "burn": "燃烧",
+      "trace": "微量",
+      "light": "轻度",
+      "active": "活跃",
+      "deep": "深度",
+      "better": "改善",
+      "rise": "上升",
+      "boost": "增强",
+      "prime": "预备",
+      "ready": "就绪",
+      "stronger": "更强"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "新手",
+      "Veteran": "熟手",
+      "Expert": "高手",
+      "Master": "大师"
+    },
+    "16h": {
+      "label": "间歇",
+      "title": "热门且易上手",
+      "description": "帮助身体利用储存的脂肪供能，并改善胰岛素敏感性。",
+      "advice": "（16 小时）标准方案！在 12 点至 20 点进食。",
+      "adviceLong": "这是最经典也最容易坚持的方案。跳过早餐，把一天的热量集中在中午 12 点到晚上 8 点之间。断食期间请喝约 2 升水。"
+    },
+    "18h": {
+      "label": "燃脂",
+      "title": "加强燃脂",
+      "description": "延长酮症时间，并开始触及细胞自噬。",
+      "advice": "（18 小时）16/8 的小幅进阶。",
+      "adviceLong": "比 16/8 多 2 小时，有助于最大化燃脂并开始启动自噬。这 18 小时内可以喝黑咖啡或无糖绿茶来度过饥饿感。"
+    },
+    "20h": {
+      "label": "战士",
+      "title": "战士模式",
+      "description": "最大化燃脂，并帮助保持肌肉量。",
+      "advice": "（20 小时）4 小时进食窗口，注意摄入足够蛋白质。",
+      "adviceLong": "进食窗口很短（只有 4 小时）。要保证足够的蛋白质（肉、鱼、蛋）和膳食纤维来保持肌肉。避免吃得太快，以免加重消化负担。"
+    },
+    "23h": {
+      "label": "一日一餐",
+      "title": "一日一餐",
+      "description": "促进细胞自噬，让消化系统得到深度休息。",
+      "advice": "（23 小时）唯一一餐要营养全面。",
+      "adviceLong": "接近完整的 24 小时断食（例如：今天晚餐后直到明天晚餐才再进食）。这唯一一餐应以天然食物为主，富含优质脂肪和蛋白质。若经常这样做，请留意身体反应。"
+    },
+    "36h": {
+      "label": "僧侣",
+      "title": "跨天挑战",
+      "description": "给肠道留出较长的恢复时间，帮助缓解炎症。",
+      "advice": "（36 小时）选一个运动量较小的日子。",
+      "adviceLong": "完整一天一夜不进食（例如：周一晚餐后跳过周二，周三早上再进食）。选择工作较轻松的一天，并补充电解质（矿物盐）以保持清醒。"
+    },
+    "48h": {
+      "label": "延长",
+      "title": "进阶深度断食",
+      "description": "彻底耗尽储存的糖原，促使身体重新调整供能方式。",
+      "advice": "（48 小时）必须补充电解质。",
+      "adviceLong": "如此长时间的断食需要每天补充电解质（盐、钾、镁）以保持血压稳定。如果长时间感到头晕乏力，请立即停止断食。"
+    },
+    "72h": {
+      "label": "长期",
+      "title": "极限挑战",
+      "description": "达到深度自噬。需要充分准备并谨慎进行。",
+      "advice": "（72 小时）仅适合经验非常丰富的人。",
+      "adviceLong": "只在身体已非常适应断食后偶尔进行。复食时切勿立刻大餐，先从骨头汤或清淡食物开始，以保护肠胃。"
+    }
+  },
+  "term": {
+    "habit": "习惯",
+    "retain": "Retain",
+    "target": "目标",
+    "targetHours": "目标 {{hours}} 小时",
+    "points": "积分",
+    "pts": "{{value}} 分",
+    "history": "历史",
+    "progress": "进度",
+    "weight": "体重",
+    "note": "笔记",
+    "mood": "心情",
+    "camera": "相机",
+    "gallery": "相册",
+    "error": "错误"
+  },
+  "fastingSheet": {
+    "completed": "已完成",
+    "result": "收获",
+    "keepGoing": "继续坚持以达成目标",
+    "now": "当前",
+    "atTarget": "达成目标时",
+    "endFasting": "结束断食"
+  },
+  "lastFast": {
+    "interrupted": "已中断",
+    "completed": "已完成",
+    "endedEarly": "提前结束",
+    "freeFasting": "自由断食",
+    "targetProgress": "目标进度"
+  },
+  "habitSheet": {
+    "title": "习惯指数",
+    "sessions_one": "{{count}} 条",
+    "sessions_other": "{{count}} 条",
+    "fastingSession": "断食记录",
+    "overRest_one": "多休息了 {{count}} 天",
+    "overRest_other": "多休息了 {{count}} 天",
+    "shieldIncrease": "获得护盾",
+    "restDays_one": "休息 {{count}} 天",
+    "restDays_other": "休息 {{count}} 天"
+  },
+  "habitDetail": {
+    "title": "习惯记录",
+    "habitPoints": "习惯积分",
+    "shields": "护盾数",
+    "fastDetail": "断食详情",
+    "restDay": "休息日",
+    "overRest": "休息过久"
+  },
+  "habitMilestone": {
+    "title": "进度"
+  },
+  "fullHabit": {
+    "title": "习惯已养成",
+    "maintainTitle": "进入保持阶段",
+    "maintainBody": "每次坚持习惯，积分都会计入 Retain。",
+    "retainTitle": "习惯 Retain",
+    "retainSub": "保持积分",
+    "note": "Retain 满 25 自动兑换 1 个护盾。习惯中断时，现有 Retain 全部归零。"
+  },
+  "streak": {
+    "milestone": {
+      "title": "连续天数达成里程碑！",
+      "subtitle": "你正在养成势不可挡的断食习惯！",
+      "button": "继续保持！🔥"
+    },
+    "rest": {
+      "title": "休息日已生效！",
+      "subtitle": "恢复也是旅程的一部分，你的连续天数依然稳固！",
+      "button": "继续前进！🌿"
+    },
+    "fresh": {
+      "title": "重新出发",
+      "subtitle": "高手也曾失败过。今天就重新开始吧！",
+      "button": "立即重新开始 🚀"
+    },
+    "best": "最佳",
+    "daysStreak": "连续天数",
+    "over": "连续天数突破 {{count}} 天！",
+    "consistency": "坚持度"
+  },
+  "result": {
+    "completed": {
+      "title": "断食完成！",
+      "subtitle": "自律做得很棒！"
+    },
+    "endedEarly": {
+      "title": "提前结束断食",
+      "subtitle": "每一小时都算数！进度已保存。"
+    },
+    "extended": {
+      "title": "长时断食完成！",
+      "subtitle": "耐力惊人！已解锁额外奖励。"
+    },
+    "fastingTime": "断食时长",
+    "targetProgress": "目标 {{hours}} 小时 · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "长时断食",
+      "retain": "保持习惯",
+      "milestone": "达成里程碑"
+    }
+  },
+  "note": {
+    "today": "今日笔记",
+    "forDate": "{{date}} 的笔记",
+    "placeholder": "今天感觉怎么样？",
+    "weightDigitsOnly": "只能输入数字。",
+    "weightOneDot": "只能有一个小数点。",
+    "weightIntMax": "整数部分最多 4 位。",
+    "weightDecMax": "小数部分最多 1 位。"
+  },
+  "image": {
+    "saveError": "无法保存照片，请重试。",
+    "deleteError": "无法删除照片，请重试。",
+    "deleteTitle": "删除照片",
+    "deleteConfirm": "删除这一天的照片吗？",
+    "addTitle": "添加照片",
+    "yourPhoto": "你的照片",
+    "addAPhoto": "添加一张照片",
+    "capture": "记录这一刻",
+    "chooseSource": "选择相机或相册"
+  },
+  "history": {
+    "title": "断食记录",
+    "total": "总计",
+    "average": "平均",
+    "recent": "最近的断食",
+    "status": {
+      "cancelled": "已取消",
+      "fasting": "进行中",
+      "free": "自由",
+      "reached": "达成目标",
+      "notReached": "未达成"
+    },
+    "actions": "操作"
+  },
+  "startTime": {
+    "invalid": "时间无效",
+    "overlap": "与上一次断食时间重叠！",
+    "max24h": "最多只能提前 24 小时开始！",
+    "future": "不能选择未来的时间！",
+    "title": "选择断食开始时间",
+    "hint": "点按时间或日期选择开始时刻",
+    "earlier": "提前开始",
+    "confirm": "确认开始"
+  },
+  "endTime": {
+    "title": "选择结束时间",
+    "confirm": "确认结束",
+    "future": {
+      "title": "时间无效",
+      "desc": "这是未来的时间。"
+    },
+    "tooQuick": {
+      "title": "本次断食将被取消",
+      "desc": "时间太短，无法记录。"
+    },
+    "failed": {
+      "title": "本次断食将记为失败",
+      "desc": "未达到完成断食的最短时间。"
+    },
+    "completed": {
+      "title": "本次断食将记为完成",
+      "desc": "时长足以记录。"
+    }
+  },
+  "targetSheet": {
+    "choose": "选择此目标",
+    "clear": "取消目标"
+  },
+  "fastDetail": {
+    "reachedTarget": "已达成目标",
+    "notReachedTarget": "未达成目标",
+    "targetHours": "目标：{{hours}} 小时",
+    "over": "超出 {{duration}}",
+    "remaining": "还差 {{duration}}",
+    "review": "本次评估",
+    "bodyAtEnd": "结束时的身体状态",
+    "metrics": "记录的数据",
+    "advice": "建议"
+  },
+  "date": {
+    "weekday": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "month": {
+      "0": "1月",
+      "1": "2月",
+      "2": "3月",
+      "3": "4月",
+      "4": "5月",
+      "5": "6月",
+      "6": "7月",
+      "7": "8月",
+      "8": "9月",
+      "9": "10月",
+      "10": "11月",
+      "11": "12月"
+    },
+    "monthNarrow": {
+      "0": "1",
+      "1": "2",
+      "2": "3",
+      "3": "4",
+      "4": "5",
+      "5": "6",
+      "6": "7",
+      "7": "8",
+      "8": "9",
+      "9": "10",
+      "10": "11",
+      "11": "12"
+    }
+  },
+  "journey": {
+    "savedImage": "图片已保存到相册。",
+    "saveImage": "保存图片",
+    "style": "样式",
+    "mode": {
+      "mood": "情绪",
+      "fasting": "断食进度"
+    },
+    "dayButton": "日",
+    "weekButton": "周",
+    "stat": {
+      "days_one": "天",
+      "days_other": "天",
+      "hours_one": "小时",
+      "hours_other": "小时",
+      "logs_one": "条",
+      "logs_other": "条"
+    },
+    "statsLine": "{{days}} 天 · {{hours}} 小时 · {{logs}} 条",
+    "legend": {
+      "mood": {
+        "0": "很差",
+        "1": "差",
+        "2": "一般",
+        "3": "好",
+        "4": "很好"
+      }
+    },
+    "info": {
+      "title": "如何查看历程",
+      "message": "图标说明没讲到的部分。",
+      "fast1": "每个格子的颜色取决于当天最长一次断食的总时长。",
+      "fast2": "跨越多天的断食会为这些天都上色，第一天较浅，越接近结束越深。",
+      "fast3": "带护盾图标的格子是被护盾保护的休息日。",
+      "mood1": "带主题色边框的格子表示当天有笔记。",
+      "actionsTitle": "操作",
+      "action1": "点按空白日期可添加心情和笔记，点按有数据的日期可查看详情。",
+      "action2": "每个图标下的数字是一年中属于该等级的天数。",
+      "action3": "用网格角落的周/日按钮切换布局，保存的图片会采用当前布局。"
+    }
+  },
+  "layout": {
+    "title": "像素布局",
+    "subtitle": "选择历程的显示方式",
+    "weekly": "按周",
+    "monthly": "按月",
+    "vertical": "↓ 纵向",
+    "horizontal": "→ 横向"
+  },
+  "iconPack": {
+    "title": "选择图标包",
+    "tabMood": "情绪",
+    "tabTarget": "目标",
+    "level": "等级 {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "基于 Ionicons 的现代简约风格",
+    "material_emoticons": "来自 Material Community 的精致表情",
+    "weather_vibes": "用天气图标表达心情",
+    "gaming_energy": "游戏风格的能量条情绪",
+    "pixel_vibe": "像素风情绪与象形表情",
+    "default_emoji_targets": "用经典表情表示目标",
+    "ionicons_targets": "来自 Ionicons 的流畅简约图标",
+    "material_energy_targets": "用能量和火焰表现挑战难度",
+    "feather_minimal_targets": "来自 Feather Icons 的精致线条设计"
+  },
+  "pixelDetail": {
+    "title": "当日日志",
+    "noMood": "尚无心情",
+    "dailyFast": "⏱️ 当日断食",
+    "dailyNote": "📝 当日笔记",
+    "relatedFasts": "相关断食",
+    "hoursToday": "小时（当天）",
+    "hoursFasted": "断食小时",
+    "weightHint": "点按编辑",
+    "addWeight": "添加体重",
+    "dayNote": "当日笔记",
+    "notePlaceholder": "为这一天添加笔记…",
+    "photos": "照片",
+    "addPhoto": "添加照片",
+    "photoHint": "为这一天添加照片",
+    "updatePhoto": "更新照片",
+    "changePhoto": "更换照片",
+    "photoFrom": "照片来源"
+  },
+  "dayModal": {
+    "todayMood": "今日心情",
+    "moodFor": "{{date}} 的心情",
+    "todayWeight": "今日体重",
+    "weightFor": "{{date}} 的体重"
+  },
+  "stats": {
+    "subtitle": "追踪你的进度",
+    "dashboard": "概览",
+    "currentStreak": "当前连续天数",
+    "days_one": "天",
+    "days_other": "天",
+    "record": "最高纪录",
+    "shields": "护盾",
+    "section": "统计",
+    "totalFasting": "总断食",
+    "completed": "已完成",
+    "averageFast": "平均断食",
+    "longestFast": "最长断食",
+    "activeDays": "活跃天数",
+    "maxStreak": "最长连续天数",
+    "shieldsUsed": "已用护盾",
+    "unit": {
+      "hours": "小时",
+      "times": "次",
+      "days": "天"
+    },
+    "distribution": {
+      "title": "断食分布",
+      "subtitle": "你的断食时长分布",
+      "range": "{{from}}–{{to}} 小时",
+      "over": "{{from}}+ 小时",
+      "fasts_one": "次",
+      "fasts_other": "次"
+    },
+    "chart": {
+      "title": "体重与断食进度",
+      "subtitle": "随时间的变化",
+      "fasting": "断食",
+      "noData": "无数据",
+      "noWeight": "- 无体重数据",
+      "hoursUnit": "小时"
+    },
+    "range": {
+      "title": "时间范围",
+      "day_one": "{{count}} 天",
+      "day_other": "{{count}} 天",
+      "week_one": "{{count}} 周",
+      "week_other": "{{count}} 周",
+      "month_one": "{{count}} 个月",
+      "month_other": "{{count}} 个月",
+      "unit": {
+        "day": "天",
+        "week": "周",
+        "month": "个月"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "当前体重",
+    "currentWeightMessage": "输入当前体重",
+    "targetMessage": "设置目标体重",
+    "setCurrent": "记录当前体重",
+    "setCurrentHint": "添加体重即可开始追踪进度",
+    "weightGoal": "体重目标",
+    "setTarget": "设置目标",
+    "currentWeight": "当前体重",
+    "setTargetHint": "设置目标体重以追踪进度",
+    "toGo": "还差 {{value}} kg",
+    "reached": "已达成目标"
+  },
+  "ach": {
+    "title": "成就",
+    "unlocked": "已解锁 {{unlocked}} / {{total}}",
+    "empty": "暂无成就",
+    "claim": "领取",
+    "done": "已达成",
+    "notDone": "未达成",
+    "empty_slot": "空位",
+    "tier": {
+      "BRONZE": "铜",
+      "SILVER": "银",
+      "GOLD": "金",
+      "DIAMOND": "钻石"
+    },
+    "fasting_hours": {
+      "name": "累计断食",
+      "description": "断食的总小时数。",
+      "item_one": "断食 {{count}} 小时",
+      "item_other": "断食 {{count}} 小时"
+    },
+    "invalid_fasts": {
+      "name": "无效断食",
+      "description": "无效断食的总次数。"
+    },
+    "failed_fasts": {
+      "name": "失败的断食",
+      "description": "失败断食的总次数。"
+    },
+    "completed_fasts": {
+      "name": "完成的断食",
+      "description": "完成断食的总次数。",
+      "item_one": "完成第一次断食",
+      "item_other": "完成 {{count}} 次断食"
+    },
+    "active_days": {
+      "name": "活跃天数",
+      "description": "在应用中活跃的天数。",
+      "item_one": "活跃 {{count}} 天",
+      "item_other": "活跃 {{count}} 天"
+    },
+    "habit": {
+      "name": "习惯",
+      "description": "你的断食习惯分数。",
+      "item_one": "习惯达到 {{count}}%",
+      "item_other": "习惯达到 {{count}}%"
+    },
+    "longest_fast": {
+      "name": "最长断食",
+      "description": "你完成过的最长断食。",
+      "item_one": "完成一次 {{count}} 小时断食",
+      "item_other": "完成一次 {{count}} 小时断食"
+    },
+    "max_streak": {
+      "name": "最长连续天数",
+      "description": "你最长的连续断食天数。",
+      "item_one": "连续 {{count}} 天",
+      "item_other": "连续 {{count}} 天"
+    },
+    "total_shields": {
+      "name": "护盾总数",
+      "description": "获得的护盾总数。",
+      "item_one": "获得第一个护盾",
+      "item_other": "获得 {{count}} 个护盾"
+    },
+    "retain_circles": {
+      "name": "Retain 大师",
+      "description": "习惯满格时完成的 Retain 圈数。",
+      "item_one": "完成第一圈 Retain",
+      "item_other": "完成 {{count}} 圈 Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "无法关闭",
+      "body": "请先完成此操作！"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "section": {
+      "showcase": "展示柜",
+      "appearance": "外观",
+      "general": "通用",
+      "sound": "声音与振动",
+      "notifications": "通知",
+      "data": "数据",
+      "about": "关于"
+    },
+    "showcaseExport": "在历程图片中显示",
+    "showcaseExportDesc": "将展示徽章加入保存的图片",
+    "showcaseEmpty": "还没有徽章。达成成就里程碑后，在统计页点“领取”即可解锁。",
+    "showcasePick": "最多选择 {{max}} 个徽章展示。",
+    "selectedCount": "已选 {{count}}/{{max}}",
+    "darkMode": "深色模式",
+    "darkModeDesc": "全应用使用深色外观",
+    "theme": "主题",
+    "language": "语言",
+    "weekStart": "每周开始于",
+    "monday": "星期一",
+    "sunday": "星期日",
+    "mondayDesc": "周一 → 周日",
+    "sundayDesc": "周日 → 周六",
+    "beginnerTips": "新手提示",
+    "beginnerTipsDesc": "显示习惯与护盾机制的简短说明",
+    "vibration": "振动",
+    "sound": "声音",
+    "soundDesc": "开始、结束和奖励时的声音",
+    "touchSound": "触摸音",
+    "touchSoundDesc": "点按和切换时的短促音",
+    "targetReached": "达成目标",
+    "targetReachedDesc": "达成断食目标时通知",
+    "dailyReminder": "每日提醒",
+    "dailyReminderDesc": "每天提醒你开始断食",
+    "reminderTime": "提醒时间",
+    "backup": "备份与恢复",
+    "backupDesc": "Google 云端硬盘或备份文件",
+    "reset": "重置设置",
+    "resetDesc": "恢复默认设置",
+    "resetConfirmTitle": "要重置设置吗？",
+    "resetConfirmBody": "主题、布局、声音和通知设置将恢复默认，断食数据会保留。",
+    "resetOk": "重置",
+    "privacy": "隐私",
+    "privacyDesc": "隐私与数据权限",
+    "privacyBody": "FastFast 可离线使用。你的断食、笔记和体重只保存在本设备上，绝不会发送到我们的服务器。备份保存在你自己保管的文件或你自己的 Google 云端硬盘中。",
+    "health": "健康声明",
+    "rate": "给应用评分",
+    "rateDesc": "喜欢这个应用？留下评分吧",
+    "rateThanks": "谢谢！",
+    "rateLater": "应用上架后即可评分。",
+    "feedback": "反馈",
+    "feedbackDesc": "告诉我们你的想法或报告问题",
+    "noEmailTitle": "没有邮件应用",
+    "noEmailBody": "请安装邮件应用后再发送反馈。",
+    "about": "关于",
+    "aboutBody": "版本 {{version}}\n\n带连续天数、护盾和像素年历的间歇性断食。",
+    "version": "版本 {{version}}",
+    "expoGoTitle": "Expo Go 中不可用",
+    "expoGoBody": "通知需要开发版或商店版应用。",
+    "notifOffTitle": "通知已关闭",
+    "notifOffBody": "请在系统设置中允许 FastFast 发送通知。",
+    "openSettings": "打开设置"
+  },
+  "account": {
+    "title": "账号",
+    "guestHint": "使用 Google 登录以备份到云端硬盘"
+  },
+  "backup": {
+    "subtitle": "数据保存在本设备上，备份是可供日后恢复的副本。",
+    "drive": "Google 云端硬盘",
+    "file": "文件",
+    "signIn": "使用 Google 登录",
+    "signInDesc": "备份到你自己的 Google 云端硬盘",
+    "notSignedIn": "未登录",
+    "lastBackup": "上次备份 {{time}}",
+    "never": "尚无备份",
+    "backUpNow": "立即备份",
+    "backingUp": "正在备份…",
+    "restoreDrive": "从云端硬盘恢复",
+    "restoreDriveDesc": "用云端硬盘的备份替换本设备数据",
+    "restoring": "正在恢复…",
+    "signOut": "退出登录",
+    "signOutTitle": "要退出登录吗？",
+    "signOutBody": "数据仍保留在本设备上，Google 云端硬盘中的备份也会保留。",
+    "signInFailedTitle": "登录失败",
+    "signInFailedBody": "无法使用 Google 登录，请重试。",
+    "confirmTitle": "要备份到 Google 云端硬盘吗？",
+    "confirmReplace": "将用当前数据和照片替换 {{time}} 的备份。",
+    "confirmFirst": "当前数据和照片将保存到你的 Google 云端硬盘。",
+    "backUp": "备份",
+    "doneTitle": "已备份",
+    "doneWithPhotos": "数据和 {{count}} 张新照片已保存到 Google 云端硬盘。",
+    "doneBody": "数据已保存到 Google 云端硬盘。",
+    "failedTitle": "备份失败",
+    "failedBody": "无法备份到 Google 云端硬盘，请检查网络后重试。",
+    "restoredTitle": "已恢复",
+    "restoredBody": "数据已恢复。",
+    "restoredMissing": "数据已恢复，云端硬盘中有 {{count}} 张照片未找到。",
+    "restoreFailedTitle": "恢复失败",
+    "restoreFailedDrive": "无法从 Google 云端硬盘恢复。",
+    "readFailed": "无法读取 Google 云端硬盘中的备份。",
+    "noneTitle": "没有备份",
+    "noneBody": "此 Google 账号还没有 FastFast 备份。",
+    "restoreDriveTitle": "要从 Google 云端硬盘恢复吗？",
+    "restoreConfirm": "{{time}} 的备份。本设备上的当前数据将全部被替换。",
+    "restoreFileConfirm": "{{time}} 的备份。当前数据将全部被替换。文件备份不包含照片。",
+    "restoreFileTitle": "要从文件恢复吗？",
+    "restoreFileFailed": "无法恢复此备份文件。",
+    "exportFile": "导出备份文件",
+    "exporting": "正在导出…",
+    "exportFileDesc": "仅数据，可随意分享或保存",
+    "exportFailedTitle": "导出失败",
+    "exportFailedBody": "无法创建备份文件。",
+    "restoreFile": "从文件恢复",
+    "restoreFileDesc": "选择一个 FastFast 备份文件",
+    "importFailedTitle": "导入失败",
+    "importFailedBody": "此文件不是有效的 FastFast 备份。"
+  },
+  "theme": {
+    "title": "主题",
+    "subtitle": "选择应用外观",
+    "notPurchased": "未购买",
+    "freeUntil": "免费至",
+    "purchase": "购买",
+    "unavailable": "不可用",
+    "premium": "高级",
+    "limited": "限定",
+    "dark": "深色",
+    "light": "浅色"
+  },
+  "notify": {
+    "targetTitle": "🎉 已达成目标！",
+    "targetBody": "你已断食 {{hours}} 小时，结束本次断食即可记录。",
+    "dailyTitle": "该开始断食了 ⏱️",
+    "dailyBody": "开始今天的断食，保持连续天数和习惯。"
+  },
+  "perm": {
+    "saveImage": "FastFast 需要权限才能将图片保存到相册。",
+    "camera": "FastFast 需要相机权限才能拍照。",
+    "gallery": "FastFast 需要访问相册才能选择图片。",
+    "saveFailed": "无法保存图片，请重试。"
+  },
+  "widget": {
+    "fasting": "断食中",
+    "ready": "准备就绪",
+    "notFasting": "未断食",
+    "tapToOpen": "点按打开 FastFast",
+    "started": "开始",
+    "done": "完成"
+  },
+  "notFound": {
+    "title": "哎呀！",
+    "body": "此页面不存在。",
+    "home": "返回首页"
+  }
+}

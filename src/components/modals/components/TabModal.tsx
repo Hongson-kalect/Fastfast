@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, TabsModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
@@ -112,7 +113,7 @@ const TabsModal = (modal: Props) => {
               color="text"
               opacity="medium"
             >
-              {modal.cancelText || "Close"}
+              {modal.cancelText || i18n.t("common.close")}
             </ThemedText>
           </TouchableOpacity>
         )}
@@ -126,7 +127,7 @@ const TabsModal = (modal: Props) => {
           }}
         >
           <ThemedText size="sm" weight="semibold" colorHex={getContrastTextColor(theme.primary)}>
-            {modal.okText || "OK"}
+            {modal.okText || i18n.t("common.ok")}
           </ThemedText>
         </TouchableOpacity>
       </View>

@@ -5,6 +5,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { ThemedText } from "../../themed-text";
+import { useT } from "@/providers/Language";
 
 type SwapFastButtonProps = {
   isCounting: boolean;
@@ -29,6 +30,7 @@ export const SwapFastButton = ({
   onLongPress,
 }: SwapFastButtonProps) => {
   const theme = useAppStore((state) => state.theme);
+  const t = useT();
   const textColor = isCounting
     ? color
     : theme.buttonText || getContrastTextColor(color);
@@ -43,7 +45,7 @@ export const SwapFastButton = ({
         color={textColor}
       />
       <ThemedText size="lg" weight="extrabold" colorHex={textColor}>
-        {isCounting ? "Kết thúc" : "Bắt đầu nhịn"}
+        {isCounting ? t("home.endFast") : t("home.startFast")}
       </ThemedText>
     </View>
   );

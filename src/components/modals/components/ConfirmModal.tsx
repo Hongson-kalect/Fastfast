@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import { ThemedText } from "@/components/themed-text";
 import { BasicModalOptions, ConfirmModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
@@ -11,8 +12,8 @@ const ConfirmModal = (modal: Props) => {
   const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
   const theme = useAppStore((state) => state.theme);
 
-  const cancelText = modal.cancelText || "Cancel";
-  const okText = modal.okText || "OK";
+  const cancelText = modal.cancelText || i18n.t("common.cancel");
+  const okText = modal.okText || i18n.t("common.ok");
 
   const handleCancel = () => {
     modal.onCancel?.();

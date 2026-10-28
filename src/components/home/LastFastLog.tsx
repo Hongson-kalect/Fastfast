@@ -8,12 +8,15 @@ import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
 import { getTargetInfo } from "@/utils/home/fast";
 import { MIN_FAST_DURATION } from "@/database/schema/fast_sessions";
+import { useT } from "@/providers/Language";
+import i18n from "i18next";
 
 interface Props {
   session: FastSession;
 }
 
 export const getSessionSummary = (session: FastSession) => {
+  const t = i18n.t;
   const targetSeconds = (session.target_duration || 0) * 3600;
   const actualSeconds = session.duration || 0;
   const theme = useAppStore.getState().theme;
@@ -23,16 +26,16 @@ export const getSessionSummary = (session: FastSession) => {
       ? Math.min(Math.round((actualSeconds / targetSeconds) * 100), 999)
       : 0;
 
-  let statusText = "Interrupted";
+  let statusText = t("lastFast.interrupted");
   let statusColor = theme.error;
   let isSuccess = false;
 
   if (session.status === "completed" || percent >= 100) {
-    statusText = "Completed";
+    statusText = t("lastFast.completed");
     statusColor = theme.success;
     isSuccess = true;
   } else if (actualSeconds >= MIN_FAST_DURATION) {
-    statusText = "Ended early";
+    statusText = t("lastFast.endedEarly");
     statusColor = theme.warning;
   }
 
@@ -51,6 +54,7 @@ export const getSessionSummary = (session: FastSession) => {
 };
 
 export const RecentFastCard = ({ session }: Props) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const summary = getSessionSummary(session);
@@ -90,7 +94,7 @@ export const RecentFastCard = ({ session }: Props) => {
           <View className="ml-2">
             <View className="flex-row items-center">
               <ThemedText size="sm" weight="bold" style={{ color: accent }}>
-                {target?.label ?? "Free fasting"}
+                {target ? t(`targets.${target.id}.label`) : t("lastFast.freeFasting")}
               </ThemedText>
 
               {target?.level && (
@@ -107,7 +111,7 @@ export const RecentFastCard = ({ session }: Props) => {
                       color: badgeText,
                     }}
                   >
-                    {target.level}
+                    {t(`targets.level.${target.level}`)}
                   </ThemedText>
                 </View>
               )}
@@ -121,7 +125,7 @@ export const RecentFastCard = ({ session }: Props) => {
                   color: theme.text + "66",
                 }}
               >
-                Target {session.target_duration}h
+                {t("term.targetHours", { hours: session.target_duration })}
               </ThemedText>
             )}
           </View>
@@ -190,7 +194,7 @@ export const RecentFastCard = ({ session }: Props) => {
               color: theme.text + "66",
             }}
           >
-            Target progress
+            {t("lastFast.targetProgress")}
           </ThemedText>
 
           <ThemedText

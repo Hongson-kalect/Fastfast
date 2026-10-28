@@ -7,8 +7,10 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { AchievementBottomSheet } from "./AchievementBottomSheet";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 const DashboardHeader = () => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const userId = useAppStore((state) => state.userProfile)?.id;
   const { currentMilestones, hasUnclaimedMilestones } = useDashboardStore(
@@ -35,11 +37,11 @@ const DashboardHeader = () => {
     <View className="flex-row items-center justify-between">
       <View>
         <ThemedText size="xxxl" weight="bold">
-          Dashboard
+          {t("stats.dashboard")}
         </ThemedText>
 
         <ThemedText size="xs" color="text" opacity="medium" className="mt-0.5">
-          Theo dõi tiến trình của bạn
+          {t("stats.subtitle")}
         </ThemedText>
       </View>
 

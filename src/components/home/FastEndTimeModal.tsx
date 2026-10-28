@@ -15,6 +15,7 @@ import { TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 type Props = {
   startTime: number;
@@ -31,6 +32,7 @@ const FastEndTimeModal = ({
   targetFinishTime,
   currentFast,
 }: Props) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const { now, sliderMin, effectiveMax, today } = useMemo(() => {
@@ -106,27 +108,27 @@ const FastEndTimeModal = ({
     if (displayTime > now)
       return {
         type: "failed" as const,
-        title: "Thời gian không hợp lệ",
-        description: "Đây là mốc thời gian trong tương lai.",
+        title: t("endTime.future.title"),
+        description: t("endTime.future.desc"),
       };
     if (seconds < TOO_QUICK_DURATION) {
       return {
         type: "too_quick" as const,
-        title: "Phiên sẽ bị hủy",
-        description: "Thời gian quá ngắn để được ghi nhận.",
+        title: t("endTime.tooQuick.title"),
+        description: t("endTime.tooQuick.desc"),
       };
     }
     if (seconds < MIN_FAST_DURATION) {
       return {
         type: "failed" as const,
-        title: "Phiên sẽ được đánh dấu thất bại",
-        description: "Chưa đạt thời gian tối thiểu để hoàn thành Fast.",
+        title: t("endTime.failed.title"),
+        description: t("endTime.failed.desc"),
       };
     }
     return {
       type: "completed" as const,
-      title: "Phiên sẽ được hoàn thành",
-      description: "Thời gian này đủ để ghi nhận Fast.",
+      title: t("endTime.completed.title"),
+      description: t("endTime.completed.desc"),
     };
   };
   const finishStatus = getFinishStatus();
@@ -139,8 +141,8 @@ const FastEndTimeModal = ({
     if (finalTime > now) {
       Toast.show({
         type: "error",
-        text1: "Thời gian không hợp lệ",
-        text2: "Không thể chọn thời gian ở tương lai!",
+        text1: t("startTime.invalid"),
+        text2: t("startTime.future"),
         useModal: true,
       });
       return;
@@ -149,8 +151,8 @@ const FastEndTimeModal = ({
     if (finalTime < startTime) {
       Toast.show({
         type: "error",
-        text1: "Thời gian không hợp lệ",
-        text2: "Thời gian kết thúc phải sau thời gian bắt đầu!",
+        text1: t("startTime.invalid"),
+        text2: t("finish.endBeforeStart"),
         useModal: true,
       });
       return;
@@ -170,7 +172,7 @@ const FastEndTimeModal = ({
 
       <View className="mb-5">
         <ThemedText size="md" weight="bold">
-          Chọn thời gian kết thúc
+          {t("endTime.title")}
         </ThemedText>
       </View>
 
@@ -194,7 +196,7 @@ const FastEndTimeModal = ({
         >
           {date !== today
             ? `⚠️ ${getRelativeTime(new Date(date), false)}`
-            : "Hôm nay"}
+            : t("common.today")}
         </ThemedText>
       </View>
 
@@ -254,7 +256,7 @@ const FastEndTimeModal = ({
         {targetFinishTime && (
           <View className="mt-3 flex-row justify-between border-t border-text-base/10 pt-3">
             <ThemedText size="xs" color="text" opacity="medium">
-              Mục tiêu
+              {t("term.target")}
             </ThemedText>
 
             <ThemedText size="xs" weight="medium" color="text" opacity="medium">
@@ -274,7 +276,7 @@ const FastEndTimeModal = ({
         className="mt-5 items-center justify-center rounded-full bg-error py-4"
       >
         <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.error)}>
-          Xác nhận kết thúc Fast
+          {t("endTime.confirm")}
         </ThemedText>
       </TouchableOpacity>
     </View>

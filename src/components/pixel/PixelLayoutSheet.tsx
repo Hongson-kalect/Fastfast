@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type PixelViewType = "week" | "month";
 type PixelOrientation = "vertical" | "horizontal";
@@ -26,25 +27,25 @@ const PIXEL_LAYOUTS: {
   {
     type: "week",
     orientation: "vertical",
-    title: "Weekly",
+    title: "layout.weekly",
     // description: "53 tuần · Cuộn dọc",
   },
   {
     type: "week",
     orientation: "horizontal",
-    title: "Weekly",
+    title: "layout.weekly",
     // description: "53 tuần · Cuộn ngang",
   },
   {
     type: "month",
     orientation: "vertical",
-    title: "Monthly",
+    title: "layout.monthly",
     // description: "12 tháng · Cuộn dọc",
   },
   {
     type: "month",
     orientation: "horizontal",
-    title: "Monthly",
+    title: "layout.monthly",
     // description: "12 tháng · Cuộn ngang",
   },
 ];
@@ -54,6 +55,7 @@ const PixelLayoutPreview = ({
   orientation,
   selected,
 }: PixelLayout & { selected: boolean }) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const isHorizontal = orientation === "horizontal";
@@ -65,13 +67,15 @@ const PixelLayoutPreview = ({
 
   const colCount = isHorizontal ? 5 : 6;
 
-  const labels = isWeek
-    ? isHorizontal
-      ? ["M", "T", "W", "T", "F", "..."]
-      : ["M", "T", "W", "T", "F", "..."]
-    : isHorizontal
-      ? ["J", "F", "M", "A", "M", "..."]
-      : ["J", "F", "M", "A", "M", "..."];
+  // Nhãn minh hoạ: 5 ngày đầu tuần hoặc 5 tháng đầu năm theo ngôn ngữ
+  const labels = [
+    ...[0, 1, 2, 3, 4].map((index) =>
+      isWeek
+        ? t(`date.weekday.${index + 1}`).charAt(0)
+        : t(`date.monthNarrow.${index}`),
+    ),
+    "...",
+  ];
 
   const background = selected ? theme.primary + "22" : theme.background2;
 
@@ -133,6 +137,7 @@ const PixelLayoutPreview = ({
 };
 
 const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
+  const t = useT();
   const { hide } = useBottomSheet();
   const dbService = useDBService();
   const { theme, settings, updateSetting } = useAppStore(
@@ -171,7 +176,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
         color="text"
         style={{ marginTop: 16, marginBottom: 4 }}
       >
-        Pixel layout
+        {t("layout.title")}
       </ThemedText>
 
       <ThemedText
@@ -180,7 +185,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
         opacity="medium"
         style={{ marginBottom: 16 }}
       >
-        Chọn cách hiển thị hành trình của bạn
+        {t("layout.subtitle")}
       </ThemedText>
 
       <View className="flex-row flex-wrap -mx-1.5">
@@ -219,7 +224,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
                       weight="semibold"
                       color={isSelected ? "primary" : "text"}
                     >
-                      {item.title}
+                      {t(item.title)}
                     </ThemedText>
 
                     <ThemedText
@@ -228,7 +233,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
                       opacity="medium"
                       style={{ marginTop: 2 }}
                     >
-                      {item.orientation === "vertical" ? "↓ Dọc" : "→ Ngang"}
+                      {item.orientation === "vertical" ? t("layout.vertical") : t("layout.horizontal")}
                     </ThemedText>
 
                     {/* {isSelected && (
@@ -256,7 +261,7 @@ const PixelLayoutSheet = ({ onSelectLayout }: Props) => {
                     opacity="medium"
                     style={{ marginTop: 2 }}
                   >
-                    {item.orientation === "vertical" ? "↓ Dọc" : "→ Ngang"}
+                    {item.orientation === "vertical" ? t("layout.vertical") : t("layout.horizontal")}
                   </ThemedText> */}
                 </View>
               </TouchableOpacity>

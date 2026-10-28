@@ -20,8 +20,10 @@ import {
 } from "../../constants/fasting_targets";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 export const PackPickerBottomSheet = () => {
+  const t = useT();
   const viewMode = usePixelStore((state) => state.viewMode);
   const [activeTab, setActiveTab] = useState<ViewMode>(viewMode);
 
@@ -61,7 +63,7 @@ export const PackPickerBottomSheet = () => {
       {/* Header */}
       <View className="mb-4 flex-row items-center justify-between">
         <ThemedText size="xl" weight="bold" color="title">
-          Chọn Icon Pack
+          {t("iconPack.title")}
         </ThemedText>
 
         <TouchableOpacity
@@ -92,7 +94,7 @@ export const PackPickerBottomSheet = () => {
             color={activeTab === "mood" ? "title" : "text"}
             opacity={activeTab === "mood" ? undefined : "medium"}
           >
-            Cảm xúc (Mood)
+            {t("iconPack.tabMood")}
           </ThemedText>
         </TouchableOpacity>
 
@@ -109,7 +111,7 @@ export const PackPickerBottomSheet = () => {
             color={activeTab === "fasting" ? "title" : "text"}
             opacity={activeTab === "fasting" ? undefined : "medium"}
           >
-            Mục tiêu (Target)
+            {t("iconPack.tabTarget")}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -156,6 +158,7 @@ const EmotionPackCard = ({
   isSelected,
   onSelect,
 }: EmotionPackCardProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
 
@@ -181,7 +184,7 @@ const EmotionPackCard = ({
       </View>
 
       <ThemedText size="xs" color="text" opacity="medium" className="mb-3">
-        {pack.description}
+        {pack.description ? t(`packs.${pack.id}`) : null}
       </ThemedText>
 
       {/* Preview Icons */}
@@ -204,7 +207,7 @@ const EmotionPackCard = ({
                 color="text"
                 opacity="medium"
               >
-                Lvl {item.level}
+                {t("iconPack.level", { level: item.level })}
               </ThemedText> */}
             </View>
           );
@@ -225,6 +228,7 @@ const TargetPackCard = ({
   isSelected,
   onSelect,
 }: TargetPackCardProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const isDark = useAppStore((state) => state.settings?.is_dark_mode ?? true);
 
@@ -250,7 +254,7 @@ const TargetPackCard = ({
       </View>
 
       <ThemedText size="xs" color="text" opacity="medium" className="mb-3">
-        {pack.description}
+        {pack.description ? t(`packs.${pack.id}`) : null}
       </ThemedText>
 
       {/* Preview Targets */}

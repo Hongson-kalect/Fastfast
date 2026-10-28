@@ -28,6 +28,7 @@ import { FastingCircle } from "./FastingCircle";
 import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type Props = {
   isCounting: boolean;
@@ -48,6 +49,7 @@ export const CircleCounter = ({
   finishFasting,
 }: Props) => {
   const counter = useFastCounter();
+  const t = useT();
   const { settings, theme } = useAppStore(
     useShallow((state) => ({ settings: state.settings, theme: state.theme })),
   );
@@ -225,7 +227,7 @@ export const CircleCounter = ({
           openFastingSheet={openFastingSheet}
           openTargetSheet={openTargetSheet}
           showHistory={showHistory}
-          phaseTitle={phase?.title}
+          phaseTitle={phase ? t(`process.${phase.key}`) : undefined}
           ringColor={color}
           diameter={radius * 2 - strokeWidth}
         />

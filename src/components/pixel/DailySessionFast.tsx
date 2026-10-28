@@ -7,6 +7,7 @@ import { FastDetail } from "../FastDetail";
 import { DEBUG_COLORS } from "./Circular24hTimeline";
 import { ThemedText } from "../themed-text";
 import { useAppStore } from "@/stores/appStore";
+import { useT } from "@/providers/Language";
 
 type DailyFastSessionCardProps = {
   index?: number;
@@ -18,6 +19,7 @@ export function DailyFastSessionCard({
   fast,
   dailyLog,
 }: DailyFastSessionCardProps) {
+  const t = useT();
   const addModal = useModalStore((state) => state.addModal);
   const theme = useAppStore((state) => state.theme);
   if (!fast) {
@@ -35,7 +37,7 @@ export function DailyFastSessionCard({
           opacity="medium"
           style={{ marginLeft: 12 }}
         >
-          Đang tải phiên nhịn...
+          {t("common.loading")}
         </ThemedText>
       </View>
     </View>
@@ -61,7 +63,7 @@ export function DailyFastSessionCard({
     return `${day}/${month}`;
   };
   const startTime = formatTime(start);
-  const endTime = end ? formatTime(end) : "Đang nhịn";
+  const endTime = end ? formatTime(end) : t("counter.fasting");
   const crossesDay =
     (!!end && start.getFullYear() !== end.getFullYear()) ||
     (!!end && start.getMonth() !== end.getMonth()) ||
@@ -165,7 +167,7 @@ export function DailyFastSessionCard({
           opacity={contributionHours > 0 ? "medium" : "fade"}
           style={{ marginLeft: 4 }}
         >
-          hours today
+          {t("pixelDetail.hoursToday")}
         </ThemedText>
       </View>
 

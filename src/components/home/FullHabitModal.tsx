@@ -5,8 +5,10 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import LiquidCircle from "./Waterball";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 const FullHabitModal = ({ habitName }: { habitName: string }) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
 
@@ -26,7 +28,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
         </View>
 
         <ThemedText size="xxl" weight="bold" style={{ marginTop: 16 }}>
-          Thói quen hình thành
+          {t("fullHabit.title")}
         </ThemedText>
       </View>
 
@@ -44,7 +46,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
       {/* Explanation */}
       <View className="mt-2 rounded-2xl border border-text-base/5 bg-background2/80 p-4">
         <ThemedText size="md" weight="bold">
-          Bước vào giai đoạn duy trì
+          {t("fullHabit.maintainTitle")}
         </ThemedText>
 
         <ThemedText
@@ -53,7 +55,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
           opacity="medium"
           style={{ marginTop: 8, lineHeight: 20 }}
         >
-          Mỗi lần bạn tiếp tục duy trì thói quen, điểm sẽ được cộng vào Retain.
+          {t("fullHabit.maintainBody")}
         </ThemedText>
       </View>
 
@@ -65,7 +67,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
           </View>
 
           <View className="flex-1">
-            <ThemedText weight="bold">Habit Retain</ThemedText>
+            <ThemedText weight="bold">{t("fullHabit.retainTitle")}</ThemedText>
 
             <ThemedText
               size="xxs"
@@ -73,7 +75,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
               opacity="medium"
               style={{ marginTop: 4 }}
             >
-              Điểm duy trì
+              {t("fullHabit.retainSub")}
             </ThemedText>
           </View>
 
@@ -96,8 +98,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
         opacity="medium"
         style={{ marginTop: 8 }}
       >
-        Đầy 25 Retain sẽ tự quy đổi 1 Shield. Khi habit bị phá, toàn bộ Retain
-        hiện có sẽ về 0.
+        {t("fullHabit.note")}
       </ThemedText>
 
       {/* CTA */}
@@ -107,7 +108,7 @@ const FullHabitModal = ({ habitName }: { habitName: string }) => {
         className="mt-6 h-14 items-center justify-center rounded-full bg-primary"
       >
         <ThemedText size="md" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
-          Đã hiểu
+          {t("common.gotIt")}
         </ThemedText>
       </Pressable>
     </View>

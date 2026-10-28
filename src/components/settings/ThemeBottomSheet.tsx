@@ -6,6 +6,7 @@ import { getThemeAccess, ThemeItem, themes } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { UserAsset } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
+import { useT } from "@/providers/Language";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { useEffect, useState } from "react";
@@ -32,6 +33,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
     })),
   );
   const { hide } = useBottomSheet();
+  const t = useT();
 
   // TODO: thay bằng API/store thật
   const isPremiumUser = userProfile?.account_type === "premium" || false;
@@ -133,12 +135,12 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
           <Feather name="droplet" size={20} color={theme.primary} />
 
           <ThemedText size="xl" weight="bold" className="ml-3">
-            Theme
+            {t("theme.title")}
           </ThemedText>
         </View>
 
         <ThemedText size="xs" color="text" opacity="medium" className="mt-1">
-          Choose the appearance of your app
+          {t("theme.subtitle")}
         </ThemedText>
       </View>
 
@@ -278,8 +280,8 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                               colorHex={colors.primary}
                             >
                               {themeData.type === "premium"
-                                ? "Premium"
-                                : "Limited"}
+                                ? t("theme.premium")
+                                : t("theme.limited")}
                             </ThemedText>
                           </View>
                         )}
@@ -291,7 +293,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                         opacity="medium"
                         className="mt-0.5"
                       >
-                        {isDarkMode ? "Dark" : "Light"}
+                        {isDarkMode ? t("theme.dark") : t("theme.light")}
                       </ThemedText>
                     </View>
 
@@ -322,7 +324,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                           weight="semibold"
                           colorHex={colors.success}
                         >
-                          un purchased
+                          {t("theme.notPurchased")}
                         </ThemedText>
                       </Pressable>
                     ) : themeData.type === "limited" && access === "free" ? (
@@ -333,7 +335,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                             opacity="full"
                             color={"success"}
                           >
-                            Free until
+                            {t("theme.freeUntil")}
                           </ThemedText>
                           <ThemedText
                             size="xxs"
@@ -360,7 +362,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                             colorHex={getContrastTextColor(theme.primary)}
                             className="ml-1"
                           >
-                            Purchase
+                            {t("theme.purchase")}
                           </ThemedText>
                         </Pressable>
                       </View>
@@ -395,7 +397,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                           colorHex={getContrastTextColor(theme.primary)}
                           className="ml-1"
                         >
-                          Purchase
+                          {t("theme.purchase")}
                         </ThemedText>
                       </Pressable>
                     ) : access === "unavailable" ? (
@@ -408,7 +410,7 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                           opacity="low"
                           className="ml-1"
                         >
-                          Unavailable
+                          {t("theme.unavailable")}
                         </ThemedText>
                       </View>
                     ) : null}

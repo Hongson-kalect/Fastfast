@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
+import { useT } from "@/providers/Language";
 import { useAppStore } from "@/stores/appStore";
 import { ThemedText } from "@/components/themed-text";
 
@@ -15,6 +16,7 @@ export function SettingsAccountCard({
   onPress,
 }: Props) {
   const theme = useAppStore((state) => state.theme);
+  const t = useT();
 
   const isGuest = !email;
 
@@ -34,7 +36,7 @@ export function SettingsAccountCard({
 
         <View className="ml-3 flex-1">
           <ThemedText size="md" weight="semibold">
-            {isGuest ? "Account" : name || "Account"}
+            {isGuest ? t("account.title") : name || t("account.title")}
           </ThemedText>
 
           <ThemedText
@@ -44,7 +46,7 @@ export function SettingsAccountCard({
             className="mt-0.5"
           >
             {isGuest
-              ? "Sign in to sync your data"
+              ? t("account.guestHint")
               : email}
           </ThemedText>
         </View>

@@ -3,6 +3,7 @@ import { useAppStore } from "@/stores/appStore";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { ThemedText } from "./themed-text";
+import { useT } from "@/providers/Language";
 
 /**
  * Thẻ mẹo cho người mới. Ẩn khi tắt "Beginner tips" trong Settings,
@@ -17,6 +18,7 @@ export const BeginnerTip = ({
 }) => {
   const enabled = useAppStore((state) => state.settings?.beginner_tips ?? true);
   const theme = useAppStore((state) => state.theme);
+  const t = useT();
 
   if (!enabled) return null;
 
@@ -62,7 +64,7 @@ export const BeginnerTip = ({
         opacity="low"
         className="mt-2.5"
       >
-        Có thể tắt mẹo trong Settings → Beginner tips
+        {t("tip.disableHint")}
       </ThemedText>
     </View>
   );

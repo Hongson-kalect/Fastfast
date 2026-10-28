@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "start": "Começar",
+    "welcome": {
+      "title": "Jejum intermitente, de um jeito divertido",
+      "body": "Toque em começar quando parar de comer. O FastFast conta o tempo e avisa quando você atingir a meta."
+    },
+    "habit": {
+      "title": "Sequência e força do hábito",
+      "body": "Cada jejum concluído mantém sua sequência e enche a barra de hábito. Jejuns mais longos enchem mais rápido."
+    },
+    "shield": {
+      "title": "Escudos: dias de descanso sem perder a sequência",
+      "body": "Seja constante ou conclua um jejum longo para ganhar escudos. Em um dia de descanso, um escudo protege sua sequência automaticamente."
+    },
+    "pixel": {
+      "title": "Um ano cheio de cores",
+      "body": "Cada dia é um pixel. Registre seu humor e peso e veja o ano inteiro em uma imagem."
+    },
+    "health": {
+      "title": "Ouça o seu corpo",
+      "body": "O FastFast não substitui orientação médica. Se estiver grávida, tiver alguma condição de saúde ou pretender jejuar mais de 48 horas, fale com um médico. Pare imediatamente se sentir tontura ou mal-estar incomum."
+    }
+  },
+  "tabs": {
+    "fast": "Jejum",
+    "stats": "Estatísticas",
+    "journey": "Jornada",
+    "settings": "Ajustes"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "gotIt": "Entendi",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "save": "Salvar",
+    "today": "Hoje",
+    "noData": "Sem dados",
+    "invalid": "Inválido",
+    "success": "Pronto",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "loading": "Carregando…",
+    "close": "Fechar",
+    "restore": "Restaurar",
+    "permission": "Permissão necessária",
+    "error": "Erro"
+  },
+  "time": {
+    "justNow": "Agora mesmo",
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
+    "yesterday": "Ontem",
+    "dayAfterTomorrow": "Depois de amanhã",
+    "daysAgo_one": "há {{count}} dia",
+    "daysAgo_other": "há {{count}} dias",
+    "daysLater_one": "em {{count}} dia",
+    "daysLater_other": "em {{count}} dias",
+    "secondsAgo_one": "há {{count}} segundo",
+    "secondsAgo_other": "há {{count}} segundos",
+    "inSeconds_one": "em {{count}} segundo",
+    "inSeconds_other": "em {{count}} segundos",
+    "minutesAgo_one": "há {{count}} minuto",
+    "minutesAgo_other": "há {{count}} minutos",
+    "inMinutes_one": "em {{count}} minuto",
+    "inMinutes_other": "em {{count}} minutos",
+    "hoursAgo_one": "há {{count}} hora",
+    "hoursAgo_other": "há {{count}} horas",
+    "inHours_one": "em {{count}} hora",
+    "inHours_other": "em {{count}} horas"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Bom dia",
+      "noon": "Boa tarde",
+      "afternoon": "Boa tarde",
+      "evening": "Boa noite"
+    },
+    "streakDays_one": "{{count}} dia",
+    "streakDays_other": "{{count}} dias",
+    "lastFast": "Último jejum",
+    "bodyPhases": "Fases do corpo",
+    "fastingPhases": "Fases durante o jejum",
+    "effectAfter": "Efeito em",
+    "startFast": "Começar jejum",
+    "endFast": "Encerrar"
+  },
+  "counter": {
+    "chooseTarget": "Escolher meta",
+    "reached": "🎉 Meta atingida",
+    "finishAt": "Termina: {{time}}",
+    "freeMode": "Modo livre",
+    "ifStartNow": "Se começar agora: {{time}}",
+    "fasting": "Em jejum",
+    "ready": "Pronto",
+    "startedAt": "Início: {{time}}",
+    "history": "Histórico"
+  },
+  "finish": {
+    "title": "Encerrar",
+    "confirm": "Tem certeza de que quer encerrar este jejum?",
+    "tooQuick": "Este jejum é curto demais e será excluído. Continuar?",
+    "tooQuickSub": "O jejum durou menos de 2 horas.",
+    "failed": "Este jejum será marcado como não concluído. Continuar?",
+    "failedSub": "O jejum durou menos de 16 horas.",
+    "reached": "Você atingiu a meta. Encerrar agora?",
+    "notReached": "Você ainda não atingiu a meta. Encerrar mesmo assim?",
+    "endBeforeStart": "O horário de término deve ser após o de início.",
+    "startBeforeLast": "O início deve ser depois do último jejum."
+  },
+  "info": {
+    "shield": {
+      "title": "Escudo",
+      "message": "Os escudos mantêm sua sequência nos dias de descanso sem jejum.",
+      "effectTitle": "Para que serve · você tem {{count}}/{{max}}",
+      "effect1": "Cada dia vazio entre dois jejuns usa 1 escudo. A sequência continua válida e o Hábito não muda.",
+      "effect2": "Se descansar sem escudos, a sequência quebra, o Hábito cai e o Retain volta a 0.",
+      "effect3": "Você pode ter até {{max}} escudos; os extras são perdidos.",
+      "longTitle": "Jejuns longos",
+      "long1": "Jejue 48h+ para ganhar 1 escudo, 72h+ para ganhar 2.",
+      "long2": "Descansar faz parte do jejum longo: o corpo precisa de tempo para voltar a comer e se recuperar. Os escudos permitem descansar nesses dias sem perder a sequência.",
+      "milestoneTitle": "Marcos do Hábito",
+      "milestone1": "Chegar a 35%, 70% e 100% de Hábito dá 1 escudo cada.",
+      "milestone2": "Se o Hábito cair e subir de novo, você pode ganhar o marco outra vez.",
+      "retainTitle": "Retain",
+      "retain1": "Com o Hábito em 100%, os pontos de cada jejum vão para o Retain.",
+      "retain2": "25 de Retain viram 1 escudo automaticamente."
+    },
+    "body": {
+      "title": "O que estas barras significam?",
+      "message": "Cada barra mostra o quanto o jejum apoia um processo natural do seu corpo.",
+      "alwaysTitle": "Sempre ativos",
+      "always1": "Esses processos sempre acontecem no corpo, mesmo quando você não está em jejum.",
+      "always2": "Não são interruptores que só ligam em certa hora.",
+      "levelsTitle": "O que os níveis 1–5 significam",
+      "levels1": "Cada nível significa que o jejum apoia mais esse processo, subindo com o tempo de jejum.",
+      "levels2": "Uma barra cheia não significa que o processo está no auge agora, só que o apoio do jejum é maior.",
+      "estimateTitle": "Apenas uma estimativa",
+      "estimate1": "Os horários são aproximados e variam por pessoa: última refeição, atividade, sono…",
+      "estimate2": "Isto não é um diagnóstico nem orientação médica."
+    }
+  },
+  "tip": {
+    "disableHint": "Você pode desativar as dicas em Ajustes → Dicas para iniciantes",
+    "habit": {
+      "title": "Como o Hábito é calculado?",
+      "line1": "Cada jejum de 16h ou mais: +3%, mais 0,2% por hora acima de 16h (20h → +3,8%).",
+      "line2": "Jejuns com menos de 16h não somam.",
+      "line3": "Cada dia vazio entre jejuns usa 1 escudo. Sem escudos, o Hábito cai — quanto maior a pausa, maior a queda.",
+      "line4": "Em 100%: os pontos vão para o Retain, e 25 de Retain viram 1 escudo."
+    }
+  },
+  "process": {
+    "glucoseControl": "Controle da glicose",
+    "fatBurning": "Queima de gordura",
+    "growthHormone": "Hormônio do crescimento",
+    "ketosis": "Cetose",
+    "autophagy": "Autofagia",
+    "cellRenewal": "Renovação celular",
+    "immuneRenewal": "Renovação imune",
+    "level": {
+      "start": "Início",
+      "standard": "Padrão",
+      "good": "Bom",
+      "high": "Alto",
+      "peak": "Pico",
+      "max": "Máx.",
+      "drop": "Queda",
+      "stable": "Estável",
+      "optimal": "Ideal",
+      "init": "Partida",
+      "warm": "Aquecendo",
+      "burn": "Queima",
+      "trace": "Traços",
+      "light": "Leve",
+      "active": "Ativa",
+      "deep": "Profunda",
+      "better": "Melhora",
+      "rise": "Sobe",
+      "boost": "Impulso",
+      "prime": "Preparo",
+      "ready": "Pronta",
+      "stronger": "Mais forte"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Iniciante",
+      "Veteran": "Veterano",
+      "Expert": "Experiente",
+      "Master": "Mestre"
+    },
+    "16h": {
+      "label": "Intermitente",
+      "title": "Popular e fácil de começar",
+      "description": "Ajuda o corpo a usar gordura armazenada como energia e melhora a sensibilidade à insulina.",
+      "advice": "(16h) O padrão! Coma entre 12h e 20h.",
+      "adviceLong": "É o padrão-ouro e o mais fácil de manter. Basta pular o café da manhã e concentrar as calorias entre 12h e 20h. Beba cerca de 2 L de água durante o jejum."
+    },
+    "18h": {
+      "label": "Queima-gordura",
+      "title": "Queima de gordura reforçada",
+      "description": "Prolonga a cetose e começa a tocar na autofagia.",
+      "advice": "(18h) Um passo a mais que o 16/8.",
+      "adviceLong": "Duas horas a mais que o 16/8 ajudam a maximizar a queima de gordura e iniciar a autofagia. Nessas 18 horas, você pode tomar café preto ou chá verde sem açúcar para vencer a fome."
+    },
+    "20h": {
+      "label": "Guerreiro",
+      "title": "Modo guerreiro",
+      "description": "Maximiza a queima de gordura e ajuda a manter a massa muscular.",
+      "advice": "(20h) Janela de 4 horas. Consuma proteína suficiente.",
+      "adviceLong": "A janela de alimentação é bem curta (só 4 horas). Priorize proteína suficiente (carne, peixe, ovos) e fibras para manter os músculos. Evite comer rápido demais para não sobrecarregar a digestão."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Uma refeição por dia",
+      "description": "Estimula a autofagia e dá um descanso profundo ao sistema digestivo.",
+      "advice": "(23h) Sua única refeição deve ser bem nutritiva.",
+      "adviceLong": "Um jejum de quase 24 horas (ex.: jantar hoje e só comer de novo no jantar de amanhã). Essa única refeição deve ser de alimentos integrais, rica em gorduras boas e proteína. Ouça seu corpo se fizer isso com frequência."
+    },
+    "36h": {
+      "label": "Monge",
+      "title": "Desafio de um dia inteiro",
+      "description": "Dá ao intestino um longo período de recuperação e ajuda a acalmar a inflamação.",
+      "advice": "(36h) Escolha um dia com pouca atividade pesada.",
+      "adviceLong": "Um dia e uma noite inteiros sem comer (ex.: jantar na segunda, pular a terça e comer de novo na quarta de manhã). Escolha um dia de trabalho leve e reponha eletrólitos (sais minerais) para ficar alerta."
+    },
+    "48h": {
+      "label": "Estendido",
+      "title": "Jejum profundo avançado",
+      "description": "Esgota totalmente o glicogênio armazenado e leva o corpo a reorganizar o uso de energia.",
+      "advice": "(48h) Eletrólitos são obrigatórios.",
+      "adviceLong": "Um jejum tão longo exige eletrólitos diários (sal, potássio, magnésio) para manter a pressão estável. Se sentir fraqueza ou tontura prolongada, interrompa o jejum imediatamente."
+    },
+    "72h": {
+      "label": "Prolongado",
+      "title": "Desafio extremo",
+      "description": "Atinge autofagia profunda. Exige preparação cuidadosa e cautela.",
+      "advice": "(72h) Só para quem tem muita experiência.",
+      "adviceLong": "Faça só de vez em quando, quando o corpo já estiver bem acostumado ao jejum. Ao quebrar o jejum, nunca comece com uma refeição grande; comece com caldo de ossos ou algo leve para proteger o estômago."
+    }
+  },
+  "term": {
+    "habit": "Hábito",
+    "retain": "Retain",
+    "target": "Meta",
+    "targetHours": "Meta {{hours}}h",
+    "points": "Pontos",
+    "pts": "{{value}} pts",
+    "history": "Histórico",
+    "progress": "Progresso",
+    "weight": "Peso",
+    "note": "Nota",
+    "mood": "Humor",
+    "camera": "Câmera",
+    "gallery": "Galeria",
+    "error": "Erro"
+  },
+  "fastingSheet": {
+    "completed": "Concluído",
+    "result": "Recompensas",
+    "keepGoing": "Continue para atingir a meta",
+    "now": "AGORA",
+    "atTarget": "NA META",
+    "endFasting": "Encerrar jejum"
+  },
+  "lastFast": {
+    "interrupted": "Interrompido",
+    "completed": "Concluído",
+    "endedEarly": "Encerrado antes",
+    "freeFasting": "Jejum livre",
+    "targetProgress": "Progresso da meta"
+  },
+  "habitSheet": {
+    "title": "Índice de hábito",
+    "sessions_one": "{{count}} sessão",
+    "sessions_other": "{{count}} sessões",
+    "fastingSession": "Sessão de jejum",
+    "overRest_one": "Descansou {{count}} dia a mais",
+    "overRest_other": "Descansou {{count}} dias a mais",
+    "shieldIncrease": "Escudo ganho",
+    "restDays_one": "Descanso de {{count}} dia",
+    "restDays_other": "Descanso de {{count}} dias"
+  },
+  "habitDetail": {
+    "title": "Registro do hábito",
+    "habitPoints": "Pontos de hábito",
+    "shields": "Escudos",
+    "fastDetail": "Detalhes do jejum",
+    "restDay": "Dia de descanso",
+    "overRest": "Descanso demais"
+  },
+  "habitMilestone": {
+    "title": "Progresso"
+  },
+  "fullHabit": {
+    "title": "Hábito formado",
+    "maintainTitle": "Entrando na fase de manutenção",
+    "maintainBody": "Cada vez que você mantém o hábito, os pontos vão para o Retain.",
+    "retainTitle": "Retain do hábito",
+    "retainSub": "Pontos de manutenção",
+    "note": "25 de Retain viram 1 escudo automaticamente. Se o hábito quebrar, todo o Retain volta a 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Marco de sequência!",
+      "subtitle": "Você está criando um hábito de jejum imparável!",
+      "button": "Continue assim! 🔥"
+    },
+    "rest": {
+      "title": "Dia de descanso ativo!",
+      "subtitle": "Recuperar faz parte da jornada. Sua sequência continua firme!",
+      "button": "Vamos em frente! 🌿"
+    },
+    "fresh": {
+      "title": "Um novo começo",
+      "subtitle": "Todo mestre falhou antes de vencer. Vamos recomeçar hoje!",
+      "button": "Recomeçar agora 🚀"
+    },
+    "best": "RECORDE",
+    "daysStreak": "Dias seguidos",
+    "over": "Sequência passou de {{count}} dias!",
+    "consistency": "Constância"
+  },
+  "result": {
+    "completed": {
+      "title": "Jejum concluído!",
+      "subtitle": "Ótimo trabalho mantendo a disciplina!"
+    },
+    "endedEarly": {
+      "title": "Jejum encerrado antes",
+      "subtitle": "Cada hora conta! Seu progresso foi salvo."
+    },
+    "extended": {
+      "title": "Jejum longo concluído!",
+      "subtitle": "Resistência incrível! Recompensas extras liberadas."
+    },
+    "fastingTime": "Tempo de jejum",
+    "targetProgress": "Meta {{hours}}h · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "Jejum longo",
+      "retain": "Manter o hábito",
+      "milestone": "Marco atingido"
+    }
+  },
+  "note": {
+    "today": "Nota de hoje",
+    "forDate": "Nota {{date}}",
+    "placeholder": "Como você se sentiu hoje?",
+    "weightDigitsOnly": "Somente números.",
+    "weightOneDot": "Só é permitido um ponto decimal.",
+    "weightIntMax": "No máximo 4 dígitos inteiros.",
+    "weightDecMax": "No máximo 1 casa decimal."
+  },
+  "image": {
+    "saveError": "Não foi possível salvar a foto. Tente novamente.",
+    "deleteError": "Não foi possível excluir a foto. Tente novamente.",
+    "deleteTitle": "Excluir foto",
+    "deleteConfirm": "Excluir a foto deste dia?",
+    "addTitle": "Adicionar foto",
+    "yourPhoto": "Sua foto",
+    "addAPhoto": "Adicione uma foto",
+    "capture": "Registre o momento",
+    "chooseSource": "Escolha câmera ou galeria"
+  },
+  "history": {
+    "title": "Histórico de jejuns",
+    "total": "Total",
+    "average": "Média",
+    "recent": "Jejuns recentes",
+    "status": {
+      "cancelled": "Cancelado",
+      "fasting": "Em jejum",
+      "free": "Livre",
+      "reached": "Meta atingida",
+      "notReached": "Não atingida"
+    },
+    "actions": "Ações"
+  },
+  "startTime": {
+    "invalid": "Horário inválido",
+    "overlap": "Sobrepõe o jejum anterior!",
+    "max24h": "Só é possível antecipar o início em até 24 horas!",
+    "future": "Não é possível escolher um horário futuro!",
+    "title": "Escolha o início do jejum",
+    "hint": "Toque na hora ou na data para escolher quando começou",
+    "earlier": "Começar antes",
+    "confirm": "Confirmar início"
+  },
+  "endTime": {
+    "title": "Escolha o término",
+    "confirm": "Confirmar término",
+    "future": {
+      "title": "Horário inválido",
+      "desc": "Este horário está no futuro."
+    },
+    "tooQuick": {
+      "title": "Este jejum será cancelado",
+      "desc": "Curto demais para ser registrado."
+    },
+    "failed": {
+      "title": "Este jejum será marcado como não concluído",
+      "desc": "Abaixo do mínimo para concluir um jejum."
+    },
+    "completed": {
+      "title": "Este jejum será concluído",
+      "desc": "Tempo suficiente para registrar."
+    }
+  },
+  "targetSheet": {
+    "choose": "Escolher esta meta",
+    "clear": "Remover meta"
+  },
+  "fastDetail": {
+    "reachedTarget": "Meta atingida",
+    "notReachedTarget": "Meta não atingida",
+    "targetHours": "Meta: {{hours}} horas",
+    "over": "{{duration}} a mais",
+    "remaining": "Faltam {{duration}}",
+    "review": "Resumo da sessão",
+    "bodyAtEnd": "Estado do corpo ao final",
+    "metrics": "Dados registrados",
+    "advice": "Dica"
+  },
+  "date": {
+    "weekday": {
+      "0": "Dom",
+      "1": "Seg",
+      "2": "Ter",
+      "3": "Qua",
+      "4": "Qui",
+      "5": "Sex",
+      "6": "Sáb"
+    },
+    "month": {
+      "0": "Jan",
+      "1": "Fev",
+      "2": "Mar",
+      "3": "Abr",
+      "4": "Mai",
+      "5": "Jun",
+      "6": "Jul",
+      "7": "Ago",
+      "8": "Set",
+      "9": "Out",
+      "10": "Nov",
+      "11": "Dez"
+    },
+    "monthNarrow": {
+      "0": "J",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Imagem salva na galeria.",
+    "saveImage": "Salvar imagem",
+    "style": "Estilo",
+    "mode": {
+      "mood": "Emoção",
+      "fasting": "Jejuns"
+    },
+    "dayButton": "Dia",
+    "weekButton": "Sem",
+    "stat": {
+      "days_one": "dia",
+      "days_other": "dias",
+      "hours_one": "hora",
+      "hours_other": "horas",
+      "logs_one": "nota",
+      "logs_other": "notas"
+    },
+    "statsLine": "{{days}} dias · {{hours}} horas · {{logs}} notas",
+    "legend": {
+      "mood": {
+        "0": "Péssimo",
+        "1": "Ruim",
+        "2": "Normal",
+        "3": "Bom",
+        "4": "Ótimo"
+      }
+    },
+    "info": {
+      "title": "Como ler sua jornada",
+      "message": "O que a legenda de ícones não explica.",
+      "fast1": "Cada célula ganha a cor da duração total do jejum mais longo daquele dia.",
+      "fast2": "Um jejum de vários dias colore todos eles, mais claro no primeiro e mais escuro até o fim.",
+      "fast3": "Uma célula com ícone de escudo é um dia de descanso protegido por escudo.",
+      "mood1": "Uma célula com borda na cor principal é um dia com nota.",
+      "actionsTitle": "Ações",
+      "action1": "Toque num dia vazio para adicionar humor e nota; toque num dia com dados para ver detalhes.",
+      "action2": "O número sob cada ícone é quantos dias do ano caem naquele nível.",
+      "action3": "Use o botão Sem/Dia no canto para mudar o layout. As imagens salvas seguem o layout atual."
+    }
+  },
+  "layout": {
+    "title": "Layout de pixels",
+    "subtitle": "Escolha como sua jornada é exibida",
+    "weekly": "Semanal",
+    "monthly": "Mensal",
+    "vertical": "↓ Vertical",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Escolha um pacote de ícones",
+    "tabMood": "Emoção",
+    "tabTarget": "Meta",
+    "level": "Nv. {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Visual minimalista e moderno com Ionicons",
+    "material_emoticons": "Rostos de emoção sutis do Material Community",
+    "weather_vibes": "Mostre seu humor com ícones de clima",
+    "gaming_energy": "Emoções como barras de energia, estilo game",
+    "pixel_vibe": "Emoções em estilo pixel e emojis pictográficos",
+    "default_emoji_targets": "Metas representadas com emojis clássicos",
+    "ionicons_targets": "Ícones minimalistas e suaves do Ionicons",
+    "material_energy_targets": "Mostra o desafio com energia e chamas",
+    "feather_minimal_targets": "Design de traço fino do Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Diário do dia",
+    "noMood": "Sem humor ainda",
+    "dailyFast": "⏱️ Jejum do dia",
+    "dailyNote": "📝 Nota do dia",
+    "relatedFasts": "JEJUNS RELACIONADOS",
+    "hoursToday": "horas hoje",
+    "hoursFasted": "HORAS DE JEJUM",
+    "weightHint": "Toque para editar",
+    "addWeight": "Adicionar peso",
+    "dayNote": "NOTA DO DIA",
+    "notePlaceholder": "Adicione uma nota para este dia...",
+    "photos": "FOTO",
+    "addPhoto": "Adicionar foto",
+    "photoHint": "Adicione uma foto para este dia",
+    "updatePhoto": "Atualizar foto",
+    "changePhoto": "Trocar foto",
+    "photoFrom": "Foto de"
+  },
+  "dayModal": {
+    "todayMood": "Humor de hoje",
+    "moodFor": "Humor {{date}}",
+    "todayWeight": "Peso de hoje",
+    "weightFor": "Peso {{date}}"
+  },
+  "stats": {
+    "subtitle": "Acompanhe seu progresso",
+    "dashboard": "Painel",
+    "currentStreak": "Sequência atual",
+    "days_one": "dia",
+    "days_other": "dias",
+    "record": "Recorde",
+    "shields": "Escudos",
+    "section": "Estatísticas",
+    "totalFasting": "Jejum total",
+    "completed": "Concluídos",
+    "averageFast": "Jejum médio",
+    "longestFast": "Jejum mais longo",
+    "activeDays": "Dias ativos",
+    "maxStreak": "Sequência máxima",
+    "shieldsUsed": "Escudos usados",
+    "unit": {
+      "hours": "horas",
+      "times": "vezes",
+      "days": "dias"
+    },
+    "distribution": {
+      "title": "Distribuição dos jejuns",
+      "subtitle": "Como suas sessões de jejum se distribuem",
+      "range": "{{from}}–{{to}} h",
+      "over": "{{from}}+ h",
+      "fasts_one": "jejum",
+      "fasts_other": "jejuns"
+    },
+    "chart": {
+      "title": "Peso e progresso do jejum",
+      "subtitle": "Seu progresso ao longo do tempo",
+      "fasting": "Jejum",
+      "noData": "Sem dados",
+      "noWeight": "- Sem dados de peso",
+      "hoursUnit": "Horas"
+    },
+    "range": {
+      "title": "Período",
+      "day_one": "{{count}} dia",
+      "day_other": "{{count}} dias",
+      "week_one": "{{count}} semana",
+      "week_other": "{{count}} semanas",
+      "month_one": "{{count}} mês",
+      "month_other": "{{count}} meses",
+      "unit": {
+        "day": "dias",
+        "week": "semanas",
+        "month": "meses"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Peso atual",
+    "currentWeightMessage": "Informe seu peso atual",
+    "targetMessage": "Defina seu peso-meta",
+    "setCurrent": "Informe seu peso atual",
+    "setCurrentHint": "Adicione seu peso para acompanhar o progresso",
+    "weightGoal": "Meta de peso",
+    "setTarget": "Definir meta",
+    "currentWeight": "Peso atual",
+    "setTargetHint": "Defina um peso-meta para acompanhar o progresso",
+    "toGo": "Faltam {{value}} kg",
+    "reached": "Meta atingida"
+  },
+  "ach": {
+    "title": "Conquistas",
+    "unlocked": "{{unlocked}} / {{total}} desbloqueadas",
+    "empty": "Nenhuma conquista",
+    "claim": "Resgatar",
+    "done": "Concluído",
+    "notDone": "Pendente",
+    "empty_slot": "Vazio",
+    "tier": {
+      "BRONZE": "BRONZE",
+      "SILVER": "PRATA",
+      "GOLD": "OURO",
+      "DIAMOND": "DIAMANTE"
+    },
+    "fasting_hours": {
+      "name": "Jejum total",
+      "description": "Total de horas em jejum.",
+      "item_one": "{{count}} hora de jejum",
+      "item_other": "{{count}} horas de jejum"
+    },
+    "invalid_fasts": {
+      "name": "Jejuns inválidos",
+      "description": "Total de jejuns inválidos."
+    },
+    "failed_fasts": {
+      "name": "Jejuns não concluídos",
+      "description": "Total de jejuns não concluídos."
+    },
+    "completed_fasts": {
+      "name": "Jejuns concluídos",
+      "description": "Total de jejuns concluídos.",
+      "item_one": "Conclua seu primeiro jejum",
+      "item_other": "Conclua {{count}} jejuns"
+    },
+    "active_days": {
+      "name": "Dias ativos",
+      "description": "Dias em que você usou o app.",
+      "item_one": "{{count}} dia ativo",
+      "item_other": "{{count}} dias ativos"
+    },
+    "habit": {
+      "name": "Hábito",
+      "description": "Sua pontuação de hábito de jejum.",
+      "item_one": "Alcance {{count}}% de hábito",
+      "item_other": "Alcance {{count}}% de hábito"
+    },
+    "longest_fast": {
+      "name": "Jejum mais longo",
+      "description": "Seu jejum concluído mais longo.",
+      "item_one": "Conclua um jejum de {{count}} hora",
+      "item_other": "Conclua um jejum de {{count}} horas"
+    },
+    "max_streak": {
+      "name": "Maior sequência",
+      "description": "Sua maior sequência de jejum.",
+      "item_one": "Alcance uma sequência de {{count}} dia",
+      "item_other": "Alcance uma sequência de {{count}} dias"
+    },
+    "total_shields": {
+      "name": "Total de escudos",
+      "description": "Total de escudos ganhos.",
+      "item_one": "Ganhe seu primeiro escudo",
+      "item_other": "Ganhe {{count}} escudos"
+    },
+    "retain_circles": {
+      "name": "Mestre do Retain",
+      "description": "Ciclos de Retain concluídos com o hábito cheio.",
+      "item_one": "Conclua seu primeiro ciclo de Retain",
+      "item_other": "Conclua {{count}} ciclos de Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "Não é possível fechar",
+      "body": "Conclua esta etapa primeiro!"
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "section": {
+      "showcase": "Vitrine",
+      "appearance": "Aparência",
+      "general": "Geral",
+      "sound": "Som e vibração",
+      "notifications": "Notificações",
+      "data": "Dados",
+      "about": "Sobre"
+    },
+    "showcaseExport": "Mostrar na imagem exportada",
+    "showcaseExportDesc": "Adicione suas insígnias à imagem salva",
+    "showcaseEmpty": "Ainda sem insígnias. Alcance um marco e toque em Resgatar em Estatísticas para desbloquear.",
+    "showcasePick": "Escolha até {{max}} insígnias para exibir.",
+    "selectedCount": "Selecionadas {{count}}/{{max}}",
+    "darkMode": "Modo escuro",
+    "darkModeDesc": "Use a aparência escura em todo o app",
+    "theme": "Tema",
+    "language": "Idioma",
+    "weekStart": "A semana começa em",
+    "monday": "Segunda-feira",
+    "sunday": "Domingo",
+    "mondayDesc": "Semanas de segunda → domingo",
+    "sundayDesc": "Semanas de domingo → sábado",
+    "beginnerTips": "Dicas para iniciantes",
+    "beginnerTipsDesc": "Mostra explicações curtas sobre hábito e escudos",
+    "vibration": "Vibração",
+    "sound": "Som",
+    "soundDesc": "Sons ao começar, terminar e ganhar recompensas",
+    "touchSound": "Som ao tocar",
+    "touchSoundDesc": "Cliques curtos ao tocar e alternar",
+    "targetReached": "Meta atingida",
+    "targetReachedDesc": "Avisar quando atingir a meta de jejum",
+    "dailyReminder": "Lembrete diário",
+    "dailyReminderDesc": "Um lembrete diário para começar o jejum",
+    "reminderTime": "Horário do lembrete",
+    "backup": "Backup e restauração",
+    "backupDesc": "Google Drive ou um arquivo",
+    "reset": "Redefinir ajustes",
+    "resetDesc": "Voltar aos ajustes padrão",
+    "resetConfirmTitle": "Redefinir ajustes?",
+    "resetConfirmBody": "Tema, layout, som e notificações voltam ao padrão. Seus dados de jejum são mantidos.",
+    "resetOk": "Redefinir",
+    "privacy": "Privacidade",
+    "privacyDesc": "Privacidade e permissões de dados",
+    "privacyBody": "O FastFast funciona offline. Seus jejuns, notas e peso ficam só neste aparelho e nunca são enviados aos nossos servidores. Os backups vão para um arquivo seu ou para o seu próprio Google Drive.",
+    "health": "Aviso de saúde",
+    "rate": "Avaliar o app",
+    "rateDesc": "Gostando do app? Deixe uma avaliação",
+    "rateThanks": "Obrigado!",
+    "rateLater": "A avaliação estará disponível quando o app estiver na loja.",
+    "feedback": "Feedback",
+    "feedbackDesc": "Diga o que acha ou relate um problema",
+    "noEmailTitle": "Sem app de e-mail",
+    "noEmailBody": "Instale um app de e-mail para enviar feedback.",
+    "about": "Sobre",
+    "aboutBody": "Versão {{version}}\n\nJejum intermitente com sequências, escudos e um ano em pixels.",
+    "version": "Versão {{version}}",
+    "expoGoTitle": "Indisponível no Expo Go",
+    "expoGoBody": "As notificações exigem uma build de desenvolvimento ou da loja.",
+    "notifOffTitle": "As notificações estão desativadas",
+    "notifOffBody": "Permita as notificações do FastFast nos ajustes do sistema.",
+    "openSettings": "Abrir ajustes"
+  },
+  "account": {
+    "title": "Conta",
+    "guestHint": "Entre com o Google para fazer backup no Drive"
+  },
+  "backup": {
+    "subtitle": "Seus dados ficam neste aparelho. Os backups são cópias para restaurar depois.",
+    "drive": "Google Drive",
+    "file": "Arquivo",
+    "signIn": "Entrar com o Google",
+    "signInDesc": "Backup no seu próprio Google Drive",
+    "notSignedIn": "Não conectado",
+    "lastBackup": "Último backup {{time}}",
+    "never": "Ainda sem backup",
+    "backUpNow": "Fazer backup agora",
+    "backingUp": "Fazendo backup…",
+    "restoreDrive": "Restaurar do Drive",
+    "restoreDriveDesc": "Substitui os dados deste aparelho pelo backup do Drive",
+    "restoring": "Restaurando…",
+    "signOut": "Sair",
+    "signOutTitle": "Sair?",
+    "signOutBody": "Seus dados ficam neste aparelho. Os backups no Google Drive são mantidos.",
+    "signInFailedTitle": "Falha ao entrar",
+    "signInFailedBody": "Não foi possível entrar com o Google. Tente novamente.",
+    "confirmTitle": "Fazer backup no Google Drive?",
+    "confirmReplace": "Isto substitui o backup de {{time}} pelos seus dados e fotos atuais.",
+    "confirmFirst": "Seus dados e fotos atuais serão salvos no seu Google Drive.",
+    "backUp": "Fazer backup",
+    "doneTitle": "Backup feito",
+    "doneWithPhotos": "Seus dados e {{count}} foto(s) nova(s) foram salvos no Google Drive.",
+    "doneBody": "Seus dados foram salvos no Google Drive.",
+    "failedTitle": "Falha no backup",
+    "failedBody": "Não foi possível fazer backup no Google Drive. Verifique a conexão e tente novamente.",
+    "restoredTitle": "Restaurado",
+    "restoredBody": "Seus dados foram restaurados.",
+    "restoredMissing": "Seus dados foram restaurados. {{count}} foto(s) não foram encontradas no Drive.",
+    "restoreFailedTitle": "Falha ao restaurar",
+    "restoreFailedDrive": "Não foi possível restaurar do Google Drive.",
+    "readFailed": "Não foi possível ler o backup no Google Drive.",
+    "noneTitle": "Sem backup",
+    "noneBody": "Ainda não há backup do FastFast nesta conta Google.",
+    "restoreDriveTitle": "Restaurar do Google Drive?",
+    "restoreConfirm": "Backup de {{time}}. Todos os dados atuais deste aparelho serão substituídos.",
+    "restoreFileConfirm": "Backup de {{time}}. Todos os dados atuais serão substituídos. Os arquivos não incluem fotos.",
+    "restoreFileTitle": "Restaurar do arquivo?",
+    "restoreFileFailed": "Não foi possível restaurar este arquivo.",
+    "exportFile": "Exportar arquivo de backup",
+    "exporting": "Exportando…",
+    "exportFileDesc": "Só dados; compartilhe ou guarde onde quiser",
+    "exportFailedTitle": "Falha ao exportar",
+    "exportFailedBody": "Não foi possível criar o arquivo de backup.",
+    "restoreFile": "Restaurar do arquivo",
+    "restoreFileDesc": "Escolha um arquivo de backup do FastFast",
+    "importFailedTitle": "Falha ao importar",
+    "importFailedBody": "Este arquivo não é um backup válido do FastFast."
+  },
+  "theme": {
+    "title": "Tema",
+    "subtitle": "Escolha a aparência do app",
+    "notPurchased": "Não comprado",
+    "freeUntil": "Grátis até",
+    "purchase": "Comprar",
+    "unavailable": "Indisponível",
+    "premium": "Premium",
+    "limited": "Limitado",
+    "dark": "Escuro",
+    "light": "Claro"
+  },
+  "notify": {
+    "targetTitle": "🎉 Meta atingida!",
+    "targetBody": "Você jejuou {{hours}} horas. Encerre a sessão para registrá-la.",
+    "dailyTitle": "Hora de jejuar ⏱️",
+    "dailyBody": "Comece o jejum de hoje para manter a sequência e o hábito."
+  },
+  "perm": {
+    "saveImage": "O FastFast precisa de permissão para salvar imagens na galeria.",
+    "camera": "O FastFast precisa de acesso à câmera para tirar fotos.",
+    "gallery": "O FastFast precisa de acesso às fotos para escolher uma imagem.",
+    "saveFailed": "Não foi possível salvar a imagem. Tente novamente."
+  },
+  "widget": {
+    "fasting": "EM JEJUM",
+    "ready": "PRONTO",
+    "notFasting": "Sem jejum",
+    "tapToOpen": "Toque para abrir o FastFast",
+    "started": "Início",
+    "done": "Fim"
+  },
+  "notFound": {
+    "title": "Ops!",
+    "body": "Esta tela não existe.",
+    "home": "Ir para o início!"
+  }
+}

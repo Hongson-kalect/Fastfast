@@ -4,7 +4,11 @@ import React, { useCallback, useMemo } from "react";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import AchievementBadge from "@/components/AchievementBadge";
+import AchievementBadge, {
+  achievementDescription,
+  achievementItemTitle,
+  achievementName,
+} from "@/components/AchievementBadge";
 import { Achievement } from "@/constants/achievements";
 import { RADIUS } from "@/constants/design";
 import { useDBService } from "@/hooks/useDBService";
@@ -24,6 +28,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { runOnJS } from "react-native-worklets";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 export type AchievementItem = {
   id: string;
@@ -66,6 +71,7 @@ export const AchievementCard = ({
   onPress,
   onClaim,
 }: Props) => {
+  const t = useT();
   const currentValue = userAchievement?.current_value ?? 0;
 
   const numericItems = achievement.items.filter(
@@ -242,7 +248,7 @@ export const AchievementCard = ({
                   numberOfLines={1}
                   className="flex-1"
                 >
-                  {achievement.name}
+                  {achievementName(achievement)}
                 </ThemedText>
 
                 {tier && !hasUnclaimed && (
@@ -254,7 +260,7 @@ export const AchievementCard = ({
                     }}
                   >
                     <ThemedText size="tiny" weight="extrabold" colorHex={tierColor}>
-                      {tier.label}
+                      {t(`ach.tier.${tier.label}`)}
                     </ThemedText>
                   </View>
                 )}
@@ -269,8 +275,12 @@ export const AchievementCard = ({
                 className="mt-1"
               >
                 {hasUnclaimed
-                  ? (unclaimedMilestone?.title ?? achievement.description)
-                  : (nextItem?.title ?? achievement.description)}
+                  ? unclaimedMilestone
+                    ? achievementItemTitle(achievement, unclaimedMilestone)
+                    : achievementDescription(achievement)
+                  : nextItem
+                    ? achievementItemTitle(achievement, nextItem)
+                    : achievementDescription(achievement)}
               </ThemedText>
             </View>
 
@@ -291,7 +301,7 @@ export const AchievementCard = ({
                   />
 
                   <ThemedText size="xs" weight="bold" colorHex={getContrastTextColor(theme.success)}>
-                    Nhận
+                    {t("ach.claim")}
                   </ThemedText>
                 </Pressable>
               ) : achievement.type === "boolean" ? (
@@ -301,7 +311,7 @@ export const AchievementCard = ({
                   color={isCompleted ? "success" : "text"}
                   opacity={isCompleted ? "full" : "medium"}
                 >
-                  {isCompleted ? "Đã đạt" : "Chưa đạt"}
+                  {isCompleted ? t("ach.done") : t("ach.notDone")}
                 </ThemedText>
               ) : (
                 <View className="items-end">
@@ -401,6 +411,7 @@ const formatAchievementValue = (value: number) => {
 export const AchievementBottomSheet = ({
   onSelect,
 }: AchievementBottomSheetProps) => {
+  const t = useT();
   const dbService = useDBService();
   const userId = useAppStore((state) => state.userProfile)?.id;
   const userAchievements = useDashboardStore((state) => state.userAchievements);
@@ -505,7 +516,7 @@ export const AchievementBottomSheet = ({
             opacity="medium"
             style={{ textAlign: "center" }}
           >
-            Không có thành tựu
+            {t("ach.empty")}
           </ThemedText>
         </View>
       }
@@ -522,6 +533,7 @@ export const AchievementBottomSheetHeader = ({
   total,
   unlocked,
 }: AchievementBottomSheetHeaderProps) => {
+  const t = useT();
   const progress = total > 0 ? unlocked / total : 0;
   const percentage = Math.round(progress * 100);
 
@@ -530,7 +542,7 @@ export const AchievementBottomSheetHeader = ({
       <View className="flex-row items-end justify-between px-1">
         <View className="flex-1">
           <ThemedText color="title" size="xxl" weight="bold">
-            Achievements
+            {t("ach.title")}
           </ThemedText>
 
           <ThemedText
@@ -539,7 +551,7 @@ export const AchievementBottomSheetHeader = ({
             size="xs"
             className="mt-0.5"
           >
-            {unlocked} / {total} unlocked
+            {t("ach.unlocked", { unlocked, total })}
           </ThemedText>
         </View>
 

@@ -1,6 +1,7 @@
 import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import Feather from "@expo/vector-icons/Feather";
+import { resolveImageUri } from "@/utils/image";
 import { ActivityIndicator, Image, TouchableOpacity } from "react-native";
 
 type SwapImageButtonProps = {
@@ -38,7 +39,10 @@ export const SwapImageButton = ({
       {loading ? (
         <ActivityIndicator color={theme.primary} />
       ) : image ? (
-        <Image source={{ uri: image }} className="h-16 w-16" />
+        <Image
+          source={{ uri: resolveImageUri(image) ?? undefined }}
+          className="h-16 w-16"
+        />
       ) : (
         <Feather name="camera" size={22} color={theme.text + "CC"} />
       )}

@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "start": "Empezar",
+    "welcome": {
+      "title": "Ayuno intermitente, pero divertido",
+      "body": "Pulsa empezar cuando dejes de comer. FastFast cuenta el tiempo y te avisa al alcanzar tu meta."
+    },
+    "habit": {
+      "title": "Racha y fuerza del hábito",
+      "body": "Cada ayuno completado mantiene tu racha y llena tu barra de hábito. Los ayunos más largos la llenan más rápido."
+    },
+    "shield": {
+      "title": "Escudos: días de descanso sin perder la racha",
+      "body": "Sé constante o completa un ayuno largo para ganar escudos. En un día de descanso, un escudo protege tu racha automáticamente."
+    },
+    "pixel": {
+      "title": "Un año lleno de color",
+      "body": "Cada día es un píxel. Registra tu ánimo y tu peso, y mira todo tu año en una sola imagen."
+    },
+    "health": {
+      "title": "Escucha a tu cuerpo",
+      "body": "FastFast no sustituye el consejo médico. Si estás embarazada, tienes una afección médica o planeas ayunar más de 48 horas, consulta a un médico. Detente de inmediato si te sientes mareado o inusualmente mal."
+    }
+  },
+  "tabs": {
+    "fast": "Ayuno",
+    "stats": "Estadísticas",
+    "journey": "Trayecto",
+    "settings": "Ajustes"
+  },
+  "common": {
+    "ok": "Aceptar",
+    "cancel": "Cancelar",
+    "gotIt": "Entendido",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "today": "Hoy",
+    "noData": "Sin datos",
+    "invalid": "No válido",
+    "success": "Listo",
+    "edit": "Editar",
+    "add": "Añadir",
+    "loading": "Cargando…",
+    "close": "Cerrar",
+    "restore": "Restaurar",
+    "permission": "Permiso necesario",
+    "error": "Error"
+  },
+  "time": {
+    "justNow": "Justo ahora",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "yesterday": "Ayer",
+    "dayAfterTomorrow": "Pasado mañana",
+    "daysAgo_one": "hace {{count}} día",
+    "daysAgo_other": "hace {{count}} días",
+    "daysLater_one": "en {{count}} día",
+    "daysLater_other": "en {{count}} días",
+    "secondsAgo_one": "hace {{count}} segundo",
+    "secondsAgo_other": "hace {{count}} segundos",
+    "inSeconds_one": "en {{count}} segundo",
+    "inSeconds_other": "en {{count}} segundos",
+    "minutesAgo_one": "hace {{count}} minuto",
+    "minutesAgo_other": "hace {{count}} minutos",
+    "inMinutes_one": "en {{count}} minuto",
+    "inMinutes_other": "en {{count}} minutos",
+    "hoursAgo_one": "hace {{count}} hora",
+    "hoursAgo_other": "hace {{count}} horas",
+    "inHours_one": "en {{count}} hora",
+    "inHours_other": "en {{count}} horas"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Buenos días",
+      "noon": "Buenas tardes",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches"
+    },
+    "streakDays_one": "{{count}} día",
+    "streakDays_other": "{{count}} días",
+    "lastFast": "Último ayuno",
+    "bodyPhases": "Fases del cuerpo",
+    "fastingPhases": "Fases durante el ayuno",
+    "effectAfter": "Efecto en",
+    "startFast": "Empezar ayuno",
+    "endFast": "Terminar"
+  },
+  "counter": {
+    "chooseTarget": "Elegir meta",
+    "reached": "🎉 Meta alcanzada",
+    "finishAt": "Termina: {{time}}",
+    "freeMode": "Modo libre",
+    "ifStartNow": "Si empiezas ahora: {{time}}",
+    "fasting": "En ayuno",
+    "ready": "Listo",
+    "startedAt": "Inicio: {{time}}",
+    "history": "Historial"
+  },
+  "finish": {
+    "title": "Terminar",
+    "confirm": "¿Seguro que quieres terminar este ayuno?",
+    "tooQuick": "Este ayuno es demasiado corto y se eliminará. ¿Continuar?",
+    "tooQuickSub": "El ayuno dura menos de 2 horas.",
+    "failed": "Este ayuno se marcará como fallido. ¿Continuar?",
+    "failedSub": "El ayuno dura menos de 16 horas.",
+    "reached": "Alcanzaste tu meta. ¿Terminar ahora?",
+    "notReached": "Aún no alcanzas tu meta. ¿Terminar de todos modos?",
+    "endBeforeStart": "La hora de fin debe ser posterior a la de inicio.",
+    "startBeforeLast": "La hora de inicio debe ser posterior a tu último ayuno."
+  },
+  "info": {
+    "shield": {
+      "title": "Escudo",
+      "message": "Los escudos mantienen tu racha en los días de descanso sin ayuno.",
+      "effectTitle": "Qué hace · tienes {{count}}/{{max}}",
+      "effect1": "Cada día vacío entre dos ayunos usa 1 escudo. Tu racha sigue válida y tu Hábito no cambia.",
+      "effect2": "Si descansas sin escudos, la racha se rompe, el Hábito baja y Retain vuelve a 0.",
+      "effect3": "Puedes tener hasta {{max}} escudos; los extra se pierden.",
+      "longTitle": "Ayunos largos",
+      "long1": "Ayuna 48 h+ para ganar 1 escudo, 72 h+ para ganar 2.",
+      "long2": "Descansar es parte de un ayuno largo: tu cuerpo necesita tiempo para volver a comer y recuperarse. Los escudos te dejan descansar esos días sin perder la racha.",
+      "milestoneTitle": "Hitos de Hábito",
+      "milestone1": "Llegar al 35 %, 70 % y 100 % de Hábito da 1 escudo cada uno.",
+      "milestone2": "Si tu Hábito baja y vuelve a subir, puedes ganar el hito otra vez.",
+      "retainTitle": "Retain",
+      "retain1": "Con el Hábito al 100 %, los puntos de cada ayuno van a Retain.",
+      "retain2": "25 de Retain se convierten automáticamente en 1 escudo."
+    },
+    "body": {
+      "title": "¿Qué significan estas barras?",
+      "message": "Cada barra muestra cuánto apoya el ayuno uno de los procesos naturales de tu cuerpo.",
+      "alwaysTitle": "Siempre activos",
+      "always1": "Estos procesos siempre ocurren en tu cuerpo, incluso cuando no ayunas.",
+      "always2": "No son interruptores que solo se encienden a cierta hora.",
+      "levelsTitle": "Qué significan los niveles 1–5",
+      "levels1": "Cada nivel significa que el ayuno apoya más ese proceso, y sube con el tiempo de ayuno.",
+      "levels2": "Una barra llena no significa que el proceso esté en su punto máximo, solo que el apoyo del ayuno es mayor.",
+      "estimateTitle": "Solo una estimación",
+      "estimate1": "Las horas son aproximadas y varían según la persona: última comida, actividad, sueño…",
+      "estimate2": "Esto no es un diagnóstico ni un consejo médico."
+    }
+  },
+  "tip": {
+    "disableHint": "Puedes desactivar los consejos en Ajustes → Consejos de inicio",
+    "habit": {
+      "title": "¿Cómo se calcula el Hábito?",
+      "line1": "Cada ayuno de 16 h o más: +3 %, más 0,2 % por cada hora sobre 16 h (20 h → +3,8 %).",
+      "line2": "Los ayunos de menos de 16 h no suman.",
+      "line3": "Cada día vacío entre ayunos usa 1 escudo. Sin escudos, el Hábito baja: cuanto más larga la pausa, más baja.",
+      "line4": "Al 100 %: los puntos pasan a Retain, y 25 de Retain se vuelven 1 escudo."
+    }
+  },
+  "process": {
+    "glucoseControl": "Control de glucosa",
+    "fatBurning": "Quema de grasa",
+    "growthHormone": "Hormona del crecimiento",
+    "ketosis": "Cetosis",
+    "autophagy": "Autofagia",
+    "cellRenewal": "Renovación celular",
+    "immuneRenewal": "Renovación inmune",
+    "level": {
+      "start": "Inicio",
+      "standard": "Estándar",
+      "good": "Bien",
+      "high": "Alto",
+      "peak": "Pico",
+      "max": "Máx.",
+      "drop": "Baja",
+      "stable": "Estable",
+      "optimal": "Óptimo",
+      "init": "Arranque",
+      "warm": "Calentando",
+      "burn": "Quema",
+      "trace": "Indicios",
+      "light": "Leve",
+      "active": "Activa",
+      "deep": "Profunda",
+      "better": "Mejora",
+      "rise": "Sube",
+      "boost": "Impulso",
+      "prime": "Preparación",
+      "ready": "Lista",
+      "stronger": "Más fuerte"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Principiante",
+      "Veteran": "Veterano",
+      "Expert": "Experto",
+      "Master": "Maestro"
+    },
+    "16h": {
+      "label": "Intermitente",
+      "title": "Popular y fácil para empezar",
+      "description": "Ayuda a usar la grasa almacenada como energía y mejora la sensibilidad a la insulina.",
+      "advice": "(16 h) ¡El estándar! Come entre las 12:00 y las 20:00.",
+      "adviceLong": "Es el estándar de oro y el más fácil de mantener. Solo sáltate el desayuno y concentra tus calorías entre las 12:00 y las 20:00. Bebe unos 2 L de agua durante el ayuno."
+    },
+    "18h": {
+      "label": "Quemagrasa",
+      "title": "Quema de grasa reforzada",
+      "description": "Prolonga la cetosis y empieza a rozar la autofagia.",
+      "advice": "(18 h) Un pequeño paso más que el 16/8.",
+      "adviceLong": "Dos horas más que el 16/8 ayudan a maximizar la quema de grasa y a iniciar la autofagia. Durante estas 18 horas puedes tomar café solo o té verde sin azúcar para superar el hambre."
+    },
+    "20h": {
+      "label": "Guerrero",
+      "title": "Modo guerrero",
+      "description": "Maximiza la quema de grasa y ayuda a conservar la masa muscular.",
+      "advice": "(20 h) Ventana de 4 horas. Come suficiente proteína.",
+      "adviceLong": "La ventana para comer es muy corta (solo 4 horas). Prioriza suficiente proteína (carne, pescado, huevos) y fibra para mantener el músculo. Evita comer demasiado rápido para no sobrecargar la digestión."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Una comida al día",
+      "description": "Favorece la autofagia y da un descanso profundo a tu sistema digestivo.",
+      "advice": "(23 h) Tu única comida debe ser muy nutritiva.",
+      "adviceLong": "Un ayuno de casi 24 horas (p. ej., cenar hoy y no comer hasta la cena de mañana). Esa única comida debe ser de alimentos integrales, rica en grasas saludables y proteína. Escucha a tu cuerpo si lo haces seguido."
+    },
+    "36h": {
+      "label": "Monje",
+      "title": "Reto de un día completo",
+      "description": "Da a tu intestino un largo periodo de recuperación y ayuda a calmar la inflamación.",
+      "advice": "(36 h) Elige un día con poca actividad intensa.",
+      "adviceLong": "Un día y una noche completos sin comer (p. ej., cenar el lunes, saltarse el martes y volver a comer el miércoles por la mañana). Elige un día de trabajo ligero y añade electrolitos (sales minerales) para mantenerte alerta."
+    },
+    "48h": {
+      "label": "Prolongado",
+      "title": "Ayuno profundo avanzado",
+      "description": "Agota por completo el glucógeno almacenado y empuja al cuerpo a reorganizar su energía.",
+      "advice": "(48 h) Los electrolitos son imprescindibles.",
+      "adviceLong": "Un ayuno tan largo requiere electrolitos diarios (sal, potasio, magnesio) para mantener estable la presión arterial. Si te sientes débil o mareado durante mucho tiempo, rompe el ayuno de inmediato."
+    },
+    "72h": {
+      "label": "Extendido",
+      "title": "Reto extremo",
+      "description": "Alcanza una autofagia profunda. Requiere preparación cuidadosa y precaución.",
+      "advice": "(72 h) Solo para personas con mucha experiencia.",
+      "adviceLong": "Hazlo solo de vez en cuando, cuando tu cuerpo ya esté muy acostumbrado al ayuno. Al romperlo, nunca empieces con una comida grande; comienza con caldo de huesos o algo ligero para proteger el estómago."
+    }
+  },
+  "term": {
+    "habit": "Hábito",
+    "retain": "Retain",
+    "target": "Meta",
+    "targetHours": "Meta {{hours}} h",
+    "points": "Puntos",
+    "pts": "{{value}} pts",
+    "history": "Historial",
+    "progress": "Progreso",
+    "weight": "Peso",
+    "note": "Nota",
+    "mood": "Ánimo",
+    "camera": "Cámara",
+    "gallery": "Galería",
+    "error": "Error"
+  },
+  "fastingSheet": {
+    "completed": "Completado",
+    "result": "Recompensas",
+    "keepGoing": "Sigue para alcanzar tu meta",
+    "now": "AHORA",
+    "atTarget": "EN LA META",
+    "endFasting": "Terminar ayuno"
+  },
+  "lastFast": {
+    "interrupted": "Interrumpido",
+    "completed": "Completado",
+    "endedEarly": "Terminado antes",
+    "freeFasting": "Ayuno libre",
+    "targetProgress": "Progreso de la meta"
+  },
+  "habitSheet": {
+    "title": "Índice de hábito",
+    "sessions_one": "{{count}} sesión",
+    "sessions_other": "{{count}} sesiones",
+    "fastingSession": "Sesión de ayuno",
+    "overRest_one": "Descansaste {{count}} día de más",
+    "overRest_other": "Descansaste {{count}} días de más",
+    "shieldIncrease": "Escudo ganado",
+    "restDays_one": "Descanso de {{count}} día",
+    "restDays_other": "Descanso de {{count}} días"
+  },
+  "habitDetail": {
+    "title": "Registro de hábito",
+    "habitPoints": "Puntos de hábito",
+    "shields": "Escudos",
+    "fastDetail": "Detalles del ayuno",
+    "restDay": "Día de descanso",
+    "overRest": "Demasiado descanso"
+  },
+  "habitMilestone": {
+    "title": "Progreso"
+  },
+  "fullHabit": {
+    "title": "Hábito formado",
+    "maintainTitle": "Entrando en la fase de mantenimiento",
+    "maintainBody": "Cada vez que mantienes el hábito, los puntos se suman a Retain.",
+    "retainTitle": "Retain del hábito",
+    "retainSub": "Puntos de mantenimiento",
+    "note": "25 de Retain se convierten automáticamente en 1 escudo. Si el hábito se rompe, todo el Retain vuelve a 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "¡Hito de racha!",
+      "subtitle": "¡Estás creando un hábito de ayuno imparable!",
+      "button": "¡Sigue así! 🔥"
+    },
+    "rest": {
+      "title": "¡Día de descanso activo!",
+      "subtitle": "Recuperarse es parte del camino. ¡Tu racha sigue firme!",
+      "button": "¡Adelante! 🌿"
+    },
+    "fresh": {
+      "title": "Un nuevo comienzo",
+      "subtitle": "Todo maestro falló antes de triunfar. ¡Reconstruyamos hoy!",
+      "button": "Empezar de nuevo 🚀"
+    },
+    "best": "MEJOR",
+    "daysStreak": "Días seguidos",
+    "over": "¡Racha de más de {{count}} días!",
+    "consistency": "Constancia"
+  },
+  "result": {
+    "completed": {
+      "title": "¡Ayuno completado!",
+      "subtitle": "¡Gran trabajo manteniendo la disciplina!"
+    },
+    "endedEarly": {
+      "title": "Ayuno terminado antes",
+      "subtitle": "¡Cada hora cuenta! Tu progreso se guardó."
+    },
+    "extended": {
+      "title": "¡Ayuno largo completado!",
+      "subtitle": "¡Resistencia increíble! Recompensas extra desbloqueadas."
+    },
+    "fastingTime": "Tiempo de ayuno",
+    "targetProgress": "Meta {{hours}} h · {{percent}} %",
+    "shieldFrom": {
+      "longFast": "Ayuno largo",
+      "retain": "Mantener el hábito",
+      "milestone": "Hito alcanzado"
+    }
+  },
+  "note": {
+    "today": "Nota de hoy",
+    "forDate": "Nota {{date}}",
+    "placeholder": "¿Cómo te sentiste hoy?",
+    "weightDigitsOnly": "Solo números.",
+    "weightOneDot": "Solo se permite un punto decimal.",
+    "weightIntMax": "Máximo 4 dígitos enteros.",
+    "weightDecMax": "Máximo 1 decimal."
+  },
+  "image": {
+    "saveError": "No se pudo guardar la foto. Inténtalo de nuevo.",
+    "deleteError": "No se pudo eliminar la foto. Inténtalo de nuevo.",
+    "deleteTitle": "Eliminar foto",
+    "deleteConfirm": "¿Eliminar la foto de este día?",
+    "addTitle": "Añadir foto",
+    "yourPhoto": "Tu foto",
+    "addAPhoto": "Añade una foto",
+    "capture": "Captura el momento",
+    "chooseSource": "Elige cámara o galería"
+  },
+  "history": {
+    "title": "Historial de ayunos",
+    "total": "Total",
+    "average": "Promedio",
+    "recent": "Ayunos recientes",
+    "status": {
+      "cancelled": "Cancelado",
+      "fasting": "En ayuno",
+      "free": "Libre",
+      "reached": "Meta alcanzada",
+      "notReached": "No alcanzada"
+    },
+    "actions": "Acciones"
+  },
+  "startTime": {
+    "invalid": "Hora no válida",
+    "overlap": "¡Se solapa con tu ayuno anterior!",
+    "max24h": "¡Solo puedes adelantar el inicio hasta 24 horas!",
+    "future": "¡No puedes elegir una hora futura!",
+    "title": "Elige la hora de inicio",
+    "hint": "Toca la hora o la fecha para elegir cuándo empezaste",
+    "earlier": "Empezar antes",
+    "confirm": "Confirmar inicio"
+  },
+  "endTime": {
+    "title": "Elige la hora de fin",
+    "confirm": "Confirmar fin",
+    "future": {
+      "title": "Hora no válida",
+      "desc": "Esta hora está en el futuro."
+    },
+    "tooQuick": {
+      "title": "Este ayuno se cancelará",
+      "desc": "Demasiado corto para registrarse."
+    },
+    "failed": {
+      "title": "Este ayuno se marcará como fallido",
+      "desc": "No alcanza el mínimo para completar un ayuno."
+    },
+    "completed": {
+      "title": "Este ayuno se completará",
+      "desc": "Suficiente para registrarse."
+    }
+  },
+  "targetSheet": {
+    "choose": "Elegir esta meta",
+    "clear": "Quitar meta"
+  },
+  "fastDetail": {
+    "reachedTarget": "Meta alcanzada",
+    "notReachedTarget": "Meta no alcanzada",
+    "targetHours": "Meta: {{hours}} horas",
+    "over": "{{duration}} de más",
+    "remaining": "Faltan {{duration}}",
+    "review": "Resumen de la sesión",
+    "bodyAtEnd": "Estado del cuerpo al terminar",
+    "metrics": "Datos registrados",
+    "advice": "Consejo"
+  },
+  "date": {
+    "weekday": {
+      "0": "Dom",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mié",
+      "4": "Jue",
+      "5": "Vie",
+      "6": "Sáb"
+    },
+    "month": {
+      "0": "Ene",
+      "1": "Feb",
+      "2": "Mar",
+      "3": "Abr",
+      "4": "May",
+      "5": "Jun",
+      "6": "Jul",
+      "7": "Ago",
+      "8": "Sep",
+      "9": "Oct",
+      "10": "Nov",
+      "11": "Dic"
+    },
+    "monthNarrow": {
+      "0": "E",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Imagen guardada en tu galería.",
+    "saveImage": "Guardar imagen",
+    "style": "Estilo",
+    "mode": {
+      "mood": "Emoción",
+      "fasting": "Ayunos"
+    },
+    "dayButton": "Día",
+    "weekButton": "Sem",
+    "stat": {
+      "days_one": "día",
+      "days_other": "días",
+      "hours_one": "hora",
+      "hours_other": "horas",
+      "logs_one": "nota",
+      "logs_other": "notas"
+    },
+    "statsLine": "{{days}} días · {{hours}} horas · {{logs}} notas",
+    "legend": {
+      "mood": {
+        "0": "Fatal",
+        "1": "Mal",
+        "2": "Normal",
+        "3": "Bien",
+        "4": "Genial"
+      }
+    },
+    "info": {
+      "title": "Cómo leer tu trayecto",
+      "message": "Lo que la leyenda de iconos no explica.",
+      "fast1": "Cada celda se colorea según la duración total del ayuno más largo de ese día.",
+      "fast2": "Un ayuno de varios días colorea todos esos días, más claro el primero y más oscuro hacia el final.",
+      "fast3": "Una celda con icono de escudo es un día de descanso protegido por un escudo.",
+      "mood1": "Una celda con borde de color principal es un día con nota.",
+      "actionsTitle": "Acciones",
+      "action1": "Toca un día vacío para añadir ánimo y nota; toca un día con datos para ver detalles.",
+      "action2": "El número bajo cada icono es cuántos días del año caen en ese nivel.",
+      "action3": "Usa el botón Sem/Día de la esquina para cambiar el diseño. Las imágenes guardadas siguen el diseño actual."
+    }
+  },
+  "layout": {
+    "title": "Diseño de píxeles",
+    "subtitle": "Elige cómo se muestra tu trayecto",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "vertical": "↓ Vertical",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Elige un paquete de iconos",
+    "tabMood": "Emoción",
+    "tabTarget": "Meta",
+    "level": "Nv. {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Un estilo minimalista y moderno con Ionicons",
+    "material_emoticons": "Caras de emoción sutiles de Material Community",
+    "weather_vibes": "Muestra tu ánimo con iconos del clima",
+    "gaming_energy": "Emociones como barras de energía, estilo videojuego",
+    "pixel_vibe": "Emociones estilo píxel y emojis pictográficos",
+    "default_emoji_targets": "Metas representadas con emojis clásicos",
+    "ionicons_targets": "Iconos minimalistas y fluidos de Ionicons",
+    "material_energy_targets": "Muestra el desafío con energía y llamas",
+    "feather_minimal_targets": "Diseño de trazo fino de Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Diario del día",
+    "noMood": "Sin ánimo aún",
+    "dailyFast": "⏱️ Ayuno del día",
+    "dailyNote": "📝 Nota del día",
+    "relatedFasts": "AYUNOS RELACIONADOS",
+    "hoursToday": "horas hoy",
+    "hoursFasted": "HORAS DE AYUNO",
+    "weightHint": "Toca para editar",
+    "addWeight": "Añadir peso",
+    "dayNote": "NOTA DEL DÍA",
+    "notePlaceholder": "Añade una nota para este día...",
+    "photos": "FOTO",
+    "addPhoto": "Añadir foto",
+    "photoHint": "Añade una foto para este día",
+    "updatePhoto": "Actualizar foto",
+    "changePhoto": "Cambiar foto",
+    "photoFrom": "Foto desde"
+  },
+  "dayModal": {
+    "todayMood": "Ánimo de hoy",
+    "moodFor": "Ánimo {{date}}",
+    "todayWeight": "Peso de hoy",
+    "weightFor": "Peso {{date}}"
+  },
+  "stats": {
+    "subtitle": "Sigue tu progreso",
+    "dashboard": "Panel",
+    "currentStreak": "Racha actual",
+    "days_one": "día",
+    "days_other": "días",
+    "record": "Récord",
+    "shields": "Escudos",
+    "section": "Estadísticas",
+    "totalFasting": "Ayuno total",
+    "completed": "Completados",
+    "averageFast": "Ayuno medio",
+    "longestFast": "Ayuno más largo",
+    "activeDays": "Días activos",
+    "maxStreak": "Racha máxima",
+    "shieldsUsed": "Escudos usados",
+    "unit": {
+      "hours": "horas",
+      "times": "veces",
+      "days": "días"
+    },
+    "distribution": {
+      "title": "Distribución de ayunos",
+      "subtitle": "Cómo se reparten tus sesiones de ayuno",
+      "range": "{{from}}–{{to}} h",
+      "over": "{{from}}+ h",
+      "fasts_one": "ayuno",
+      "fasts_other": "ayunos"
+    },
+    "chart": {
+      "title": "Peso y progreso de ayuno",
+      "subtitle": "Tu progreso a lo largo del tiempo",
+      "fasting": "Ayuno",
+      "noData": "Sin datos",
+      "noWeight": "- Sin datos de peso",
+      "hoursUnit": "Horas"
+    },
+    "range": {
+      "title": "Periodo",
+      "day_one": "{{count}} día",
+      "day_other": "{{count}} días",
+      "week_one": "{{count}} semana",
+      "week_other": "{{count}} semanas",
+      "month_one": "{{count}} mes",
+      "month_other": "{{count}} meses",
+      "unit": {
+        "day": "días",
+        "week": "semanas",
+        "month": "meses"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Peso actual",
+    "currentWeightMessage": "Introduce tu peso actual",
+    "targetMessage": "Define tu peso objetivo",
+    "setCurrent": "Indica tu peso actual",
+    "setCurrentHint": "Añade tu peso para empezar a seguir tu progreso",
+    "weightGoal": "Meta de peso",
+    "setTarget": "Definir meta",
+    "currentWeight": "Peso actual",
+    "setTargetHint": "Define un peso objetivo para seguir tu progreso",
+    "toGo": "Faltan {{value}} kg",
+    "reached": "Meta alcanzada"
+  },
+  "ach": {
+    "title": "Logros",
+    "unlocked": "{{unlocked}} / {{total}} desbloqueados",
+    "empty": "Sin logros",
+    "claim": "Reclamar",
+    "done": "Logrado",
+    "notDone": "Pendiente",
+    "empty_slot": "Vacío",
+    "tier": {
+      "BRONZE": "BRONCE",
+      "SILVER": "PLATA",
+      "GOLD": "ORO",
+      "DIAMOND": "DIAMANTE"
+    },
+    "fasting_hours": {
+      "name": "Ayuno total",
+      "description": "Horas totales de ayuno.",
+      "item_one": "{{count}} hora de ayuno",
+      "item_other": "{{count}} horas de ayuno"
+    },
+    "invalid_fasts": {
+      "name": "Ayunos no válidos",
+      "description": "Número total de ayunos no válidos."
+    },
+    "failed_fasts": {
+      "name": "Ayunos fallidos",
+      "description": "Número total de ayunos fallidos."
+    },
+    "completed_fasts": {
+      "name": "Ayunos completados",
+      "description": "Número total de ayunos completados.",
+      "item_one": "Completa tu primer ayuno",
+      "item_other": "Completa {{count}} ayunos"
+    },
+    "active_days": {
+      "name": "Días activos",
+      "description": "Días en los que has usado la app.",
+      "item_one": "{{count}} día activo",
+      "item_other": "{{count}} días activos"
+    },
+    "habit": {
+      "name": "Hábito",
+      "description": "Tu puntuación de hábito de ayuno.",
+      "item_one": "Alcanza un {{count}} % de hábito",
+      "item_other": "Alcanza un {{count}} % de hábito"
+    },
+    "longest_fast": {
+      "name": "Ayuno más largo",
+      "description": "Tu ayuno completado más largo.",
+      "item_one": "Completa un ayuno de {{count}} hora",
+      "item_other": "Completa un ayuno de {{count}} horas"
+    },
+    "max_streak": {
+      "name": "Racha más larga",
+      "description": "Tu racha de ayuno más larga.",
+      "item_one": "Logra una racha de {{count}} día",
+      "item_other": "Logra una racha de {{count}} días"
+    },
+    "total_shields": {
+      "name": "Escudos totales",
+      "description": "Número total de escudos ganados.",
+      "item_one": "Gana tu primer escudo",
+      "item_other": "Gana {{count}} escudos"
+    },
+    "retain_circles": {
+      "name": "Maestro del Retain",
+      "description": "Ciclos de Retain completados con el hábito al máximo.",
+      "item_one": "Completa tu primer ciclo de Retain",
+      "item_other": "Completa {{count}} ciclos de Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "No se puede cerrar",
+      "body": "¡Termina este paso primero!"
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "section": {
+      "showcase": "Vitrina",
+      "appearance": "Apariencia",
+      "general": "General",
+      "sound": "Sonido y vibración",
+      "notifications": "Notificaciones",
+      "data": "Datos",
+      "about": "Acerca de"
+    },
+    "showcaseExport": "Mostrar en la imagen exportada",
+    "showcaseExportDesc": "Añade tus insignias a la imagen guardada",
+    "showcaseEmpty": "Aún no tienes insignias. Alcanza un hito y pulsa Reclamar en Estadísticas para desbloquearla.",
+    "showcasePick": "Elige hasta {{max}} insignias para presumir.",
+    "selectedCount": "Seleccionadas {{count}}/{{max}}",
+    "darkMode": "Modo oscuro",
+    "darkModeDesc": "Usa la apariencia oscura en toda la app",
+    "theme": "Tema",
+    "language": "Idioma",
+    "weekStart": "La semana empieza el",
+    "monday": "Lunes",
+    "sunday": "Domingo",
+    "mondayDesc": "Semanas de lunes → domingo",
+    "sundayDesc": "Semanas de domingo → sábado",
+    "beginnerTips": "Consejos de inicio",
+    "beginnerTipsDesc": "Muestra breves explicaciones sobre el hábito y los escudos",
+    "vibration": "Vibración",
+    "sound": "Sonido",
+    "soundDesc": "Sonidos al empezar, terminar y recibir recompensas",
+    "touchSound": "Sonido al tocar",
+    "touchSoundDesc": "Clics breves al tocar y activar",
+    "targetReached": "Meta alcanzada",
+    "targetReachedDesc": "Avisar al alcanzar tu meta de ayuno",
+    "dailyReminder": "Recordatorio diario",
+    "dailyReminderDesc": "Un recordatorio diario para empezar a ayunar",
+    "reminderTime": "Hora del recordatorio",
+    "backup": "Copia y restauración",
+    "backupDesc": "Google Drive o un archivo",
+    "reset": "Restablecer ajustes",
+    "resetDesc": "Volver a los ajustes predeterminados",
+    "resetConfirmTitle": "¿Restablecer ajustes?",
+    "resetConfirmBody": "Tema, diseño, sonido y notificaciones vuelven a lo predeterminado. Tus datos de ayuno se conservan.",
+    "resetOk": "Restablecer",
+    "privacy": "Privacidad",
+    "privacyDesc": "Privacidad y permisos de datos",
+    "privacyBody": "FastFast funciona sin conexión. Tus ayunos, notas y peso se guardan solo en este dispositivo y nunca se envían a nuestros servidores. Las copias van a un archivo que tú guardas o a tu propio Google Drive.",
+    "health": "Aviso de salud",
+    "rate": "Valorar la app",
+    "rateDesc": "¿Te gusta la app? Déjanos una valoración",
+    "rateThanks": "¡Gracias!",
+    "rateLater": "Podrás valorar cuando la app esté en la tienda.",
+    "feedback": "Comentarios",
+    "feedbackDesc": "Cuéntanos qué opinas o informa un problema",
+    "noEmailTitle": "Sin app de correo",
+    "noEmailBody": "Instala una app de correo para enviar comentarios.",
+    "about": "Acerca de",
+    "aboutBody": "Versión {{version}}\n\nAyuno intermitente con rachas, escudos y un año en píxeles.",
+    "version": "Versión {{version}}",
+    "expoGoTitle": "No disponible en Expo Go",
+    "expoGoBody": "Las notificaciones requieren una build de desarrollo o de la tienda.",
+    "notifOffTitle": "Las notificaciones están desactivadas",
+    "notifOffBody": "Permite las notificaciones de FastFast en los ajustes del sistema.",
+    "openSettings": "Abrir ajustes"
+  },
+  "account": {
+    "title": "Cuenta",
+    "guestHint": "Inicia sesión con Google para copiar en Drive"
+  },
+  "backup": {
+    "subtitle": "Tus datos están en este dispositivo. Las copias sirven para restaurarlos después.",
+    "drive": "Google Drive",
+    "file": "Archivo",
+    "signIn": "Iniciar sesión con Google",
+    "signInDesc": "Copia en tu propio Google Drive",
+    "notSignedIn": "Sin iniciar sesión",
+    "lastBackup": "Última copia {{time}}",
+    "never": "Aún sin copia",
+    "backUpNow": "Copiar ahora",
+    "backingUp": "Copiando…",
+    "restoreDrive": "Restaurar desde Drive",
+    "restoreDriveDesc": "Reemplaza los datos de este dispositivo con la copia de Drive",
+    "restoring": "Restaurando…",
+    "signOut": "Cerrar sesión",
+    "signOutTitle": "¿Cerrar sesión?",
+    "signOutBody": "Tus datos siguen en este dispositivo. Las copias de Google Drive se conservan.",
+    "signInFailedTitle": "Error al iniciar sesión",
+    "signInFailedBody": "No se pudo iniciar sesión con Google. Inténtalo de nuevo.",
+    "confirmTitle": "¿Copiar en Google Drive?",
+    "confirmReplace": "Esto reemplaza la copia del {{time}} con tus datos y fotos actuales.",
+    "confirmFirst": "Tus datos y fotos actuales se guardarán en tu Google Drive.",
+    "backUp": "Copiar",
+    "doneTitle": "Copia hecha",
+    "doneWithPhotos": "Tus datos y {{count}} foto(s) nueva(s) se guardaron en Google Drive.",
+    "doneBody": "Tus datos se guardaron en Google Drive.",
+    "failedTitle": "Error al copiar",
+    "failedBody": "No se pudo copiar en Google Drive. Revisa tu conexión e inténtalo de nuevo.",
+    "restoredTitle": "Restaurado",
+    "restoredBody": "Tus datos se restauraron.",
+    "restoredMissing": "Tus datos se restauraron. No se encontraron {{count}} foto(s) en Drive.",
+    "restoreFailedTitle": "Error al restaurar",
+    "restoreFailedDrive": "No se pudo restaurar desde Google Drive.",
+    "readFailed": "No se pudo leer la copia de Google Drive.",
+    "noneTitle": "Sin copia",
+    "noneBody": "Aún no hay copia de FastFast en esta cuenta de Google.",
+    "restoreDriveTitle": "¿Restaurar desde Google Drive?",
+    "restoreConfirm": "Copia del {{time}}. Se reemplazarán todos los datos actuales de este dispositivo.",
+    "restoreFileConfirm": "Copia del {{time}}. Se reemplazarán todos los datos actuales. Los archivos no incluyen fotos.",
+    "restoreFileTitle": "¿Restaurar desde archivo?",
+    "restoreFileFailed": "No se pudo restaurar este archivo.",
+    "exportFile": "Exportar archivo de copia",
+    "exporting": "Exportando…",
+    "exportFileDesc": "Solo datos; compártelo o guárdalo donde quieras",
+    "exportFailedTitle": "Error al exportar",
+    "exportFailedBody": "No se pudo crear el archivo de copia.",
+    "restoreFile": "Restaurar desde archivo",
+    "restoreFileDesc": "Elige un archivo de copia de FastFast",
+    "importFailedTitle": "Error al importar",
+    "importFailedBody": "Este archivo no es una copia válida de FastFast."
+  },
+  "theme": {
+    "title": "Tema",
+    "subtitle": "Elige la apariencia de la app",
+    "notPurchased": "No comprado",
+    "freeUntil": "Gratis hasta",
+    "purchase": "Comprar",
+    "unavailable": "No disponible",
+    "premium": "Premium",
+    "limited": "Limitado",
+    "dark": "Oscuro",
+    "light": "Claro"
+  },
+  "notify": {
+    "targetTitle": "🎉 ¡Meta alcanzada!",
+    "targetBody": "Llevas {{hours}} horas de ayuno. Termina la sesión para registrarla.",
+    "dailyTitle": "Hora de ayunar ⏱️",
+    "dailyBody": "Empieza el ayuno de hoy para mantener tu racha y tu hábito."
+  },
+  "perm": {
+    "saveImage": "FastFast necesita permiso para guardar imágenes en tu galería.",
+    "camera": "FastFast necesita acceso a la cámara para hacer fotos.",
+    "gallery": "FastFast necesita acceso a tus fotos para elegir una imagen.",
+    "saveFailed": "No se pudo guardar la imagen. Inténtalo de nuevo."
+  },
+  "widget": {
+    "fasting": "EN AYUNO",
+    "ready": "LISTO",
+    "notFasting": "Sin ayuno",
+    "tapToOpen": "Toca para abrir FastFast",
+    "started": "Inicio",
+    "done": "Fin"
+  },
+  "notFound": {
+    "title": "¡Vaya!",
+    "body": "Esta pantalla no existe.",
+    "home": "¡Ir al inicio!"
+  }
+}

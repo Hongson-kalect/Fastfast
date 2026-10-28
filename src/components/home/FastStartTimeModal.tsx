@@ -6,6 +6,7 @@ import { Platform, TouchableOpacity, View } from "react-native";
 import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 type Props = {
   minTime?: number | null;
@@ -23,6 +24,7 @@ const START_PRESETS = [
 ];
 
 const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const [now] = useState(() => new Date());
@@ -40,7 +42,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const showError = (text2: string) => {
     Toast.show({
       type: "error",
-      text1: "Thời gian không hợp lệ",
+      text1: t("startTime.invalid"),
       text2,
       useModal: true,
     });
@@ -48,17 +50,17 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
 
   const validateTime = (time: number) => {
     if (minTime && time < minTime) {
-      showError("Trùng thời gian với phiên trước đó!");
+      showError(t("startTime.overlap"));
       return false;
     }
 
     if (time < now.getTime() - MAX_DELAY_MS) {
-      showError("Chỉ được phép bắt đầu sớm tối đa 24 giờ!");
+      showError(t("startTime.max24h"));
       return false;
     }
 
     if (time > now.getTime()) {
-      showError("Không thể chọn thời gian ở tương lai!");
+      showError(t("startTime.future"));
       return false;
     }
 
@@ -109,11 +111,11 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
       {/* Header */}
       <View className="mb-5">
         <ThemedText size="md" weight="bold" color="title">
-          Chọn thời gian bắt đầu Fast
+          {t("startTime.title")}
         </ThemedText>
 
         <ThemedText size="xs" color="text" opacity="medium" className="mt-1">
-          Chạm vào giờ hoặc ngày để chọn thời điểm bắt đầu
+          {t("startTime.hint")}
         </ThemedText>
       </View>
 
@@ -130,7 +132,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             letterSpacing: 1,
           }}
         >
-          Bắt đầu sớm
+          {t("startTime.earlier")}
         </ThemedText>
 
         <View className="flex-row gap-2">
@@ -207,7 +209,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
             opacity={selectedDay !== today ? "full" : "medium"}
           >
             {selectedDay !== today && "⚠️ "}
-            {selectedDay === today ? "Hôm nay" : selectedDay} ▾
+            {selectedDay === today ? t("common.today") : selectedDay} ▾
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -234,7 +236,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
         }}
       >
         <ThemedText size="sm" weight="bold" colorHex={getContrastTextColor(theme.primary)}>
-          Xác nhận bắt đầu Fast
+          {t("startTime.confirm")}
         </ThemedText>
       </TouchableOpacity>
     </View>

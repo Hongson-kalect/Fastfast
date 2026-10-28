@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "건너뛰기",
+    "next": "다음",
+    "start": "시작하기",
+    "welcome": {
+      "title": "더 즐거운 간헐적 단식",
+      "body": "식사를 마치면 시작을 누르세요. FastFast가 시간을 재고 목표에 도달하면 알려 드려요."
+    },
+    "habit": {
+      "title": "연속 기록과 습관 지수",
+      "body": "단식을 완료할 때마다 연속 기록이 이어지고 습관 바가 채워져요. 오래 할수록 더 빨리 채워져요."
+    },
+    "shield": {
+      "title": "실드 — 연속 기록을 지켜 주는 휴식일",
+      "body": "꾸준히 하거나 긴 단식을 마치면 실드를 받아요. 쉬는 날에는 실드가 자동으로 연속 기록을 지켜 줘요."
+    },
+    "pixel": {
+      "title": "알록달록한 한 해",
+      "body": "하루가 하나의 픽셀이에요. 기분과 체중을 기록하고 한 해를 한 장의 그림으로 확인하세요."
+    },
+    "health": {
+      "title": "몸의 신호에 귀 기울이세요",
+      "body": "FastFast는 의학적 조언을 대신하지 않아요. 임신 중이거나 지병이 있거나 48시간 이상 단식하려면 의사와 상담하세요. 어지럽거나 평소와 다르게 몸이 안 좋으면 즉시 중단하세요."
+    }
+  },
+  "tabs": {
+    "fast": "단식",
+    "stats": "통계",
+    "journey": "여정",
+    "settings": "설정"
+  },
+  "common": {
+    "ok": "확인",
+    "cancel": "취소",
+    "gotIt": "알겠어요",
+    "confirm": "확인",
+    "delete": "삭제",
+    "save": "저장",
+    "today": "오늘",
+    "noData": "데이터 없음",
+    "invalid": "유효하지 않음",
+    "success": "완료",
+    "edit": "편집",
+    "add": "추가",
+    "loading": "불러오는 중…",
+    "close": "닫기",
+    "restore": "복원",
+    "permission": "권한 필요",
+    "error": "오류"
+  },
+  "time": {
+    "justNow": "방금",
+    "today": "오늘",
+    "tomorrow": "내일",
+    "yesterday": "어제",
+    "dayAfterTomorrow": "모레",
+    "daysAgo_one": "{{count}}일 전",
+    "daysAgo_other": "{{count}}일 전",
+    "daysLater_one": "{{count}}일 후",
+    "daysLater_other": "{{count}}일 후",
+    "secondsAgo_one": "{{count}}초 전",
+    "secondsAgo_other": "{{count}}초 전",
+    "inSeconds_one": "{{count}}초 후",
+    "inSeconds_other": "{{count}}초 후",
+    "minutesAgo_one": "{{count}}분 전",
+    "minutesAgo_other": "{{count}}분 전",
+    "inMinutes_one": "{{count}}분 후",
+    "inMinutes_other": "{{count}}분 후",
+    "hoursAgo_one": "{{count}}시간 전",
+    "hoursAgo_other": "{{count}}시간 전",
+    "inHours_one": "{{count}}시간 후",
+    "inHours_other": "{{count}}시간 후"
+  },
+  "home": {
+    "greeting": {
+      "morning": "좋은 아침이에요",
+      "noon": "좋은 점심이에요",
+      "afternoon": "좋은 오후예요",
+      "evening": "좋은 저녁이에요"
+    },
+    "streakDays_one": "{{count}}일",
+    "streakDays_other": "{{count}}일",
+    "lastFast": "최근 단식",
+    "bodyPhases": "신체 단계",
+    "fastingPhases": "단식 중 단계",
+    "effectAfter": "효과까지",
+    "startFast": "단식 시작",
+    "endFast": "종료"
+  },
+  "counter": {
+    "chooseTarget": "목표 선택",
+    "reached": "🎉 목표 달성",
+    "finishAt": "종료 {{time}}",
+    "freeMode": "자유 모드",
+    "ifStartNow": "지금 시작하면: {{time}}",
+    "fasting": "단식 중",
+    "ready": "준비",
+    "startedAt": "시작 {{time}}",
+    "history": "단식 기록"
+  },
+  "finish": {
+    "title": "종료",
+    "confirm": "이 단식을 종료할까요?",
+    "tooQuick": "너무 짧아서 이 기록은 삭제돼요. 계속할까요?",
+    "tooQuickSub": "단식 시간이 2시간 미만이에요.",
+    "failed": "이 단식은 실패로 기록돼요. 계속할까요?",
+    "failedSub": "단식 시간이 16시간 미만이에요.",
+    "reached": "목표를 달성했어요. 지금 종료할까요?",
+    "notReached": "아직 목표에 도달하지 못했어요. 그래도 종료할까요?",
+    "endBeforeStart": "종료 시간은 시작 시간 이후여야 해요.",
+    "startBeforeLast": "시작 시간은 이전 단식 이후여야 해요."
+  },
+  "info": {
+    "shield": {
+      "title": "실드",
+      "message": "실드는 단식하지 않는 휴식일에도 연속 기록을 지켜 줘요.",
+      "effectTitle": "효과 · 보유 {{count}}/{{max}}",
+      "effect1": "두 단식 사이의 빈 날마다 실드 1개를 사용해요. 연속 기록이 유지되고 습관 지수도 그대로예요.",
+      "effect2": "실드 없이 쉬면 연속 기록이 끊기고, 습관 지수가 내려가며 Retain은 0이 돼요.",
+      "effect3": "실드는 최대 {{max}}개까지 보유해요. 초과분은 사라져요.",
+      "longTitle": "긴 단식",
+      "long1": "48시간 이상이면 +1, 72시간 이상이면 +2.",
+      "long2": "휴식도 긴 단식의 일부예요. 몸이 다시 먹고 회복할 시간이 필요하거든요. 실드가 있으면 그날 쉬어도 연속 기록이 유지돼요.",
+      "milestoneTitle": "습관 마일스톤",
+      "milestone1": "습관 지수가 35%, 70%, 100%에 도달할 때마다 실드 +1.",
+      "milestone2": "습관 지수가 내려갔다가 다시 오르면 다시 받을 수 있어요.",
+      "retainTitle": "Retain",
+      "retain1": "습관 지수가 100%가 되면 단식 포인트가 Retain에 쌓여요.",
+      "retain2": "Retain 25가 모이면 자동으로 실드 1개가 돼요."
+    },
+    "body": {
+      "title": "이 막대는 무슨 뜻인가요?",
+      "message": "각 막대는 단식이 몸의 자연스러운 작용을 얼마나 돕는지 보여 줘요.",
+      "alwaysTitle": "항상 작동 중",
+      "always1": "이 작용들은 단식하지 않을 때도 몸에서 늘 일어나요.",
+      "always2": "특정 시간이 되어야 켜지는 스위치가 아니에요.",
+      "levelsTitle": "1~5단계의 의미",
+      "levels1": "단계가 높을수록 단식이 그 작용을 더 돕는다는 뜻이며, 단식 시간에 따라 올라가요.",
+      "levels2": "막대가 가득 찼다고 그 작용이 지금 가장 강하다는 뜻은 아니에요. 단식의 도움이 커졌다는 뜻이에요.",
+      "estimateTitle": "추정치일 뿐이에요",
+      "estimate1": "시간 기준은 추정이며 직전 식사, 활동량, 수면 등에 따라 사람마다 달라요.",
+      "estimate2": "진단이나 의학적 조언이 아니에요."
+    }
+  },
+  "tip": {
+    "disableHint": "설정 → 초보자 팁에서 팁을 끌 수 있어요",
+    "habit": {
+      "title": "습관 지수는 어떻게 계산되나요?",
+      "line1": "16시간 이상 단식할 때마다 +3%, 16시간 초과 1시간마다 +0.2% (20시간 → +3.8%).",
+      "line2": "16시간 미만 단식은 점수가 오르지 않아요.",
+      "line3": "단식 사이 빈 날마다 실드 1개를 써요. 실드가 없으면 습관 지수가 내려가고, 오래 쉴수록 더 많이 내려가요.",
+      "line4": "100%가 되면 포인트가 Retain으로 가고, Retain 25는 실드 1개가 돼요."
+    }
+  },
+  "process": {
+    "glucoseControl": "혈당 조절",
+    "fatBurning": "지방 연소",
+    "growthHormone": "성장 호르몬",
+    "ketosis": "케토시스",
+    "autophagy": "자가포식",
+    "cellRenewal": "세포 재생",
+    "immuneRenewal": "면역 재생",
+    "level": {
+      "start": "시작",
+      "standard": "기본",
+      "good": "좋음",
+      "high": "높음",
+      "peak": "최고",
+      "max": "최대",
+      "drop": "하락",
+      "stable": "안정",
+      "optimal": "최적",
+      "init": "준비",
+      "warm": "예열",
+      "burn": "연소",
+      "trace": "미량",
+      "light": "가벼움",
+      "active": "활발",
+      "deep": "깊음",
+      "better": "개선",
+      "rise": "상승",
+      "boost": "부스트",
+      "prime": "준비",
+      "ready": "준비 완료",
+      "stronger": "강화"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "초보",
+      "Veteran": "숙련",
+      "Expert": "전문가",
+      "Master": "마스터"
+    },
+    "16h": {
+      "label": "간헐적",
+      "title": "인기 많고 시작하기 쉬움",
+      "description": "저장된 지방을 에너지로 쓰도록 돕고 인슐린 감수성을 높여요.",
+      "advice": "(16시간) 기본! 12시~20시에 식사하세요.",
+      "adviceLong": "가장 꾸준히 하기 쉬운 기본 단계예요. 아침을 거르고 필요한 칼로리를 12시~20시 식사 시간에 섭취하세요. 단식 중에는 물을 2L 정도 마셔요."
+    },
+    "18h": {
+      "label": "지방 연소",
+      "title": "강화된 지방 연소",
+      "description": "케토시스를 늘리고 자가포식의 초입에 들어서요.",
+      "advice": "(18시간) 16/8보다 한 단계 위.",
+      "adviceLong": "16/8보다 2시간 더 하면 지방 연소가 극대화되고 자가포식이 시작돼요. 이 18시간 동안 블랙커피나 무가당 녹차로 배고픔을 넘길 수 있어요."
+    },
+    "20h": {
+      "label": "워리어",
+      "title": "워리어 모드",
+      "description": "지방 연소를 극대화하고 근육량 유지를 도와요.",
+      "advice": "(20시간) 식사 시간 4시간. 단백질을 충분히.",
+      "adviceLong": "식사 시간이 매우 짧아요(4시간뿐). 근육을 지키려면 단백질(고기, 생선, 달걀)과 식이섬유를 충분히 먹어요. 너무 빨리 먹으면 소화에 부담이 가니 피하세요."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "하루 한 끼",
+      "description": "자가포식을 촉진하고 소화기관을 깊이 쉬게 해요.",
+      "advice": "(23시간) 한 끼는 영양을 골고루.",
+      "adviceLong": "거의 24시간 단식이에요(예: 오늘 저녁 후 내일 저녁까지 먹지 않기). 그 한 끼는 자연식 위주로 좋은 지방과 단백질을 충분히. 자주 한다면 몸의 신호를 잘 살피세요."
+    },
+    "36h": {
+      "label": "수도승",
+      "title": "하루를 넘기는 도전",
+      "description": "장에 긴 회복 시간을 주고 염증 완화를 도와요.",
+      "advice": "(36시간) 격한 활동이 적은 날을 고르세요.",
+      "adviceLong": "하루 낮과 밤을 꼬박 굶어요(예: 월요일 저녁 후 화요일을 건너뛰고 수요일 아침에 식사). 가벼운 일정의 날을 고르고 전해질(미네랄 소금)을 보충해 정신을 맑게 유지하세요."
+    },
+    "48h": {
+      "label": "연장",
+      "title": "고급 심층 단식",
+      "description": "저장된 글리코겐을 완전히 소진시켜 몸이 에너지 사용 방식을 재구성하게 해요.",
+      "advice": "(48시간) 전해질 보충은 필수.",
+      "adviceLong": "이렇게 긴 단식에는 혈압을 안정적으로 유지하기 위해 매일 전해질(소금, 칼륨, 마그네슘)을 보충해야 해요. 어지럼증이 오래가면 바로 단식을 중단하세요."
+    },
+    "72h": {
+      "label": "장기",
+      "title": "극한의 도전",
+      "description": "깊은 자가포식에 도달해요. 꼼꼼한 준비와 주의가 필요해요.",
+      "advice": "(72시간) 경험이 아주 많은 사람만.",
+      "adviceLong": "몸이 단식에 아주 익숙해진 뒤에 가끔만 하세요. 단식을 끝낼 때는 절대 바로 많이 먹지 말고, 위를 보호하기 위해 사골 국물이나 가벼운 음식부터 시작하세요."
+    }
+  },
+  "term": {
+    "habit": "습관",
+    "retain": "Retain",
+    "target": "목표",
+    "targetHours": "목표 {{hours}}시간",
+    "points": "포인트",
+    "pts": "{{value}}점",
+    "history": "기록",
+    "progress": "진행",
+    "weight": "체중",
+    "note": "메모",
+    "mood": "기분",
+    "camera": "카메라",
+    "gallery": "갤러리",
+    "error": "오류"
+  },
+  "fastingSheet": {
+    "completed": "완료",
+    "result": "보상",
+    "keepGoing": "목표까지 계속하세요",
+    "now": "현재",
+    "atTarget": "목표 시",
+    "endFasting": "단식 종료"
+  },
+  "lastFast": {
+    "interrupted": "중단됨",
+    "completed": "완료",
+    "endedEarly": "일찍 종료",
+    "freeFasting": "자유 단식",
+    "targetProgress": "목표 진행률"
+  },
+  "habitSheet": {
+    "title": "습관 지수",
+    "sessions_one": "{{count}}회",
+    "sessions_other": "{{count}}회",
+    "fastingSession": "단식 세션",
+    "overRest_one": "{{count}}일 과하게 쉼",
+    "overRest_other": "{{count}}일 과하게 쉼",
+    "shieldIncrease": "실드 획득",
+    "restDays_one": "{{count}}일 휴식",
+    "restDays_other": "{{count}}일 휴식"
+  },
+  "habitDetail": {
+    "title": "습관 기록",
+    "habitPoints": "습관 점수",
+    "shields": "실드 수",
+    "fastDetail": "단식 상세",
+    "restDay": "휴식일",
+    "overRest": "너무 오래 쉼"
+  },
+  "habitMilestone": {
+    "title": "진행 상황"
+  },
+  "fullHabit": {
+    "title": "습관 형성 완료",
+    "maintainTitle": "유지 단계에 들어섰어요",
+    "maintainBody": "습관을 이어갈 때마다 Retain에 포인트가 쌓여요.",
+    "retainTitle": "습관 Retain",
+    "retainSub": "유지 포인트",
+    "note": "Retain 25는 자동으로 실드 1개로 바뀌어요. 습관이 끊기면 Retain은 모두 0이 돼요."
+  },
+  "streak": {
+    "milestone": {
+      "title": "연속 기록 달성!",
+      "subtitle": "멈출 수 없는 단식 습관을 만들고 있어요!",
+      "button": "계속 가요! 🔥"
+    },
+    "rest": {
+      "title": "휴식일 사용 중!",
+      "subtitle": "회복도 여정의 일부예요. 연속 기록은 그대로예요!",
+      "button": "계속해요! 🌿"
+    },
+    "fresh": {
+      "title": "새로운 시작",
+      "subtitle": "모든 고수도 실패를 거쳤어요. 오늘부터 다시 쌓아요!",
+      "button": "지금 다시 시작 🚀"
+    },
+    "best": "최고",
+    "daysStreak": "연속 일수",
+    "over": "연속 {{count}}일 돌파!",
+    "consistency": "꾸준함"
+  },
+  "result": {
+    "completed": {
+      "title": "단식 완료!",
+      "subtitle": "꾸준함을 잘 지켰어요!"
+    },
+    "endedEarly": {
+      "title": "단식을 일찍 마쳤어요",
+      "subtitle": "한 시간 한 시간이 소중해요! 진행 상황이 저장됐어요."
+    },
+    "extended": {
+      "title": "긴 단식 완료!",
+      "subtitle": "대단한 인내력! 추가 보상을 얻었어요."
+    },
+    "fastingTime": "단식 시간",
+    "targetProgress": "목표 {{hours}}시간 · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "긴 단식",
+      "retain": "습관 유지",
+      "milestone": "마일스톤 달성"
+    }
+  },
+  "note": {
+    "today": "오늘의 메모",
+    "forDate": "{{date}} 메모",
+    "placeholder": "오늘 기분은 어땠나요?",
+    "weightDigitsOnly": "숫자만 입력하세요.",
+    "weightOneDot": "소수점은 하나만 입력할 수 있어요.",
+    "weightIntMax": "정수 부분은 최대 4자리예요.",
+    "weightDecMax": "소수 부분은 최대 1자리예요."
+  },
+  "image": {
+    "saveError": "사진을 저장하지 못했어요. 다시 시도해 주세요.",
+    "deleteError": "사진을 삭제하지 못했어요. 다시 시도해 주세요.",
+    "deleteTitle": "사진 삭제",
+    "deleteConfirm": "이 날의 사진을 삭제할까요?",
+    "addTitle": "사진 추가",
+    "yourPhoto": "내 사진",
+    "addAPhoto": "사진을 추가하세요",
+    "capture": "순간을 담아 보세요",
+    "chooseSource": "카메라 또는 갤러리 선택"
+  },
+  "history": {
+    "title": "단식 기록",
+    "total": "합계",
+    "average": "평균",
+    "recent": "최근 단식",
+    "status": {
+      "cancelled": "취소됨",
+      "fasting": "진행 중",
+      "free": "자유",
+      "reached": "목표 달성",
+      "notReached": "미달성"
+    },
+    "actions": "작업"
+  },
+  "startTime": {
+    "invalid": "잘못된 시간",
+    "overlap": "이전 단식과 시간이 겹쳐요!",
+    "max24h": "최대 24시간 전까지만 시작할 수 있어요!",
+    "future": "미래 시간은 선택할 수 없어요!",
+    "title": "단식 시작 시간 선택",
+    "hint": "시간이나 날짜를 눌러 시작 시점을 고르세요",
+    "earlier": "더 일찍 시작",
+    "confirm": "시작 확인"
+  },
+  "endTime": {
+    "title": "종료 시간 선택",
+    "confirm": "종료 확인",
+    "future": {
+      "title": "잘못된 시간",
+      "desc": "미래 시간이에요."
+    },
+    "tooQuick": {
+      "title": "이 단식은 취소돼요",
+      "desc": "너무 짧아서 기록되지 않아요."
+    },
+    "failed": {
+      "title": "이 단식은 실패로 기록돼요",
+      "desc": "단식 완료 최소 시간에 못 미쳐요."
+    },
+    "completed": {
+      "title": "이 단식은 완료로 기록돼요",
+      "desc": "기록하기에 충분한 시간이에요."
+    }
+  },
+  "targetSheet": {
+    "choose": "이 목표 선택",
+    "clear": "목표 해제"
+  },
+  "fastDetail": {
+    "reachedTarget": "목표 달성",
+    "notReachedTarget": "목표 미달성",
+    "targetHours": "목표: {{hours}}시간",
+    "over": "{{duration}} 초과",
+    "remaining": "{{duration}} 남음",
+    "review": "세션 평가",
+    "bodyAtEnd": "종료 시 몸 상태",
+    "metrics": "기록된 수치",
+    "advice": "조언"
+  },
+  "date": {
+    "weekday": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    },
+    "month": {
+      "0": "1월",
+      "1": "2월",
+      "2": "3월",
+      "3": "4월",
+      "4": "5월",
+      "5": "6월",
+      "6": "7월",
+      "7": "8월",
+      "8": "9월",
+      "9": "10월",
+      "10": "11월",
+      "11": "12월"
+    },
+    "monthNarrow": {
+      "0": "1",
+      "1": "2",
+      "2": "3",
+      "3": "4",
+      "4": "5",
+      "5": "6",
+      "6": "7",
+      "7": "8",
+      "8": "9",
+      "9": "10",
+      "10": "11",
+      "11": "12"
+    }
+  },
+  "journey": {
+    "savedImage": "사진 보관함에 저장했어요.",
+    "saveImage": "이미지 저장",
+    "style": "스타일",
+    "mode": {
+      "mood": "감정",
+      "fasting": "단식 기록"
+    },
+    "dayButton": "일",
+    "weekButton": "주",
+    "stat": {
+      "days_one": "일",
+      "days_other": "일",
+      "hours_one": "시간",
+      "hours_other": "시간",
+      "logs_one": "기록",
+      "logs_other": "기록"
+    },
+    "statsLine": "{{days}}일 · {{hours}}시간 · 기록 {{logs}}",
+    "legend": {
+      "mood": {
+        "0": "최악",
+        "1": "나쁨",
+        "2": "보통",
+        "3": "좋음",
+        "4": "최고"
+      }
+    },
+    "info": {
+      "title": "여정 보는 법",
+      "message": "아이콘 범례로는 알 수 없는 것들이에요.",
+      "fast1": "각 칸은 그날에 걸친 가장 긴 단식의 전체 길이에 따라 색이 정해져요.",
+      "fast2": "여러 날에 걸친 단식은 모든 날을 칠하며, 첫날은 옅고 끝으로 갈수록 진해져요.",
+      "fast3": "실드 아이콘이 있는 칸은 실드로 지켜진 휴식일이에요.",
+      "mood1": "기본 색 테두리가 있는 칸은 메모가 있는 날이에요.",
+      "actionsTitle": "조작",
+      "action1": "빈 날을 누르면 기분과 메모를 추가하고, 기록이 있는 날을 누르면 상세를 볼 수 있어요.",
+      "action2": "아이콘 아래 숫자는 올해 그 단계에 해당하는 날 수예요.",
+      "action3": "격자 모서리의 주/일 버튼으로 배치를 바꿔요. 저장한 이미지는 현재 배치를 따라요."
+    }
+  },
+  "layout": {
+    "title": "픽셀 배치",
+    "subtitle": "여정을 보여 줄 방식을 고르세요",
+    "weekly": "주간",
+    "monthly": "월간",
+    "vertical": "↓ 세로",
+    "horizontal": "→ 가로"
+  },
+  "iconPack": {
+    "title": "아이콘 팩 선택",
+    "tabMood": "감정",
+    "tabTarget": "목표",
+    "level": "Lv.{{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Ionicons로 만든 모던하고 미니멀한 디자인",
+    "material_emoticons": "Material Community의 섬세한 감정 얼굴",
+    "weather_vibes": "날씨 아이콘으로 기분을 표현해요",
+    "gaming_energy": "게임처럼 에너지 바로 감정을 표현해요",
+    "pixel_vibe": "픽셀 스타일 감정과 그림 이모지",
+    "default_emoji_targets": "클래식 이모지로 목표를 표시해요",
+    "ionicons_targets": "Ionicons의 부드럽고 미니멀한 아이콘",
+    "material_energy_targets": "에너지와 불꽃으로 도전 정도를 표현해요",
+    "feather_minimal_targets": "Feather Icons의 섬세한 선 디자인"
+  },
+  "pixelDetail": {
+    "title": "하루 기록",
+    "noMood": "아직 기분 없음",
+    "dailyFast": "⏱️ 하루 단식",
+    "dailyNote": "📝 하루 메모",
+    "relatedFasts": "관련 단식",
+    "hoursToday": "시간 (이날)",
+    "hoursFasted": "단식 시간",
+    "weightHint": "눌러서 편집",
+    "addWeight": "체중 추가",
+    "dayNote": "오늘의 메모",
+    "notePlaceholder": "이 날의 메모를 추가하세요...",
+    "photos": "사진",
+    "addPhoto": "사진 추가",
+    "photoHint": "이 날의 사진을 추가하세요",
+    "updatePhoto": "사진 업데이트",
+    "changePhoto": "사진 변경",
+    "photoFrom": "사진 가져오기"
+  },
+  "dayModal": {
+    "todayMood": "오늘의 기분",
+    "moodFor": "{{date}} 기분",
+    "todayWeight": "오늘의 체중",
+    "weightFor": "{{date}} 체중"
+  },
+  "stats": {
+    "subtitle": "진행 상황을 확인하세요",
+    "dashboard": "대시보드",
+    "currentStreak": "현재 연속 기록",
+    "days_one": "일",
+    "days_other": "일",
+    "record": "최고 기록",
+    "shields": "실드",
+    "section": "통계",
+    "totalFasting": "총 단식",
+    "completed": "완료",
+    "averageFast": "평균 단식",
+    "longestFast": "최장 단식",
+    "activeDays": "활동 일수",
+    "maxStreak": "최장 연속 기록",
+    "shieldsUsed": "사용한 실드",
+    "unit": {
+      "hours": "시간",
+      "times": "회",
+      "days": "일"
+    },
+    "distribution": {
+      "title": "단식 분포",
+      "subtitle": "단식 세션의 분포",
+      "range": "{{from}}~{{to}}시간",
+      "over": "{{from}}시간 이상",
+      "fasts_one": "회",
+      "fasts_other": "회"
+    },
+    "chart": {
+      "title": "체중 및 단식 추이",
+      "subtitle": "시간에 따른 변화",
+      "fasting": "단식",
+      "noData": "데이터 없음",
+      "noWeight": "- 체중 데이터 없음",
+      "hoursUnit": "시간"
+    },
+    "range": {
+      "title": "기간",
+      "day_one": "{{count}}일",
+      "day_other": "{{count}}일",
+      "week_one": "{{count}}주",
+      "week_other": "{{count}}주",
+      "month_one": "{{count}}개월",
+      "month_other": "{{count}}개월",
+      "unit": {
+        "day": "일",
+        "week": "주",
+        "month": "개월"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "현재 체중",
+    "currentWeightMessage": "현재 체중을 입력하세요",
+    "targetMessage": "목표 체중을 설정하세요",
+    "setCurrent": "현재 체중 입력",
+    "setCurrentHint": "체중을 추가하고 진행 상황을 확인하세요",
+    "weightGoal": "체중 목표",
+    "setTarget": "목표 설정",
+    "currentWeight": "현재 체중",
+    "setTargetHint": "목표 체중을 정하고 진행 상황을 확인하세요",
+    "toGo": "{{value}}kg 남음",
+    "reached": "목표 달성"
+  },
+  "ach": {
+    "title": "업적",
+    "unlocked": "{{unlocked}} / {{total}} 달성",
+    "empty": "업적 없음",
+    "claim": "받기",
+    "done": "달성",
+    "notDone": "미달성",
+    "empty_slot": "비어 있음",
+    "tier": {
+      "BRONZE": "브론즈",
+      "SILVER": "실버",
+      "GOLD": "골드",
+      "DIAMOND": "다이아"
+    },
+    "fasting_hours": {
+      "name": "누적 단식",
+      "description": "단식한 총 시간.",
+      "item_one": "단식 {{count}}시간",
+      "item_other": "단식 {{count}}시간"
+    },
+    "invalid_fasts": {
+      "name": "무효 단식",
+      "description": "무효 단식 횟수."
+    },
+    "failed_fasts": {
+      "name": "실패한 단식",
+      "description": "실패한 단식 횟수."
+    },
+    "completed_fasts": {
+      "name": "완료한 단식",
+      "description": "완료한 단식 횟수.",
+      "item_one": "첫 단식 완료",
+      "item_other": "단식 {{count}}회 완료"
+    },
+    "active_days": {
+      "name": "활동 일수",
+      "description": "앱에서 활동한 일수.",
+      "item_one": "활동 {{count}}일",
+      "item_other": "활동 {{count}}일"
+    },
+    "habit": {
+      "name": "습관",
+      "description": "단식 습관 점수.",
+      "item_one": "습관 {{count}}% 달성",
+      "item_other": "습관 {{count}}% 달성"
+    },
+    "longest_fast": {
+      "name": "최장 단식",
+      "description": "지금까지 완료한 가장 긴 단식.",
+      "item_one": "{{count}}시간 단식 완료",
+      "item_other": "{{count}}시간 단식 완료"
+    },
+    "max_streak": {
+      "name": "최장 연속 기록",
+      "description": "지금까지 가장 긴 연속 단식 기록.",
+      "item_one": "{{count}}일 연속 달성",
+      "item_other": "{{count}}일 연속 달성"
+    },
+    "total_shields": {
+      "name": "누적 실드",
+      "description": "획득한 실드 수.",
+      "item_one": "첫 실드 획득",
+      "item_other": "실드 {{count}}개 획득"
+    },
+    "retain_circles": {
+      "name": "Retain 마스터",
+      "description": "습관이 가득 찬 상태에서 완료한 Retain 회차.",
+      "item_one": "첫 Retain 회차 완료",
+      "item_other": "Retain {{count}}회 완료"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "닫을 수 없어요",
+      "body": "먼저 이 단계를 완료해 주세요!"
+    }
+  },
+  "settings": {
+    "title": "설정",
+    "section": {
+      "showcase": "쇼케이스",
+      "appearance": "화면",
+      "general": "일반",
+      "sound": "소리 및 진동",
+      "notifications": "알림",
+      "data": "데이터",
+      "about": "정보"
+    },
+    "showcaseExport": "여정 이미지에 표시",
+    "showcaseExportDesc": "저장 이미지에 배지를 추가해요",
+    "showcaseEmpty": "아직 배지가 없어요. 업적 마일스톤을 달성하고 통계 탭에서 받기를 누르세요.",
+    "showcasePick": "자랑할 배지를 최대 {{max}}개 고르세요.",
+    "selectedCount": "선택 {{count}}/{{max}}",
+    "darkMode": "다크 모드",
+    "darkModeDesc": "앱 전체에 어두운 화면 사용",
+    "theme": "테마",
+    "language": "언어",
+    "weekStart": "주 시작일",
+    "monday": "월요일",
+    "sunday": "일요일",
+    "mondayDesc": "월요일 → 일요일",
+    "sundayDesc": "일요일 → 토요일",
+    "beginnerTips": "초보자 팁",
+    "beginnerTipsDesc": "습관과 실드의 작동 방식을 짧게 설명해요",
+    "vibration": "진동",
+    "sound": "소리",
+    "soundDesc": "시작, 종료, 보상 소리",
+    "touchSound": "터치 소리",
+    "touchSoundDesc": "탭과 전환 시 짧은 클릭음",
+    "targetReached": "목표 달성",
+    "targetReachedDesc": "단식 목표에 도달하면 알려요",
+    "dailyReminder": "매일 알림",
+    "dailyReminderDesc": "매일 단식 시작을 알려 줘요",
+    "reminderTime": "알림 시간",
+    "backup": "백업 및 복원",
+    "backupDesc": "Google 드라이브 또는 파일",
+    "reset": "설정 초기화",
+    "resetDesc": "설정을 기본값으로 되돌려요",
+    "resetConfirmTitle": "설정을 초기화할까요?",
+    "resetConfirmBody": "테마, 배치, 소리, 알림 설정이 기본값으로 돌아가요. 단식 기록은 유지돼요.",
+    "resetOk": "초기화",
+    "privacy": "개인정보",
+    "privacyDesc": "개인정보 및 데이터 권한",
+    "privacyBody": "FastFast는 오프라인으로 작동해요. 단식, 메모, 체중은 이 기기에만 저장되며 저희 서버로 전송되지 않아요. 백업은 직접 보관하는 파일이나 본인의 Google 드라이브에 저장돼요.",
+    "health": "건강 관련 안내",
+    "rate": "앱 평가하기",
+    "rateDesc": "앱이 마음에 드시나요? 평가를 남겨 주세요",
+    "rateThanks": "감사합니다!",
+    "rateLater": "앱이 스토어에 올라가면 평가할 수 있어요.",
+    "feedback": "피드백",
+    "feedbackDesc": "의견을 보내거나 문제를 신고하세요",
+    "noEmailTitle": "이메일 앱 없음",
+    "noEmailBody": "피드백을 보내려면 이메일 앱을 설치해 주세요.",
+    "about": "앱 정보",
+    "aboutBody": "버전 {{version}}\n\n연속 기록, 실드, 픽셀로 보는 한 해와 함께하는 간헐적 단식.",
+    "version": "버전 {{version}}",
+    "expoGoTitle": "Expo Go에서는 사용할 수 없어요",
+    "expoGoBody": "알림은 개발 빌드나 스토어 버전에서만 작동해요.",
+    "notifOffTitle": "알림이 꺼져 있어요",
+    "notifOffBody": "시스템 설정에서 FastFast 알림을 허용해 주세요.",
+    "openSettings": "설정 열기"
+  },
+  "account": {
+    "title": "계정",
+    "guestHint": "Google로 로그인해 드라이브에 백업하세요"
+  },
+  "backup": {
+    "subtitle": "데이터는 이 기기에 있어요. 백업은 나중에 복원할 수 있는 사본이에요.",
+    "drive": "Google 드라이브",
+    "file": "파일",
+    "signIn": "Google로 로그인",
+    "signInDesc": "내 Google 드라이브에 백업",
+    "notSignedIn": "로그인 안 됨",
+    "lastBackup": "마지막 백업 {{time}}",
+    "never": "아직 백업 없음",
+    "backUpNow": "지금 백업",
+    "backingUp": "백업 중…",
+    "restoreDrive": "드라이브에서 복원",
+    "restoreDriveDesc": "이 기기의 데이터를 드라이브 백업으로 바꿔요",
+    "restoring": "복원 중…",
+    "signOut": "로그아웃",
+    "signOutTitle": "로그아웃할까요?",
+    "signOutBody": "데이터는 이 기기에 남아요. Google 드라이브 백업도 유지돼요.",
+    "signInFailedTitle": "로그인 실패",
+    "signInFailedBody": "Google로 로그인하지 못했어요. 다시 시도해 주세요.",
+    "confirmTitle": "Google 드라이브에 백업할까요?",
+    "confirmReplace": "{{time}} 백업을 현재 데이터와 사진으로 바꿔요.",
+    "confirmFirst": "현재 데이터와 사진을 Google 드라이브에 저장해요.",
+    "backUp": "백업",
+    "doneTitle": "백업 완료",
+    "doneWithPhotos": "데이터와 새 사진 {{count}}장을 Google 드라이브에 저장했어요.",
+    "doneBody": "데이터를 Google 드라이브에 저장했어요.",
+    "failedTitle": "백업 실패",
+    "failedBody": "Google 드라이브에 백업하지 못했어요. 연결을 확인하고 다시 시도해 주세요.",
+    "restoredTitle": "복원 완료",
+    "restoredBody": "데이터를 복원했어요.",
+    "restoredMissing": "데이터를 복원했어요. 드라이브에서 사진 {{count}}장을 찾지 못했어요.",
+    "restoreFailedTitle": "복원 실패",
+    "restoreFailedDrive": "Google 드라이브에서 복원하지 못했어요.",
+    "readFailed": "Google 드라이브의 백업을 읽지 못했어요.",
+    "noneTitle": "백업 없음",
+    "noneBody": "이 Google 계정에는 아직 FastFast 백업이 없어요.",
+    "restoreDriveTitle": "Google 드라이브에서 복원할까요?",
+    "restoreConfirm": "{{time}} 백업이에요. 이 기기의 현재 데이터가 모두 바뀌어요.",
+    "restoreFileConfirm": "{{time}} 백업이에요. 현재 데이터가 모두 바뀌어요. 파일에는 사진이 포함되지 않아요.",
+    "restoreFileTitle": "파일에서 복원할까요?",
+    "restoreFileFailed": "이 백업 파일을 복원하지 못했어요.",
+    "exportFile": "백업 파일 내보내기",
+    "exporting": "내보내는 중…",
+    "exportFileDesc": "데이터만 포함, 원하는 곳에 공유·보관",
+    "exportFailedTitle": "내보내기 실패",
+    "exportFailedBody": "백업 파일을 만들지 못했어요.",
+    "restoreFile": "파일에서 복원",
+    "restoreFileDesc": "FastFast 백업 파일을 선택하세요",
+    "importFailedTitle": "가져오기 실패",
+    "importFailedBody": "유효한 FastFast 백업 파일이 아니에요."
+  },
+  "theme": {
+    "title": "테마",
+    "subtitle": "앱의 모습을 고르세요",
+    "notPurchased": "구매 안 함",
+    "freeUntil": "무료 기간",
+    "purchase": "구매",
+    "unavailable": "사용 불가",
+    "premium": "프리미엄",
+    "limited": "한정",
+    "dark": "어두움",
+    "light": "밝음"
+  },
+  "notify": {
+    "targetTitle": "🎉 목표 달성!",
+    "targetBody": "{{hours}}시간 단식했어요. 세션을 종료해 기록하세요.",
+    "dailyTitle": "단식할 시간이에요 ⏱️",
+    "dailyBody": "오늘 단식을 시작해 연속 기록과 습관을 지키세요."
+  },
+  "perm": {
+    "saveImage": "사진 보관함에 이미지를 저장하려면 권한이 필요해요.",
+    "camera": "사진을 찍으려면 카메라 권한이 필요해요.",
+    "gallery": "이미지를 고르려면 사진 접근 권한이 필요해요.",
+    "saveFailed": "이미지를 저장하지 못했어요. 다시 시도해 주세요."
+  },
+  "widget": {
+    "fasting": "단식 중",
+    "ready": "준비",
+    "notFasting": "단식 전",
+    "tapToOpen": "눌러서 FastFast 열기",
+    "started": "시작",
+    "done": "종료"
+  },
+  "notFound": {
+    "title": "앗!",
+    "body": "존재하지 않는 화면이에요.",
+    "home": "홈으로 가기"
+  }
+}

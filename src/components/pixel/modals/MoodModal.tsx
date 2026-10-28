@@ -5,6 +5,7 @@ import { EMOTION_PACKS, MoodLevel } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
 import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
+import { useT } from "@/providers/Language";
 
 type Props = {
   visible: boolean;
@@ -21,6 +22,7 @@ export const MoodModal = ({
   dateStr,
   onSave,
 }: Props) => {
+  const t = useT();
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
@@ -40,7 +42,7 @@ export const MoodModal = ({
     <NoteModalShell
       visible={visible}
       setVisible={setVisible}
-      title={date === today ? "Today Mood" : `Mood ${date}`}
+      title={date === today ? t("dayModal.todayMood") : t("dayModal.moodFor", { date })}
       icon="face-smile"
     >
       <View className="gap-y-5">

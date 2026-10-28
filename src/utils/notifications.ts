@@ -2,6 +2,7 @@ import { DBService } from "@/hooks/useDBService";
 import { FastSession } from "@/interfaces/db.type";
 import { useAppStore } from "@/stores/appStore";
 import Constants, { ExecutionEnvironment } from "expo-constants";
+import i18n from "i18next";
 import { Platform } from "react-native";
 
 // Thông báo cục bộ (không cần server).
@@ -115,8 +116,8 @@ export const scheduleTargetReached = async (
   try {
     const id = await Notifications.scheduleNotificationAsync({
       content: {
-        title: "🎉 Đã đạt mục tiêu!",
-        body: `Bạn đã nhịn đủ ${session.target_duration} giờ. Kết thúc phiên để ghi nhận nhé.`,
+        title: i18n.t("notify.targetTitle"),
+        body: i18n.t("notify.targetBody", { hours: session.target_duration }),
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -153,8 +154,8 @@ export const setDailyReminder = async (
   try {
     const id = await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Đến giờ nhịn rồi ⏱️",
-        body: "Bắt đầu phiên hôm nay để giữ streak và độ bền thói quen.",
+        title: i18n.t("notify.dailyTitle"),
+        body: i18n.t("notify.dailyBody"),
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,

@@ -1,6 +1,4 @@
 {
-  "hello": "Chao xìn {name}!",
-  "goodbye": "Tạm biệt!",
   "onboarding": {
     "skip": "Bỏ qua",
     "next": "Tiếp",
@@ -25,5 +23,835 @@
       "title": "Lắng nghe cơ thể",
       "body": "FastFast không thay thế tư vấn y tế. Nếu bạn đang mang thai, có bệnh nền hoặc định nhịn trên 48 giờ, hãy hỏi ý kiến bác sĩ. Ngừng ngay nếu thấy chóng mặt hoặc mệt bất thường."
     }
+  },
+  "tabs": {
+    "fast": "Nhịn",
+    "stats": "Thống kê",
+    "journey": "Hành trình",
+    "settings": "Cài đặt"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Huỷ",
+    "gotIt": "Đã hiểu",
+    "confirm": "Xác nhận",
+    "delete": "Xoá",
+    "save": "Lưu",
+    "today": "Hôm nay",
+    "noData": "Không có dữ liệu",
+    "invalid": "Không hợp lệ",
+    "success": "Thành công",
+    "edit": "Chỉnh sửa",
+    "add": "Thêm",
+    "loading": "Đang tải…",
+    "close": "Đóng",
+    "restore": "Khôi phục",
+    "permission": "Quyền truy cập",
+    "error": "Lỗi"
+  },
+  "time": {
+    "justNow": "Vừa xong",
+    "today": "Hôm nay",
+    "tomorrow": "Ngày mai",
+    "yesterday": "Hôm qua",
+    "dayAfterTomorrow": "Ngày kia",
+    "daysAgo_one": "{{count}} ngày trước",
+    "daysAgo_other": "{{count}} ngày trước",
+    "daysLater_one": "{{count}} ngày sau",
+    "daysLater_other": "{{count}} ngày sau",
+    "secondsAgo_one": "{{count}} giây trước",
+    "secondsAgo_other": "{{count}} giây trước",
+    "inSeconds_one": "Sau {{count}} giây",
+    "inSeconds_other": "Sau {{count}} giây",
+    "minutesAgo_one": "{{count}} phút trước",
+    "minutesAgo_other": "{{count}} phút trước",
+    "inMinutes_one": "Sau {{count}} phút",
+    "inMinutes_other": "Sau {{count}} phút",
+    "hoursAgo_one": "{{count}} giờ trước",
+    "hoursAgo_other": "{{count}} giờ trước",
+    "inHours_one": "Sau {{count}} giờ",
+    "inHours_other": "Sau {{count}} giờ"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Chào buổi sáng",
+      "noon": "Chào buổi trưa",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối"
+    },
+    "streakDays_one": "{{count}} ngày",
+    "streakDays_other": "{{count}} ngày",
+    "lastFast": "Lần nhịn gần nhất",
+    "bodyPhases": "Giai đoạn cơ thể",
+    "fastingPhases": "Các giai đoạn khi nhịn",
+    "effectAfter": "Hiệu quả sau",
+    "startFast": "Bắt đầu nhịn",
+    "endFast": "Kết thúc"
+  },
+  "counter": {
+    "chooseTarget": "Chọn mục tiêu",
+    "reached": "🎉 Đã đạt mục tiêu",
+    "finishAt": "Xong lúc {{time}}",
+    "freeMode": "Chế độ tự do",
+    "ifStartNow": "Nếu bắt đầu bây giờ: {{time}}",
+    "fasting": "Đang nhịn",
+    "ready": "Sẵn sàng",
+    "startedAt": "Bắt đầu {{time}}",
+    "history": "Lịch sử nhịn"
+  },
+  "finish": {
+    "title": "Kết thúc",
+    "confirm": "Bạn chắc chắn muốn kết thúc phiên nhịn?",
+    "tooQuick": "Phiên này quá ngắn và sẽ bị xoá. Tiếp tục?",
+    "tooQuickSub": "Thời gian nhịn dưới 2 giờ.",
+    "failed": "Phiên này sẽ bị đánh dấu thất bại. Tiếp tục?",
+    "failedSub": "Thời gian nhịn dưới 16 giờ.",
+    "reached": "Bạn đã đạt mục tiêu. Kết thúc ngay?",
+    "notReached": "Bạn chưa đạt mục tiêu. Vẫn kết thúc?",
+    "endBeforeStart": "Thời gian kết thúc phải sau thời gian bắt đầu.",
+    "startBeforeLast": "Thời gian bắt đầu phải sau phiên trước."
+  },
+  "info": {
+    "shield": {
+      "title": "Shield",
+      "message": "Shield giữ chuỗi của bạn hợp lệ trong những ngày nghỉ không nhịn.",
+      "effectTitle": "Tác dụng · bạn đang có {{count}}/{{max}}",
+      "effect1": "Mỗi ngày bỏ trống giữa hai phiên nhịn sẽ dùng 1 shield. Chuỗi vẫn hợp lệ và Habit giữ nguyên.",
+      "effect2": "Hết shield mà vẫn nghỉ thì chuỗi bị ngắt, Habit bị trừ và Retain về 0.",
+      "effect3": "Giữ tối đa {{max}} shield, nhận thêm khi đã đầy sẽ bị bỏ.",
+      "longTitle": "Phiên nhịn dài",
+      "long1": "Nhịn từ 48h được +1 shield, từ 72h được +2.",
+      "long2": "Nghỉ ngơi là một phần của phiên nhịn dài: cơ thể cần thời gian ăn lại và hồi phục. Shield cho bạn nghỉ những ngày đó mà chuỗi vẫn hợp lệ.",
+      "milestoneTitle": "Mốc Habit",
+      "milestone1": "Habit chạm 35%, 70% và 100% mỗi mốc được +1 shield.",
+      "milestone2": "Nếu Habit tụt xuống rồi leo lại, mốc có thể nhận lại.",
+      "retainTitle": "Retain",
+      "retain1": "Khi Habit đã 100%, điểm từ mỗi phiên nhịn dồn vào Retain.",
+      "retain2": "Đủ 25 Retain tự đổi thành 1 shield."
+    },
+    "body": {
+      "title": "Các thanh này nói gì?",
+      "message": "Mỗi thanh cho biết việc nhịn ăn đang hỗ trợ một cơ chế sẵn có của cơ thể ở mức nào.",
+      "alwaysTitle": "Cơ chế luôn diễn ra",
+      "always1": "Các cơ chế này vốn luôn hoạt động trong cơ thể, kể cả khi bạn không nhịn.",
+      "always2": "Chúng không phải công tắc chỉ \"bật\" khi đến một mốc giờ nhất định.",
+      "levelsTitle": "Mức 1–5 nghĩa là gì",
+      "levels1": "Mỗi mức thể hiện việc nhịn ăn đang hỗ trợ cơ chế đó nhiều hơn, tăng dần theo thời gian nhịn.",
+      "levels2": "Thanh đầy không có nghĩa cơ chế đang mạnh nhất lúc này, chỉ là mức hỗ trợ từ việc nhịn ăn đã cao hơn.",
+      "estimateTitle": "Chỉ là ước lượng",
+      "estimate1": "Mốc giờ chỉ mang tính phỏng đoán, mỗi người khác nhau tuỳ bữa ăn trước, vận động, giấc ngủ…",
+      "estimate2": "Đây không phải chẩn đoán hay lời khuyên y khoa."
+    }
+  },
+  "tip": {
+    "disableHint": "Có thể tắt mẹo trong Settings → Beginner tips",
+    "habit": {
+      "title": "Habit được tính thế nào?",
+      "line1": "Mỗi phiên nhịn từ 16h trở lên: +3%, cộng thêm 0,2% cho mỗi giờ quá 16h (nhịn 20h → +3,8%).",
+      "line2": "Phiên dưới 16h không được cộng.",
+      "line3": "Mỗi ngày bỏ trống giữa hai phiên dùng 1 shield. Hết shield thì Habit bị trừ, nghỉ càng lâu trừ càng nhiều.",
+      "line4": "Đạt 100%: điểm chuyển sang Retain, đủ 25 Retain đổi 1 shield."
+    }
+  },
+  "process": {
+    "glucoseControl": "Kiểm soát đường huyết",
+    "fatBurning": "Đốt mỡ",
+    "growthHormone": "Hormone tăng trưởng",
+    "ketosis": "Ketosis",
+    "autophagy": "Tự thực",
+    "cellRenewal": "Tái tạo tế bào",
+    "immuneRenewal": "Tái tạo miễn dịch",
+    "level": {
+      "start": "Khởi đầu",
+      "standard": "Cơ bản",
+      "good": "Tốt",
+      "high": "Cao",
+      "peak": "Đỉnh",
+      "max": "Tối đa",
+      "drop": "Giảm",
+      "stable": "Ổn định",
+      "optimal": "Tối ưu",
+      "init": "Khởi động",
+      "warm": "Làm nóng",
+      "burn": "Đốt",
+      "trace": "Chớm",
+      "light": "Nhẹ",
+      "active": "Hoạt động",
+      "deep": "Sâu",
+      "better": "Cải thiện",
+      "rise": "Tăng",
+      "boost": "Tăng mạnh",
+      "prime": "Chuẩn bị",
+      "ready": "Sẵn sàng",
+      "stronger": "Mạnh hơn"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Mới bắt đầu",
+      "Veteran": "Quen thuộc",
+      "Expert": "Chuyên sâu",
+      "Master": "Bậc thầy"
+    },
+    "16h": {
+      "label": "Gián đoạn",
+      "title": "Phổ biến & Dễ bắt đầu",
+      "description": "Hỗ trợ chuyển hóa năng lượng từ mỡ thừa và cải thiện độ nhạy Insulin.",
+      "advice": "(16h) Tiêu chuẩn! Ăn trong khung giờ 12h - 20h.",
+      "adviceLong": "Đây là mốc chuẩn vàng dễ duy trì nhất. Bạn chỉ cần bỏ qua bữa sáng và gom toàn bộ lượng calo cần thiết vào khung giờ ăn từ 12h trưa đến 8h tối. Đảm bảo uống đủ 2L nước trong thời gian nhịn."
+    },
+    "18h": {
+      "label": "Đốt mỡ",
+      "title": "Đốt mỡ tăng cường",
+      "description": "Kéo dài thời gian Ketosis và bắt đầu chớm bước vào quá trình Tự thực (Autophagy).",
+      "advice": "(18h) Bản nâng cao nhẹ của mốc 16/8.",
+      "adviceLong": "Nhịn thêm 2 tiếng so với mốc 16/8 giúp tối ưu hóa việc đốt mỡ và chớm kích hoạt Autophagy. Trong 18 tiếng này, có thể uống cà phê đen hoặc trà xanh không đường để hỗ trợ vượt qua cơn đói."
+    },
+    "20h": {
+      "label": "Chiến binh",
+      "title": "Chế độ Chiến binh",
+      "description": "Tối ưu hóa khả năng đốt mỡ và hỗ trợ duy trì khối lượng cơ bắp.",
+      "advice": "(20h) Khung ăn 4 tiếng. Chú ý nạp đủ Protein.",
+      "adviceLong": "Khung giờ ăn rất hẹp (chỉ 4 tiếng). Cần tập trung nạp đủ lượng Protein (thịt, cá, trứng) và chất xơ để giữ cơ bắp. Tránh ăn dồn dập quá nhanh gây quá tải hệ tiêu hóa."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Một bữa mỗi ngày",
+      "description": "Thúc đẩy quá trình Tự thực (Autophagy) và cho hệ tiêu hóa nghỉ ngơi sâu.",
+      "advice": "(23h) Bữa ăn duy nhất cần giàu dinh dưỡng toàn phần.",
+      "adviceLong": "Nhịn trọn vẹn gần 24 tiếng (ví dụ: ăn tối hôm nay đến tối hôm sau mới ăn lại). Bữa ăn duy nhất này phải là dinh dưỡng toàn phần (Whole foods), giàu chất béo tốt và đạm. Cần lắng nghe cơ thể nếu áp dụng liên tục."
+    },
+    "36h": {
+      "label": "Tu sĩ",
+      "title": "Thử thách nhịn xuyên ngày",
+      "description": "Tạo khoảng trống phục hồi lớn cho đường ruột và tối ưu hóa phản ứng viêm.",
+      "advice": "(36h) Nên chọn ngày ít vận động nặng.",
+      "adviceLong": "Nhịn trọn vẹn 1 ngày đêm (ví dụ: tối T2 ăn xong thì bỏ qua ngày T3, đến sáng T4 mới ăn lại). Hãy chọn ngày làm việc nhẹ nhàng, bổ sung thêm điện giải (muối khoáng) để giữ sự tỉnh táo."
+    },
+    "48h": {
+      "label": "Kéo dài",
+      "title": "Nhịn sâu nâng cao",
+      "description": "Cạn kiệt hoàn toàn Glycogen dự trữ, thúc đẩy cơ thể tái cấu trúc năng lượng.",
+      "advice": "(48h) Bắt buộc bổ sung điện giải đầy đủ.",
+      "adviceLong": "Mức độ nhịn dài hạn này đòi hỏi phải bổ sung Điện giải (Muối, Kali, Magie) hàng ngày để giữ huyết áp ổn định. Nếu xuất hiện triệu chứng choáng váng, chóng mặt kéo dài thì cần ngắt nhịn (Break fast) ngay."
+    },
+    "72h": {
+      "label": "Dài hạn",
+      "title": "Thử thách cực hạn",
+      "description": "Đạt mức Autophagy sâu. Cần chuẩn bị kỹ lưỡng và thực hiện cẩn trọng.",
+      "advice": "(72h) Chỉ dành cho người chơi rất kinh nghiệm.",
+      "adviceLong": "Chỉ nên thực hiện hiếm hoi khi cơ thể đã rất quen với Fasting. Khi xả nhịn (Break fast) tuyệt đối không ăn bữa lớn ngay, chỉ bắt đầu bằng nước hầm xương hoặc đồ ăn nhẹ để bảo vệ dạ dày."
+    }
+  },
+  "term": {
+    "habit": "Habit",
+    "retain": "Retain",
+    "target": "Mục tiêu",
+    "targetHours": "Mục tiêu {{hours}}h",
+    "points": "Điểm",
+    "pts": "{{value}} điểm",
+    "history": "Lịch sử",
+    "progress": "Tiến độ",
+    "weight": "Cân nặng",
+    "note": "Ghi chú",
+    "mood": "Cảm xúc",
+    "camera": "Máy ảnh",
+    "gallery": "Thư viện",
+    "error": "Lỗi"
+  },
+  "fastingSheet": {
+    "completed": "Đã hoàn thành",
+    "result": "Kết quả",
+    "keepGoing": "Tiếp tục để đạt mục tiêu",
+    "now": "HIỆN TẠI",
+    "atTarget": "MỤC TIÊU",
+    "endFasting": "Kết thúc nhịn"
+  },
+  "lastFast": {
+    "interrupted": "Bị gián đoạn",
+    "completed": "Hoàn thành",
+    "endedEarly": "Kết thúc sớm",
+    "freeFasting": "Nhịn tự do",
+    "targetProgress": "Tiến độ mục tiêu"
+  },
+  "habitSheet": {
+    "title": "Chỉ số Habit",
+    "sessions_one": "{{count}} phiên",
+    "sessions_other": "{{count}} phiên",
+    "fastingSession": "Phiên nhịn",
+    "overRest_one": "Nghỉ quá {{count}} ngày",
+    "overRest_other": "Nghỉ quá {{count}} ngày",
+    "shieldIncrease": "Nhận thêm shield",
+    "restDays_one": "Nghỉ {{count}} ngày",
+    "restDays_other": "Nghỉ {{count}} ngày"
+  },
+  "habitDetail": {
+    "title": "Nhật ký Habit",
+    "habitPoints": "Điểm Habit",
+    "shields": "Số khiên",
+    "fastDetail": "Chi tiết phiên nhịn",
+    "restDay": "Ngày nghỉ",
+    "overRest": "Nghỉ quá đà"
+  },
+  "habitMilestone": {
+    "title": "Tiến trình"
+  },
+  "fullHabit": {
+    "title": "Thói quen hình thành",
+    "maintainTitle": "Bước vào giai đoạn duy trì",
+    "maintainBody": "Mỗi lần bạn tiếp tục duy trì thói quen, điểm sẽ được cộng vào Retain.",
+    "retainTitle": "Habit Retain",
+    "retainSub": "Điểm duy trì",
+    "note": "Đầy 25 Retain sẽ tự quy đổi 1 Shield. Khi habit bị phá, toàn bộ Retain hiện có sẽ về 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Chạm mốc streak!",
+      "subtitle": "Bạn đang xây một thói quen nhịn ăn khó cản!",
+      "button": "Giữ vững nhé! 🔥"
+    },
+    "rest": {
+      "title": "Đang dùng ngày nghỉ!",
+      "subtitle": "Phục hồi là một phần của hành trình. Streak của bạn vẫn vững!",
+      "button": "Tiếp tục nào! 🌿"
+    },
+    "fresh": {
+      "title": "Một khởi đầu mới",
+      "subtitle": "Ai thành công cũng từng vấp ngã. Cùng xây lại từ hôm nay!",
+      "button": "Bắt đầu lại ngay 🚀"
+    },
+    "best": "KỶ LỤC",
+    "daysStreak": "Ngày liên tiếp",
+    "over": "Streak vượt {{count}} ngày!",
+    "consistency": "Độ đều đặn"
+  },
+  "result": {
+    "completed": {
+      "title": "Hoàn thành phiên nhịn!",
+      "subtitle": "Bạn giữ kỷ luật rất tốt!"
+    },
+    "endedEarly": {
+      "title": "Kết thúc sớm",
+      "subtitle": "Mỗi giờ đều có giá trị! Tiến độ đã được lưu."
+    },
+    "extended": {
+      "title": "Hoàn thành phiên nhịn dài!",
+      "subtitle": "Sức bền tuyệt vời! Đã mở khoá phần thưởng thêm."
+    },
+    "fastingTime": "Thời gian nhịn",
+    "targetProgress": "Mục tiêu {{hours}}h · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "Phiên nhịn dài",
+      "retain": "Duy trì Habit",
+      "milestone": "Đạt mốc"
+    }
+  },
+  "note": {
+    "today": "Ghi chú hôm nay",
+    "forDate": "Ghi chú {{date}}",
+    "placeholder": "Hôm nay bạn thấy thế nào?",
+    "weightDigitsOnly": "Chỉ được nhập số.",
+    "weightOneDot": "Chỉ được nhập một dấu thập phân.",
+    "weightIntMax": "Phần nguyên tối đa 4 chữ số.",
+    "weightDecMax": "Phần thập phân tối đa 1 chữ số."
+  },
+  "image": {
+    "saveError": "Không thể lưu ảnh. Vui lòng thử lại.",
+    "deleteError": "Không thể xoá ảnh. Vui lòng thử lại.",
+    "deleteTitle": "Xoá ảnh",
+    "deleteConfirm": "Bạn có chắc chắn muốn xoá ảnh của ngày này?",
+    "addTitle": "Thêm ảnh",
+    "yourPhoto": "Ảnh của bạn",
+    "addAPhoto": "Thêm một ảnh",
+    "capture": "Lưu lại khoảnh khắc",
+    "chooseSource": "Chọn camera hoặc thư viện"
+  },
+  "history": {
+    "title": "Lịch sử nhịn",
+    "total": "Tổng",
+    "average": "Trung bình",
+    "recent": "Các phiên gần đây",
+    "status": {
+      "cancelled": "Bị huỷ",
+      "fasting": "Đang nhịn",
+      "free": "Tự do",
+      "reached": "Đạt mục tiêu",
+      "notReached": "Chưa đạt"
+    },
+    "actions": "Thao tác"
+  },
+  "startTime": {
+    "invalid": "Thời gian không hợp lệ",
+    "overlap": "Trùng thời gian với phiên trước đó!",
+    "max24h": "Chỉ được phép bắt đầu sớm tối đa 24 giờ!",
+    "future": "Không thể chọn thời gian ở tương lai!",
+    "title": "Chọn thời gian bắt đầu nhịn",
+    "hint": "Chạm vào giờ hoặc ngày để chọn thời điểm bắt đầu",
+    "earlier": "Bắt đầu sớm",
+    "confirm": "Xác nhận bắt đầu"
+  },
+  "endTime": {
+    "title": "Chọn thời gian kết thúc",
+    "confirm": "Xác nhận kết thúc",
+    "future": {
+      "title": "Thời gian không hợp lệ",
+      "desc": "Đây là mốc thời gian trong tương lai."
+    },
+    "tooQuick": {
+      "title": "Phiên sẽ bị huỷ",
+      "desc": "Thời gian quá ngắn để được ghi nhận."
+    },
+    "failed": {
+      "title": "Phiên sẽ được đánh dấu thất bại",
+      "desc": "Chưa đạt thời gian tối thiểu để hoàn thành phiên nhịn."
+    },
+    "completed": {
+      "title": "Phiên sẽ được hoàn thành",
+      "desc": "Thời gian này đủ để ghi nhận."
+    }
+  },
+  "targetSheet": {
+    "choose": "Chọn mục tiêu này",
+    "clear": "Huỷ mục tiêu"
+  },
+  "fastDetail": {
+    "reachedTarget": "Đã đạt mục tiêu",
+    "notReachedTarget": "Chưa đạt mục tiêu",
+    "targetHours": "Mục tiêu: {{hours}} giờ",
+    "over": "Vượt {{duration}}",
+    "remaining": "Còn {{duration}}",
+    "review": "Đánh giá phiên",
+    "bodyAtEnd": "Trạng thái cơ thể lúc kết thúc",
+    "metrics": "Chỉ số ghi nhận",
+    "advice": "Lời khuyên"
+  },
+  "date": {
+    "weekday": {
+      "0": "CN",
+      "1": "T2",
+      "2": "T3",
+      "3": "T4",
+      "4": "T5",
+      "5": "T6",
+      "6": "T7"
+    },
+    "month": {
+      "0": "Th1",
+      "1": "Th2",
+      "2": "Th3",
+      "3": "Th4",
+      "4": "Th5",
+      "5": "Th6",
+      "6": "Th7",
+      "7": "Th8",
+      "8": "Th9",
+      "9": "Th10",
+      "10": "Th11",
+      "11": "Th12"
+    },
+    "monthNarrow": {
+      "0": "1",
+      "1": "2",
+      "2": "3",
+      "3": "4",
+      "4": "5",
+      "5": "6",
+      "6": "7",
+      "7": "8",
+      "8": "9",
+      "9": "10",
+      "10": "11",
+      "11": "12"
+    }
+  },
+  "journey": {
+    "savedImage": "Đã lưu ảnh vào thư viện ảnh.",
+    "saveImage": "Lưu ảnh",
+    "style": "Kiểu",
+    "mode": {
+      "mood": "Cảm xúc",
+      "fasting": "Tiến trình nhịn"
+    },
+    "dayButton": "Ngày",
+    "weekButton": "Tuần",
+    "stat": {
+      "days_one": "ngày",
+      "days_other": "ngày",
+      "hours_one": "giờ",
+      "hours_other": "giờ",
+      "logs_one": "ghi chú",
+      "logs_other": "ghi chú"
+    },
+    "statsLine": "{{days}} ngày · {{hours}} giờ · {{logs}} ghi chú",
+    "legend": {
+      "mood": {
+        "0": "Rất tệ",
+        "1": "Tệ",
+        "2": "Bình thường",
+        "3": "Tốt",
+        "4": "Rất tốt"
+      }
+    },
+    "info": {
+      "title": "Đọc lịch Journey",
+      "message": "Những điểm mà dải chú thích icon chưa nói hết.",
+      "fast1": "Mỗi ô lấy màu theo tổng độ dài của phiên nhịn dài nhất có mặt trong ngày đó.",
+      "fast2": "Phiên kéo qua nhiều ngày tô màu cho tất cả các ngày đó, nhạt ở ngày đầu và đậm dần tới ngày kết thúc.",
+      "fast3": "Ô có icon khiên là ngày nghỉ được shield giữ chuỗi.",
+      "mood1": "Ô có viền màu chủ đạo là ngày có ghi chú.",
+      "actionsTitle": "Thao tác",
+      "action1": "Bấm ngày trống để thêm cảm xúc và ghi chú, bấm ngày đã có dữ liệu để xem chi tiết.",
+      "action2": "Số dưới mỗi icon là số ngày trong năm rơi vào mức đó.",
+      "action3": "Nút Week/Day ở góc lưới để đổi bố cục. Ảnh lưu ra sẽ theo đúng bố cục đang chọn."
+    }
+  },
+  "layout": {
+    "title": "Bố cục pixel",
+    "subtitle": "Chọn cách hiển thị hành trình của bạn",
+    "weekly": "Theo tuần",
+    "monthly": "Theo tháng",
+    "vertical": "↓ Dọc",
+    "horizontal": "→ Ngang"
+  },
+  "iconPack": {
+    "title": "Chọn bộ icon",
+    "tabMood": "Cảm xúc",
+    "tabTarget": "Mục tiêu",
+    "level": "Cấp {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Giao diện tối giản hiện đại với Ionicons",
+    "material_emoticons": "Bộ mặt cảm xúc tinh tế từ Material Community",
+    "weather_vibes": "Thể hiện tâm trạng theo biểu tượng thời tiết",
+    "gaming_energy": "Cảm xúc dạng thanh năng lượng & game",
+    "pixel_vibe": "Cảm xúc phong cách Pixel & Emoji tượng hình",
+    "default_emoji_targets": "Mốc mục tiêu biểu thị bằng Emoji truyền thống",
+    "ionicons_targets": "Bộ icon tối giản, mượt mà từ Ionicons",
+    "material_energy_targets": "Thể hiện độ thử thách qua năng lượng và ngọn lửa",
+    "feather_minimal_targets": "Thiết kế nét mảnh tinh xảo từ Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Nhật ký ngày",
+    "noMood": "Chưa có cảm xúc",
+    "dailyFast": "⏱️ Nhịn trong ngày",
+    "dailyNote": "📝 Ghi chú ngày",
+    "relatedFasts": "CÁC PHIÊN LIÊN QUAN",
+    "hoursToday": "giờ trong ngày",
+    "hoursFasted": "GIỜ ĐÃ NHỊN",
+    "weightHint": "Nhấn để chỉnh sửa",
+    "addWeight": "Thêm cân nặng",
+    "dayNote": "GHI CHÚ TRONG NGÀY",
+    "notePlaceholder": "Thêm ghi chú cho ngày này...",
+    "photos": "HÌNH ẢNH",
+    "addPhoto": "Thêm ảnh",
+    "photoHint": "Thêm hình ảnh cho ngày này",
+    "updatePhoto": "Cập nhật ảnh",
+    "changePhoto": "Đổi ảnh",
+    "photoFrom": "Hình ảnh từ"
+  },
+  "dayModal": {
+    "todayMood": "Cảm xúc hôm nay",
+    "moodFor": "Cảm xúc {{date}}",
+    "todayWeight": "Cân nặng hôm nay",
+    "weightFor": "Cân nặng {{date}}"
+  },
+  "stats": {
+    "subtitle": "Theo dõi tiến trình của bạn",
+    "dashboard": "Tổng quan",
+    "currentStreak": "Streak hiện tại",
+    "days_one": "ngày",
+    "days_other": "ngày",
+    "record": "Kỷ lục",
+    "shields": "Khiên",
+    "section": "Thống kê",
+    "totalFasting": "Tổng giờ nhịn",
+    "completed": "Hoàn thành",
+    "averageFast": "Trung bình mỗi phiên",
+    "longestFast": "Phiên dài nhất",
+    "activeDays": "Ngày hoạt động",
+    "maxStreak": "Streak dài nhất",
+    "shieldsUsed": "Khiên đã dùng",
+    "unit": {
+      "hours": "giờ",
+      "times": "lần",
+      "days": "ngày"
+    },
+    "distribution": {
+      "title": "Phân bổ các phiên nhịn",
+      "subtitle": "Các phiên nhịn của bạn phân bổ ra sao",
+      "range": "{{from}}–{{to}} giờ",
+      "over": "{{from}}+ giờ",
+      "fasts_one": "phiên",
+      "fasts_other": "phiên"
+    },
+    "chart": {
+      "title": "Cân nặng & tiến trình nhịn",
+      "subtitle": "Tiến trình của bạn theo thời gian",
+      "fasting": "Nhịn",
+      "noData": "Không có dữ liệu",
+      "noWeight": "- Chưa có cân nặng",
+      "hoursUnit": "Giờ"
+    },
+    "range": {
+      "title": "Khoảng thời gian",
+      "day_one": "{{count}} ngày",
+      "day_other": "{{count}} ngày",
+      "week_one": "{{count}} tuần",
+      "week_other": "{{count}} tuần",
+      "month_one": "{{count}} tháng",
+      "month_other": "{{count}} tháng",
+      "unit": {
+        "day": "ngày",
+        "week": "tuần",
+        "month": "tháng"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Cân nặng hiện tại",
+    "currentWeightMessage": "Nhập cân nặng hiện tại",
+    "targetMessage": "Đặt cân nặng mục tiêu",
+    "setCurrent": "Nhập cân nặng hiện tại",
+    "setCurrentHint": "Thêm cân nặng để bắt đầu theo dõi tiến trình",
+    "weightGoal": "Mục tiêu cân nặng",
+    "setTarget": "Đặt mục tiêu",
+    "currentWeight": "Cân nặng hiện tại",
+    "setTargetHint": "Đặt cân nặng mục tiêu để theo dõi tiến trình",
+    "toGo": "Còn {{value}} kg",
+    "reached": "Đã đạt mục tiêu"
+  },
+  "ach": {
+    "title": "Thành tựu",
+    "unlocked": "Đã mở {{unlocked}} / {{total}}",
+    "empty": "Không có thành tựu",
+    "claim": "Nhận",
+    "done": "Đã đạt",
+    "notDone": "Chưa đạt",
+    "empty_slot": "Trống",
+    "tier": {
+      "BRONZE": "ĐỒNG",
+      "SILVER": "BẠC",
+      "GOLD": "VÀNG",
+      "DIAMOND": "KIM CƯƠNG"
+    },
+    "fasting_hours": {
+      "name": "Tổng giờ nhịn",
+      "description": "Tổng số giờ đã nhịn.",
+      "item_one": "{{count}} giờ nhịn",
+      "item_other": "{{count}} giờ nhịn"
+    },
+    "invalid_fasts": {
+      "name": "Phiên không hợp lệ",
+      "description": "Tổng số phiên nhịn không hợp lệ."
+    },
+    "failed_fasts": {
+      "name": "Phiên thất bại",
+      "description": "Tổng số phiên nhịn thất bại."
+    },
+    "completed_fasts": {
+      "name": "Phiên hoàn thành",
+      "description": "Tổng số phiên nhịn đã hoàn thành.",
+      "item_one": "Hoàn thành phiên nhịn đầu tiên",
+      "item_other": "Hoàn thành {{count}} phiên nhịn"
+    },
+    "active_days": {
+      "name": "Ngày hoạt động",
+      "description": "Số ngày bạn hoạt động trong app.",
+      "item_one": "{{count}} ngày hoạt động",
+      "item_other": "{{count}} ngày hoạt động"
+    },
+    "habit": {
+      "name": "Thói quen",
+      "description": "Điểm thói quen nhịn ăn của bạn.",
+      "item_one": "Đạt {{count}}% thói quen",
+      "item_other": "Đạt {{count}}% thói quen"
+    },
+    "longest_fast": {
+      "name": "Phiên dài nhất",
+      "description": "Phiên nhịn dài nhất bạn từng hoàn thành.",
+      "item_one": "Hoàn thành phiên nhịn {{count}} giờ",
+      "item_other": "Hoàn thành phiên nhịn {{count}} giờ"
+    },
+    "max_streak": {
+      "name": "Streak dài nhất",
+      "description": "Chuỗi nhịn dài nhất bạn từng đạt.",
+      "item_one": "Đạt chuỗi {{count}} ngày",
+      "item_other": "Đạt chuỗi {{count}} ngày"
+    },
+    "total_shields": {
+      "name": "Tổng số khiên",
+      "description": "Tổng số khiên đã nhận.",
+      "item_one": "Nhận khiên đầu tiên",
+      "item_other": "Nhận {{count}} khiên"
+    },
+    "retain_circles": {
+      "name": "Bậc thầy duy trì",
+      "description": "Số vòng Retain hoàn thành khi thói quen đã đầy.",
+      "item_one": "Hoàn thành vòng Retain đầu tiên",
+      "item_other": "Hoàn thành {{count}} vòng Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "Tác vụ không thể đóng",
+      "body": "Vui lòng hoàn thành hoạt động!"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "section": {
+      "showcase": "Trưng bày",
+      "appearance": "Giao diện",
+      "general": "Chung",
+      "sound": "Âm thanh & rung",
+      "notifications": "Thông báo",
+      "data": "Dữ liệu",
+      "about": "Thông tin"
+    },
+    "showcaseExport": "Hiện trong ảnh Journey",
+    "showcaseExportDesc": "Thêm huy hiệu trưng bày vào ảnh lưu ra",
+    "showcaseEmpty": "Chưa có huy hiệu nào. Đạt mốc thành tựu và bấm Nhận trong tab Thống kê để mở khoá.",
+    "showcasePick": "Chọn tối đa {{max}} huy hiệu để khoe.",
+    "selectedCount": "Đã chọn {{count}}/{{max}}",
+    "darkMode": "Chế độ tối",
+    "darkModeDesc": "Dùng giao diện tối cho toàn app",
+    "theme": "Chủ đề",
+    "language": "Ngôn ngữ",
+    "weekStart": "Ngày đầu tuần",
+    "monday": "Thứ Hai",
+    "sunday": "Chủ nhật",
+    "mondayDesc": "Tuần từ Thứ Hai → Chủ nhật",
+    "sundayDesc": "Tuần từ Chủ nhật → Thứ Bảy",
+    "beginnerTips": "Mẹo cho người mới",
+    "beginnerTipsDesc": "Hiện giải thích ngắn về cách habit và khiên hoạt động",
+    "vibration": "Rung",
+    "sound": "Âm thanh",
+    "soundDesc": "Âm thanh khi bắt đầu, kết thúc và nhận thưởng",
+    "touchSound": "Âm chạm",
+    "touchSoundDesc": "Tiếng click ngắn khi chạm và bật/tắt",
+    "targetReached": "Đạt mục tiêu",
+    "targetReachedDesc": "Báo khi bạn đạt mục tiêu nhịn",
+    "dailyReminder": "Nhắc hằng ngày",
+    "dailyReminderDesc": "Nhắc bạn bắt đầu nhịn mỗi ngày",
+    "reminderTime": "Giờ nhắc",
+    "backup": "Sao lưu & Khôi phục",
+    "backupDesc": "Google Drive hoặc file sao lưu",
+    "reset": "Đặt lại cài đặt",
+    "resetDesc": "Đưa cài đặt về mặc định",
+    "resetConfirmTitle": "Đặt lại cài đặt?",
+    "resetConfirmBody": "Chủ đề, bố cục, âm thanh và thông báo trở về mặc định. Dữ liệu nhịn ăn được giữ nguyên.",
+    "resetOk": "Đặt lại",
+    "privacy": "Quyền riêng tư",
+    "privacyDesc": "Quyền riêng tư và dữ liệu",
+    "privacyBody": "FastFast hoạt động offline. Phiên nhịn, ghi chú và cân nặng chỉ lưu trên máy này và không bao giờ gửi lên máy chủ của chúng tôi. Bản sao lưu nằm trong file bạn giữ hoặc trong Google Drive của chính bạn.",
+    "health": "Lưu ý sức khoẻ",
+    "rate": "Đánh giá app",
+    "rateDesc": "Thích app? Để lại đánh giá nhé",
+    "rateThanks": "Cảm ơn bạn!",
+    "rateLater": "Bạn có thể đánh giá khi app lên cửa hàng.",
+    "feedback": "Góp ý",
+    "feedbackDesc": "Chia sẻ ý kiến hoặc báo lỗi",
+    "noEmailTitle": "Không có app email",
+    "noEmailBody": "Vui lòng cài một app email để gửi góp ý.",
+    "about": "Giới thiệu",
+    "aboutBody": "Phiên bản {{version}}\n\nNhịn ăn gián đoạn với streak, khiên và một năm bằng pixel.",
+    "version": "Phiên bản {{version}}",
+    "expoGoTitle": "Không dùng được trong Expo Go",
+    "expoGoBody": "Thông báo cần bản build dev hoặc bản trên cửa hàng.",
+    "notifOffTitle": "Thông báo đang tắt",
+    "notifOffBody": "Hãy cho phép FastFast gửi thông báo trong cài đặt hệ thống.",
+    "openSettings": "Mở cài đặt"
+  },
+  "account": {
+    "title": "Tài khoản",
+    "guestHint": "Đăng nhập Google để sao lưu lên Drive"
+  },
+  "backup": {
+    "subtitle": "Dữ liệu nằm trên máy này. Bản sao lưu là bản sao để khôi phục sau.",
+    "drive": "Google Drive",
+    "file": "File",
+    "signIn": "Đăng nhập bằng Google",
+    "signInDesc": "Sao lưu lên Google Drive của bạn",
+    "notSignedIn": "Chưa đăng nhập",
+    "lastBackup": "Lần sao lưu gần nhất {{time}}",
+    "never": "Chưa có bản sao lưu",
+    "backUpNow": "Sao lưu ngay",
+    "backingUp": "Đang sao lưu…",
+    "restoreDrive": "Khôi phục từ Drive",
+    "restoreDriveDesc": "Thay dữ liệu trên máy bằng bản sao lưu trên Drive",
+    "restoring": "Đang khôi phục…",
+    "signOut": "Đăng xuất",
+    "signOutTitle": "Đăng xuất?",
+    "signOutBody": "Dữ liệu vẫn ở trên máy. Bản sao lưu trên Google Drive được giữ nguyên.",
+    "signInFailedTitle": "Đăng nhập thất bại",
+    "signInFailedBody": "Không thể đăng nhập Google. Vui lòng thử lại.",
+    "confirmTitle": "Sao lưu lên Google Drive?",
+    "confirmReplace": "Bản sao lưu lúc {{time}} sẽ được thay bằng dữ liệu và ảnh hiện tại.",
+    "confirmFirst": "Dữ liệu và ảnh hiện tại sẽ được lưu vào Google Drive của bạn.",
+    "backUp": "Sao lưu",
+    "doneTitle": "Đã sao lưu",
+    "doneWithPhotos": "Dữ liệu và {{count}} ảnh mới đã được lưu lên Google Drive.",
+    "doneBody": "Dữ liệu đã được lưu lên Google Drive.",
+    "failedTitle": "Sao lưu thất bại",
+    "failedBody": "Không thể sao lưu lên Google Drive. Kiểm tra kết nối và thử lại.",
+    "restoredTitle": "Đã khôi phục",
+    "restoredBody": "Dữ liệu của bạn đã được khôi phục.",
+    "restoredMissing": "Dữ liệu đã được khôi phục. Không tìm thấy {{count}} ảnh trên Drive.",
+    "restoreFailedTitle": "Khôi phục thất bại",
+    "restoreFailedDrive": "Không thể khôi phục từ Google Drive.",
+    "readFailed": "Không đọc được bản sao lưu trên Google Drive.",
+    "noneTitle": "Chưa có bản sao lưu",
+    "noneBody": "Tài khoản Google này chưa có bản sao lưu FastFast nào.",
+    "restoreDriveTitle": "Khôi phục từ Google Drive?",
+    "restoreConfirm": "Bản sao lưu lúc {{time}}. Toàn bộ dữ liệu hiện tại trên máy sẽ bị thay thế.",
+    "restoreFileConfirm": "Bản sao lưu lúc {{time}}. Toàn bộ dữ liệu hiện tại trên máy sẽ bị thay thế. File sao lưu không kèm ảnh.",
+    "restoreFileTitle": "Khôi phục từ file?",
+    "restoreFileFailed": "Không thể khôi phục file sao lưu này.",
+    "exportFile": "Xuất file sao lưu",
+    "exporting": "Đang xuất…",
+    "exportFileDesc": "Chỉ dữ liệu, chia sẻ hoặc lưu ở đâu cũng được",
+    "exportFailedTitle": "Xuất file thất bại",
+    "exportFailedBody": "Không thể tạo file sao lưu.",
+    "restoreFile": "Khôi phục từ file",
+    "restoreFileDesc": "Chọn một file sao lưu FastFast",
+    "importFailedTitle": "Nhập file thất bại",
+    "importFailedBody": "File này không phải bản sao lưu FastFast hợp lệ."
+  },
+  "theme": {
+    "title": "Chủ đề",
+    "subtitle": "Chọn giao diện cho app",
+    "notPurchased": "Chưa mua",
+    "freeUntil": "Miễn phí đến",
+    "purchase": "Mua",
+    "unavailable": "Không khả dụng",
+    "premium": "Premium",
+    "limited": "Giới hạn",
+    "dark": "Tối",
+    "light": "Sáng"
+  },
+  "notify": {
+    "targetTitle": "🎉 Đã đạt mục tiêu!",
+    "targetBody": "Bạn đã nhịn đủ {{hours}} giờ. Kết thúc phiên để ghi nhận nhé.",
+    "dailyTitle": "Đến giờ nhịn rồi ⏱️",
+    "dailyBody": "Bắt đầu phiên hôm nay để giữ streak và độ bền thói quen."
+  },
+  "perm": {
+    "saveImage": "App cần quyền lưu ảnh để xuất ảnh vào thư viện.",
+    "camera": "App cần quyền sử dụng Camera để chụp ảnh!",
+    "gallery": "App cần quyền truy cập bộ sưu tập để chọn ảnh!",
+    "saveFailed": "Không thể lưu ảnh. Vui lòng thử lại."
+  },
+  "widget": {
+    "fasting": "ĐANG NHỊN",
+    "ready": "SẴN SÀNG",
+    "notFasting": "Chưa nhịn",
+    "tapToOpen": "Chạm để mở FastFast",
+    "started": "Bắt đầu",
+    "done": "Xong"
+  },
+  "notFound": {
+    "title": "Ối!",
+    "body": "Màn hình này không tồn tại.",
+    "home": "Về màn hình chính!"
   }
 }

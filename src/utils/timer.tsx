@@ -6,15 +6,13 @@ import {
   differenceInSeconds,
   format,
   getISOWeek,
-  isToday,
-  isTomorrow,
-  isYesterday,
   startOfMonth,
   startOfWeek,
   subDays,
   subMonths,
   subWeeks,
 } from "date-fns";
+import i18n from "i18next";
 
 export const timeString = (time: number) => {
   const timeCheck = time;
@@ -76,88 +74,51 @@ export const getWeek = (date: Date) => {
   return getISOWeek(date);
 };
 
+// Ngày tương đối so với hôm nay: "Hôm nay", "Ngày mai", "3 ngày trước"...
+const relativeDay = (diffDays: number) => {
+  if (diffDays === 0) return i18n.t("time.today");
+  if (diffDays === 1) return i18n.t("time.tomorrow");
+  if (diffDays === -1) return i18n.t("time.yesterday");
+  if (diffDays === 2) return i18n.t("time.dayAfterTomorrow");
+  return diffDays > 0
+    ? i18n.t("time.daysLater", { count: diffDays })
+    : i18n.t("time.daysAgo", { count: -diffDays });
+};
+
 export const getRelativeDate = (targetDate: Date, showHour = true): string => {
-  const timeStr = format(targetDate, "HH:mm");
-  const diffDays = differenceInCalendarDays(targetDate, new Date());
-  if (isToday(targetDate)) {
-    return `${showHour ? timeStr + " " : ""}Hôm nay`;
-  }
-  if (isTomorrow(targetDate)) {
-    return `${showHour ? timeStr + " " : ""}Ngày mai`;
-  }
-  if (isYesterday(targetDate)) {
-    return `${showHour ? timeStr + " " : ""}Hôm qua`;
-  }
-  if (diffDays > 0 && diffDays === 2) {
-    return `${showHour ? timeStr + " " : ""}Ngày kia`;
-  }
-  if (diffDays < 0 && diffDays === -2) {
-    return `${showHour ? timeStr + " " : ""}2 ngày trước`;
-  }
-  if (diffDays > 0) {
-    return `${showHour ? timeStr + " " : ""}${diffDays} ngày sau`;
-  }
-  return `${showHour ? timeStr + " " : ""}${Math.abs(diffDays)} ngày trước`;
+  const prefix = showHour ? `${format(targetDate, "HH:mm")} ` : "";
+  return prefix + relativeDay(differenceInCalendarDays(targetDate, new Date()));
 };
 
 export const getRelativeTime = (targetDate: Date, showHour = true): string => {
   const now = new Date();
-  const timeStr = format(targetDate, "HH:mm");
 
   const diffSeconds = differenceInSeconds(now, targetDate);
   const diffMinutes = differenceInMinutes(now, targetDate);
   const diffHours = differenceInHours(now, targetDate);
-  const diffDays = differenceInCalendarDays(targetDate, now);
-
-  const prefix = showHour ? `${timeStr} ` : "";
 
   // Trong khoảng 24 giờ: hiển thị thời gian tương đối
   if (Math.abs(diffSeconds) < 60) {
-    if (diffSeconds === 0) return "Vừa xong";
-
+    if (diffSeconds === 0) return i18n.t("time.justNow");
     return diffSeconds > 0
-      ? `${diffSeconds} giây trước`
-      : `Sau ${Math.abs(diffSeconds)} giây`;
+      ? i18n.t("time.secondsAgo", { count: diffSeconds })
+      : i18n.t("time.inSeconds", { count: -diffSeconds });
   }
 
   if (Math.abs(diffMinutes) < 60) {
     return diffMinutes > 0
-      ? `${diffMinutes} phút trước`
-      : `Sau ${Math.abs(diffMinutes)} phút`;
+      ? i18n.t("time.minutesAgo", { count: diffMinutes })
+      : i18n.t("time.inMinutes", { count: -diffMinutes });
   }
 
   if (Math.abs(diffHours) < 24) {
     return diffHours > 0
-      ? `${diffHours} giờ trước`
-      : `Sau ${Math.abs(diffHours)} giờ`;
+      ? i18n.t("time.hoursAgo", { count: diffHours })
+      : i18n.t("time.inHours", { count: -diffHours });
   }
 
   // Từ đây trở đi dùng ngày
-  if (isToday(targetDate)) {
-    return `${prefix}Hôm nay`;
-  }
-
-  if (isTomorrow(targetDate)) {
-    return `${prefix}Ngày mai`;
-  }
-
-  if (isYesterday(targetDate)) {
-    return `${prefix}Hôm qua`;
-  }
-
-  if (diffDays === 2) {
-    return `${prefix}Ngày kia`;
-  }
-
-  if (diffDays === -2) {
-    return `${prefix}2 ngày trước`;
-  }
-
-  if (diffDays > 0) {
-    return `${prefix}${diffDays} ngày sau`;
-  }
-
-  return `${prefix}${Math.abs(diffDays)} ngày trước`;
+  return getRelativeDate(targetDate, showHour);
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");

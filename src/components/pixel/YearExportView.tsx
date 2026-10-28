@@ -10,6 +10,7 @@ import MonthPixel, { MONTH_LABELS, MonthDayItem } from "./MonthPixel";
 import PixelLegend from "./PixelLegend";
 import WeekPixel from "./WeekPixel";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 // Khớp gap-1 và w-15/h-12 trong WeekPixel/MonthPixel
 const GAP = 4;
@@ -41,6 +42,7 @@ const YearExportView = ({
   orientation,
   weekdays,
 }: Props) => {
+  const t = useT();
   const todayStr = getLocalTodayStr();
   const { theme, settings } = useAppStore(
     useShallow((state) => ({ theme: state.theme, settings: state.settings })),
@@ -59,6 +61,7 @@ const YearExportView = ({
   );
 
   const isMonth = viewType === "month";
+  const monthLabels = MONTH_LABELS.map((_, month) => t(`date.month.${month}`));
   const isHorizontal = orientation === "horizontal";
 
   const common = {
@@ -83,7 +86,7 @@ const YearExportView = ({
     // Cột nhãn cố định bên trái, các tuần/ngày trải ngang
     const size = isMonth ? CELL.monthHorizontal : CELL.weekHorizontal;
     const items = isMonth ? monthGrid : gridData;
-    const axisLabels = isMonth ? MONTH_LABELS : weekdays;
+    const axisLabels = isMonth ? monthLabels : weekdays;
     gridWidth = LABEL_SIZE + items.length * (size + GAP);
 
     grid = (
@@ -114,7 +117,7 @@ const YearExportView = ({
     grid = (
       <View style={{ gap: GAP }}>
         <View style={{ flexDirection: "row", paddingLeft: LABEL_SIZE, gap: GAP }}>
-          {MONTH_LABELS.map((label) => (
+          {monthLabels.map((label) => (
             <View key={label} style={{ width: size }} className="items-center">
               <ThemedText size="xxs" color="text" opacity="medium">
                 {label}
@@ -168,15 +171,18 @@ const YearExportView = ({
       <View className="flex-row items-end justify-between">
         <View>
           <ThemedText size="xxl" weight="bold" color="title">
-            Journey {year}
+            {`${t("tabs.journey")} ${year}`}
           </ThemedText>
           <ThemedText size="xs" color="text" opacity="medium">
-            {viewMode === "mood" ? "Emotion" : "Fast process"}
+            {viewMode === "mood" ? t("journey.mode.mood") : t("journey.mode.fasting")}
           </ThemedText>
         </View>
         <ThemedText size="xs" color="text" opacity="medium">
-          {stats.fastDays} days · {fixed(stats.fastHour)} hours ·{" "}
-          {stats.logDays} logs
+          {t("journey.statsLine", {
+            days: stats.fastDays,
+            hours: fixed(stats.fastHour),
+            logs: stats.logDays,
+          })}
         </ThemedText>
       </View>
 

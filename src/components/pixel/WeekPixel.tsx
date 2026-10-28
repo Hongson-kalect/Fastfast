@@ -3,6 +3,7 @@ import React from "react";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 import DayPixel from "./DayPixel";
+import { useT } from "@/providers/Language";
 
 const WeekPixel = React.memo(
   ({
@@ -22,6 +23,7 @@ const WeekPixel = React.memo(
     orientation: "vertical" | "horizontal";
     onSelectDate: (date: string) => void;
   }) => {
+    const t = useT();
     if (orientation === "vertical") {
       return (
         <View className="flex-row">
@@ -33,7 +35,7 @@ const WeekPixel = React.memo(
             {week.isMonthHeader && (
               <View className="absolute -top-2 left-0 -rotate-45">
                 <ThemedText size="tiny" color="primary" opacity="full">
-                  {week.month}
+                  {t(`date.month.${week.month}`)}
                 </ThemedText>
               </View>
             )}
@@ -76,7 +78,7 @@ const WeekPixel = React.memo(
           {week.isMonthHeader && (
             <View className="absolute top-0 left-0">
               <ThemedText size="tiny" color="primary" opacity="full">
-                {week.month}
+                {t(`date.month.${week.month}`)}
               </ThemedText>
             </View>
           )}

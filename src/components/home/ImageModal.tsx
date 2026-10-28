@@ -1,7 +1,12 @@
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { getContrastTextColor } from "@/utils/color";
-import { deleteSavedImage, selectPhoto, takePhoto } from "@/utils/image";
+import {
+  deleteSavedImage,
+  resolveImageUri,
+  selectPhoto,
+  takePhoto,
+} from "@/utils/image";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -20,11 +25,12 @@ import Animated, {
 import { ThemedText } from "../themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 interface PhotoPickerModalProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  photoUri?: string; // Uri hiện tại truyền từ DB lên để hiển thị preview
+  photoUri?: string; // Tên file ảnh lưu trong DB, ghép đường dẫn khi hiển thị
   updateImage: (uri?: string) => void; // Hàm callback trả lại kết quả (uri mới hoặc null)
 }
 
@@ -34,6 +40,7 @@ export const PhotoPickerModal = ({
   photoUri,
   updateImage,
 }: PhotoPickerModalProps) => {
+  const t = useT();
   const { theme, settings } = useAppStore(
     useShallow((state) => ({ theme: state.theme, settings: state.settings })),
   );
@@ -48,7 +55,7 @@ export const PhotoPickerModal = ({
       }
     } catch (error) {
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
-      Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
+      Alert.alert(t("term.error"), t("image.saveError"));
     }
   };
 
@@ -64,18 +71,18 @@ export const PhotoPickerModal = ({
       }
     } catch (error) {
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
-      Alert.alert("Lỗi", "Không thể lưu ảnh. Vuiổi thử lagi.");
+      Alert.alert(t("term.error"), t("image.saveError"));
     }
   };
 
   const handleDeletePhoto = () => {
-    Alert.alert("Xóa ảnh", "Bạn có chắc chắn muốn xóa ảnh của ngày này?", [
+    Alert.alert(t("image.deleteTitle"), t("image.deleteConfirm"), [
       {
-        text: "Hủy",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async() => {
           try {
@@ -89,7 +96,7 @@ export const PhotoPickerModal = ({
             setVisible(false);
           } catch (error) {
             console.error("Lỗi xóa ảnh:", error);
-            Alert.alert("Lỗi", "Không thể xóa ảnh. Vui lòng thử lại.");
+            Alert.alert(t("term.error"), t("image.deleteError"));
           }
         },
       },
@@ -107,7 +114,7 @@ export const PhotoPickerModal = ({
   const handleAddPhoto = () => {
     addModal({
       type: "confirm",
-      title: "Add Photo",
+      title: t("image.addTitle"),
       okText: (
         <View className="flex-row items-center justify-center gap-2">
           <MaterialIcons
@@ -121,7 +128,7 @@ export const PhotoPickerModal = ({
             weight="bold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            Gallery
+            {t("term.gallery")}
           </ThemedText>
         </View>
       ),
@@ -130,7 +137,7 @@ export const PhotoPickerModal = ({
           <MaterialIcons name="photo-camera" size={25} color={theme.text} />
 
           <ThemedText size="sm" weight="bold" color="text">
-            Camera
+            {t("term.camera")}
           </ThemedText>
         </View>
       ),
@@ -180,11 +187,11 @@ export const PhotoPickerModal = ({
 
                 <View>
                   <ThemedText size="lg" weight="bold" color="title">
-                    {photoUri ? "Your photo" : "Add a photo"}
+                    {photoUri ? t("image.yourPhoto") : t("image.addAPhoto")}
                   </ThemedText>
 
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    Hôm nay
+                    {t("common.today")}
                   </ThemedText>
                 </View>
               </View>
@@ -215,7 +222,7 @@ export const PhotoPickerModal = ({
                 {/* Image preview */}
                 <Pressable onPress={openImagePreview} className="h-full w-full">
                   <Image
-                    source={{ uri: photoUri }}
+                    source={{ uri: resolveImageUri(photoUri) ?? undefined }}
                     className="h-full w-full"
                     resizeMode="cover"
                   />
@@ -258,7 +265,7 @@ export const PhotoPickerModal = ({
                 </View> */}
 
                 <ThemedText size="sm" weight="semibold" color="text">
-                  Capture the moment
+                  {t("image.capture")}
                 </ThemedText>
 
                 <ThemedText
@@ -267,7 +274,7 @@ export const PhotoPickerModal = ({
                   opacity="low"
                   className="mt-1"
                 >
-                  Chọn camera hoặc thư viện
+                  {t("image.chooseSource")}
                 </ThemedText>
               </Pressable>
             )}
@@ -286,7 +293,7 @@ export const PhotoPickerModal = ({
                 />
 
                 <ThemedText size="sm" weight="bold" color="text">
-                  Camera
+                  {t("term.camera")}
                 </ThemedText>
               </TouchableOpacity>
 
@@ -306,7 +313,7 @@ export const PhotoPickerModal = ({
                   weight="bold"
                   colorHex={getContrastTextColor(theme.primary)}
                 >
-                  Gallery
+                  {t("term.gallery")}
                 </ThemedText>
               </TouchableOpacity>
             </View>

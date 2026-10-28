@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
+import { useT } from "@/providers/Language";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -205,6 +206,7 @@ export default function Circular24hTimeline({
   animationDuration = 1000,
   isLoading = false,
 }: Props) {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const center = size / 2;
@@ -386,7 +388,7 @@ export default function Circular24hTimeline({
           textAnchor="middle"
           alignmentBaseline="middle"
         >
-          HOURS FASTED
+          {t("pixelDetail.hoursFasted")}
         </SvgText>
       </Svg>
 

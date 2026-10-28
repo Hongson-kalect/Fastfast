@@ -11,6 +11,7 @@ import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 interface FastingSheetProps {
   counter: number;
@@ -28,6 +29,7 @@ const FastingSheet = ({
   onStopFasting,
   onChangeTarget,
 }: FastingSheetProps) => {
+  const t = useT();
   const { theme, settings } = useAppStore(
     useShallow((state) => ({ theme: state.theme, settings: state.settings })),
   );
@@ -99,7 +101,7 @@ const FastingSheet = ({
         <View className="flex-row items-end justify-between">
           <View className="flex-1">
             <ThemedText size="xxs" color="text" opacity="medium">
-              Tiến độ
+              {t("term.progress")}
             </ThemedText>
 
             <View className="mt-0.5 flex-row items-baseline gap-1.5">
@@ -126,7 +128,7 @@ const FastingSheet = ({
               colorHex={accentColor}
               style={{ textTransform: "uppercase" }}
             >
-              {fastTarget?.label || "FREE MODE"}
+              {fastTarget ? t(`targets.${fastTarget.id}.label`) : t("counter.freeMode")}
             </ThemedText>
           </View>
         </View>
@@ -154,7 +156,7 @@ const FastingSheet = ({
           {hasTarget && finishTime ? (
             isTargetReached ? (
               <ThemedText size="xxs" weight="semibold" color="success">
-                Đã hoàn thành
+                {t("fastingSheet.completed")}
               </ThemedText>
             ) : (
               <ThemedText size="xxs" color="text" opacity="medium">
@@ -163,7 +165,7 @@ const FastingSheet = ({
             )
           ) : (
             <ThemedText size="xxs" color="text" opacity="medium">
-              Free mode
+              {t("counter.freeMode")}
             </ThemedText>
           )}
         </View>
@@ -173,12 +175,12 @@ const FastingSheet = ({
       <View className="gap-3">
         <View className="flex-row items-center justify-between">
           <ThemedText size="sm" weight="bold" color="primary">
-            Kết quả
+            {t("fastingSheet.result")}
           </ThemedText>
 
           {hasTarget && !isTargetReached && (
             <ThemedText size="xxs" color="text" opacity="low">
-              Tiếp tục để đạt mục tiêu
+              {t("fastingSheet.keepGoing")}
             </ThemedText>
           )}
         </View>
@@ -205,7 +207,7 @@ const FastingSheet = ({
                   color="text"
                   opacity="medium"
                 >
-                  HIỆN TẠI
+                  {t("fastingSheet.now")}
                 </ThemedText>
               </View>
 
@@ -222,7 +224,7 @@ const FastingSheet = ({
               {/* Habit */}
               <View className="flex-1">
                 <ThemedText size="xxs" color="text" opacity="medium">
-                  Habit
+                  {t("term.habit")}
                 </ThemedText>
 
                 <ThemedText
@@ -241,7 +243,7 @@ const FastingSheet = ({
               {/* Shield */}
               <View className="flex-1">
                 <ThemedText size="xxs" color="text" opacity="medium">
-                  Shield
+                  {t("info.shield.title")}
                 </ThemedText>
 
                 <ThemedText
@@ -284,7 +286,7 @@ const FastingSheet = ({
                     weight="semibold"
                     colorHex={accentColor}
                   >
-                    MỤC TIÊU
+                    {t("fastingSheet.atTarget")}
                   </ThemedText>
                 </View>
 
@@ -305,7 +307,7 @@ const FastingSheet = ({
                 {/* Habit */}
                 <View className="flex-1">
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    Habit
+                    {t("term.habit")}
                   </ThemedText>
 
                   <ThemedText
@@ -324,7 +326,7 @@ const FastingSheet = ({
                 {/* Shield */}
                 <View className="flex-1">
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    Shield
+                    {t("info.shield.title")}
                   </ThemedText>
 
                   <ThemedText
@@ -353,7 +355,7 @@ const FastingSheet = ({
           className="items-center rounded-2xl bg-error py-3.5"
         >
           <ThemedText size="md" weight="bold" colorHex={getContrastTextColor(theme.error)}>
-            Kết thúc Fasting
+            {t("fastingSheet.endFasting")}
           </ThemedText>
         </TouchableOpacity>
       </View>

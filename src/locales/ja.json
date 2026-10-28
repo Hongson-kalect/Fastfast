@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "スキップ",
+    "next": "次へ",
+    "start": "はじめる",
+    "welcome": {
+      "title": "楽しく続ける間欠的ファスティング",
+      "body": "食べ終えたらスタートをタップ。FastFastが時間を計り、目標に届いたらお知らせします。"
+    },
+    "habit": {
+      "title": "連続記録と習慣の強さ",
+      "body": "ファスティングを完了するたびに連続記録が続き、習慣バーが溜まります。長いほど早く溜まります。"
+    },
+    "shield": {
+      "title": "シールド — 記録を守る休息日",
+      "body": "継続するか長いファスティングを完了するとシールドがもらえます。休んだ日はシールドが自動で記録を守ります。"
+    },
+    "pixel": {
+      "title": "カラフルな1年",
+      "body": "毎日がひとつのピクセル。気分と体重を記録して、1年をひと目で振り返りましょう。"
+    },
+    "health": {
+      "title": "体の声を聞きましょう",
+      "body": "FastFastは医療アドバイスの代わりにはなりません。妊娠中の方、持病のある方、48時間を超えるファスティングを考えている方は医師に相談してください。めまいや普段と違う体調不良を感じたらすぐに中止してください。"
+    }
+  },
+  "tabs": {
+    "fast": "ファスト",
+    "stats": "統計",
+    "journey": "ジャーニー",
+    "settings": "設定"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "gotIt": "わかった",
+    "confirm": "確認",
+    "delete": "削除",
+    "save": "保存",
+    "today": "今日",
+    "noData": "データなし",
+    "invalid": "無効です",
+    "success": "完了",
+    "edit": "編集",
+    "add": "追加",
+    "loading": "読み込み中…",
+    "close": "閉じる",
+    "restore": "復元",
+    "permission": "アクセス許可",
+    "error": "エラー"
+  },
+  "time": {
+    "justNow": "たった今",
+    "today": "今日",
+    "tomorrow": "明日",
+    "yesterday": "昨日",
+    "dayAfterTomorrow": "明後日",
+    "daysAgo_one": "{{count}}日前",
+    "daysAgo_other": "{{count}}日前",
+    "daysLater_one": "{{count}}日後",
+    "daysLater_other": "{{count}}日後",
+    "secondsAgo_one": "{{count}}秒前",
+    "secondsAgo_other": "{{count}}秒前",
+    "inSeconds_one": "{{count}}秒後",
+    "inSeconds_other": "{{count}}秒後",
+    "minutesAgo_one": "{{count}}分前",
+    "minutesAgo_other": "{{count}}分前",
+    "inMinutes_one": "{{count}}分後",
+    "inMinutes_other": "{{count}}分後",
+    "hoursAgo_one": "{{count}}時間前",
+    "hoursAgo_other": "{{count}}時間前",
+    "inHours_one": "{{count}}時間後",
+    "inHours_other": "{{count}}時間後"
+  },
+  "home": {
+    "greeting": {
+      "morning": "おはようございます",
+      "noon": "こんにちは",
+      "afternoon": "こんにちは",
+      "evening": "こんばんは"
+    },
+    "streakDays_one": "{{count}}日",
+    "streakDays_other": "{{count}}日",
+    "lastFast": "前回のファスティング",
+    "bodyPhases": "体のフェーズ",
+    "fastingPhases": "ファスティング中のフェーズ",
+    "effectAfter": "効果まで",
+    "startFast": "ファスティング開始",
+    "endFast": "終了"
+  },
+  "counter": {
+    "chooseTarget": "目標を選ぶ",
+    "reached": "🎉 目標達成",
+    "finishAt": "終了予定 {{time}}",
+    "freeMode": "フリーモード",
+    "ifStartNow": "今始めると: {{time}}",
+    "fasting": "ファスティング中",
+    "ready": "準備完了",
+    "startedAt": "開始 {{time}}",
+    "history": "履歴"
+  },
+  "finish": {
+    "title": "終了",
+    "confirm": "このファスティングを終了しますか？",
+    "tooQuick": "短すぎるため、この記録は削除されます。続けますか？",
+    "tooQuickSub": "2時間未満です。",
+    "failed": "この記録は未達成になります。続けますか？",
+    "failedSub": "16時間未満です。",
+    "reached": "目標を達成しました。今すぐ終了しますか？",
+    "notReached": "まだ目標に届いていません。終了しますか？",
+    "endBeforeStart": "終了時刻は開始時刻より後にしてください。",
+    "startBeforeLast": "開始時刻は前回のファスティングより後にしてください。"
+  },
+  "info": {
+    "shield": {
+      "title": "シールド",
+      "message": "シールドは、ファスティングしない休息日でも連続記録を守ります。",
+      "effectTitle": "効果 · 所持 {{count}}/{{max}}",
+      "effect1": "2回のファスティングの間の空白日ごとにシールドを1つ使います。記録は続き、習慣値も変わりません。",
+      "effect2": "シールドがない状態で休むと記録が途切れ、習慣値が下がり、Retainは0に戻ります。",
+      "effect3": "シールドは最大{{max}}個まで。それ以上は失われます。",
+      "longTitle": "長時間ファスティング",
+      "long1": "48時間以上で+1、72時間以上で+2。",
+      "long2": "休息も長時間ファスティングの一部です。体には食事を戻して回復する時間が必要です。シールドがあれば、その日に休んでも記録は続きます。",
+      "milestoneTitle": "習慣のマイルストーン",
+      "milestone1": "習慣が35%・70%・100%に達するたびにシールド+1。",
+      "milestone2": "習慣値が下がって再び上がれば、もう一度受け取れます。",
+      "retainTitle": "Retain",
+      "retain1": "習慣が100%になると、各ファスティングのポイントはRetainに貯まります。",
+      "retain2": "Retainが25貯まると自動でシールド1つになります。"
+    },
+    "body": {
+      "title": "このバーの意味は？",
+      "message": "各バーは、ファスティングが体にもともとある働きをどれだけ後押ししているかを示します。",
+      "alwaysTitle": "常に働いている",
+      "always1": "これらの働きは、ファスティングしていないときも常に体内で起きています。",
+      "always2": "特定の時間になって初めて入るスイッチではありません。",
+      "levelsTitle": "レベル1〜5の意味",
+      "levels1": "レベルが上がるほど、ファスティングがその働きをより後押ししています。時間とともに上がります。",
+      "levels2": "バーが満タンでも、その働きが今最も強いという意味ではなく、ファスティングによる後押しが大きいという意味です。",
+      "estimateTitle": "あくまで目安",
+      "estimate1": "時間の目安は推測で、直前の食事・運動・睡眠などにより人それぞれです。",
+      "estimate2": "これは診断や医療アドバイスではありません。"
+    }
+  },
+  "tip": {
+    "disableHint": "ヒントは 設定 → ビギナーヒント でオフにできます",
+    "habit": {
+      "title": "習慣値の計算方法",
+      "line1": "16時間以上のファスティングごとに+3%、16時間を超える1時間ごとに+0.2%（20時間→+3.8%）。",
+      "line2": "16時間未満は加算されません。",
+      "line3": "空白日ごとにシールドを1つ使います。シールドがなければ習慣値が下がり、休みが長いほど大きく下がります。",
+      "line4": "100%到達後はポイントがRetainへ。Retain 25でシールド1つ。"
+    }
+  },
+  "process": {
+    "glucoseControl": "血糖コントロール",
+    "fatBurning": "脂肪燃焼",
+    "growthHormone": "成長ホルモン",
+    "ketosis": "ケトーシス",
+    "autophagy": "オートファジー",
+    "cellRenewal": "細胞の再生",
+    "immuneRenewal": "免疫の再生",
+    "level": {
+      "start": "開始",
+      "standard": "標準",
+      "good": "良好",
+      "high": "高い",
+      "peak": "ピーク",
+      "max": "最大",
+      "drop": "低下",
+      "stable": "安定",
+      "optimal": "最適",
+      "init": "始動",
+      "warm": "ウォーム",
+      "burn": "燃焼",
+      "trace": "微量",
+      "light": "軽度",
+      "active": "活発",
+      "deep": "深い",
+      "better": "改善",
+      "rise": "上昇",
+      "boost": "ブースト",
+      "prime": "準備",
+      "ready": "準備完了",
+      "stronger": "強化"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "初心者",
+      "Veteran": "中級者",
+      "Expert": "上級者",
+      "Master": "達人"
+    },
+    "16h": {
+      "label": "インターミッテント",
+      "title": "定番で始めやすい",
+      "description": "蓄えた脂肪をエネルギーに変えやすくし、インスリン感受性を高めます。",
+      "advice": "（16時間）定番！ 12時〜20時に食事。",
+      "adviceLong": "最も続けやすい定番の方法です。朝食を抜き、12時〜20時の食事時間に必要なカロリーをまとめましょう。ファスティング中は2Lほど水を飲みましょう。"
+    },
+    "18h": {
+      "label": "ファットバーナー",
+      "title": "脂肪燃焼を強化",
+      "description": "ケトーシスを延ばし、オートファジーの入り口に差しかかります。",
+      "advice": "（18時間）16/8から少しステップアップ。",
+      "adviceLong": "16/8より2時間長くすることで脂肪燃焼を高め、オートファジーが始まり始めます。この18時間はブラックコーヒーや無糖の緑茶で空腹を乗り切れます。"
+    },
+    "20h": {
+      "label": "ウォリアー",
+      "title": "ウォリアーモード",
+      "description": "脂肪燃焼を最大化し、筋肉量の維持を助けます。",
+      "advice": "（20時間）食事は4時間。たんぱく質をしっかり。",
+      "adviceLong": "食事時間はわずか4時間。筋肉を保つため、たんぱく質（肉・魚・卵）と食物繊維をしっかりとりましょう。早食いは消化に負担がかかるので避けましょう。"
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "1日1食",
+      "description": "オートファジーを促し、消化器官をしっかり休ませます。",
+      "advice": "（23時間）1回の食事は栄養満点に。",
+      "adviceLong": "ほぼ24時間のファスティング（例：今日の夕食の後、翌日の夕食まで食べない）。1回の食事は自然食品中心で、良質な脂質とたんぱく質を豊富に。続けて行う場合は体の声を聞きましょう。"
+    },
+    "36h": {
+      "label": "モンク",
+      "title": "丸1日を越えるチャレンジ",
+      "description": "腸に長い回復時間を与え、炎症を落ち着かせるのに役立ちます。",
+      "advice": "（36時間）激しい運動の少ない日を選んで。",
+      "adviceLong": "丸1日食べないファスティング（例：月曜の夕食後、火曜はとばして水曜の朝に食べる）。軽めの日を選び、電解質（ミネラル塩）を補って頭をすっきり保ちましょう。"
+    },
+    "48h": {
+      "label": "エクステンド",
+      "title": "上級のディープファスティング",
+      "description": "蓄えたグリコーゲンを使い切り、体のエネルギーの使い方を切り替えます。",
+      "advice": "（48時間）電解質の補給は必須。",
+      "adviceLong": "これほど長いファスティングでは、血圧を安定させるため毎日電解質（塩・カリウム・マグネシウム）の補給が必要です。ふらつきやめまいが続く場合は、すぐにファスティングを中止してください。"
+    },
+    "72h": {
+      "label": "プロロング",
+      "title": "究極のチャレンジ",
+      "description": "深いオートファジーに達します。入念な準備と慎重さが必要です。",
+      "advice": "（72時間）経験豊富な人向け。",
+      "adviceLong": "体がファスティングにかなり慣れてから、たまに行う程度に。終えるときは決していきなり大量に食べず、胃を守るために骨スープや軽い食事から始めましょう。"
+    }
+  },
+  "term": {
+    "habit": "習慣",
+    "retain": "Retain",
+    "target": "目標",
+    "targetHours": "目標 {{hours}}時間",
+    "points": "ポイント",
+    "pts": "{{value}} pt",
+    "history": "履歴",
+    "progress": "進捗",
+    "weight": "体重",
+    "note": "メモ",
+    "mood": "気分",
+    "camera": "カメラ",
+    "gallery": "ギャラリー",
+    "error": "エラー"
+  },
+  "fastingSheet": {
+    "completed": "達成",
+    "result": "結果",
+    "keepGoing": "目標まであと少し",
+    "now": "現在",
+    "atTarget": "目標時",
+    "endFasting": "ファスティングを終了"
+  },
+  "lastFast": {
+    "interrupted": "中断",
+    "completed": "達成",
+    "endedEarly": "早めに終了",
+    "freeFasting": "フリーファスティング",
+    "targetProgress": "目標の進捗"
+  },
+  "habitSheet": {
+    "title": "習慣インデックス",
+    "sessions_one": "{{count}}件",
+    "sessions_other": "{{count}}件",
+    "fastingSession": "ファスティング",
+    "overRest_one": "{{count}}日休みすぎ",
+    "overRest_other": "{{count}}日休みすぎ",
+    "shieldIncrease": "シールド獲得",
+    "restDays_one": "{{count}}日休息",
+    "restDays_other": "{{count}}日休息"
+  },
+  "habitDetail": {
+    "title": "習慣ログ",
+    "habitPoints": "習慣ポイント",
+    "shields": "シールド数",
+    "fastDetail": "ファスティングの詳細",
+    "restDay": "休息日",
+    "overRest": "休みすぎ"
+  },
+  "habitMilestone": {
+    "title": "進捗"
+  },
+  "fullHabit": {
+    "title": "習慣が定着しました",
+    "maintainTitle": "維持フェーズへ",
+    "maintainBody": "習慣を続けるたびにRetainにポイントが貯まります。",
+    "retainTitle": "習慣Retain",
+    "retainSub": "維持ポイント",
+    "note": "Retainが25貯まると自動でシールド1つに交換されます。習慣が途切れるとRetainはすべて0に戻ります。"
+  },
+  "streak": {
+    "milestone": {
+      "title": "連続記録の節目！",
+      "subtitle": "止まらないファスティング習慣ができています！",
+      "button": "この調子で！🔥"
+    },
+    "rest": {
+      "title": "休息日を使用中！",
+      "subtitle": "回復も旅の一部。記録は守られています！",
+      "button": "続けよう！🌿"
+    },
+    "fresh": {
+      "title": "新しいスタート",
+      "subtitle": "達人も失敗を重ねてきました。今日から立て直そう！",
+      "button": "今すぐ再スタート 🚀"
+    },
+    "best": "最高",
+    "daysStreak": "連続日数",
+    "over": "連続{{count}}日を突破！",
+    "consistency": "継続度"
+  },
+  "result": {
+    "completed": {
+      "title": "ファスティング達成！",
+      "subtitle": "見事な自制心です！"
+    },
+    "endedEarly": {
+      "title": "早めに終了しました",
+      "subtitle": "1時間ごとに意味があります！記録は保存されました。"
+    },
+    "extended": {
+      "title": "長時間ファスティング達成！",
+      "subtitle": "驚異的な持久力！追加報酬を獲得しました。"
+    },
+    "fastingTime": "ファスティング時間",
+    "targetProgress": "目標 {{hours}}時間 · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "長時間ファスティング",
+      "retain": "習慣の維持",
+      "milestone": "節目を達成"
+    }
+  },
+  "note": {
+    "today": "今日のメモ",
+    "forDate": "{{date}} のメモ",
+    "placeholder": "今日の気分はどうでしたか？",
+    "weightDigitsOnly": "数字のみ入力できます。",
+    "weightOneDot": "小数点は1つまでです。",
+    "weightIntMax": "整数部分は4桁までです。",
+    "weightDecMax": "小数部分は1桁までです。"
+  },
+  "image": {
+    "saveError": "写真を保存できませんでした。もう一度お試しください。",
+    "deleteError": "写真を削除できませんでした。もう一度お試しください。",
+    "deleteTitle": "写真を削除",
+    "deleteConfirm": "この日の写真を削除しますか？",
+    "addTitle": "写真を追加",
+    "yourPhoto": "あなたの写真",
+    "addAPhoto": "写真を追加",
+    "capture": "この瞬間を残そう",
+    "chooseSource": "カメラかギャラリーを選択"
+  },
+  "history": {
+    "title": "ファスティング履歴",
+    "total": "合計",
+    "average": "平均",
+    "recent": "最近のファスティング",
+    "status": {
+      "cancelled": "キャンセル",
+      "fasting": "実施中",
+      "free": "フリー",
+      "reached": "目標達成",
+      "notReached": "未達成"
+    },
+    "actions": "操作"
+  },
+  "startTime": {
+    "invalid": "無効な時刻",
+    "overlap": "前回のファスティングと重なっています！",
+    "max24h": "開始を早められるのは最大24時間です！",
+    "future": "未来の時刻は選べません！",
+    "title": "開始時刻を選択",
+    "hint": "時刻か日付をタップして開始時点を選択",
+    "earlier": "早めに開始",
+    "confirm": "開始を確定"
+  },
+  "endTime": {
+    "title": "終了時刻を選択",
+    "confirm": "終了を確定",
+    "future": {
+      "title": "無効な時刻",
+      "desc": "未来の時刻です。"
+    },
+    "tooQuick": {
+      "title": "この記録は取り消されます",
+      "desc": "短すぎて記録されません。"
+    },
+    "failed": {
+      "title": "この記録は未達成になります",
+      "desc": "達成に必要な最低時間に届いていません。"
+    },
+    "completed": {
+      "title": "この記録は達成になります",
+      "desc": "記録に十分な時間です。"
+    }
+  },
+  "targetSheet": {
+    "choose": "この目標にする",
+    "clear": "目標を解除"
+  },
+  "fastDetail": {
+    "reachedTarget": "目標達成",
+    "notReachedTarget": "目標未達成",
+    "targetHours": "目標：{{hours}}時間",
+    "over": "{{duration}} 超過",
+    "remaining": "残り {{duration}}",
+    "review": "セッションの振り返り",
+    "bodyAtEnd": "終了時の体の状態",
+    "metrics": "記録された数値",
+    "advice": "アドバイス"
+  },
+  "date": {
+    "weekday": {
+      "0": "日",
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土"
+    },
+    "month": {
+      "0": "1月",
+      "1": "2月",
+      "2": "3月",
+      "3": "4月",
+      "4": "5月",
+      "5": "6月",
+      "6": "7月",
+      "7": "8月",
+      "8": "9月",
+      "9": "10月",
+      "10": "11月",
+      "11": "12月"
+    },
+    "monthNarrow": {
+      "0": "1",
+      "1": "2",
+      "2": "3",
+      "3": "4",
+      "4": "5",
+      "5": "6",
+      "6": "7",
+      "7": "8",
+      "8": "9",
+      "9": "10",
+      "10": "11",
+      "11": "12"
+    }
+  },
+  "journey": {
+    "savedImage": "写真ライブラリに保存しました。",
+    "saveImage": "画像を保存",
+    "style": "スタイル",
+    "mode": {
+      "mood": "気分",
+      "fasting": "ファスティング"
+    },
+    "dayButton": "日",
+    "weekButton": "週",
+    "stat": {
+      "days_one": "日",
+      "days_other": "日",
+      "hours_one": "時間",
+      "hours_other": "時間",
+      "logs_one": "件",
+      "logs_other": "件"
+    },
+    "statsLine": "{{days}}日 · {{hours}}時間 · {{logs}}件",
+    "legend": {
+      "mood": {
+        "0": "最悪",
+        "1": "悪い",
+        "2": "普通",
+        "3": "良い",
+        "4": "最高"
+      }
+    },
+    "info": {
+      "title": "ジャーニーの見方",
+      "message": "アイコンの凡例だけでは分からないこと。",
+      "fast1": "各マスは、その日に含まれる最も長いファスティングの合計時間で色分けされます。",
+      "fast2": "複数日にまたがるファスティングはその全日に色が付き、初日は薄く、終わりに向けて濃くなります。",
+      "fast3": "シールドのアイコンがあるマスは、シールドで守られた休息日です。",
+      "mood1": "メインカラーの枠があるマスはメモのある日です。",
+      "actionsTitle": "操作",
+      "action1": "空の日をタップすると気分とメモを追加、記録のある日をタップすると詳細を表示します。",
+      "action2": "各アイコンの下の数字は、その年にそのレベルだった日数です。",
+      "action3": "グリッド左上の週/日ボタンでレイアウトを変更。保存画像は現在のレイアウトになります。"
+    }
+  },
+  "layout": {
+    "title": "ピクセルのレイアウト",
+    "subtitle": "ジャーニーの表示方法を選択",
+    "weekly": "週ごと",
+    "monthly": "月ごと",
+    "vertical": "↓ 縦",
+    "horizontal": "→ 横"
+  },
+  "iconPack": {
+    "title": "アイコンパックを選択",
+    "tabMood": "気分",
+    "tabTarget": "目標",
+    "level": "Lv.{{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Ioniconsによるモダンでミニマルなデザイン",
+    "material_emoticons": "Material Communityの繊細な表情アイコン",
+    "weather_vibes": "天気のアイコンで気分を表現",
+    "gaming_energy": "ゲーム風のエネルギーバーで感情を表現",
+    "pixel_vibe": "ピクセル風の感情と絵文字",
+    "default_emoji_targets": "定番の絵文字で目標を表示",
+    "ionicons_targets": "Ioniconsのなめらかでミニマルなアイコン",
+    "material_energy_targets": "エネルギーと炎で難易度を表現",
+    "feather_minimal_targets": "Feather Iconsの繊細な線のデザイン"
+  },
+  "pixelDetail": {
+    "title": "1日の記録",
+    "noMood": "気分は未記録",
+    "dailyFast": "⏱️ 1日のファスティング",
+    "dailyNote": "📝 1日のメモ",
+    "relatedFasts": "関連するファスティング",
+    "hoursToday": "時間（この日）",
+    "hoursFasted": "ファスティング時間",
+    "weightHint": "タップして編集",
+    "addWeight": "体重を追加",
+    "dayNote": "この日のメモ",
+    "notePlaceholder": "この日のメモを追加…",
+    "photos": "写真",
+    "addPhoto": "写真を追加",
+    "photoHint": "この日の写真を追加",
+    "updatePhoto": "写真を更新",
+    "changePhoto": "写真を変更",
+    "photoFrom": "写真の取得元"
+  },
+  "dayModal": {
+    "todayMood": "今日の気分",
+    "moodFor": "{{date}} の気分",
+    "todayWeight": "今日の体重",
+    "weightFor": "{{date}} の体重"
+  },
+  "stats": {
+    "subtitle": "進捗をチェック",
+    "dashboard": "ダッシュボード",
+    "currentStreak": "現在の連続記録",
+    "days_one": "日",
+    "days_other": "日",
+    "record": "最高記録",
+    "shields": "シールド",
+    "section": "統計",
+    "totalFasting": "合計ファスティング",
+    "completed": "達成",
+    "averageFast": "平均ファスティング",
+    "longestFast": "最長ファスティング",
+    "activeDays": "アクティブ日数",
+    "maxStreak": "最長連続記録",
+    "shieldsUsed": "使用したシールド",
+    "unit": {
+      "hours": "時間",
+      "times": "回",
+      "days": "日"
+    },
+    "distribution": {
+      "title": "ファスティングの分布",
+      "subtitle": "ファスティング時間の内訳",
+      "range": "{{from}}〜{{to}}時間",
+      "over": "{{from}}時間以上",
+      "fasts_one": "回",
+      "fasts_other": "回"
+    },
+    "chart": {
+      "title": "体重とファスティングの推移",
+      "subtitle": "これまでの推移",
+      "fasting": "ファスティング",
+      "noData": "データなし",
+      "noWeight": "- 体重データなし",
+      "hoursUnit": "時間"
+    },
+    "range": {
+      "title": "期間",
+      "day_one": "{{count}}日",
+      "day_other": "{{count}}日",
+      "week_one": "{{count}}週",
+      "week_other": "{{count}}週",
+      "month_one": "{{count}}か月",
+      "month_other": "{{count}}か月",
+      "unit": {
+        "day": "日",
+        "week": "週",
+        "month": "か月"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "現在の体重",
+    "currentWeightMessage": "現在の体重を入力",
+    "targetMessage": "目標体重を設定",
+    "setCurrent": "現在の体重を記録",
+    "setCurrentHint": "体重を追加して進捗の記録を始めましょう",
+    "weightGoal": "体重の目標",
+    "setTarget": "目標を設定",
+    "currentWeight": "現在の体重",
+    "setTargetHint": "目標体重を設定して進捗を確認しましょう",
+    "toGo": "あと {{value}} kg",
+    "reached": "目標達成"
+  },
+  "ach": {
+    "title": "実績",
+    "unlocked": "{{unlocked}} / {{total}} 解除",
+    "empty": "実績なし",
+    "claim": "受け取る",
+    "done": "達成",
+    "notDone": "未達成",
+    "empty_slot": "空き",
+    "tier": {
+      "BRONZE": "ブロンズ",
+      "SILVER": "シルバー",
+      "GOLD": "ゴールド",
+      "DIAMOND": "ダイヤ"
+    },
+    "fasting_hours": {
+      "name": "累計ファスティング",
+      "description": "ファスティングした合計時間。",
+      "item_one": "ファスティング{{count}}時間",
+      "item_other": "ファスティング{{count}}時間"
+    },
+    "invalid_fasts": {
+      "name": "無効なファスティング",
+      "description": "無効なファスティングの合計回数。"
+    },
+    "failed_fasts": {
+      "name": "未達成のファスティング",
+      "description": "未達成のファスティングの合計回数。"
+    },
+    "completed_fasts": {
+      "name": "達成したファスティング",
+      "description": "達成したファスティングの合計回数。",
+      "item_one": "初めてのファスティングを達成",
+      "item_other": "ファスティングを{{count}}回達成"
+    },
+    "active_days": {
+      "name": "アクティブ日数",
+      "description": "アプリでアクティブだった日数。",
+      "item_one": "アクティブ{{count}}日",
+      "item_other": "アクティブ{{count}}日"
+    },
+    "habit": {
+      "name": "習慣",
+      "description": "ファスティング習慣のスコア。",
+      "item_one": "習慣{{count}}%に到達",
+      "item_other": "習慣{{count}}%に到達"
+    },
+    "longest_fast": {
+      "name": "最長ファスティング",
+      "description": "これまでで最長の達成記録。",
+      "item_one": "{{count}}時間のファスティングを達成",
+      "item_other": "{{count}}時間のファスティングを達成"
+    },
+    "max_streak": {
+      "name": "最長連続記録",
+      "description": "これまでで最長の連続記録。",
+      "item_one": "{{count}}日連続を達成",
+      "item_other": "{{count}}日連続を達成"
+    },
+    "total_shields": {
+      "name": "獲得シールド",
+      "description": "獲得したシールドの合計。",
+      "item_one": "初めてのシールドを獲得",
+      "item_other": "シールドを{{count}}個獲得"
+    },
+    "retain_circles": {
+      "name": "Retainマスター",
+      "description": "習慣が満タンの間に完了したRetainの周回数。",
+      "item_one": "初めてのRetain周回を達成",
+      "item_other": "Retainを{{count}}周達成"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "閉じられません",
+      "body": "先にこの操作を完了してください！"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "section": {
+      "showcase": "ショーケース",
+      "appearance": "外観",
+      "general": "一般",
+      "sound": "サウンドと振動",
+      "notifications": "通知",
+      "data": "データ",
+      "about": "アプリについて"
+    },
+    "showcaseExport": "ジャーニー画像に表示",
+    "showcaseExportDesc": "保存する画像にバッジを追加",
+    "showcaseEmpty": "バッジはまだありません。実績の節目に達し、統計タブで「受け取る」をタップしてください。",
+    "showcasePick": "見せびらかすバッジを最大{{max}}個選択。",
+    "selectedCount": "選択中 {{count}}/{{max}}",
+    "darkMode": "ダークモード",
+    "darkModeDesc": "アプリ全体をダークにする",
+    "theme": "テーマ",
+    "language": "言語",
+    "weekStart": "週の始まり",
+    "monday": "月曜日",
+    "sunday": "日曜日",
+    "mondayDesc": "月曜 → 日曜",
+    "sundayDesc": "日曜 → 土曜",
+    "beginnerTips": "ビギナーヒント",
+    "beginnerTipsDesc": "習慣とシールドの仕組みを短く説明",
+    "vibration": "バイブレーション",
+    "sound": "サウンド",
+    "soundDesc": "開始・終了・報酬のサウンド",
+    "touchSound": "タッチ音",
+    "touchSoundDesc": "タップや切り替え時の短いクリック音",
+    "targetReached": "目標達成",
+    "targetReachedDesc": "目標時間に達したら通知",
+    "dailyReminder": "毎日のリマインダー",
+    "dailyReminderDesc": "毎日ファスティング開始をお知らせ",
+    "reminderTime": "通知時刻",
+    "backup": "バックアップと復元",
+    "backupDesc": "Googleドライブまたはファイル",
+    "reset": "設定をリセット",
+    "resetDesc": "設定を初期状態に戻す",
+    "resetConfirmTitle": "設定をリセットしますか？",
+    "resetConfirmBody": "テーマ・レイアウト・サウンド・通知が初期状態に戻ります。ファスティングの記録は残ります。",
+    "resetOk": "リセット",
+    "privacy": "プライバシー",
+    "privacyDesc": "プライバシーとデータの扱い",
+    "privacyBody": "FastFastはオフラインで動作します。ファスティング・メモ・体重はこの端末にのみ保存され、当社のサーバーに送られることはありません。バックアップはご自身で保管するファイルか、ご自身のGoogleドライブに保存されます。",
+    "health": "健康に関する注意",
+    "rate": "アプリを評価",
+    "rateDesc": "気に入ったら評価をお願いします",
+    "rateThanks": "ありがとうございます！",
+    "rateLater": "ストア公開後に評価できるようになります。",
+    "feedback": "フィードバック",
+    "feedbackDesc": "ご意見や不具合をお知らせください",
+    "noEmailTitle": "メールアプリがありません",
+    "noEmailBody": "フィードバックを送るにはメールアプリをインストールしてください。",
+    "about": "アプリについて",
+    "aboutBody": "バージョン {{version}}\n\n連続記録・シールド・ピクセルの1年で続ける間欠的ファスティング。",
+    "version": "バージョン {{version}}",
+    "expoGoTitle": "Expo Goでは使えません",
+    "expoGoBody": "通知には開発版またはストア版が必要です。",
+    "notifOffTitle": "通知がオフです",
+    "notifOffBody": "システム設定でFastFastの通知を許可してください。",
+    "openSettings": "設定を開く"
+  },
+  "account": {
+    "title": "アカウント",
+    "guestHint": "Googleでログインしてドライブにバックアップ"
+  },
+  "backup": {
+    "subtitle": "データはこの端末に保存されています。バックアップは後で復元できるコピーです。",
+    "drive": "Googleドライブ",
+    "file": "ファイル",
+    "signIn": "Googleでログイン",
+    "signInDesc": "ご自身のGoogleドライブにバックアップ",
+    "notSignedIn": "未ログイン",
+    "lastBackup": "前回のバックアップ {{time}}",
+    "never": "バックアップなし",
+    "backUpNow": "今すぐバックアップ",
+    "backingUp": "バックアップ中…",
+    "restoreDrive": "ドライブから復元",
+    "restoreDriveDesc": "この端末のデータをドライブのバックアップで置き換えます",
+    "restoring": "復元中…",
+    "signOut": "ログアウト",
+    "signOutTitle": "ログアウトしますか？",
+    "signOutBody": "データはこの端末に残ります。Googleドライブのバックアップも保持されます。",
+    "signInFailedTitle": "ログインに失敗しました",
+    "signInFailedBody": "Googleでログインできませんでした。もう一度お試しください。",
+    "confirmTitle": "Googleドライブにバックアップしますか？",
+    "confirmReplace": "{{time}} のバックアップを現在のデータと写真で置き換えます。",
+    "confirmFirst": "現在のデータと写真をGoogleドライブに保存します。",
+    "backUp": "バックアップ",
+    "doneTitle": "バックアップ完了",
+    "doneWithPhotos": "データと新しい写真{{count}}枚をGoogleドライブに保存しました。",
+    "doneBody": "データをGoogleドライブに保存しました。",
+    "failedTitle": "バックアップに失敗しました",
+    "failedBody": "Googleドライブにバックアップできませんでした。接続を確認してもう一度お試しください。",
+    "restoredTitle": "復元しました",
+    "restoredBody": "データを復元しました。",
+    "restoredMissing": "データを復元しました。ドライブに写真が{{count}}枚見つかりませんでした。",
+    "restoreFailedTitle": "復元に失敗しました",
+    "restoreFailedDrive": "Googleドライブから復元できませんでした。",
+    "readFailed": "Googleドライブのバックアップを読み込めませんでした。",
+    "noneTitle": "バックアップなし",
+    "noneBody": "このGoogleアカウントにはまだFastFastのバックアップがありません。",
+    "restoreDriveTitle": "Googleドライブから復元しますか？",
+    "restoreConfirm": "{{time}} のバックアップ。この端末の現在のデータはすべて置き換えられます。",
+    "restoreFileConfirm": "{{time}} のバックアップ。現在のデータはすべて置き換えられます。ファイルには写真は含まれません。",
+    "restoreFileTitle": "ファイルから復元しますか？",
+    "restoreFileFailed": "このバックアップファイルを復元できませんでした。",
+    "exportFile": "バックアップファイルを書き出す",
+    "exporting": "書き出し中…",
+    "exportFileDesc": "データのみ。共有や保存は自由に",
+    "exportFailedTitle": "書き出しに失敗しました",
+    "exportFailedBody": "バックアップファイルを作成できませんでした。",
+    "restoreFile": "ファイルから復元",
+    "restoreFileDesc": "FastFastのバックアップファイルを選択",
+    "importFailedTitle": "読み込みに失敗しました",
+    "importFailedBody": "このファイルは有効なFastFastのバックアップではありません。"
+  },
+  "theme": {
+    "title": "テーマ",
+    "subtitle": "アプリの見た目を選択",
+    "notPurchased": "未購入",
+    "freeUntil": "無料期限",
+    "purchase": "購入",
+    "unavailable": "利用不可",
+    "premium": "プレミアム",
+    "limited": "期間限定",
+    "dark": "ダーク",
+    "light": "ライト"
+  },
+  "notify": {
+    "targetTitle": "🎉 目標達成！",
+    "targetBody": "{{hours}}時間のファスティングを達成しました。終了して記録しましょう。",
+    "dailyTitle": "ファスティングの時間です ⏱️",
+    "dailyBody": "今日のファスティングを始めて、連続記録と習慣を守りましょう。"
+  },
+  "perm": {
+    "saveImage": "写真ライブラリに画像を保存するための許可が必要です。",
+    "camera": "写真を撮るにはカメラへのアクセスが必要です。",
+    "gallery": "画像を選ぶには写真へのアクセスが必要です。",
+    "saveFailed": "画像を保存できませんでした。もう一度お試しください。"
+  },
+  "widget": {
+    "fasting": "ファスティング中",
+    "ready": "準備完了",
+    "notFasting": "未開始",
+    "tapToOpen": "タップしてFastFastを開く",
+    "started": "開始",
+    "done": "終了"
+  },
+  "notFound": {
+    "title": "おっと！",
+    "body": "この画面は存在しません。",
+    "home": "ホームに戻る"
+  }
+}

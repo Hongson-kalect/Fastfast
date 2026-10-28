@@ -2,6 +2,7 @@ import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { SQLiteDatabase } from "expo-sqlite";
 import { getLocalTodayStr } from "./timer";
+import { normalizeImagePaths } from "@/database";
 
 /**
  * Sao lưu / khôi phục toàn bộ dữ liệu local ra một file JSON.
@@ -14,7 +15,7 @@ const BACKUP_VERSION = 1;
 // Id thông báo chỉ có nghĩa trên máy đã tạo ra chúng
 const DEVICE_SETTING_KEYS = ["target_notification_id", "daily_reminder_id"];
 
-type BackupFile = {
+export type BackupFile = {
   app: string;
   version: number;
   exportedAt: number;
@@ -36,8 +37,8 @@ const getColumns = async (db: SQLiteDatabase, table: string) => {
   return rows.map((row) => row.name);
 };
 
-/** Xuất dữ liệu ra file JSON trong cache rồi mở share sheet. */
-export const exportBackup = async (db: SQLiteDatabase) => {
+/** Đọc toàn bộ bảng thành một bản sao lưu (chưa ghi ra file). */
+export const buildBackup = async (db: SQLiteDatabase): Promise<BackupFile> => {
   const tables: BackupFile["tables"] = {};
 
   for (const table of await getTableNames(db)) {
@@ -46,12 +47,38 @@ export const exportBackup = async (db: SQLiteDatabase) => {
     );
   }
 
-  const backup: BackupFile = {
+  return {
     app: BACKUP_APP,
     version: BACKUP_VERSION,
     exportedAt: Date.now(),
     tables,
   };
+};
+
+/** Kiểm tra nội dung JSON có đúng là bản sao lưu FastFast. */
+export const parseBackup = (text: string): BackupFile => {
+  const data = JSON.parse(text) as BackupFile;
+
+  if (data?.app !== BACKUP_APP || typeof data.tables !== "object") {
+    throw new Error("Not a FastFast backup file");
+  }
+
+  return data;
+};
+
+/** Tên các file ảnh đang được dữ liệu tham chiếu (cần đi kèm bản sao lưu). */
+export const getReferencedImages = async (db: SQLiteDatabase) => {
+  const rows = await db.getAllAsync<{ image_uri: string }>(
+    `SELECT image_uri FROM daily_notes WHERE image_uri IS NOT NULL AND image_uri != ''
+     UNION
+     SELECT image_uri FROM user_profile WHERE image_uri IS NOT NULL AND image_uri != '';`,
+  );
+  return rows.map((row) => row.image_uri);
+};
+
+/** Xuất dữ liệu ra file JSON trong cache rồi mở share sheet. */
+export const exportBackup = async (db: SQLiteDatabase) => {
+  const backup = await buildBackup(db);
 
   const file = new File(Paths.cache, `fastfast-backup-${getLocalTodayStr()}.json`);
   file.create({ overwrite: true });
@@ -74,13 +101,7 @@ export const pickBackup = async (): Promise<BackupFile | null> => {
   });
   if (picked.canceled) return null;
 
-  const data = JSON.parse(await picked.result.text()) as BackupFile;
-
-  if (data?.app !== BACKUP_APP || typeof data.tables !== "object") {
-    throw new Error("Not a FastFast backup file");
-  }
-
-  return data;
+  return parseBackup(await picked.result.text());
 };
 
 /** Ghi đè dữ liệu hiện tại bằng bản sao lưu (chỉ các bảng/cột đang tồn tại). */
@@ -109,6 +130,9 @@ export const restoreBackup = async (db: SQLiteDatabase, backup: BackupFile) => {
         );
       }
     }
+
+    // Bản sao lưu cũ có thể còn đường dẫn ảnh tuyệt đối của máy khác
+    await normalizeImagePaths(tx);
   });
 };
 

@@ -21,28 +21,29 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 export const checkWeightError = (text: string): string => {
   if (!text) return "";
 
   if (!/^[\d.]*$/.test(text)) {
-    return "Chỉ được nhập số.";
+    return "note.weightDigitsOnly";
   }
 
   const dots = (text.match(/\./g) || []).length;
 
   if (dots > 1) {
-    return "Chỉ được nhập một dấu thập phân.";
+    return "note.weightOneDot";
   }
 
   const [integer = "", decimal = ""] = text.split(".");
 
   if (integer.length > 4) {
-    return "Phần nguyên tối đa 4 chữ số.";
+    return "note.weightIntMax";
   }
 
   if (decimal.length > 1) {
-    return "Phần thập phân tối đa 1 chữ số.";
+    return "note.weightDecMax";
   }
 
   return "";
@@ -69,6 +70,7 @@ const NoteModal = ({
   dateStr,
   onSelectMood,
 }: Props) => {
+  const t = useT();
   const today = getLocalTodayStr();
   const { theme, settings, weight } = useAppStore(
     useShallow((state) => ({
@@ -152,11 +154,11 @@ const NoteModal = ({
 
                 {dateStr === today ? (
                   <ThemedText size="xl" weight="bold" color="primary">
-                    Today Note
+                    {t("note.today")}
                   </ThemedText>
                 ) : (
                   <ThemedText size="xl" weight="bold" color="title">
-                    Note {dateStr}
+                    {t("note.forDate", { date: dateStr })}
                   </ThemedText>
                 )}
 
@@ -200,7 +202,7 @@ const NoteModal = ({
                     color="text"
                     opacity="half"
                   >
-                    Weight
+                    {t("term.weight")}
                   </ThemedText>
                 </View>
 
@@ -243,7 +245,7 @@ const NoteModal = ({
                     className="mt-1"
                     numberOfLines={2}
                   >
-                    {weightError}
+                    {t(weightError)}
                   </ThemedText>
                 ) : null}
               </View>
@@ -264,7 +266,7 @@ const NoteModal = ({
                     color="text"
                     opacity="half"
                   >
-                    Note
+                    {t("term.note")}
                   </ThemedText>
                 </View>
 
@@ -275,7 +277,7 @@ const NoteModal = ({
                   numberOfLines={3}
                   textAlignVertical="top"
                   cursorColor={theme.text}
-                  placeholder="How did you feel today?"
+                  placeholder={t("note.placeholder")}
                   placeholderTextColor={`${theme.text}55`}
                   className="h-24 rounded-2xl border border-text-base/10 bg-background px-4 py-3 text-sm text-text-base"
                 />
@@ -298,7 +300,7 @@ const NoteModal = ({
                   color="text"
                   opacity="medium"
                 >
-                  Mood
+                  {t("term.mood")}
                 </ThemedText>
               </View>
 

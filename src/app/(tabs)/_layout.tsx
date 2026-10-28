@@ -12,6 +12,7 @@ import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useT } from "@/providers/Language";
 
 const TAB_ICONS = {
   index: "clock",
@@ -21,6 +22,7 @@ const TAB_ICONS = {
 } as const;
 
 const MainTab = () => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const inset = useSafeAreaInsets();
 
@@ -85,10 +87,10 @@ const MainTab = () => {
         },
       })}
     >
-      <Tabs.Screen name="index" options={{ title: "Fast" }} />
-      <Tabs.Screen name="dashboard" options={{ title: "Stats" }} />
-      <Tabs.Screen name="pixel" options={{ title: "Journey" }} />
-      <Tabs.Screen name="settings" options={{ title: "Settings" }} />
+      <Tabs.Screen name="index" options={{ title: t("tabs.fast") }} />
+      <Tabs.Screen name="dashboard" options={{ title: t("tabs.stats") }} />
+      <Tabs.Screen name="pixel" options={{ title: t("tabs.journey") }} />
+      <Tabs.Screen name="settings" options={{ title: t("tabs.settings") }} />
     </Tabs>
   );
 };

@@ -21,6 +21,7 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { useCallback } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useT } from "@/providers/Language";
 
 const HomeScreen = () => {
   const setCurrentFastSession = useAppStore(
@@ -34,6 +35,7 @@ const HomeScreen = () => {
   const startTime = currentFastSession?.start_time ?? null;
   const addModal = useModalStore((state) => state.addModal);
   const dbService = useDBService();
+  const t = useT();
 
   const isCounting = !!currentFastSession && !currentFastSession.end_time;
 
@@ -44,11 +46,11 @@ const HomeScreen = () => {
     if (startTime >= now) {
       return addModal({
         type: "alert",
-        title: "Invalid",
-        message: "Time finish must be greater than start time",
+        title: t("common.invalid"),
+        message: t("finish.endBeforeStart"),
       });
     }
-    let message = "Are you sure you want to finish your session?";
+    let message = t("finish.confirm");
     let subMessage = "";
     const duration = Math.floor(Math.abs(now - startTime) / 1000);
     const isTooFast = duration < TOO_QUICK_DURATION;
@@ -59,24 +61,24 @@ const HomeScreen = () => {
       : null;
 
     if (isTooFast) {
-      message = "This session too fast, it will be deleted, are you sure?";
-      subMessage = "The duration is less than 2 hours.";
+      message = t("finish.tooQuick");
+      subMessage = t("finish.tooQuickSub");
     } else if (!isValid) {
-      message = "This session will marked as FAILED, are you sure?";
-      subMessage = "The duration is less than 16 hours.";
+      message = t("finish.failed");
+      subMessage = t("finish.failedSub");
     }
 
     if (isReachTarget) {
-      message = "You got the target, finish now?";
+      message = t("finish.reached");
     }
 
     if (isReachTarget === false) {
-      message = "You not reach the target, are you sure to finish?";
+      message = t("finish.notReached");
     }
 
     addModal({
       type: "confirm",
-      title: "Finish",
+      title: t("finish.title"),
       message: message,
 
       subMessage: subMessage || "",
@@ -94,8 +96,8 @@ const HomeScreen = () => {
     if (currentFastSession?.end_time && now <= currentFastSession?.end_time) {
       return addModal({
         type: "alert",
-        title: "Invalid",
-        message: "Start time must be greater than the last session",
+        title: t("common.invalid"),
+        message: t("finish.startBeforeLast"),
       });
     }
     const newSession = await dbService?.startNewSession(now, settings?.target);
@@ -119,11 +121,10 @@ const HomeScreen = () => {
     feedback("tap");
     addModal({
       type: "alert",
-      title: "Các thanh này nói gì?",
-      message:
-        "Mỗi thanh cho biết việc nhịn ăn đang hỗ trợ một cơ chế sẵn có của cơ thể ở mức nào.",
+      title: t("info.body.title"),
+      message: t("info.body.message"),
       middle: <BodyProgressInfo />,
-      okText: "Đã hiểu",
+      okText: t("common.gotIt"),
     });
   };
   const isFastingActive = isCounting && !currentFastSession?.end_time;
@@ -158,7 +159,7 @@ const HomeScreen = () => {
           {/* Lần nhịn gần nhất (khi chưa nhịn) */}
           {!isFastingActive && currentFastSession?.end_time && (
             <View className="mt-7">
-              <SectionTitle title="Lần nhịn gần nhất" />
+              <SectionTitle title={t("home.lastFast")} />
               <RecentFastCard session={currentFastSession} />
             </View>
           )}
@@ -166,7 +167,7 @@ const HomeScreen = () => {
           {/* Giai đoạn cơ thể */}
           <View className="mt-7">
             <SectionTitle
-              title={isFastingActive ? "Giai đoạn cơ thể" : "Các giai đoạn khi nhịn"}
+              title={isFastingActive ? t("home.bodyPhases") : t("home.fastingPhases")}
               right={
                 <TouchableOpacity
                   activeOpacity={0.7}

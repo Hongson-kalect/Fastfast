@@ -47,6 +47,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot, { ViewShotRef } from "react-native-view-shot";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 // Khoảng cách giữa các ô, phải khớp gap-1 trong WeekPixel/MonthPixel
 const CELL_GAP = 4;
@@ -55,7 +56,9 @@ const H_PADDING = 20;
 const LABEL_WIDTH = 60;
 // Số hàng hiển thị trước hàng hiện tại khi cuộn tới
 const ROWS_BEFORE_CURRENT = 3;
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// Thứ tự ngày trong tuần theo chỉ số của Date.getDay() (0 = Chủ nhật)
+const MONDAY_FIRST = [1, 2, 3, 4, 5, 6, 0];
+const SUNDAY_FIRST = [0, 1, 2, 3, 4, 5, 6];
 
 // Hướng của hàng hôm nay so với vùng đang nhìn thấy; null = đang thấy
 type ScrollButton = "back" | "forward" | null;
@@ -66,6 +69,7 @@ const fitCells = (length: number, count: number) =>
   Math.floor((length - CELL_GAP * (count - 1)) / count);
 
 const PixelScreen = () => {
+  const t = useT();
   const dbService = useDBService();
   const { present } = useBottomSheet();
   const { width } = useWindowDimensions();
@@ -102,9 +106,13 @@ const PixelScreen = () => {
   const itemLength = pixelSize + CELL_GAP;
 
   const sundayFirst = settings?.week_starts_on === "sunday";
-  const weekdays = sundayFirst
-    ? ["Sun", ...WEEKDAYS.slice(0, 6)]
-    : WEEKDAYS;
+  const weekdays = (sundayFirst ? SUNDAY_FIRST : MONDAY_FIRST).map((day) =>
+    t(`date.weekday.${day}`),
+  );
+  const monthLabels = MONTH_LABELS.map((_, month) => t(`date.month.${month}`));
+  const monthNarrow = MONTH_LABELS.map((_, month) =>
+    t(`date.monthNarrow.${month}`),
+  );
 
   const gridData = useMemo(() => {
     return generateYearGrid(year, sundayFirst);
@@ -259,12 +267,12 @@ const PixelScreen = () => {
       const uri = await exportRef.current?.capture?.();
       if (!uri) return;
 
-      await saveToGallery(uri);
-
-      Alert.alert("Thành công", "Đã lưu ảnh vào thư viện ảnh.");
+      if (await saveToGallery(uri)) {
+        Alert.alert(t("common.success"), t("journey.savedImage"));
+      }
     } catch (error) {
       console.error("Export image error:", error);
-      Alert.alert("Lỗi", "Không thể lưu ảnh. Vui lòng thử lại.");
+      Alert.alert(t("term.error"), t("image.saveError"));
     } finally {
       isCapturing.current = false;
       setIsExporting(false);
@@ -292,12 +300,12 @@ const PixelScreen = () => {
         weight="bold"
         colorHex={getContrastTextColor(theme.primary)}
       >
-        {isMonth ? "Day" : "Week"}
+        {isMonth ? t("journey.dayButton") : t("journey.weekButton")}
       </ThemedText>
     </TouchableOpacity>
   );
 
-  const axisLabels = isMonth ? MONTH_LABELS : weekdays;
+  const axisLabels = isMonth ? monthLabels : weekdays;
 
   const list = (
     <FlatList
@@ -468,7 +476,7 @@ const PixelScreen = () => {
                   className="items-center justify-center pb-1"
                 >
                   <ThemedText size="xxs" color="text" opacity="medium">
-                    {isMonth ? label.charAt(0) : label}
+                    {isMonth ? monthNarrow[axisLabels.indexOf(label)] : label}
                   </ThemedText>
                 </View>
               ))}

@@ -8,6 +8,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { getContrastTextColor } from "@/utils/color";
+import { useT } from "@/providers/Language";
 
 export type FastResultStatus = "COMPLETED" | "ENDED_EARLY" | "OVERACHIEVED";
 
@@ -48,24 +49,24 @@ interface Props {
 
 const STATUS_CONFIG = {
   COMPLETED: {
-    title: "Fast Completed!",
-    subtitle: "Great job maintaining your discipline!",
+    title: "result.completed.title",
+    subtitle: "result.completed.subtitle",
     badgeBg: "bg-emerald-500/15 border-emerald-500/30",
     badgeText: "text-emerald-400",
     icon: "🎉",
     barColor: ["#34D399", "#10B981"] as const,
   },
   ENDED_EARLY: {
-    title: "Fast Ended Early",
-    subtitle: "Every hour counts! Progress has been saved.",
+    title: "result.endedEarly.title",
+    subtitle: "result.endedEarly.subtitle",
     badgeBg: "bg-amber-500/15 border-amber-500/30",
     badgeText: "text-amber-400",
     icon: "⚡",
     barColor: ["#FBBF24", "#F59E0B"] as const,
   },
   OVERACHIEVED: {
-    title: "Extended Fast Completed!",
-    subtitle: "Outstanding endurance! Extra rewards unlocked.",
+    title: "result.extended.title",
+    subtitle: "result.extended.subtitle",
     badgeBg: "bg-purple-500/15 border-purple-500/30",
     badgeText: "text-purple-400",
     icon: "🏆",
@@ -74,6 +75,7 @@ const STATUS_CONFIG = {
 };
 
 export const ResultModal = ({ data = testData }: Props) => {
+  const t = useT();
   const closeCurrentModal = useModalStore((state) => state.closeCurrentModal);
   const theme = useAppStore((state) => state.theme);
 
@@ -115,7 +117,7 @@ export const ResultModal = ({ data = testData }: Props) => {
           color="title"
           style={{ textAlign: "center" }}
         >
-          {config.title}
+          {t(config.title)}
         </ThemedText>
 
         <ThemedText
@@ -125,7 +127,7 @@ export const ResultModal = ({ data = testData }: Props) => {
           className="mt-1"
           style={{ textAlign: "center" }}
         >
-          {config.subtitle}
+          {t(config.subtitle)}
         </ThemedText>
       </Animated.View>
 
@@ -145,7 +147,7 @@ export const ResultModal = ({ data = testData }: Props) => {
               letterSpacing: 1,
             }}
           >
-            Fasting time
+            {t("result.fastingTime")}
           </ThemedText>
 
           <ThemedText
@@ -178,7 +180,7 @@ export const ResultModal = ({ data = testData }: Props) => {
             className="mt-1.5"
             style={{ textAlign: "right" }}
           >
-            Target {data.targetHours}h · {progressPercent}%
+            {t("result.targetProgress", { hours: data.targetHours, percent: progressPercent })}
           </ThemedText>
         ) : null}
       </Animated.View>
@@ -195,7 +197,7 @@ export const ResultModal = ({ data = testData }: Props) => {
             color="text"
             opacity="medium"
           >
-            Habit
+            {t("term.habit")}
           </ThemedText>
 
           <ThemedText
@@ -225,7 +227,7 @@ export const ResultModal = ({ data = testData }: Props) => {
             color="text"
             opacity="medium"
           >
-            Shield
+            {t("info.shield.title")}
           </ThemedText>
 
           <View className="mt-1 flex-row items-center">
@@ -263,7 +265,7 @@ export const ResultModal = ({ data = testData }: Props) => {
             color="text"
             opacity="medium"
           >
-            Retain
+            {t("term.retain")}
           </ThemedText>
 
           <ThemedText
@@ -294,9 +296,9 @@ export const ResultModal = ({ data = testData }: Props) => {
             if (!amount) return null;
 
             const labels = [
-              "Fast dài",
-              "Duy trì Habit",
-              "Đạt milestone",
+              t("result.shieldFrom.longFast"),
+              t("result.shieldFrom.retain"),
+              t("result.shieldFrom.milestone"),
             ];
 
             return (
@@ -367,7 +369,7 @@ export const ResultModal = ({ data = testData }: Props) => {
           weight="bold"
           colorHex={getContrastTextColor(theme.primary)}
         >
-          OK
+          {t("common.ok")}
         </ThemedText>
       </TouchableOpacity>
     </View>

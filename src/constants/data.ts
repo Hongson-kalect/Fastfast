@@ -1,4 +1,5 @@
 import { MoodLevel } from "@/interfaces/db.type";
+import i18n from "i18next";
 
 export type ProcessDataType = {
   key: keyof typeof processLevelTitles;
@@ -125,76 +126,77 @@ export const processData: ProcessDataType[] = [
   },
 ];
 
+// Mã từ vựng cho tên từng cấp; chữ hiển thị nằm ở locales: process.level.<mã>
 export const processLevelTitles = {
   default: {
-    0: "Start",
-    1: "Standard",
-    2: "Good",
-    3: "High",
-    4: "Peak",
-    5: "Max",
+    0: "start",
+    1: "standard",
+    2: "good",
+    3: "high",
+    4: "peak",
+    5: "max",
   },
   glucoseControl: {
-    0: "Drop",
-    1: "Drop",
-    2: "Stable",
-    3: "Good",
-    4: "Optimal",
-    5: "Peak",
+    0: "drop",
+    1: "drop",
+    2: "stable",
+    3: "good",
+    4: "optimal",
+    5: "peak",
   },
 
   fatBurning: {
-    0: "Init",
-    1: "Start",
-    2: "Warm",
-    3: "Burn",
-    4: "High",
-    5: "Peak",
+    0: "init",
+    1: "start",
+    2: "warm",
+    3: "burn",
+    4: "high",
+    5: "peak",
   },
 
   ketosis: {
-    0: "Init",
-    1: "Trace",
-    2: "Light",
-    3: "Active",
-    4: "Deep",
-    5: "Max",
+    0: "init",
+    1: "trace",
+    2: "light",
+    3: "active",
+    4: "deep",
+    5: "max",
   },
 
   growthHormone: {
-    0: "Better",
-    1: "Rise",
-    2: "Boost",
-    3: "High",
-    4: "Peak",
-    5: "Max",
+    0: "better",
+    1: "rise",
+    2: "boost",
+    3: "high",
+    4: "peak",
+    5: "max",
   },
 
   autophagy: {
-    0: "Better",
-    1: "Rise",
-    2: "Boost",
-    3: "High",
-    4: "Deep",
-    5: "Max",
+    0: "better",
+    1: "rise",
+    2: "boost",
+    3: "high",
+    4: "deep",
+    5: "max",
   },
 
   cellRenewal: {
-    0: "Better",
-    1: "Prime",
-    2: "Warm",
-    3: "Ready",
-    4: "Boost",
-    5: "Max",
+    0: "better",
+    1: "prime",
+    2: "warm",
+    3: "ready",
+    4: "boost",
+    5: "max",
   },
 
   immuneRenewal: {
-    0: "Init",
-    1: "Start",
-    2: "Good",
-    3: "Strogger",
-    4: "Boost",
-    5: "Max",
+    0: "init",
+    1: "start",
+    2: "good",
+    3: "stronger",
+    4: "boost",
+    5: "max",
   },
 } as const;
 
@@ -202,7 +204,7 @@ export function getProcessLevelTitle(
   key: keyof typeof processLevelTitles = "default",
   level: 0 | 1 | 2 | 3 | 4 | 5,
 ): string {
-  return processLevelTitles[key]?.[level];
+  return i18n.t(`process.level.${processLevelTitles[key]?.[level]}`);
 }
 
 // data/emotions.ts

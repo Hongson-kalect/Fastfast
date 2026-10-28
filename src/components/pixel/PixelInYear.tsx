@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import PixelDetailSheet from "./PixelDetailSheet";
 import { DayItem, WeekItem } from "@/interfaces/pixel";
+import { useT } from "@/providers/Language";
 
 export const generateYearGrid = (
   targetYear: number,
@@ -36,20 +37,6 @@ export const generateYearGrid = (
   const lastDayOfYear = new Date(targetYear, 11, 31);
   const targetStartDay = sundayFirst ? 0 : 1; // 0: Sun, 1: Mon
 
-  const shortMonths = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-  ];
   const trackedMonths = new Set<number>();
 
   let currentWeekNum: number = 1;
@@ -81,7 +68,7 @@ export const generateYearGrid = (
         (d === 1 || (m === 0 && d === firstDayOfYear.getDate() && i === 0))
       ) {
         if (!trackedMonths.has(m)) {
-          monthLabelToUse = shortMonths[m];
+          monthLabelToUse = String(m);
           shouldBeMonthHeader = true;
           trackedMonths.add(m);
         }
@@ -129,6 +116,7 @@ type Props = {
 };
 
 const PixelGridManager = (props: Props) => {
+  const t = useT();
   const [renderedYear] = useState<number>(
     new Date().getFullYear(),
   );
@@ -197,7 +185,7 @@ const PixelGridManager = (props: Props) => {
                     weight="regular"
                     color="primary"
                   >
-                    {week.month}
+                    {t(`date.month.${week.month}`)}
                   </ThemedText>
                 </View>
               )}

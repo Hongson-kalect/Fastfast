@@ -1,14 +1,16 @@
 import { Link, Stack } from "expo-router";
+import { useT } from "@/providers/Language";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function NotFoundScreen() {
+  const t = useT();
   return (
     <>
-      <Stack.Screen options={{ title: "Oops!" }} />
+      <Stack.Screen options={{ title: t("notFound.title") }} />
       <View style={styles.container}>
-        <Text>This screen does not exist.</Text>
+        <Text>{t("notFound.body")}</Text>
         <Link href="/(tabs)" style={styles.link}>
-          <Text>Go to home screen!</Text>
+          <Text>{t("notFound.home")}</Text>
         </Link>
       </View>
     </>

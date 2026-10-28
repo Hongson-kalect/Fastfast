@@ -1,6 +1,4 @@
 {
-  "hello": "Hello {{name}}!",
-  "goodbye": "Goodbye!",
   "onboarding": {
     "skip": "Skip",
     "next": "Next",
@@ -25,5 +23,835 @@
       "title": "Listen to your body",
       "body": "FastFast is not a substitute for medical advice. If you are pregnant, have a medical condition or plan to fast longer than 48 hours, talk to a doctor. Stop right away if you feel dizzy or unusually unwell."
     }
+  },
+  "tabs": {
+    "fast": "Fast",
+    "stats": "Stats",
+    "journey": "Journey",
+    "settings": "Settings"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "gotIt": "Got it",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "save": "Save",
+    "today": "Today",
+    "noData": "No data",
+    "invalid": "Invalid",
+    "success": "Done",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading…",
+    "close": "Close",
+    "restore": "Restore",
+    "permission": "Permission needed",
+    "error": "Error"
+  },
+  "time": {
+    "justNow": "Just now",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "dayAfterTomorrow": "In 2 days",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "daysLater_one": "In {{count}} day",
+    "daysLater_other": "In {{count}} days",
+    "secondsAgo_one": "{{count}} second ago",
+    "secondsAgo_other": "{{count}} seconds ago",
+    "inSeconds_one": "In {{count}} second",
+    "inSeconds_other": "In {{count}} seconds",
+    "minutesAgo_one": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "inMinutes_one": "In {{count}} minute",
+    "inMinutes_other": "In {{count}} minutes",
+    "hoursAgo_one": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "inHours_one": "In {{count}} hour",
+    "inHours_other": "In {{count}} hours"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Good morning",
+      "noon": "Good afternoon",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "streakDays_one": "{{count}} day",
+    "streakDays_other": "{{count}} days",
+    "lastFast": "Last fast",
+    "bodyPhases": "Body phases",
+    "fastingPhases": "Phases while fasting",
+    "effectAfter": "Effect after",
+    "startFast": "Start fasting",
+    "endFast": "End"
+  },
+  "counter": {
+    "chooseTarget": "Choose a target",
+    "reached": "🎉 Target reached",
+    "finishAt": "Done at {{time}}",
+    "freeMode": "Free mode",
+    "ifStartNow": "If you start now: {{time}}",
+    "fasting": "Fasting",
+    "ready": "Ready",
+    "startedAt": "Started {{time}}",
+    "history": "Fast history"
+  },
+  "finish": {
+    "title": "Finish",
+    "confirm": "Are you sure you want to finish this fast?",
+    "tooQuick": "This fast is too short and will be deleted. Continue?",
+    "tooQuickSub": "The fast is shorter than 2 hours.",
+    "failed": "This fast will be marked as failed. Continue?",
+    "failedSub": "The fast is shorter than 16 hours.",
+    "reached": "You reached your target. Finish now?",
+    "notReached": "You haven't reached your target yet. Finish anyway?",
+    "endBeforeStart": "The end time must be after the start time.",
+    "startBeforeLast": "The start time must be after your last fast."
+  },
+  "info": {
+    "shield": {
+      "title": "Shield",
+      "message": "Shields keep your streak valid on rest days when you don't fast.",
+      "effectTitle": "What it does · you have {{count}}/{{max}}",
+      "effect1": "Each empty day between two fasts uses 1 shield. Your streak stays valid and your Habit is unchanged.",
+      "effect2": "Rest without shields left and your streak breaks, Habit drops and Retain resets to 0.",
+      "effect3": "You can hold up to {{max}} shields; extra ones are lost.",
+      "longTitle": "Long fasts",
+      "long1": "Fast 48h+ to earn 1 shield, 72h+ to earn 2.",
+      "long2": "Rest is part of a long fast: your body needs time to refeed and recover. Shields let you rest on those days while your streak stays valid.",
+      "milestoneTitle": "Habit milestones",
+      "milestone1": "Reaching 35%, 70% and 100% Habit gives 1 shield each.",
+      "milestone2": "If your Habit drops and climbs back, you can earn the milestone again.",
+      "retainTitle": "Retain",
+      "retain1": "Once Habit is at 100%, points from each fast go into Retain.",
+      "retain2": "25 Retain automatically turns into 1 shield."
+    },
+    "body": {
+      "title": "What do these bars mean?",
+      "message": "Each bar shows how much fasting supports one of your body's built-in processes.",
+      "alwaysTitle": "Always running",
+      "always1": "These processes always run in your body, even when you're not fasting.",
+      "always2": "They aren't switches that only turn on at a certain hour.",
+      "levelsTitle": "What levels 1–5 mean",
+      "levels1": "Each level means fasting supports that process more, rising with fasting time.",
+      "levels2": "A full bar doesn't mean the process is at its strongest right now, only that fasting's support is higher.",
+      "estimateTitle": "Only an estimate",
+      "estimate1": "The hour marks are guesses and vary by person: your last meal, activity, sleep…",
+      "estimate2": "This is not a diagnosis or medical advice."
+    }
+  },
+  "tip": {
+    "disableHint": "You can turn off tips in Settings → Beginner tips",
+    "habit": {
+      "title": "How is Habit calculated?",
+      "line1": "Each fast of 16h or more: +3%, plus 0.2% per hour beyond 16h (20h → +3.8%).",
+      "line2": "Fasts under 16h don't add points.",
+      "line3": "Each empty day between fasts uses 1 shield. With no shields left, Habit drops — the longer the break, the bigger the drop.",
+      "line4": "At 100%: points move to Retain, and 25 Retain becomes 1 shield."
+    }
+  },
+  "process": {
+    "glucoseControl": "Glucose Control",
+    "fatBurning": "Fat Burning",
+    "growthHormone": "Growth Hormone",
+    "ketosis": "Ketosis",
+    "autophagy": "Autophagy",
+    "cellRenewal": "Cell Renewal",
+    "immuneRenewal": "Immune Renewal",
+    "level": {
+      "start": "Start",
+      "standard": "Standard",
+      "good": "Good",
+      "high": "High",
+      "peak": "Peak",
+      "max": "Max",
+      "drop": "Drop",
+      "stable": "Stable",
+      "optimal": "Optimal",
+      "init": "Init",
+      "warm": "Warm",
+      "burn": "Burn",
+      "trace": "Trace",
+      "light": "Light",
+      "active": "Active",
+      "deep": "Deep",
+      "better": "Better",
+      "rise": "Rise",
+      "boost": "Boost",
+      "prime": "Prime",
+      "ready": "Ready",
+      "stronger": "Stronger"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Novice",
+      "Veteran": "Veteran",
+      "Expert": "Expert",
+      "Master": "Master"
+    },
+    "16h": {
+      "label": "Intermittent",
+      "title": "Popular & easy to start",
+      "description": "Helps your body use stored fat for energy and improves insulin sensitivity.",
+      "advice": "(16h) The standard! Eat between 12pm and 8pm.",
+      "adviceLong": "This is the gold standard and the easiest to keep up. Just skip breakfast and fit all your calories into a 12pm–8pm eating window. Drink about 2L of water while fasting."
+    },
+    "18h": {
+      "label": "Fat Burner",
+      "title": "Boosted fat burning",
+      "description": "Extends ketosis and starts touching on autophagy.",
+      "advice": "(18h) A small step up from 16/8.",
+      "adviceLong": "Two extra hours beyond 16/8 help maximize fat burning and start autophagy. During these 18 hours you can have black coffee or unsweetened green tea to get past hunger."
+    },
+    "20h": {
+      "label": "Warrior",
+      "title": "Warrior mode",
+      "description": "Maximizes fat burning and helps preserve muscle mass.",
+      "advice": "(20h) A 4-hour eating window. Get enough protein.",
+      "adviceLong": "The eating window is very short (only 4 hours). Focus on enough protein (meat, fish, eggs) and fiber to keep your muscles. Avoid eating too fast, which can overload digestion."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "One meal a day",
+      "description": "Promotes autophagy and gives your digestive system a deep rest.",
+      "advice": "(23h) Your one meal should be fully nutritious.",
+      "adviceLong": "A nearly full 24-hour fast (e.g. dinner today, then nothing until dinner tomorrow). That single meal should be whole foods, rich in healthy fats and protein. Listen to your body if you do this often."
+    },
+    "36h": {
+      "label": "Monk",
+      "title": "Through-the-day challenge",
+      "description": "Gives your gut a long recovery window and helps calm inflammation.",
+      "advice": "(36h) Pick a day with little heavy activity.",
+      "adviceLong": "A full day and night without food (e.g. finish dinner on Monday, skip Tuesday, eat again Wednesday morning). Choose a light workday and add electrolytes (mineral salts) to stay alert."
+    },
+    "48h": {
+      "label": "Extended",
+      "title": "Advanced deep fast",
+      "description": "Fully depletes stored glycogen, pushing your body to restructure how it uses energy.",
+      "advice": "(48h) Electrolytes are a must.",
+      "adviceLong": "A fast this long requires daily electrolytes (salt, potassium, magnesium) to keep your blood pressure stable. If you feel faint or dizzy for a long time, break your fast right away."
+    },
+    "72h": {
+      "label": "Prolonged",
+      "title": "Ultimate challenge",
+      "description": "Reaches deep autophagy. Needs careful preparation and caution.",
+      "advice": "(72h) Only for very experienced fasters.",
+      "adviceLong": "Only do this occasionally, once your body is very used to fasting. When breaking the fast, never start with a big meal; begin with bone broth or something light to protect your stomach."
+    }
+  },
+  "term": {
+    "habit": "Habit",
+    "retain": "Retain",
+    "target": "Target",
+    "targetHours": "Target {{hours}}h",
+    "points": "Points",
+    "pts": "{{value}} pts",
+    "history": "History",
+    "progress": "Progress",
+    "weight": "Weight",
+    "note": "Note",
+    "mood": "Mood",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "error": "Error"
+  },
+  "fastingSheet": {
+    "completed": "Completed",
+    "result": "Rewards",
+    "keepGoing": "Keep going to reach your target",
+    "now": "NOW",
+    "atTarget": "AT TARGET",
+    "endFasting": "End fasting"
+  },
+  "lastFast": {
+    "interrupted": "Interrupted",
+    "completed": "Completed",
+    "endedEarly": "Ended early",
+    "freeFasting": "Free fasting",
+    "targetProgress": "Target progress"
+  },
+  "habitSheet": {
+    "title": "Habit Index",
+    "sessions_one": "{{count}} session",
+    "sessions_other": "{{count}} sessions",
+    "fastingSession": "Fasting session",
+    "overRest_one": "Rested {{count}} day too many",
+    "overRest_other": "Rested {{count}} days too many",
+    "shieldIncrease": "Shield earned",
+    "restDays_one": "Rest {{count}} day",
+    "restDays_other": "Rest {{count}} days"
+  },
+  "habitDetail": {
+    "title": "Habit log",
+    "habitPoints": "Habit points",
+    "shields": "Shields",
+    "fastDetail": "Fast details",
+    "restDay": "Rest day",
+    "overRest": "Rested too long"
+  },
+  "habitMilestone": {
+    "title": "Progress"
+  },
+  "fullHabit": {
+    "title": "Habit formed",
+    "maintainTitle": "Entering the maintenance stage",
+    "maintainBody": "Each time you keep the habit going, points are added to Retain.",
+    "retainTitle": "Habit Retain",
+    "retainSub": "Maintenance points",
+    "note": "25 Retain automatically converts into 1 Shield. If the habit breaks, all current Retain resets to 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Streak milestone hit!",
+      "subtitle": "You're building an unstoppable fasting habit!",
+      "button": "Keep it up! 🔥"
+    },
+    "rest": {
+      "title": "Rest day active!",
+      "subtitle": "Recovery is part of the journey. Your streak stays strong!",
+      "button": "Keep going! 🌿"
+    },
+    "fresh": {
+      "title": "Fresh start ahead",
+      "subtitle": "Every master failed before succeeding. Let's rebuild today!",
+      "button": "Start fresh now 🚀"
+    },
+    "best": "BEST",
+    "daysStreak": "Days streak",
+    "over": "Streak passed {{count}} days!",
+    "consistency": "Consistency"
+  },
+  "result": {
+    "completed": {
+      "title": "Fast completed!",
+      "subtitle": "Great job keeping your discipline!"
+    },
+    "endedEarly": {
+      "title": "Fast ended early",
+      "subtitle": "Every hour counts! Your progress has been saved."
+    },
+    "extended": {
+      "title": "Extended fast completed!",
+      "subtitle": "Outstanding endurance! Extra rewards unlocked."
+    },
+    "fastingTime": "Fasting time",
+    "targetProgress": "Target {{hours}}h · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "Long fast",
+      "retain": "Habit retain",
+      "milestone": "Milestone reached"
+    }
+  },
+  "note": {
+    "today": "Today's note",
+    "forDate": "Note {{date}}",
+    "placeholder": "How did you feel today?",
+    "weightDigitsOnly": "Numbers only.",
+    "weightOneDot": "Only one decimal point allowed.",
+    "weightIntMax": "Up to 4 digits before the decimal.",
+    "weightDecMax": "Up to 1 digit after the decimal."
+  },
+  "image": {
+    "saveError": "Couldn't save the photo. Please try again.",
+    "deleteError": "Couldn't delete the photo. Please try again.",
+    "deleteTitle": "Delete photo",
+    "deleteConfirm": "Delete this day's photo?",
+    "addTitle": "Add photo",
+    "yourPhoto": "Your photo",
+    "addAPhoto": "Add a photo",
+    "capture": "Capture the moment",
+    "chooseSource": "Choose camera or gallery"
+  },
+  "history": {
+    "title": "Fast history",
+    "total": "Total",
+    "average": "Average",
+    "recent": "Recent fasts",
+    "status": {
+      "cancelled": "Cancelled",
+      "fasting": "Fasting",
+      "free": "Free",
+      "reached": "Target reached",
+      "notReached": "Not reached"
+    },
+    "actions": "Fast actions"
+  },
+  "startTime": {
+    "invalid": "Invalid time",
+    "overlap": "This overlaps your previous fast!",
+    "max24h": "You can start at most 24 hours earlier!",
+    "future": "You can't pick a time in the future!",
+    "title": "Choose fast start time",
+    "hint": "Tap the time or date to choose when you started",
+    "earlier": "Start earlier",
+    "confirm": "Confirm start"
+  },
+  "endTime": {
+    "title": "Choose end time",
+    "confirm": "Confirm end",
+    "future": {
+      "title": "Invalid time",
+      "desc": "This time is in the future."
+    },
+    "tooQuick": {
+      "title": "This fast will be cancelled",
+      "desc": "Too short to be recorded."
+    },
+    "failed": {
+      "title": "This fast will be marked as failed",
+      "desc": "Shorter than the minimum to complete a fast."
+    },
+    "completed": {
+      "title": "This fast will be completed",
+      "desc": "Long enough to be recorded."
+    }
+  },
+  "targetSheet": {
+    "choose": "Choose this target",
+    "clear": "Clear target"
+  },
+  "fastDetail": {
+    "reachedTarget": "Target reached",
+    "notReachedTarget": "Target not reached",
+    "targetHours": "Target: {{hours}} hours",
+    "over": "{{duration}} over",
+    "remaining": "{{duration}} to go",
+    "review": "Session review",
+    "bodyAtEnd": "Body state at the end",
+    "metrics": "Recorded metrics",
+    "advice": "Advice"
+  },
+  "date": {
+    "weekday": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "month": {
+      "0": "Jan",
+      "1": "Feb",
+      "2": "Mar",
+      "3": "Apr",
+      "4": "May",
+      "5": "Jun",
+      "6": "Jul",
+      "7": "Aug",
+      "8": "Sep",
+      "9": "Oct",
+      "10": "Nov",
+      "11": "Dec"
+    },
+    "monthNarrow": {
+      "0": "J",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Image saved to your photo library.",
+    "saveImage": "Save image",
+    "style": "Style",
+    "mode": {
+      "mood": "Emotion",
+      "fasting": "Fast process"
+    },
+    "dayButton": "Day",
+    "weekButton": "Week",
+    "stat": {
+      "days_one": "day",
+      "days_other": "days",
+      "hours_one": "hour",
+      "hours_other": "hours",
+      "logs_one": "log",
+      "logs_other": "logs"
+    },
+    "statsLine": "{{days}} days · {{hours}} hours · {{logs}} logs",
+    "legend": {
+      "mood": {
+        "0": "Awful",
+        "1": "Bad",
+        "2": "Okay",
+        "3": "Good",
+        "4": "Great"
+      }
+    },
+    "info": {
+      "title": "Reading your Journey",
+      "message": "What the icon legend doesn't cover.",
+      "fast1": "Each cell is colored by the total length of the longest fast that touches that day.",
+      "fast2": "A fast spanning several days colors all of them, lighter on the first day and darker toward the end.",
+      "fast3": "A cell with a shield icon is a rest day protected by a shield.",
+      "mood1": "A cell with a primary-colored border is a day with a note.",
+      "actionsTitle": "Actions",
+      "action1": "Tap an empty day to add a mood and note; tap a day with data to see details.",
+      "action2": "The number under each icon is how many days of the year fall into that level.",
+      "action3": "Use the Week/Day button in the grid corner to change the layout. Saved images follow the current layout."
+    }
+  },
+  "layout": {
+    "title": "Pixel layout",
+    "subtitle": "Choose how your journey is displayed",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "vertical": "↓ Vertical",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Choose an icon pack",
+    "tabMood": "Emotion",
+    "tabTarget": "Target",
+    "level": "Lvl {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "A clean, modern minimal look with Ionicons",
+    "material_emoticons": "Subtle emotion faces from Material Community",
+    "weather_vibes": "Show your mood with weather icons",
+    "gaming_energy": "Emotions as energy bars, game style",
+    "pixel_vibe": "Pixel-style emotions and pictogram emojis",
+    "default_emoji_targets": "Target levels shown with classic emojis",
+    "ionicons_targets": "Smooth, minimal icons from Ionicons",
+    "material_energy_targets": "Shows the challenge with energy and flames",
+    "feather_minimal_targets": "Fine-line design from Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Daily journal",
+    "noMood": "No mood yet",
+    "dailyFast": "⏱️ Daily fast",
+    "dailyNote": "📝 Daily note",
+    "relatedFasts": "RELATED FASTS",
+    "hoursToday": "hours today",
+    "hoursFasted": "HOURS FASTED",
+    "weightHint": "Tap to edit",
+    "addWeight": "Add weight",
+    "dayNote": "NOTE OF THE DAY",
+    "notePlaceholder": "Add a note for this day...",
+    "photos": "PHOTO",
+    "addPhoto": "Add photo",
+    "photoHint": "Add a photo for this day",
+    "updatePhoto": "Update photo",
+    "changePhoto": "Change photo",
+    "photoFrom": "Photo from"
+  },
+  "dayModal": {
+    "todayMood": "Today's mood",
+    "moodFor": "Mood {{date}}",
+    "todayWeight": "Today's weight",
+    "weightFor": "Weight {{date}}"
+  },
+  "stats": {
+    "subtitle": "Track your progress",
+    "dashboard": "Dashboard",
+    "currentStreak": "Current streak",
+    "days_one": "day",
+    "days_other": "days",
+    "record": "Best",
+    "shields": "Shields",
+    "section": "Statistics",
+    "totalFasting": "Total fasting",
+    "completed": "Completed",
+    "averageFast": "Average fast",
+    "longestFast": "Longest fast",
+    "activeDays": "Active days",
+    "maxStreak": "Max streak",
+    "shieldsUsed": "Shields used",
+    "unit": {
+      "hours": "hours",
+      "times": "times",
+      "days": "days"
+    },
+    "distribution": {
+      "title": "Fast distribution",
+      "subtitle": "How your fasting sessions are spread",
+      "range": "{{from}}–{{to}} hrs",
+      "over": "{{from}}+ hrs",
+      "fasts_one": "fast",
+      "fasts_other": "fasts"
+    },
+    "chart": {
+      "title": "Weight & fast progress",
+      "subtitle": "Your progress over time",
+      "fasting": "Fasting",
+      "noData": "No data",
+      "noWeight": "- No weight data",
+      "hoursUnit": "Hours"
+    },
+    "range": {
+      "title": "Time range",
+      "day_one": "{{count}} day",
+      "day_other": "{{count}} days",
+      "week_one": "{{count}} week",
+      "week_other": "{{count}} weeks",
+      "month_one": "{{count}} month",
+      "month_other": "{{count}} months",
+      "unit": {
+        "day": "days",
+        "week": "weeks",
+        "month": "months"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Current weight",
+    "currentWeightMessage": "Enter your current weight",
+    "targetMessage": "Set your weight target",
+    "setCurrent": "Set your current weight",
+    "setCurrentHint": "Add your weight to start tracking progress",
+    "weightGoal": "Weight goal",
+    "setTarget": "Set weight target",
+    "currentWeight": "Current weight",
+    "setTargetHint": "Set a target weight to track your progress",
+    "toGo": "{{value}} kg to go",
+    "reached": "Goal reached"
+  },
+  "ach": {
+    "title": "Achievements",
+    "unlocked": "{{unlocked}} / {{total}} unlocked",
+    "empty": "No achievements",
+    "claim": "Claim",
+    "done": "Done",
+    "notDone": "Not yet",
+    "empty_slot": "Empty",
+    "tier": {
+      "BRONZE": "BRONZE",
+      "SILVER": "SILVER",
+      "GOLD": "GOLD",
+      "DIAMOND": "DIAMOND"
+    },
+    "fasting_hours": {
+      "name": "Total Fasting",
+      "description": "Total hours spent fasting.",
+      "item_one": "{{count}} fasting hour",
+      "item_other": "{{count}} fasting hours"
+    },
+    "invalid_fasts": {
+      "name": "Invalid Fasts",
+      "description": "Total number of invalid fasting sessions."
+    },
+    "failed_fasts": {
+      "name": "Failed Fasts",
+      "description": "Total number of failed fasting sessions."
+    },
+    "completed_fasts": {
+      "name": "Completed Fasts",
+      "description": "Total number of completed fasting sessions.",
+      "item_one": "Complete your first fast",
+      "item_other": "Complete {{count}} fasts"
+    },
+    "active_days": {
+      "name": "Active Days",
+      "description": "Number of days you've been active in the app.",
+      "item_one": "{{count}} active day",
+      "item_other": "{{count}} active days"
+    },
+    "habit": {
+      "name": "Habit",
+      "description": "Your fasting habit score.",
+      "item_one": "Reach {{count}}% habit",
+      "item_other": "Reach {{count}}% habit"
+    },
+    "longest_fast": {
+      "name": "Longest Fast",
+      "description": "Your longest completed fast.",
+      "item_one": "Complete a {{count}}-hour fast",
+      "item_other": "Complete a {{count}}-hour fast"
+    },
+    "max_streak": {
+      "name": "Longest Streak",
+      "description": "Your longest fasting streak.",
+      "item_one": "Reach a {{count}}-day streak",
+      "item_other": "Reach a {{count}}-day streak"
+    },
+    "total_shields": {
+      "name": "Total Shields",
+      "description": "Total number of shields earned.",
+      "item_one": "Earn your first shield",
+      "item_other": "Earn {{count}} shields"
+    },
+    "retain_circles": {
+      "name": "Retain Master",
+      "description": "Retain circles completed while your habit is full.",
+      "item_one": "Complete your first retain circle",
+      "item_other": "Complete {{count}} retain circles"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "This can't be closed",
+      "body": "Please finish this step first!"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "section": {
+      "showcase": "Showcase",
+      "appearance": "Appearance",
+      "general": "General",
+      "sound": "Sound & Haptics",
+      "notifications": "Notifications",
+      "data": "Data",
+      "about": "About"
+    },
+    "showcaseExport": "Show in Journey export",
+    "showcaseExportDesc": "Add your showcase badges to the saved image",
+    "showcaseEmpty": "No badges yet. Reach an achievement milestone and tap Claim in the Stats tab to unlock one.",
+    "showcasePick": "Choose up to {{max}} badges to show off.",
+    "selectedCount": "Selected {{count}}/{{max}}",
+    "darkMode": "Dark mode",
+    "darkModeDesc": "Use dark appearance throughout the app",
+    "theme": "Theme",
+    "language": "Language",
+    "weekStart": "Week starts on",
+    "monday": "Monday",
+    "sunday": "Sunday",
+    "mondayDesc": "Weeks run Monday → Sunday",
+    "sundayDesc": "Weeks run Sunday → Saturday",
+    "beginnerTips": "Beginner tips",
+    "beginnerTipsDesc": "Show short explanations of how habit and shields work",
+    "vibration": "Vibration",
+    "sound": "Sound",
+    "soundDesc": "Sounds for starting, finishing and rewards",
+    "touchSound": "Touch sound",
+    "touchSoundDesc": "Short clicks for taps and toggles",
+    "targetReached": "Target reached",
+    "targetReachedDesc": "Notify when your fasting target is reached",
+    "dailyReminder": "Daily reminder",
+    "dailyReminderDesc": "A reminder to start your fast every day",
+    "reminderTime": "Reminder time",
+    "backup": "Backup & Restore",
+    "backupDesc": "Google Drive or a backup file",
+    "reset": "Reset settings",
+    "resetDesc": "Restore app settings to default",
+    "resetConfirmTitle": "Reset settings?",
+    "resetConfirmBody": "Theme, layout, sound and notification settings go back to default. Your fasting data is kept.",
+    "resetOk": "Reset",
+    "privacy": "Privacy",
+    "privacyDesc": "Privacy and data permissions",
+    "privacyBody": "FastFast works offline. Your fasts, notes and weight are stored only on this device and are never sent to our servers. Backups go to a file you keep or to your own Google Drive.",
+    "health": "Health disclaimer",
+    "rate": "Rate the app",
+    "rateDesc": "Enjoying the app? Leave a rating",
+    "rateThanks": "Thank you!",
+    "rateLater": "Rating will be available once the app is on the store.",
+    "feedback": "Feedback",
+    "feedbackDesc": "Tell us what you think or report a problem",
+    "noEmailTitle": "No email app",
+    "noEmailBody": "Please install an email app to send feedback.",
+    "about": "About",
+    "aboutBody": "Version {{version}}\n\nIntermittent fasting with streaks, shields and a year in pixels.",
+    "version": "Version {{version}}",
+    "expoGoTitle": "Not available in Expo Go",
+    "expoGoBody": "Notifications need a development or store build of FastFast.",
+    "notifOffTitle": "Notifications are off",
+    "notifOffBody": "Allow notifications for FastFast in system settings.",
+    "openSettings": "Open settings"
+  },
+  "account": {
+    "title": "Account",
+    "guestHint": "Sign in with Google to back up to Drive"
+  },
+  "backup": {
+    "subtitle": "Your data lives on this device. Backups are copies you can restore later.",
+    "drive": "Google Drive",
+    "file": "File",
+    "signIn": "Sign in with Google",
+    "signInDesc": "Back up to your own Google Drive",
+    "notSignedIn": "Not signed in",
+    "lastBackup": "Last backup {{time}}",
+    "never": "No backup yet",
+    "backUpNow": "Back up now",
+    "backingUp": "Backing up…",
+    "restoreDrive": "Restore from Drive",
+    "restoreDriveDesc": "Replace data on this device with the Drive backup",
+    "restoring": "Restoring…",
+    "signOut": "Sign out",
+    "signOutTitle": "Sign out?",
+    "signOutBody": "Your data stays on this device. Backups on Google Drive are kept.",
+    "signInFailedTitle": "Sign in failed",
+    "signInFailedBody": "Could not sign in with Google. Please try again.",
+    "confirmTitle": "Back up to Google Drive?",
+    "confirmReplace": "This replaces the backup from {{time}} with your current data and photos.",
+    "confirmFirst": "Your current data and photos will be saved to your Google Drive.",
+    "backUp": "Back up",
+    "doneTitle": "Backed up",
+    "doneWithPhotos": "Your data and {{count}} new photo(s) are saved to Google Drive.",
+    "doneBody": "Your data is saved to Google Drive.",
+    "failedTitle": "Backup failed",
+    "failedBody": "Could not back up to Google Drive. Check your connection and try again.",
+    "restoredTitle": "Restored",
+    "restoredBody": "Your data has been restored.",
+    "restoredMissing": "Your data has been restored. {{count}} photo(s) were not found on Drive.",
+    "restoreFailedTitle": "Restore failed",
+    "restoreFailedDrive": "Could not restore from Google Drive.",
+    "readFailed": "Could not read the backup on Google Drive.",
+    "noneTitle": "No backup",
+    "noneBody": "There is no FastFast backup on this Google account yet.",
+    "restoreDriveTitle": "Restore from Google Drive?",
+    "restoreConfirm": "Backup from {{time}}. All current data on this device will be replaced.",
+    "restoreFileConfirm": "Backup from {{time}}. All current data on this device will be replaced. Photos are not included in files.",
+    "restoreFileTitle": "Restore from file?",
+    "restoreFileFailed": "Could not restore this backup file.",
+    "exportFile": "Export backup file",
+    "exporting": "Exporting…",
+    "exportFileDesc": "Data only, share or keep it anywhere",
+    "exportFailedTitle": "Export failed",
+    "exportFailedBody": "Could not create the backup file.",
+    "restoreFile": "Restore from file",
+    "restoreFileDesc": "Pick a FastFast backup file",
+    "importFailedTitle": "Import failed",
+    "importFailedBody": "This file is not a valid FastFast backup."
+  },
+  "theme": {
+    "title": "Theme",
+    "subtitle": "Choose the appearance of your app",
+    "notPurchased": "Not purchased",
+    "freeUntil": "Free until",
+    "purchase": "Purchase",
+    "unavailable": "Unavailable",
+    "premium": "Premium",
+    "limited": "Limited",
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "notify": {
+    "targetTitle": "🎉 Target reached!",
+    "targetBody": "You've fasted for {{hours}} hours. End the session to record it.",
+    "dailyTitle": "Time to fast ⏱️",
+    "dailyBody": "Start today's fast to keep your streak and habit strong."
+  },
+  "perm": {
+    "saveImage": "FastFast needs permission to save images to your photo library.",
+    "camera": "FastFast needs camera access to take photos.",
+    "gallery": "FastFast needs access to your photos to choose an image.",
+    "saveFailed": "Could not save the image. Please try again."
+  },
+  "widget": {
+    "fasting": "FASTING",
+    "ready": "READY",
+    "notFasting": "Not fasting",
+    "tapToOpen": "Tap to open FastFast",
+    "started": "Started",
+    "done": "Done"
+  },
+  "notFound": {
+    "title": "Oops!",
+    "body": "This screen does not exist.",
+    "home": "Go to home screen!"
   }
 }

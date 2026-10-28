@@ -14,14 +14,16 @@ import Animated, {
 import { ThemedText } from "../themed-text";
 import { useFastCounter } from "@/hooks/useFastCounter";
 import Counter from "./Counter";
+import { useT } from "@/providers/Language";
 
 const HomeBodyProgress = () => {
   const counter = useFastCounter();
   const theme = useAppStore((state) => state.theme);
+  const t = useT();
 
   return (
     <View className="gap-3">
-      {processData.map(({ key, title, icon, color, process }) => {
+      {processData.map(({ key, icon, color, process }) => {
         const { activeProcess, percentage, startOn } = getProcessProgress(
           counter,
           process,
@@ -63,7 +65,7 @@ const HomeBodyProgress = () => {
                     color="text"
                     opacity={activeProcess ? "full" : "half"}
                   >
-                    {title}
+                    {t(`process.${key}`)}
                   </ThemedText>
 
                   {activeProcess && (
@@ -99,7 +101,7 @@ const HomeBodyProgress = () => {
                   className="flex-row items-center justify-between"
                 >
                   <ThemedText size="xs" opacity="low">
-                    Effect after
+                    {t("home.effectAfter")}
                   </ThemedText>
 
                   <Counter

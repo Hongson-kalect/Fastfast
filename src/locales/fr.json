@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "Passer",
+    "next": "Suivant",
+    "start": "Commencer",
+    "welcome": {
+      "title": "Le jeûne intermittent, en plus fun",
+      "body": "Appuyez sur démarrer quand vous arrêtez de manger. FastFast compte le temps et vous prévient quand l'objectif est atteint."
+    },
+    "habit": {
+      "title": "Série et force de l'habitude",
+      "body": "Chaque jeûne terminé prolonge votre série et remplit votre barre d'habitude. Plus le jeûne est long, plus elle se remplit vite."
+    },
+    "shield": {
+      "title": "Boucliers : des jours de repos sans perdre votre série",
+      "body": "Soyez régulier ou terminez un long jeûne pour gagner des boucliers. Un jour de repos, un bouclier protège automatiquement votre série."
+    },
+    "pixel": {
+      "title": "Une année en couleurs",
+      "body": "Chaque jour est un pixel. Notez votre humeur et votre poids, et voyez toute votre année en une image."
+    },
+    "health": {
+      "title": "Écoutez votre corps",
+      "body": "FastFast ne remplace pas un avis médical. Si vous êtes enceinte, avez un problème de santé ou prévoyez de jeûner plus de 48 heures, parlez-en à un médecin. Arrêtez immédiatement en cas de vertiges ou de malaise inhabituel."
+    }
+  },
+  "tabs": {
+    "fast": "Jeûne",
+    "stats": "Stats",
+    "journey": "Parcours",
+    "settings": "Réglages"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "gotIt": "Compris",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "today": "Aujourd'hui",
+    "noData": "Aucune donnée",
+    "invalid": "Invalide",
+    "success": "C'est fait",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "loading": "Chargement…",
+    "close": "Fermer",
+    "restore": "Restaurer",
+    "permission": "Autorisation requise",
+    "error": "Erreur"
+  },
+  "time": {
+    "justNow": "À l'instant",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "yesterday": "Hier",
+    "dayAfterTomorrow": "Après-demain",
+    "daysAgo_one": "il y a {{count}} jour",
+    "daysAgo_other": "il y a {{count}} jours",
+    "daysLater_one": "dans {{count}} jour",
+    "daysLater_other": "dans {{count}} jours",
+    "secondsAgo_one": "il y a {{count}} seconde",
+    "secondsAgo_other": "il y a {{count}} secondes",
+    "inSeconds_one": "dans {{count}} seconde",
+    "inSeconds_other": "dans {{count}} secondes",
+    "minutesAgo_one": "il y a {{count}} minute",
+    "minutesAgo_other": "il y a {{count}} minutes",
+    "inMinutes_one": "dans {{count}} minute",
+    "inMinutes_other": "dans {{count}} minutes",
+    "hoursAgo_one": "il y a {{count}} heure",
+    "hoursAgo_other": "il y a {{count}} heures",
+    "inHours_one": "dans {{count}} heure",
+    "inHours_other": "dans {{count}} heures"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Bonjour",
+      "noon": "Bon après-midi",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir"
+    },
+    "streakDays_one": "{{count}} jour",
+    "streakDays_other": "{{count}} jours",
+    "lastFast": "Dernier jeûne",
+    "bodyPhases": "Phases du corps",
+    "fastingPhases": "Les phases du jeûne",
+    "effectAfter": "Effet dans",
+    "startFast": "Commencer le jeûne",
+    "endFast": "Terminer"
+  },
+  "counter": {
+    "chooseTarget": "Choisir un objectif",
+    "reached": "🎉 Objectif atteint",
+    "finishAt": "Fin : {{time}}",
+    "freeMode": "Mode libre",
+    "ifStartNow": "Si vous commencez maintenant : {{time}}",
+    "fasting": "En jeûne",
+    "ready": "Prêt",
+    "startedAt": "Début : {{time}}",
+    "history": "Historique"
+  },
+  "finish": {
+    "title": "Terminer",
+    "confirm": "Voulez-vous vraiment terminer ce jeûne ?",
+    "tooQuick": "Ce jeûne est trop court et sera supprimé. Continuer ?",
+    "tooQuickSub": "Le jeûne dure moins de 2 heures.",
+    "failed": "Ce jeûne sera marqué comme échoué. Continuer ?",
+    "failedSub": "Le jeûne dure moins de 16 heures.",
+    "reached": "Objectif atteint. Terminer maintenant ?",
+    "notReached": "Objectif pas encore atteint. Terminer quand même ?",
+    "endBeforeStart": "L'heure de fin doit être après l'heure de début.",
+    "startBeforeLast": "Le début doit être après votre dernier jeûne."
+  },
+  "info": {
+    "shield": {
+      "title": "Bouclier",
+      "message": "Les boucliers préservent votre série les jours de repos sans jeûne.",
+      "effectTitle": "Effet · vous en avez {{count}}/{{max}}",
+      "effect1": "Chaque jour vide entre deux jeûnes utilise 1 bouclier. La série reste valide et l'Habitude ne change pas.",
+      "effect2": "Sans bouclier, un jour de repos casse la série, l'Habitude baisse et Retain revient à 0.",
+      "effect3": "Vous pouvez garder jusqu'à {{max}} boucliers ; les suivants sont perdus.",
+      "longTitle": "Jeûnes longs",
+      "long1": "Jeûnez 48 h+ pour gagner 1 bouclier, 72 h+ pour en gagner 2.",
+      "long2": "Le repos fait partie d'un long jeûne : le corps a besoin de temps pour se réalimenter et récupérer. Les boucliers vous laissent souffler ces jours-là sans perdre votre série.",
+      "milestoneTitle": "Paliers d'Habitude",
+      "milestone1": "Atteindre 35 %, 70 % et 100 % d'Habitude donne 1 bouclier chacun.",
+      "milestone2": "Si votre Habitude baisse puis remonte, vous pouvez regagner le palier.",
+      "retainTitle": "Retain",
+      "retain1": "Une fois l'Habitude à 100 %, les points de chaque jeûne vont dans Retain.",
+      "retain2": "25 Retain se convertissent automatiquement en 1 bouclier."
+    },
+    "body": {
+      "title": "Que signifient ces barres ?",
+      "message": "Chaque barre montre à quel point le jeûne soutient un processus naturel de votre corps.",
+      "alwaysTitle": "Toujours actifs",
+      "always1": "Ces processus fonctionnent toujours dans votre corps, même sans jeûne.",
+      "always2": "Ce ne sont pas des interrupteurs qui s'allument à une heure précise.",
+      "levelsTitle": "Ce que signifient les niveaux 1 à 5",
+      "levels1": "Chaque niveau signifie que le jeûne soutient davantage ce processus, en augmentant avec la durée.",
+      "levels2": "Une barre pleine ne veut pas dire que le processus est à son maximum, seulement que le soutien du jeûne est plus élevé.",
+      "estimateTitle": "Seulement une estimation",
+      "estimate1": "Les repères horaires sont approximatifs et varient selon chacun : dernier repas, activité, sommeil…",
+      "estimate2": "Ceci n'est ni un diagnostic ni un avis médical."
+    }
+  },
+  "tip": {
+    "disableHint": "Désactivez les conseils dans Réglages → Conseils débutant",
+    "habit": {
+      "title": "Comment l'Habitude est-elle calculée ?",
+      "line1": "Chaque jeûne de 16 h ou plus : +3 %, plus 0,2 % par heure au-delà de 16 h (20 h → +3,8 %).",
+      "line2": "Les jeûnes de moins de 16 h ne comptent pas.",
+      "line3": "Chaque jour vide entre deux jeûnes utilise 1 bouclier. Sans bouclier, l'Habitude baisse, d'autant plus que la pause est longue.",
+      "line4": "À 100 % : les points vont dans Retain, et 25 Retain donnent 1 bouclier."
+    }
+  },
+  "process": {
+    "glucoseControl": "Contrôle de la glycémie",
+    "fatBurning": "Combustion des graisses",
+    "growthHormone": "Hormone de croissance",
+    "ketosis": "Cétose",
+    "autophagy": "Autophagie",
+    "cellRenewal": "Renouvellement cellulaire",
+    "immuneRenewal": "Renouvellement immunitaire",
+    "level": {
+      "start": "Début",
+      "standard": "Standard",
+      "good": "Bon",
+      "high": "Élevé",
+      "peak": "Pic",
+      "max": "Max",
+      "drop": "Baisse",
+      "stable": "Stable",
+      "optimal": "Optimal",
+      "init": "Amorce",
+      "warm": "Échauffement",
+      "burn": "Combustion",
+      "trace": "Traces",
+      "light": "Légère",
+      "active": "Active",
+      "deep": "Profonde",
+      "better": "Mieux",
+      "rise": "Hausse",
+      "boost": "Boost",
+      "prime": "Amorçage",
+      "ready": "Prête",
+      "stronger": "Plus forte"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Débutant",
+      "Veteran": "Confirmé",
+      "Expert": "Expert",
+      "Master": "Maître"
+    },
+    "16h": {
+      "label": "Intermittent",
+      "title": "Populaire et facile pour débuter",
+      "description": "Aide à puiser l'énergie dans les graisses et améliore la sensibilité à l'insuline.",
+      "advice": "(16 h) Le classique ! Mangez entre 12 h et 20 h.",
+      "adviceLong": "C'est la référence, la plus facile à tenir. Sautez simplement le petit-déjeuner et regroupez vos calories entre 12 h et 20 h. Buvez environ 2 L d'eau pendant le jeûne."
+    },
+    "18h": {
+      "label": "Brûle-graisse",
+      "title": "Combustion des graisses renforcée",
+      "description": "Prolonge la cétose et commence à amorcer l'autophagie.",
+      "advice": "(18 h) Un cran au-dessus du 16/8.",
+      "adviceLong": "Deux heures de plus que le 16/8 aident à optimiser la combustion des graisses et à amorcer l'autophagie. Pendant ces 18 heures, un café noir ou un thé vert sans sucre aide à passer la faim."
+    },
+    "20h": {
+      "label": "Guerrier",
+      "title": "Mode guerrier",
+      "description": "Optimise la combustion des graisses et aide à préserver la masse musculaire.",
+      "advice": "(20 h) Fenêtre de 4 heures. Mangez assez de protéines.",
+      "adviceLong": "La fenêtre alimentaire est très courte (4 heures). Misez sur assez de protéines (viande, poisson, œufs) et de fibres pour garder vos muscles. Évitez de manger trop vite pour ne pas surcharger la digestion."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Un repas par jour",
+      "description": "Favorise l'autophagie et offre un repos profond à la digestion.",
+      "advice": "(23 h) Votre unique repas doit être très nourrissant.",
+      "adviceLong": "Un jeûne de presque 24 heures (par ex. dîner aujourd'hui, puis rien jusqu'au dîner de demain). Ce repas unique doit être complet, riche en bons gras et en protéines. Écoutez votre corps si vous le pratiquez souvent."
+    },
+    "36h": {
+      "label": "Moine",
+      "title": "Défi d'une journée entière",
+      "description": "Offre à l'intestin une longue pause de récupération et aide à calmer l'inflammation.",
+      "advice": "(36 h) Choisissez un jour sans gros effort.",
+      "adviceLong": "Un jour et une nuit complets sans manger (par ex. dîner lundi, sauter mardi, remanger mercredi matin). Choisissez une journée calme et prenez des électrolytes (sels minéraux) pour rester alerte."
+    },
+    "48h": {
+      "label": "Prolongé",
+      "title": "Jeûne profond avancé",
+      "description": "Épuise totalement le glycogène stocké et pousse le corps à réorganiser son énergie.",
+      "advice": "(48 h) Les électrolytes sont indispensables.",
+      "adviceLong": "Un jeûne aussi long nécessite des électrolytes chaque jour (sel, potassium, magnésium) pour garder une tension stable. En cas de malaise ou de vertiges prolongés, rompez le jeûne immédiatement."
+    },
+    "72h": {
+      "label": "Long",
+      "title": "Défi ultime",
+      "description": "Atteint une autophagie profonde. Demande une préparation soignée et de la prudence.",
+      "advice": "(72 h) Réservé aux jeûneurs très expérimentés.",
+      "adviceLong": "À faire rarement, quand le corps est déjà très habitué au jeûne. Pour rompre le jeûne, ne commencez jamais par un gros repas ; optez pour un bouillon d'os ou quelque chose de léger pour protéger l'estomac."
+    }
+  },
+  "term": {
+    "habit": "Habitude",
+    "retain": "Retain",
+    "target": "Objectif",
+    "targetHours": "Objectif {{hours}} h",
+    "points": "Points",
+    "pts": "{{value}} pts",
+    "history": "Historique",
+    "progress": "Progression",
+    "weight": "Poids",
+    "note": "Note",
+    "mood": "Humeur",
+    "camera": "Appareil photo",
+    "gallery": "Galerie",
+    "error": "Erreur"
+  },
+  "fastingSheet": {
+    "completed": "Terminé",
+    "result": "Récompenses",
+    "keepGoing": "Continuez pour atteindre l'objectif",
+    "now": "MAINTENANT",
+    "atTarget": "À L'OBJECTIF",
+    "endFasting": "Terminer le jeûne"
+  },
+  "lastFast": {
+    "interrupted": "Interrompu",
+    "completed": "Terminé",
+    "endedEarly": "Terminé tôt",
+    "freeFasting": "Jeûne libre",
+    "targetProgress": "Progression de l'objectif"
+  },
+  "habitSheet": {
+    "title": "Indice d'habitude",
+    "sessions_one": "{{count}} session",
+    "sessions_other": "{{count}} sessions",
+    "fastingSession": "Séance de jeûne",
+    "overRest_one": "{{count}} jour de repos en trop",
+    "overRest_other": "{{count}} jours de repos en trop",
+    "shieldIncrease": "Bouclier gagné",
+    "restDays_one": "{{count}} jour de repos",
+    "restDays_other": "{{count}} jours de repos"
+  },
+  "habitDetail": {
+    "title": "Journal d'habitude",
+    "habitPoints": "Points d'habitude",
+    "shields": "Boucliers",
+    "fastDetail": "Détails du jeûne",
+    "restDay": "Jour de repos",
+    "overRest": "Trop de repos"
+  },
+  "habitMilestone": {
+    "title": "Progression"
+  },
+  "fullHabit": {
+    "title": "Habitude installée",
+    "maintainTitle": "Place à la phase d'entretien",
+    "maintainBody": "Chaque fois que vous entretenez l'habitude, des points s'ajoutent à Retain.",
+    "retainTitle": "Retain d'habitude",
+    "retainSub": "Points d'entretien",
+    "note": "25 Retain se convertissent automatiquement en 1 bouclier. Si l'habitude se brise, tout le Retain revient à 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Palier de série atteint !",
+      "subtitle": "Vous construisez une habitude de jeûne inarrêtable !",
+      "button": "Continuez ! 🔥"
+    },
+    "rest": {
+      "title": "Jour de repos actif !",
+      "subtitle": "La récupération fait partie du parcours. Votre série tient bon !",
+      "button": "On continue ! 🌿"
+    },
+    "fresh": {
+      "title": "Un nouveau départ",
+      "subtitle": "Tout maître a échoué avant de réussir. On reconstruit dès aujourd'hui !",
+      "button": "Repartir maintenant 🚀"
+    },
+    "best": "RECORD",
+    "daysStreak": "Jours d'affilée",
+    "over": "Série de plus de {{count}} jours !",
+    "consistency": "Régularité"
+  },
+  "result": {
+    "completed": {
+      "title": "Jeûne terminé !",
+      "subtitle": "Bravo pour votre discipline !"
+    },
+    "endedEarly": {
+      "title": "Jeûne terminé plus tôt",
+      "subtitle": "Chaque heure compte ! Votre progression est enregistrée."
+    },
+    "extended": {
+      "title": "Long jeûne terminé !",
+      "subtitle": "Endurance remarquable ! Récompenses bonus débloquées."
+    },
+    "fastingTime": "Durée du jeûne",
+    "targetProgress": "Objectif {{hours}} h · {{percent}} %",
+    "shieldFrom": {
+      "longFast": "Jeûne long",
+      "retain": "Entretien de l'habitude",
+      "milestone": "Palier atteint"
+    }
+  },
+  "note": {
+    "today": "Note du jour",
+    "forDate": "Note du {{date}}",
+    "placeholder": "Comment vous êtes-vous senti aujourd'hui ?",
+    "weightDigitsOnly": "Chiffres uniquement.",
+    "weightOneDot": "Un seul séparateur décimal autorisé.",
+    "weightIntMax": "4 chiffres maximum avant la virgule.",
+    "weightDecMax": "1 chiffre maximum après la virgule."
+  },
+  "image": {
+    "saveError": "Impossible d'enregistrer la photo. Réessayez.",
+    "deleteError": "Impossible de supprimer la photo. Réessayez.",
+    "deleteTitle": "Supprimer la photo",
+    "deleteConfirm": "Supprimer la photo de ce jour ?",
+    "addTitle": "Ajouter une photo",
+    "yourPhoto": "Votre photo",
+    "addAPhoto": "Ajoutez une photo",
+    "capture": "Capturez l'instant",
+    "chooseSource": "Choisissez l'appareil photo ou la galerie"
+  },
+  "history": {
+    "title": "Historique des jeûnes",
+    "total": "Total",
+    "average": "Moyenne",
+    "recent": "Jeûnes récents",
+    "status": {
+      "cancelled": "Annulé",
+      "fasting": "En cours",
+      "free": "Libre",
+      "reached": "Objectif atteint",
+      "notReached": "Non atteint"
+    },
+    "actions": "Actions"
+  },
+  "startTime": {
+    "invalid": "Heure invalide",
+    "overlap": "Chevauche votre jeûne précédent !",
+    "max24h": "Vous pouvez avancer le début de 24 heures maximum !",
+    "future": "Impossible de choisir une heure future !",
+    "title": "Heure de début du jeûne",
+    "hint": "Touchez l'heure ou la date pour choisir le début",
+    "earlier": "Commencer plus tôt",
+    "confirm": "Confirmer le début"
+  },
+  "endTime": {
+    "title": "Heure de fin",
+    "confirm": "Confirmer la fin",
+    "future": {
+      "title": "Heure invalide",
+      "desc": "Cette heure est dans le futur."
+    },
+    "tooQuick": {
+      "title": "Ce jeûne sera annulé",
+      "desc": "Trop court pour être enregistré."
+    },
+    "failed": {
+      "title": "Ce jeûne sera marqué comme échoué",
+      "desc": "En dessous du minimum pour valider un jeûne."
+    },
+    "completed": {
+      "title": "Ce jeûne sera validé",
+      "desc": "Assez long pour être enregistré."
+    }
+  },
+  "targetSheet": {
+    "choose": "Choisir cet objectif",
+    "clear": "Retirer l'objectif"
+  },
+  "fastDetail": {
+    "reachedTarget": "Objectif atteint",
+    "notReachedTarget": "Objectif non atteint",
+    "targetHours": "Objectif : {{hours}} heures",
+    "over": "{{duration}} de plus",
+    "remaining": "Encore {{duration}}",
+    "review": "Bilan de la séance",
+    "bodyAtEnd": "État du corps à la fin",
+    "metrics": "Données enregistrées",
+    "advice": "Conseil"
+  },
+  "date": {
+    "weekday": {
+      "0": "Dim",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mer",
+      "4": "Jeu",
+      "5": "Ven",
+      "6": "Sam"
+    },
+    "month": {
+      "0": "Janv",
+      "1": "Févr",
+      "2": "Mars",
+      "3": "Avr",
+      "4": "Mai",
+      "5": "Juin",
+      "6": "Juil",
+      "7": "Août",
+      "8": "Sept",
+      "9": "Oct",
+      "10": "Nov",
+      "11": "Déc"
+    },
+    "monthNarrow": {
+      "0": "J",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Image enregistrée dans votre galerie.",
+    "saveImage": "Enregistrer l'image",
+    "style": "Style",
+    "mode": {
+      "mood": "Émotion",
+      "fasting": "Jeûnes"
+    },
+    "dayButton": "Jour",
+    "weekButton": "Sem",
+    "stat": {
+      "days_one": "jour",
+      "days_other": "jours",
+      "hours_one": "heure",
+      "hours_other": "heures",
+      "logs_one": "note",
+      "logs_other": "notes"
+    },
+    "statsLine": "{{days}} jours · {{hours}} heures · {{logs}} notes",
+    "legend": {
+      "mood": {
+        "0": "Très mal",
+        "1": "Mal",
+        "2": "Bof",
+        "3": "Bien",
+        "4": "Très bien"
+      }
+    },
+    "info": {
+      "title": "Lire votre parcours",
+      "message": "Ce que la légende des icônes ne dit pas.",
+      "fast1": "Chaque case prend la couleur de la durée totale du plus long jeûne de la journée.",
+      "fast2": "Un jeûne sur plusieurs jours les colore tous, plus clair au début et plus foncé vers la fin.",
+      "fast3": "Une case avec une icône de bouclier est un jour de repos protégé.",
+      "mood1": "Une case bordée de la couleur principale est un jour avec une note.",
+      "actionsTitle": "Actions",
+      "action1": "Touchez un jour vide pour ajouter humeur et note ; touchez un jour rempli pour voir le détail.",
+      "action2": "Le nombre sous chaque icône indique combien de jours de l'année sont à ce niveau.",
+      "action3": "Le bouton Sem/Jour dans le coin change la disposition. Les images enregistrées suivent la disposition choisie."
+    }
+  },
+  "layout": {
+    "title": "Disposition des pixels",
+    "subtitle": "Choisissez l'affichage de votre parcours",
+    "weekly": "Par semaine",
+    "monthly": "Par mois",
+    "vertical": "↓ Vertical",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Choisir un pack d'icônes",
+    "tabMood": "Émotion",
+    "tabTarget": "Objectif",
+    "level": "Niv. {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Un look minimaliste et moderne avec Ionicons",
+    "material_emoticons": "Des visages d'émotion subtils de Material Community",
+    "weather_vibes": "Exprimez votre humeur avec la météo",
+    "gaming_energy": "Les émotions en barres d'énergie, style jeu vidéo",
+    "pixel_vibe": "Émotions style pixel et emojis pictogrammes",
+    "default_emoji_targets": "Objectifs représentés par des emojis classiques",
+    "ionicons_targets": "Des icônes minimalistes et fluides d'Ionicons",
+    "material_energy_targets": "Le défi illustré par l'énergie et les flammes",
+    "feather_minimal_targets": "Un design en traits fins de Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Journal du jour",
+    "noMood": "Pas encore d'humeur",
+    "dailyFast": "⏱️ Jeûne du jour",
+    "dailyNote": "📝 Note du jour",
+    "relatedFasts": "JEÛNES LIÉS",
+    "hoursToday": "heures aujourd'hui",
+    "hoursFasted": "HEURES DE JEÛNE",
+    "weightHint": "Touchez pour modifier",
+    "addWeight": "Ajouter le poids",
+    "dayNote": "NOTE DU JOUR",
+    "notePlaceholder": "Ajoutez une note pour ce jour...",
+    "photos": "PHOTO",
+    "addPhoto": "Ajouter une photo",
+    "photoHint": "Ajoutez une photo pour ce jour",
+    "updatePhoto": "Modifier la photo",
+    "changePhoto": "Changer la photo",
+    "photoFrom": "Photo depuis"
+  },
+  "dayModal": {
+    "todayMood": "Humeur du jour",
+    "moodFor": "Humeur du {{date}}",
+    "todayWeight": "Poids du jour",
+    "weightFor": "Poids du {{date}}"
+  },
+  "stats": {
+    "subtitle": "Suivez vos progrès",
+    "dashboard": "Tableau de bord",
+    "currentStreak": "Série actuelle",
+    "days_one": "jour",
+    "days_other": "jours",
+    "record": "Record",
+    "shields": "Boucliers",
+    "section": "Statistiques",
+    "totalFasting": "Jeûne total",
+    "completed": "Terminés",
+    "averageFast": "Jeûne moyen",
+    "longestFast": "Plus long jeûne",
+    "activeDays": "Jours actifs",
+    "maxStreak": "Meilleure série",
+    "shieldsUsed": "Boucliers utilisés",
+    "unit": {
+      "hours": "heures",
+      "times": "fois",
+      "days": "jours"
+    },
+    "distribution": {
+      "title": "Répartition des jeûnes",
+      "subtitle": "Comment se répartissent vos jeûnes",
+      "range": "{{from}}–{{to}} h",
+      "over": "{{from}}+ h",
+      "fasts_one": "jeûne",
+      "fasts_other": "jeûnes"
+    },
+    "chart": {
+      "title": "Poids et progression du jeûne",
+      "subtitle": "Votre progression dans le temps",
+      "fasting": "Jeûne",
+      "noData": "Aucune donnée",
+      "noWeight": "- Pas de poids",
+      "hoursUnit": "Heures"
+    },
+    "range": {
+      "title": "Période",
+      "day_one": "{{count}} jour",
+      "day_other": "{{count}} jours",
+      "week_one": "{{count}} semaine",
+      "week_other": "{{count}} semaines",
+      "month_one": "{{count}} mois",
+      "month_other": "{{count}} mois",
+      "unit": {
+        "day": "jours",
+        "week": "semaines",
+        "month": "mois"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Poids actuel",
+    "currentWeightMessage": "Saisissez votre poids actuel",
+    "targetMessage": "Définissez votre poids cible",
+    "setCurrent": "Indiquez votre poids actuel",
+    "setCurrentHint": "Ajoutez votre poids pour suivre vos progrès",
+    "weightGoal": "Objectif de poids",
+    "setTarget": "Définir l'objectif",
+    "currentWeight": "Poids actuel",
+    "setTargetHint": "Définissez un poids cible pour suivre vos progrès",
+    "toGo": "Encore {{value}} kg",
+    "reached": "Objectif atteint"
+  },
+  "ach": {
+    "title": "Succès",
+    "unlocked": "{{unlocked}} / {{total}} débloqués",
+    "empty": "Aucun succès",
+    "claim": "Récupérer",
+    "done": "Obtenu",
+    "notDone": "Pas encore",
+    "empty_slot": "Vide",
+    "tier": {
+      "BRONZE": "BRONZE",
+      "SILVER": "ARGENT",
+      "GOLD": "OR",
+      "DIAMOND": "DIAMANT"
+    },
+    "fasting_hours": {
+      "name": "Jeûne total",
+      "description": "Nombre total d'heures de jeûne.",
+      "item_one": "{{count}} heure de jeûne",
+      "item_other": "{{count}} heures de jeûne"
+    },
+    "invalid_fasts": {
+      "name": "Jeûnes invalides",
+      "description": "Nombre total de jeûnes invalides."
+    },
+    "failed_fasts": {
+      "name": "Jeûnes échoués",
+      "description": "Nombre total de jeûnes échoués."
+    },
+    "completed_fasts": {
+      "name": "Jeûnes terminés",
+      "description": "Nombre total de jeûnes terminés.",
+      "item_one": "Terminez votre premier jeûne",
+      "item_other": "Terminez {{count}} jeûnes"
+    },
+    "active_days": {
+      "name": "Jours actifs",
+      "description": "Nombre de jours d'activité dans l'app.",
+      "item_one": "{{count}} jour actif",
+      "item_other": "{{count}} jours actifs"
+    },
+    "habit": {
+      "name": "Habitude",
+      "description": "Votre score d'habitude de jeûne.",
+      "item_one": "Atteignez {{count}} % d'habitude",
+      "item_other": "Atteignez {{count}} % d'habitude"
+    },
+    "longest_fast": {
+      "name": "Plus long jeûne",
+      "description": "Votre plus long jeûne terminé.",
+      "item_one": "Terminez un jeûne de {{count}} heure",
+      "item_other": "Terminez un jeûne de {{count}} heures"
+    },
+    "max_streak": {
+      "name": "Plus longue série",
+      "description": "Votre plus longue série de jeûnes.",
+      "item_one": "Atteignez une série de {{count}} jour",
+      "item_other": "Atteignez une série de {{count}} jours"
+    },
+    "total_shields": {
+      "name": "Total de boucliers",
+      "description": "Nombre total de boucliers gagnés.",
+      "item_one": "Gagnez votre premier bouclier",
+      "item_other": "Gagnez {{count}} boucliers"
+    },
+    "retain_circles": {
+      "name": "Maître du Retain",
+      "description": "Cycles de Retain complétés avec l'habitude au maximum.",
+      "item_one": "Complétez votre premier cycle de Retain",
+      "item_other": "Complétez {{count}} cycles de Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "Impossible de fermer",
+      "body": "Terminez d'abord cette étape !"
+    }
+  },
+  "settings": {
+    "title": "Réglages",
+    "section": {
+      "showcase": "Vitrine",
+      "appearance": "Apparence",
+      "general": "Général",
+      "sound": "Sons et vibrations",
+      "notifications": "Notifications",
+      "data": "Données",
+      "about": "À propos"
+    },
+    "showcaseExport": "Afficher dans l'image exportée",
+    "showcaseExportDesc": "Ajoutez vos badges à l'image enregistrée",
+    "showcaseEmpty": "Aucun badge pour l'instant. Atteignez un palier et touchez Récupérer dans Stats pour le débloquer.",
+    "showcasePick": "Choisissez jusqu'à {{max}} badges à afficher.",
+    "selectedCount": "Sélectionnés {{count}}/{{max}}",
+    "darkMode": "Mode sombre",
+    "darkModeDesc": "Utiliser l'apparence sombre partout",
+    "theme": "Thème",
+    "language": "Langue",
+    "weekStart": "La semaine commence le",
+    "monday": "Lundi",
+    "sunday": "Dimanche",
+    "mondayDesc": "Semaines du lundi → dimanche",
+    "sundayDesc": "Semaines du dimanche → samedi",
+    "beginnerTips": "Conseils débutant",
+    "beginnerTipsDesc": "Affiche de courtes explications sur l'habitude et les boucliers",
+    "vibration": "Vibration",
+    "sound": "Son",
+    "soundDesc": "Sons au début, à la fin et pour les récompenses",
+    "touchSound": "Son au toucher",
+    "touchSoundDesc": "Petits clics aux appuis et bascules",
+    "targetReached": "Objectif atteint",
+    "targetReachedDesc": "Prévenir quand l'objectif est atteint",
+    "dailyReminder": "Rappel quotidien",
+    "dailyReminderDesc": "Un rappel quotidien pour commencer le jeûne",
+    "reminderTime": "Heure du rappel",
+    "backup": "Sauvegarde et restauration",
+    "backupDesc": "Google Drive ou un fichier",
+    "reset": "Réinitialiser les réglages",
+    "resetDesc": "Revenir aux réglages par défaut",
+    "resetConfirmTitle": "Réinitialiser les réglages ?",
+    "resetConfirmBody": "Thème, disposition, sons et notifications reviennent par défaut. Vos données de jeûne sont conservées.",
+    "resetOk": "Réinitialiser",
+    "privacy": "Confidentialité",
+    "privacyDesc": "Confidentialité et données",
+    "privacyBody": "FastFast fonctionne hors ligne. Vos jeûnes, notes et poids restent sur cet appareil et ne sont jamais envoyés sur nos serveurs. Les sauvegardes vont dans un fichier que vous gardez ou dans votre propre Google Drive.",
+    "health": "Avertissement santé",
+    "rate": "Noter l'app",
+    "rateDesc": "Vous aimez l'app ? Laissez une note",
+    "rateThanks": "Merci !",
+    "rateLater": "La notation sera possible une fois l'app sur le store.",
+    "feedback": "Avis",
+    "feedbackDesc": "Donnez votre avis ou signalez un problème",
+    "noEmailTitle": "Aucune app e-mail",
+    "noEmailBody": "Installez une app e-mail pour envoyer votre avis.",
+    "about": "À propos",
+    "aboutBody": "Version {{version}}\n\nJeûne intermittent avec séries, boucliers et une année en pixels.",
+    "version": "Version {{version}}",
+    "expoGoTitle": "Indisponible dans Expo Go",
+    "expoGoBody": "Les notifications nécessitent une version de développement ou du store.",
+    "notifOffTitle": "Les notifications sont désactivées",
+    "notifOffBody": "Autorisez les notifications de FastFast dans les réglages du système.",
+    "openSettings": "Ouvrir les réglages"
+  },
+  "account": {
+    "title": "Compte",
+    "guestHint": "Connectez-vous avec Google pour sauvegarder sur Drive"
+  },
+  "backup": {
+    "subtitle": "Vos données restent sur cet appareil. Les sauvegardes sont des copies à restaurer plus tard.",
+    "drive": "Google Drive",
+    "file": "Fichier",
+    "signIn": "Se connecter avec Google",
+    "signInDesc": "Sauvegarder sur votre propre Google Drive",
+    "notSignedIn": "Non connecté",
+    "lastBackup": "Dernière sauvegarde {{time}}",
+    "never": "Pas encore de sauvegarde",
+    "backUpNow": "Sauvegarder maintenant",
+    "backingUp": "Sauvegarde…",
+    "restoreDrive": "Restaurer depuis Drive",
+    "restoreDriveDesc": "Remplace les données de l'appareil par la sauvegarde Drive",
+    "restoring": "Restauration…",
+    "signOut": "Se déconnecter",
+    "signOutTitle": "Se déconnecter ?",
+    "signOutBody": "Vos données restent sur l'appareil. Les sauvegardes Google Drive sont conservées.",
+    "signInFailedTitle": "Échec de la connexion",
+    "signInFailedBody": "Connexion Google impossible. Réessayez.",
+    "confirmTitle": "Sauvegarder sur Google Drive ?",
+    "confirmReplace": "La sauvegarde du {{time}} sera remplacée par vos données et photos actuelles.",
+    "confirmFirst": "Vos données et photos actuelles seront enregistrées sur votre Google Drive.",
+    "backUp": "Sauvegarder",
+    "doneTitle": "Sauvegardé",
+    "doneWithPhotos": "Vos données et {{count}} nouvelle(s) photo(s) sont sur Google Drive.",
+    "doneBody": "Vos données sont enregistrées sur Google Drive.",
+    "failedTitle": "Échec de la sauvegarde",
+    "failedBody": "Sauvegarde Google Drive impossible. Vérifiez la connexion et réessayez.",
+    "restoredTitle": "Restauré",
+    "restoredBody": "Vos données ont été restaurées.",
+    "restoredMissing": "Données restaurées. {{count}} photo(s) introuvable(s) sur Drive.",
+    "restoreFailedTitle": "Échec de la restauration",
+    "restoreFailedDrive": "Restauration depuis Google Drive impossible.",
+    "readFailed": "Impossible de lire la sauvegarde sur Google Drive.",
+    "noneTitle": "Aucune sauvegarde",
+    "noneBody": "Aucune sauvegarde FastFast sur ce compte Google pour l'instant.",
+    "restoreDriveTitle": "Restaurer depuis Google Drive ?",
+    "restoreConfirm": "Sauvegarde du {{time}}. Toutes les données actuelles de l'appareil seront remplacées.",
+    "restoreFileConfirm": "Sauvegarde du {{time}}. Toutes les données actuelles seront remplacées. Les fichiers n'incluent pas les photos.",
+    "restoreFileTitle": "Restaurer depuis un fichier ?",
+    "restoreFileFailed": "Impossible de restaurer ce fichier.",
+    "exportFile": "Exporter un fichier de sauvegarde",
+    "exporting": "Exportation…",
+    "exportFileDesc": "Données uniquement, à partager ou garder où vous voulez",
+    "exportFailedTitle": "Échec de l'exportation",
+    "exportFailedBody": "Impossible de créer le fichier de sauvegarde.",
+    "restoreFile": "Restaurer depuis un fichier",
+    "restoreFileDesc": "Choisissez un fichier de sauvegarde FastFast",
+    "importFailedTitle": "Échec de l'import",
+    "importFailedBody": "Ce fichier n'est pas une sauvegarde FastFast valide."
+  },
+  "theme": {
+    "title": "Thème",
+    "subtitle": "Choisissez l'apparence de l'app",
+    "notPurchased": "Non acheté",
+    "freeUntil": "Gratuit jusqu'au",
+    "purchase": "Acheter",
+    "unavailable": "Indisponible",
+    "premium": "Premium",
+    "limited": "Limité",
+    "dark": "Sombre",
+    "light": "Clair"
+  },
+  "notify": {
+    "targetTitle": "🎉 Objectif atteint !",
+    "targetBody": "Vous avez jeûné {{hours}} heures. Terminez la séance pour l'enregistrer.",
+    "dailyTitle": "C'est l'heure du jeûne ⏱️",
+    "dailyBody": "Lancez le jeûne du jour pour garder votre série et votre habitude."
+  },
+  "perm": {
+    "saveImage": "FastFast a besoin d'une autorisation pour enregistrer des images dans votre galerie.",
+    "camera": "FastFast a besoin de l'appareil photo pour prendre des photos.",
+    "gallery": "FastFast a besoin d'accéder à vos photos pour choisir une image.",
+    "saveFailed": "Impossible d'enregistrer l'image. Réessayez."
+  },
+  "widget": {
+    "fasting": "EN JEÛNE",
+    "ready": "PRÊT",
+    "notFasting": "Pas de jeûne",
+    "tapToOpen": "Touchez pour ouvrir FastFast",
+    "started": "Début",
+    "done": "Fin"
+  },
+  "notFound": {
+    "title": "Oups !",
+    "body": "Cet écran n'existe pas.",
+    "home": "Retour à l'accueil !"
+  }
+}

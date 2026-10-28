@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "start": "Los geht's",
+    "welcome": {
+      "title": "Intervallfasten, das Spaß macht",
+      "body": "Tippe auf Start, wenn du aufhörst zu essen. FastFast zählt die Zeit und meldet sich, wenn du dein Ziel erreichst."
+    },
+    "habit": {
+      "title": "Serie & Gewohnheitsstärke",
+      "body": "Jedes abgeschlossene Fasten hält deine Serie und füllt deine Gewohnheitsleiste. Längeres Fasten füllt sie schneller."
+    },
+    "shield": {
+      "title": "Schilde – Ruhetage, ohne die Serie zu verlieren",
+      "body": "Bleib dran oder schließe ein langes Fasten ab, um Schilde zu verdienen. An einem Ruhetag schützt ein Schild deine Serie automatisch."
+    },
+    "pixel": {
+      "title": "Ein farbenfrohes Jahr",
+      "body": "Jeder Tag ist ein Pixel. Erfasse Stimmung und Gewicht und sieh dein ganzes Jahr in einem Bild."
+    },
+    "health": {
+      "title": "Hör auf deinen Körper",
+      "body": "FastFast ersetzt keine ärztliche Beratung. Wenn du schwanger bist, eine Vorerkrankung hast oder länger als 48 Stunden fasten möchtest, sprich mit einer Ärztin oder einem Arzt. Hör sofort auf, wenn dir schwindlig oder ungewöhnlich unwohl ist."
+    }
+  },
+  "tabs": {
+    "fast": "Fasten",
+    "stats": "Statistik",
+    "journey": "Verlauf",
+    "settings": "Einstellungen"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "gotIt": "Verstanden",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "today": "Heute",
+    "noData": "Keine Daten",
+    "invalid": "Ungültig",
+    "success": "Erledigt",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "loading": "Wird geladen …",
+    "close": "Schließen",
+    "restore": "Wiederherstellen",
+    "permission": "Berechtigung erforderlich",
+    "error": "Fehler"
+  },
+  "time": {
+    "justNow": "Gerade eben",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "yesterday": "Gestern",
+    "dayAfterTomorrow": "Übermorgen",
+    "daysAgo_one": "vor {{count}} Tag",
+    "daysAgo_other": "vor {{count}} Tagen",
+    "daysLater_one": "in {{count}} Tag",
+    "daysLater_other": "in {{count}} Tagen",
+    "secondsAgo_one": "vor {{count}} Sekunde",
+    "secondsAgo_other": "vor {{count}} Sekunden",
+    "inSeconds_one": "in {{count}} Sekunde",
+    "inSeconds_other": "in {{count}} Sekunden",
+    "minutesAgo_one": "vor {{count}} Minute",
+    "minutesAgo_other": "vor {{count}} Minuten",
+    "inMinutes_one": "in {{count}} Minute",
+    "inMinutes_other": "in {{count}} Minuten",
+    "hoursAgo_one": "vor {{count}} Stunde",
+    "hoursAgo_other": "vor {{count}} Stunden",
+    "inHours_one": "in {{count}} Stunde",
+    "inHours_other": "in {{count}} Stunden"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Guten Morgen",
+      "noon": "Guten Tag",
+      "afternoon": "Guten Nachmittag",
+      "evening": "Guten Abend"
+    },
+    "streakDays_one": "{{count}} Tag",
+    "streakDays_other": "{{count}} Tage",
+    "lastFast": "Letztes Fasten",
+    "bodyPhases": "Körperphasen",
+    "fastingPhases": "Phasen beim Fasten",
+    "effectAfter": "Wirkung nach",
+    "startFast": "Fasten starten",
+    "endFast": "Beenden"
+  },
+  "counter": {
+    "chooseTarget": "Ziel wählen",
+    "reached": "🎉 Ziel erreicht",
+    "finishAt": "Fertig: {{time}}",
+    "freeMode": "Freier Modus",
+    "ifStartNow": "Wenn du jetzt startest: {{time}}",
+    "fasting": "Fastet",
+    "ready": "Bereit",
+    "startedAt": "Start: {{time}}",
+    "history": "Verlauf"
+  },
+  "finish": {
+    "title": "Beenden",
+    "confirm": "Möchtest du dieses Fasten wirklich beenden?",
+    "tooQuick": "Dieses Fasten ist zu kurz und wird gelöscht. Fortfahren?",
+    "tooQuickSub": "Das Fasten dauert weniger als 2 Stunden.",
+    "failed": "Dieses Fasten wird als nicht geschafft markiert. Fortfahren?",
+    "failedSub": "Das Fasten dauert weniger als 16 Stunden.",
+    "reached": "Ziel erreicht. Jetzt beenden?",
+    "notReached": "Ziel noch nicht erreicht. Trotzdem beenden?",
+    "endBeforeStart": "Das Ende muss nach dem Start liegen.",
+    "startBeforeLast": "Der Start muss nach deinem letzten Fasten liegen."
+  },
+  "info": {
+    "shield": {
+      "title": "Schild",
+      "message": "Schilde halten deine Serie an Ruhetagen ohne Fasten gültig.",
+      "effectTitle": "Wirkung · du hast {{count}}/{{max}}",
+      "effect1": "Jeder leere Tag zwischen zwei Fasten verbraucht 1 Schild. Deine Serie bleibt gültig, deine Gewohnheit unverändert.",
+      "effect2": "Ohne Schilde reißt die Serie, die Gewohnheit sinkt und Retain fällt auf 0.",
+      "effect3": "Du kannst bis zu {{max}} Schilde haben; weitere verfallen.",
+      "longTitle": "Langes Fasten",
+      "long1": "Faste 48 h+ für 1 Schild, 72 h+ für 2.",
+      "long2": "Erholung gehört zum langen Fasten: Dein Körper braucht Zeit, um wieder zu essen und sich zu erholen. Schilde lassen dich an diesen Tagen pausieren, ohne die Serie zu verlieren.",
+      "milestoneTitle": "Gewohnheits-Meilensteine",
+      "milestone1": "35 %, 70 % und 100 % Gewohnheit bringen je 1 Schild.",
+      "milestone2": "Sinkt deine Gewohnheit und steigt wieder, kannst du den Meilenstein erneut erhalten.",
+      "retainTitle": "Retain",
+      "retain1": "Bei 100 % Gewohnheit fließen die Punkte jedes Fastens in Retain.",
+      "retain2": "25 Retain werden automatisch zu 1 Schild."
+    },
+    "body": {
+      "title": "Was bedeuten diese Balken?",
+      "message": "Jeder Balken zeigt, wie stark das Fasten einen natürlichen Prozess deines Körpers unterstützt.",
+      "alwaysTitle": "Laufen immer",
+      "always1": "Diese Prozesse laufen in deinem Körper immer, auch wenn du nicht fastest.",
+      "always2": "Es sind keine Schalter, die erst zu einer bestimmten Stunde anspringen.",
+      "levelsTitle": "Was die Stufen 1–5 bedeuten",
+      "levels1": "Jede Stufe bedeutet mehr Unterstützung für diesen Prozess und steigt mit der Fastendauer.",
+      "levels2": "Ein voller Balken heißt nicht, dass der Prozess gerade am stärksten ist, nur dass die Unterstützung durchs Fasten höher ist.",
+      "estimateTitle": "Nur eine Schätzung",
+      "estimate1": "Die Zeitmarken sind Schätzungen und je nach Person verschieden: letzte Mahlzeit, Bewegung, Schlaf …",
+      "estimate2": "Dies ist keine Diagnose und kein medizinischer Rat."
+    }
+  },
+  "tip": {
+    "disableHint": "Tipps lassen sich unter Einstellungen → Einsteigertipps ausschalten",
+    "habit": {
+      "title": "Wie wird die Gewohnheit berechnet?",
+      "line1": "Jedes Fasten ab 16 h: +3 %, plus 0,2 % pro Stunde über 16 h (20 h → +3,8 %).",
+      "line2": "Fasten unter 16 h zählt nicht.",
+      "line3": "Jeder leere Tag zwischen zwei Fasten verbraucht 1 Schild. Ohne Schilde sinkt die Gewohnheit – je länger die Pause, desto stärker.",
+      "line4": "Bei 100 %: Punkte gehen in Retain, 25 Retain ergeben 1 Schild."
+    }
+  },
+  "process": {
+    "glucoseControl": "Blutzuckerkontrolle",
+    "fatBurning": "Fettverbrennung",
+    "growthHormone": "Wachstumshormon",
+    "ketosis": "Ketose",
+    "autophagy": "Autophagie",
+    "cellRenewal": "Zellerneuerung",
+    "immuneRenewal": "Immunerneuerung",
+    "level": {
+      "start": "Start",
+      "standard": "Standard",
+      "good": "Gut",
+      "high": "Hoch",
+      "peak": "Spitze",
+      "max": "Max",
+      "drop": "Sinkt",
+      "stable": "Stabil",
+      "optimal": "Optimal",
+      "init": "Anlauf",
+      "warm": "Warm",
+      "burn": "Brennt",
+      "trace": "Spuren",
+      "light": "Leicht",
+      "active": "Aktiv",
+      "deep": "Tief",
+      "better": "Besser",
+      "rise": "Steigt",
+      "boost": "Schub",
+      "prime": "Vorbereitung",
+      "ready": "Bereit",
+      "stronger": "Stärker"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Einsteiger",
+      "Veteran": "Erfahren",
+      "Expert": "Experte",
+      "Master": "Meister"
+    },
+    "16h": {
+      "label": "Intervall",
+      "title": "Beliebt & leicht für den Einstieg",
+      "description": "Hilft, gespeichertes Fett als Energie zu nutzen, und verbessert die Insulinsensitivität.",
+      "advice": "(16 h) Der Standard! Iss zwischen 12 und 20 Uhr.",
+      "adviceLong": "Der Goldstandard und am leichtesten durchzuhalten. Lass einfach das Frühstück weg und iss deine Kalorien zwischen 12 und 20 Uhr. Trink während des Fastens etwa 2 L Wasser."
+    },
+    "18h": {
+      "label": "Fettverbrenner",
+      "title": "Verstärkte Fettverbrennung",
+      "description": "Verlängert die Ketose und streift den Beginn der Autophagie.",
+      "advice": "(18 h) Eine kleine Steigerung von 16/8.",
+      "adviceLong": "Zwei Stunden mehr als bei 16/8 maximieren die Fettverbrennung und starten die Autophagie. In diesen 18 Stunden helfen schwarzer Kaffee oder ungesüßter grüner Tee gegen den Hunger."
+    },
+    "20h": {
+      "label": "Krieger",
+      "title": "Krieger-Modus",
+      "description": "Maximiert die Fettverbrennung und hilft, Muskelmasse zu erhalten.",
+      "advice": "(20 h) 4-Stunden-Essensfenster. Achte auf genug Protein.",
+      "adviceLong": "Das Essensfenster ist sehr kurz (nur 4 Stunden). Achte auf genug Protein (Fleisch, Fisch, Eier) und Ballaststoffe, um Muskeln zu erhalten. Iss nicht zu hastig, um die Verdauung nicht zu überlasten."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Eine Mahlzeit am Tag",
+      "description": "Fördert die Autophagie und gönnt der Verdauung eine tiefe Pause.",
+      "advice": "(23 h) Deine einzige Mahlzeit sollte vollwertig sein.",
+      "adviceLong": "Fast 24 Stunden Fasten (z. B. heute Abendessen, dann nichts bis morgen Abend). Diese eine Mahlzeit sollte vollwertig sein, mit gesunden Fetten und Protein. Hör auf deinen Körper, wenn du das oft machst."
+    },
+    "36h": {
+      "label": "Mönch",
+      "title": "Herausforderung über den ganzen Tag",
+      "description": "Gibt dem Darm eine lange Erholungspause und hilft, Entzündungen zu dämpfen.",
+      "advice": "(36 h) Wähle einen Tag ohne große Anstrengung.",
+      "adviceLong": "Ein ganzer Tag und eine Nacht ohne Essen (z. B. Montag zu Abend essen, Dienstag auslassen, Mittwochmorgen wieder essen). Wähle einen ruhigen Arbeitstag und nimm Elektrolyte (Mineralsalze) zu dir, um wach zu bleiben."
+    },
+    "48h": {
+      "label": "Verlängert",
+      "title": "Fortgeschrittenes Tiefenfasten",
+      "description": "Leert die Glykogenspeicher vollständig und bringt den Körper dazu, seine Energie neu zu organisieren.",
+      "advice": "(48 h) Elektrolyte sind ein Muss.",
+      "adviceLong": "So langes Fasten erfordert täglich Elektrolyte (Salz, Kalium, Magnesium), um den Blutdruck stabil zu halten. Wenn dir länger schwindlig oder schwach ist, brich das Fasten sofort ab."
+    },
+    "72h": {
+      "label": "Langzeit",
+      "title": "Ultimative Herausforderung",
+      "description": "Erreicht tiefe Autophagie. Erfordert gründliche Vorbereitung und Vorsicht.",
+      "advice": "(72 h) Nur für sehr Erfahrene.",
+      "adviceLong": "Nur selten machen, wenn dein Körper das Fasten schon sehr gewohnt ist. Beim Fastenbrechen nie mit einer großen Mahlzeit beginnen, sondern mit Knochenbrühe oder etwas Leichtem, um den Magen zu schonen."
+    }
+  },
+  "term": {
+    "habit": "Gewohnheit",
+    "retain": "Retain",
+    "target": "Ziel",
+    "targetHours": "Ziel {{hours}} h",
+    "points": "Punkte",
+    "pts": "{{value}} Pkt.",
+    "history": "Verlauf",
+    "progress": "Fortschritt",
+    "weight": "Gewicht",
+    "note": "Notiz",
+    "mood": "Stimmung",
+    "camera": "Kamera",
+    "gallery": "Galerie",
+    "error": "Fehler"
+  },
+  "fastingSheet": {
+    "completed": "Geschafft",
+    "result": "Belohnungen",
+    "keepGoing": "Weiter so bis zum Ziel",
+    "now": "JETZT",
+    "atTarget": "AM ZIEL",
+    "endFasting": "Fasten beenden"
+  },
+  "lastFast": {
+    "interrupted": "Abgebrochen",
+    "completed": "Geschafft",
+    "endedEarly": "Früher beendet",
+    "freeFasting": "Freies Fasten",
+    "targetProgress": "Zielfortschritt"
+  },
+  "habitSheet": {
+    "title": "Gewohnheitsindex",
+    "sessions_one": "{{count}} Eintrag",
+    "sessions_other": "{{count}} Einträge",
+    "fastingSession": "Fastensitzung",
+    "overRest_one": "{{count}} Ruhetag zu viel",
+    "overRest_other": "{{count}} Ruhetage zu viel",
+    "shieldIncrease": "Schild erhalten",
+    "restDays_one": "{{count}} Ruhetag",
+    "restDays_other": "{{count}} Ruhetage"
+  },
+  "habitDetail": {
+    "title": "Gewohnheitsprotokoll",
+    "habitPoints": "Gewohnheitspunkte",
+    "shields": "Schilde",
+    "fastDetail": "Fasten-Details",
+    "restDay": "Ruhetag",
+    "overRest": "Zu lange pausiert"
+  },
+  "habitMilestone": {
+    "title": "Fortschritt"
+  },
+  "fullHabit": {
+    "title": "Gewohnheit gefestigt",
+    "maintainTitle": "Willkommen in der Erhaltungsphase",
+    "maintainBody": "Jedes Mal, wenn du dranbleibst, fließen Punkte in Retain.",
+    "retainTitle": "Gewohnheits-Retain",
+    "retainSub": "Erhaltungspunkte",
+    "note": "25 Retain werden automatisch zu 1 Schild. Bricht die Gewohnheit ab, fällt das ganze Retain auf 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Serien-Meilenstein erreicht!",
+      "subtitle": "Du baust eine unaufhaltsame Fastengewohnheit auf!",
+      "button": "Weiter so! 🔥"
+    },
+    "rest": {
+      "title": "Ruhetag aktiv!",
+      "subtitle": "Erholung gehört dazu. Deine Serie bleibt stark!",
+      "button": "Weiter geht's! 🌿"
+    },
+    "fresh": {
+      "title": "Ein Neuanfang",
+      "subtitle": "Jeder Meister ist mal gescheitert. Lass uns heute neu aufbauen!",
+      "button": "Jetzt neu starten 🚀"
+    },
+    "best": "BESTWERT",
+    "daysStreak": "Tage am Stück",
+    "over": "Serie über {{count}} Tage!",
+    "consistency": "Beständigkeit"
+  },
+  "result": {
+    "completed": {
+      "title": "Fasten geschafft!",
+      "subtitle": "Super Disziplin!"
+    },
+    "endedEarly": {
+      "title": "Fasten früher beendet",
+      "subtitle": "Jede Stunde zählt! Dein Fortschritt ist gespeichert."
+    },
+    "extended": {
+      "title": "Langes Fasten geschafft!",
+      "subtitle": "Starke Ausdauer! Extra-Belohnungen freigeschaltet."
+    },
+    "fastingTime": "Fastenzeit",
+    "targetProgress": "Ziel {{hours}} h · {{percent}} %",
+    "shieldFrom": {
+      "longFast": "Langes Fasten",
+      "retain": "Gewohnheit gehalten",
+      "milestone": "Meilenstein erreicht"
+    }
+  },
+  "note": {
+    "today": "Notiz von heute",
+    "forDate": "Notiz {{date}}",
+    "placeholder": "Wie hast du dich heute gefühlt?",
+    "weightDigitsOnly": "Nur Zahlen.",
+    "weightOneDot": "Nur ein Dezimalpunkt erlaubt.",
+    "weightIntMax": "Höchstens 4 Stellen vor dem Komma.",
+    "weightDecMax": "Höchstens 1 Nachkommastelle."
+  },
+  "image": {
+    "saveError": "Foto konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    "deleteError": "Foto konnte nicht gelöscht werden. Bitte erneut versuchen.",
+    "deleteTitle": "Foto löschen",
+    "deleteConfirm": "Foto dieses Tages löschen?",
+    "addTitle": "Foto hinzufügen",
+    "yourPhoto": "Dein Foto",
+    "addAPhoto": "Foto hinzufügen",
+    "capture": "Halte den Moment fest",
+    "chooseSource": "Kamera oder Galerie wählen"
+  },
+  "history": {
+    "title": "Fastenverlauf",
+    "total": "Gesamt",
+    "average": "Schnitt",
+    "recent": "Letzte Fasten",
+    "status": {
+      "cancelled": "Abgebrochen",
+      "fasting": "Läuft",
+      "free": "Frei",
+      "reached": "Ziel erreicht",
+      "notReached": "Nicht erreicht"
+    },
+    "actions": "Aktionen"
+  },
+  "startTime": {
+    "invalid": "Ungültige Zeit",
+    "overlap": "Überschneidet sich mit deinem letzten Fasten!",
+    "max24h": "Du kannst höchstens 24 Stunden früher starten!",
+    "future": "Du kannst keine Zeit in der Zukunft wählen!",
+    "title": "Startzeit wählen",
+    "hint": "Tippe auf Uhrzeit oder Datum, um den Start zu wählen",
+    "earlier": "Früher starten",
+    "confirm": "Start bestätigen"
+  },
+  "endTime": {
+    "title": "Endzeit wählen",
+    "confirm": "Ende bestätigen",
+    "future": {
+      "title": "Ungültige Zeit",
+      "desc": "Diese Zeit liegt in der Zukunft."
+    },
+    "tooQuick": {
+      "title": "Dieses Fasten wird verworfen",
+      "desc": "Zu kurz, um gespeichert zu werden."
+    },
+    "failed": {
+      "title": "Dieses Fasten gilt als nicht geschafft",
+      "desc": "Unter der Mindestzeit für ein abgeschlossenes Fasten."
+    },
+    "completed": {
+      "title": "Dieses Fasten wird abgeschlossen",
+      "desc": "Lang genug, um gezählt zu werden."
+    }
+  },
+  "targetSheet": {
+    "choose": "Dieses Ziel wählen",
+    "clear": "Ziel entfernen"
+  },
+  "fastDetail": {
+    "reachedTarget": "Ziel erreicht",
+    "notReachedTarget": "Ziel nicht erreicht",
+    "targetHours": "Ziel: {{hours}} Stunden",
+    "over": "{{duration}} drüber",
+    "remaining": "Noch {{duration}}",
+    "review": "Auswertung",
+    "bodyAtEnd": "Körperzustand am Ende",
+    "metrics": "Erfasste Werte",
+    "advice": "Tipp"
+  },
+  "date": {
+    "weekday": {
+      "0": "So",
+      "1": "Mo",
+      "2": "Di",
+      "3": "Mi",
+      "4": "Do",
+      "5": "Fr",
+      "6": "Sa"
+    },
+    "month": {
+      "0": "Jan",
+      "1": "Feb",
+      "2": "Mär",
+      "3": "Apr",
+      "4": "Mai",
+      "5": "Jun",
+      "6": "Jul",
+      "7": "Aug",
+      "8": "Sep",
+      "9": "Okt",
+      "10": "Nov",
+      "11": "Dez"
+    },
+    "monthNarrow": {
+      "0": "J",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Bild in deiner Galerie gespeichert.",
+    "saveImage": "Bild speichern",
+    "style": "Stil",
+    "mode": {
+      "mood": "Gefühl",
+      "fasting": "Fasten"
+    },
+    "dayButton": "Tag",
+    "weekButton": "Woche",
+    "stat": {
+      "days_one": "Tag",
+      "days_other": "Tage",
+      "hours_one": "Std.",
+      "hours_other": "Std.",
+      "logs_one": "Notiz",
+      "logs_other": "Notizen"
+    },
+    "statsLine": "{{days}} Tage · {{hours}} Std. · {{logs}} Notizen",
+    "legend": {
+      "mood": {
+        "0": "Sehr schlecht",
+        "1": "Schlecht",
+        "2": "Okay",
+        "3": "Gut",
+        "4": "Sehr gut"
+      }
+    },
+    "info": {
+      "title": "So liest du deinen Verlauf",
+      "message": "Was die Symbollegende nicht erklärt.",
+      "fast1": "Jede Zelle wird nach der Gesamtdauer des längsten Fastens an diesem Tag eingefärbt.",
+      "fast2": "Ein Fasten über mehrere Tage färbt alle ein – am ersten Tag heller, zum Ende hin dunkler.",
+      "fast3": "Eine Zelle mit Schild-Symbol ist ein durch einen Schild geschützter Ruhetag.",
+      "mood1": "Eine Zelle mit farbigem Rahmen ist ein Tag mit Notiz.",
+      "actionsTitle": "Aktionen",
+      "action1": "Tippe auf einen leeren Tag für Stimmung und Notiz, auf einen Tag mit Daten für Details.",
+      "action2": "Die Zahl unter jedem Symbol zeigt, wie viele Tage des Jahres in diese Stufe fallen.",
+      "action3": "Mit der Woche/Tag-Taste in der Ecke änderst du das Layout. Gespeicherte Bilder folgen dem aktuellen Layout."
+    }
+  },
+  "layout": {
+    "title": "Pixel-Layout",
+    "subtitle": "Wähle, wie dein Verlauf angezeigt wird",
+    "weekly": "Wöchentlich",
+    "monthly": "Monatlich",
+    "vertical": "↓ Vertikal",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Symbolpaket wählen",
+    "tabMood": "Gefühl",
+    "tabTarget": "Ziel",
+    "level": "Stufe {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Moderner, minimalistischer Look mit Ionicons",
+    "material_emoticons": "Dezente Gefühlsgesichter aus Material Community",
+    "weather_vibes": "Zeig deine Stimmung mit Wettersymbolen",
+    "gaming_energy": "Gefühle als Energiebalken im Gaming-Stil",
+    "pixel_vibe": "Gefühle im Pixel-Stil und Piktogramm-Emojis",
+    "default_emoji_targets": "Zielstufen als klassische Emojis",
+    "ionicons_targets": "Schlichte, runde Symbole von Ionicons",
+    "material_energy_targets": "Zeigt die Herausforderung mit Energie und Flammen",
+    "feather_minimal_targets": "Feines Liniendesign von Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Tagebuch",
+    "noMood": "Noch keine Stimmung",
+    "dailyFast": "⏱️ Fasten des Tages",
+    "dailyNote": "📝 Tagesnotiz",
+    "relatedFasts": "ZUGEHÖRIGES FASTEN",
+    "hoursToday": "Std. heute",
+    "hoursFasted": "GEFASTETE STUNDEN",
+    "weightHint": "Zum Bearbeiten tippen",
+    "addWeight": "Gewicht hinzufügen",
+    "dayNote": "NOTIZ DES TAGES",
+    "notePlaceholder": "Notiz für diesen Tag hinzufügen ...",
+    "photos": "FOTO",
+    "addPhoto": "Foto hinzufügen",
+    "photoHint": "Foto für diesen Tag hinzufügen",
+    "updatePhoto": "Foto aktualisieren",
+    "changePhoto": "Foto ändern",
+    "photoFrom": "Foto aus"
+  },
+  "dayModal": {
+    "todayMood": "Stimmung heute",
+    "moodFor": "Stimmung {{date}}",
+    "todayWeight": "Gewicht heute",
+    "weightFor": "Gewicht {{date}}"
+  },
+  "stats": {
+    "subtitle": "Verfolge deinen Fortschritt",
+    "dashboard": "Übersicht",
+    "currentStreak": "Aktuelle Serie",
+    "days_one": "Tag",
+    "days_other": "Tage",
+    "record": "Rekord",
+    "shields": "Schilde",
+    "section": "Statistik",
+    "totalFasting": "Gesamtfasten",
+    "completed": "Geschafft",
+    "averageFast": "Ø Fasten",
+    "longestFast": "Längstes Fasten",
+    "activeDays": "Aktive Tage",
+    "maxStreak": "Längste Serie",
+    "shieldsUsed": "Genutzte Schilde",
+    "unit": {
+      "hours": "Std.",
+      "times": "Mal",
+      "days": "Tage"
+    },
+    "distribution": {
+      "title": "Fasten-Verteilung",
+      "subtitle": "So verteilen sich deine Fastensitzungen",
+      "range": "{{from}}–{{to}} Std.",
+      "over": "{{from}}+ Std.",
+      "fasts_one": "Fasten",
+      "fasts_other": "Fasten"
+    },
+    "chart": {
+      "title": "Gewicht & Fastenfortschritt",
+      "subtitle": "Dein Fortschritt im Zeitverlauf",
+      "fasting": "Fasten",
+      "noData": "Keine Daten",
+      "noWeight": "- Keine Gewichtsdaten",
+      "hoursUnit": "Std."
+    },
+    "range": {
+      "title": "Zeitraum",
+      "day_one": "{{count}} Tag",
+      "day_other": "{{count}} Tage",
+      "week_one": "{{count}} Woche",
+      "week_other": "{{count}} Wochen",
+      "month_one": "{{count}} Monat",
+      "month_other": "{{count}} Monate",
+      "unit": {
+        "day": "Tage",
+        "week": "Wochen",
+        "month": "Monate"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Aktuelles Gewicht",
+    "currentWeightMessage": "Gib dein aktuelles Gewicht ein",
+    "targetMessage": "Lege dein Zielgewicht fest",
+    "setCurrent": "Aktuelles Gewicht eintragen",
+    "setCurrentHint": "Trag dein Gewicht ein, um den Fortschritt zu verfolgen",
+    "weightGoal": "Gewichtsziel",
+    "setTarget": "Ziel festlegen",
+    "currentWeight": "Aktuelles Gewicht",
+    "setTargetHint": "Lege ein Zielgewicht fest, um deinen Fortschritt zu sehen",
+    "toGo": "Noch {{value}} kg",
+    "reached": "Ziel erreicht"
+  },
+  "ach": {
+    "title": "Erfolge",
+    "unlocked": "{{unlocked}} / {{total}} freigeschaltet",
+    "empty": "Keine Erfolge",
+    "claim": "Abholen",
+    "done": "Erreicht",
+    "notDone": "Noch nicht",
+    "empty_slot": "Leer",
+    "tier": {
+      "BRONZE": "BRONZE",
+      "SILVER": "SILBER",
+      "GOLD": "GOLD",
+      "DIAMOND": "DIAMANT"
+    },
+    "fasting_hours": {
+      "name": "Gesamtfasten",
+      "description": "Gesamte Fastenstunden.",
+      "item_one": "{{count}} Fastenstunde",
+      "item_other": "{{count}} Fastenstunden"
+    },
+    "invalid_fasts": {
+      "name": "Ungültiges Fasten",
+      "description": "Anzahl ungültiger Fastensitzungen."
+    },
+    "failed_fasts": {
+      "name": "Nicht geschafftes Fasten",
+      "description": "Anzahl nicht geschaffter Fastensitzungen."
+    },
+    "completed_fasts": {
+      "name": "Geschafftes Fasten",
+      "description": "Anzahl geschaffter Fastensitzungen.",
+      "item_one": "Schaffe dein erstes Fasten",
+      "item_other": "Schaffe {{count}}-mal das Fasten"
+    },
+    "active_days": {
+      "name": "Aktive Tage",
+      "description": "Anzahl der Tage, an denen du die App genutzt hast.",
+      "item_one": "{{count}} aktiver Tag",
+      "item_other": "{{count}} aktive Tage"
+    },
+    "habit": {
+      "name": "Gewohnheit",
+      "description": "Dein Fasten-Gewohnheitswert.",
+      "item_one": "Erreiche {{count}} % Gewohnheit",
+      "item_other": "Erreiche {{count}} % Gewohnheit"
+    },
+    "longest_fast": {
+      "name": "Längstes Fasten",
+      "description": "Dein längstes geschafftes Fasten.",
+      "item_one": "Schaffe ein {{count}}-Stunden-Fasten",
+      "item_other": "Schaffe ein {{count}}-Stunden-Fasten"
+    },
+    "max_streak": {
+      "name": "Längste Serie",
+      "description": "Deine längste Fastenserie.",
+      "item_one": "Erreiche eine {{count}}-Tage-Serie",
+      "item_other": "Erreiche eine {{count}}-Tage-Serie"
+    },
+    "total_shields": {
+      "name": "Schilde gesamt",
+      "description": "Anzahl verdienter Schilde.",
+      "item_one": "Verdiene deinen ersten Schild",
+      "item_other": "Verdiene {{count}} Schilde"
+    },
+    "retain_circles": {
+      "name": "Retain-Meister",
+      "description": "Retain-Runden bei voller Gewohnheit.",
+      "item_one": "Schließe deine erste Retain-Runde ab",
+      "item_other": "Schließe {{count}} Retain-Runden ab"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "Kann nicht geschlossen werden",
+      "body": "Schließe zuerst diesen Schritt ab!"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "section": {
+      "showcase": "Vitrine",
+      "appearance": "Darstellung",
+      "general": "Allgemein",
+      "sound": "Ton & Haptik",
+      "notifications": "Mitteilungen",
+      "data": "Daten",
+      "about": "Über"
+    },
+    "showcaseExport": "Im Verlaufsbild zeigen",
+    "showcaseExportDesc": "Füge deine Abzeichen dem gespeicherten Bild hinzu",
+    "showcaseEmpty": "Noch keine Abzeichen. Erreiche einen Meilenstein und tippe in der Statistik auf Abholen.",
+    "showcasePick": "Wähle bis zu {{max}} Abzeichen zum Zeigen.",
+    "selectedCount": "Ausgewählt {{count}}/{{max}}",
+    "darkMode": "Dunkelmodus",
+    "darkModeDesc": "Dunkles Design in der ganzen App",
+    "theme": "Design",
+    "language": "Sprache",
+    "weekStart": "Woche beginnt am",
+    "monday": "Montag",
+    "sunday": "Sonntag",
+    "mondayDesc": "Wochen von Montag → Sonntag",
+    "sundayDesc": "Wochen von Sonntag → Samstag",
+    "beginnerTips": "Einsteigertipps",
+    "beginnerTipsDesc": "Kurze Erklärungen zu Gewohnheit und Schilden anzeigen",
+    "vibration": "Vibration",
+    "sound": "Ton",
+    "soundDesc": "Töne für Start, Ende und Belohnungen",
+    "touchSound": "Tippton",
+    "touchSoundDesc": "Kurze Klicks beim Tippen und Umschalten",
+    "targetReached": "Ziel erreicht",
+    "targetReachedDesc": "Benachrichtigen, wenn dein Ziel erreicht ist",
+    "dailyReminder": "Tägliche Erinnerung",
+    "dailyReminderDesc": "Jeden Tag an den Fastenstart erinnern",
+    "reminderTime": "Erinnerungszeit",
+    "backup": "Sichern & Wiederherstellen",
+    "backupDesc": "Google Drive oder eine Datei",
+    "reset": "Einstellungen zurücksetzen",
+    "resetDesc": "Standardeinstellungen wiederherstellen",
+    "resetConfirmTitle": "Einstellungen zurücksetzen?",
+    "resetConfirmBody": "Design, Layout, Ton und Mitteilungen werden zurückgesetzt. Deine Fastendaten bleiben erhalten.",
+    "resetOk": "Zurücksetzen",
+    "privacy": "Datenschutz",
+    "privacyDesc": "Datenschutz und Berechtigungen",
+    "privacyBody": "FastFast funktioniert offline. Fasten, Notizen und Gewicht bleiben nur auf diesem Gerät und werden nie an unsere Server gesendet. Backups landen in einer Datei, die du behältst, oder in deinem eigenen Google Drive.",
+    "health": "Gesundheitshinweis",
+    "rate": "App bewerten",
+    "rateDesc": "Gefällt dir die App? Hinterlass eine Bewertung",
+    "rateThanks": "Danke!",
+    "rateLater": "Bewertungen sind möglich, sobald die App im Store ist.",
+    "feedback": "Feedback",
+    "feedbackDesc": "Sag uns deine Meinung oder melde ein Problem",
+    "noEmailTitle": "Keine E-Mail-App",
+    "noEmailBody": "Installiere eine E-Mail-App, um Feedback zu senden.",
+    "about": "Über",
+    "aboutBody": "Version {{version}}\n\nIntervallfasten mit Serien, Schilden und einem Jahr in Pixeln.",
+    "version": "Version {{version}}",
+    "expoGoTitle": "In Expo Go nicht verfügbar",
+    "expoGoBody": "Mitteilungen brauchen eine Entwicklungs- oder Store-Version.",
+    "notifOffTitle": "Mitteilungen sind aus",
+    "notifOffBody": "Erlaube Mitteilungen für FastFast in den Systemeinstellungen.",
+    "openSettings": "Einstellungen öffnen"
+  },
+  "account": {
+    "title": "Konto",
+    "guestHint": "Mit Google anmelden, um in Drive zu sichern"
+  },
+  "backup": {
+    "subtitle": "Deine Daten liegen auf diesem Gerät. Backups sind Kopien zum späteren Wiederherstellen.",
+    "drive": "Google Drive",
+    "file": "Datei",
+    "signIn": "Mit Google anmelden",
+    "signInDesc": "In deinem eigenen Google Drive sichern",
+    "notSignedIn": "Nicht angemeldet",
+    "lastBackup": "Letztes Backup {{time}}",
+    "never": "Noch kein Backup",
+    "backUpNow": "Jetzt sichern",
+    "backingUp": "Wird gesichert …",
+    "restoreDrive": "Aus Drive wiederherstellen",
+    "restoreDriveDesc": "Ersetzt die Daten auf diesem Gerät durch das Drive-Backup",
+    "restoring": "Wird wiederhergestellt …",
+    "signOut": "Abmelden",
+    "signOutTitle": "Abmelden?",
+    "signOutBody": "Deine Daten bleiben auf dem Gerät. Backups in Google Drive bleiben erhalten.",
+    "signInFailedTitle": "Anmeldung fehlgeschlagen",
+    "signInFailedBody": "Anmeldung mit Google fehlgeschlagen. Bitte erneut versuchen.",
+    "confirmTitle": "In Google Drive sichern?",
+    "confirmReplace": "Das Backup vom {{time}} wird durch deine aktuellen Daten und Fotos ersetzt.",
+    "confirmFirst": "Deine aktuellen Daten und Fotos werden in deinem Google Drive gespeichert.",
+    "backUp": "Sichern",
+    "doneTitle": "Gesichert",
+    "doneWithPhotos": "Deine Daten und {{count}} neue(s) Foto(s) sind in Google Drive gespeichert.",
+    "doneBody": "Deine Daten sind in Google Drive gespeichert.",
+    "failedTitle": "Sicherung fehlgeschlagen",
+    "failedBody": "Sicherung in Google Drive fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.",
+    "restoredTitle": "Wiederhergestellt",
+    "restoredBody": "Deine Daten wurden wiederhergestellt.",
+    "restoredMissing": "Daten wiederhergestellt. {{count}} Foto(s) wurden in Drive nicht gefunden.",
+    "restoreFailedTitle": "Wiederherstellung fehlgeschlagen",
+    "restoreFailedDrive": "Wiederherstellung aus Google Drive fehlgeschlagen.",
+    "readFailed": "Backup in Google Drive konnte nicht gelesen werden.",
+    "noneTitle": "Kein Backup",
+    "noneBody": "Für dieses Google-Konto gibt es noch kein FastFast-Backup.",
+    "restoreDriveTitle": "Aus Google Drive wiederherstellen?",
+    "restoreConfirm": "Backup vom {{time}}. Alle aktuellen Daten auf diesem Gerät werden ersetzt.",
+    "restoreFileConfirm": "Backup vom {{time}}. Alle aktuellen Daten werden ersetzt. Dateien enthalten keine Fotos.",
+    "restoreFileTitle": "Aus Datei wiederherstellen?",
+    "restoreFileFailed": "Diese Backup-Datei konnte nicht wiederhergestellt werden.",
+    "exportFile": "Backup-Datei exportieren",
+    "exporting": "Wird exportiert …",
+    "exportFileDesc": "Nur Daten – teilen oder speichern, wo du willst",
+    "exportFailedTitle": "Export fehlgeschlagen",
+    "exportFailedBody": "Backup-Datei konnte nicht erstellt werden.",
+    "restoreFile": "Aus Datei wiederherstellen",
+    "restoreFileDesc": "Wähle eine FastFast-Backup-Datei",
+    "importFailedTitle": "Import fehlgeschlagen",
+    "importFailedBody": "Diese Datei ist kein gültiges FastFast-Backup."
+  },
+  "theme": {
+    "title": "Design",
+    "subtitle": "Wähle das Aussehen deiner App",
+    "notPurchased": "Nicht gekauft",
+    "freeUntil": "Gratis bis",
+    "purchase": "Kaufen",
+    "unavailable": "Nicht verfügbar",
+    "premium": "Premium",
+    "limited": "Limitiert",
+    "dark": "Dunkel",
+    "light": "Hell"
+  },
+  "notify": {
+    "targetTitle": "🎉 Ziel erreicht!",
+    "targetBody": "Du hast {{hours}} Stunden gefastet. Beende die Sitzung, um sie zu speichern.",
+    "dailyTitle": "Zeit zum Fasten ⏱️",
+    "dailyBody": "Starte heute dein Fasten, um Serie und Gewohnheit zu halten."
+  },
+  "perm": {
+    "saveImage": "FastFast braucht die Berechtigung, Bilder in deiner Galerie zu speichern.",
+    "camera": "FastFast braucht Kamerazugriff, um Fotos aufzunehmen.",
+    "gallery": "FastFast braucht Zugriff auf deine Fotos, um ein Bild auszuwählen.",
+    "saveFailed": "Bild konnte nicht gespeichert werden. Bitte erneut versuchen."
+  },
+  "widget": {
+    "fasting": "FASTET",
+    "ready": "BEREIT",
+    "notFasting": "Kein Fasten",
+    "tapToOpen": "Tippen, um FastFast zu öffnen",
+    "started": "Start",
+    "done": "Ende"
+  },
+  "notFound": {
+    "title": "Hoppla!",
+    "body": "Dieser Bildschirm existiert nicht.",
+    "home": "Zum Startbildschirm!"
+  }
+}

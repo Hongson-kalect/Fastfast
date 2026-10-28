@@ -1,0 +1,857 @@
+{
+  "onboarding": {
+    "skip": "Lewati",
+    "next": "Lanjut",
+    "start": "Mulai",
+    "welcome": {
+      "title": "Puasa intermiten jadi lebih seru",
+      "body": "Ketuk mulai saat kamu berhenti makan. FastFast menghitung waktu dan memberi tahu saat target tercapai."
+    },
+    "habit": {
+      "title": "Streak & kekuatan kebiasaan",
+      "body": "Setiap puasa yang selesai menjaga streak dan mengisi bar kebiasaan. Makin lama puasanya, makin cepat terisi."
+    },
+    "shield": {
+      "title": "Perisai — hari istirahat tanpa kehilangan streak",
+      "body": "Tetap konsisten atau selesaikan puasa panjang untuk mendapat perisai. Saat hari istirahat, perisai otomatis melindungi streak-mu."
+    },
+    "pixel": {
+      "title": "Setahun penuh warna",
+      "body": "Setiap hari adalah satu piksel. Catat suasana hati dan berat badan, lalu lihat setahun penuh dalam satu gambar."
+    },
+    "health": {
+      "title": "Dengarkan tubuhmu",
+      "body": "FastFast bukan pengganti saran medis. Jika kamu sedang hamil, punya kondisi medis, atau berencana puasa lebih dari 48 jam, konsultasikan dengan dokter. Segera hentikan jika merasa pusing atau tidak enak badan yang tidak biasa."
+    }
+  },
+  "tabs": {
+    "fast": "Puasa",
+    "stats": "Statistik",
+    "journey": "Perjalanan",
+    "settings": "Pengaturan"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Batal",
+    "gotIt": "Mengerti",
+    "confirm": "Konfirmasi",
+    "delete": "Hapus",
+    "save": "Simpan",
+    "today": "Hari ini",
+    "noData": "Tidak ada data",
+    "invalid": "Tidak valid",
+    "success": "Berhasil",
+    "edit": "Ubah",
+    "add": "Tambah",
+    "loading": "Memuat…",
+    "close": "Tutup",
+    "restore": "Pulihkan",
+    "permission": "Izin diperlukan",
+    "error": "Kesalahan"
+  },
+  "time": {
+    "justNow": "Baru saja",
+    "today": "Hari ini",
+    "tomorrow": "Besok",
+    "yesterday": "Kemarin",
+    "dayAfterTomorrow": "Lusa",
+    "daysAgo_one": "{{count}} hari lalu",
+    "daysAgo_other": "{{count}} hari lalu",
+    "daysLater_one": "{{count}} hari lagi",
+    "daysLater_other": "{{count}} hari lagi",
+    "secondsAgo_one": "{{count}} detik lalu",
+    "secondsAgo_other": "{{count}} detik lalu",
+    "inSeconds_one": "{{count}} detik lagi",
+    "inSeconds_other": "{{count}} detik lagi",
+    "minutesAgo_one": "{{count}} menit lalu",
+    "minutesAgo_other": "{{count}} menit lalu",
+    "inMinutes_one": "{{count}} menit lagi",
+    "inMinutes_other": "{{count}} menit lagi",
+    "hoursAgo_one": "{{count}} jam lalu",
+    "hoursAgo_other": "{{count}} jam lalu",
+    "inHours_one": "{{count}} jam lagi",
+    "inHours_other": "{{count}} jam lagi"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Selamat pagi",
+      "noon": "Selamat siang",
+      "afternoon": "Selamat sore",
+      "evening": "Selamat malam"
+    },
+    "streakDays_one": "{{count}} hari",
+    "streakDays_other": "{{count}} hari",
+    "lastFast": "Puasa terakhir",
+    "bodyPhases": "Fase tubuh",
+    "fastingPhases": "Fase saat berpuasa",
+    "effectAfter": "Efek dalam",
+    "startFast": "Mulai puasa",
+    "endFast": "Selesai"
+  },
+  "counter": {
+    "chooseTarget": "Pilih target",
+    "reached": "🎉 Target tercapai",
+    "finishAt": "Selesai {{time}}",
+    "freeMode": "Mode bebas",
+    "ifStartNow": "Jika mulai sekarang: {{time}}",
+    "fasting": "Berpuasa",
+    "ready": "Siap",
+    "startedAt": "Mulai {{time}}",
+    "history": "Riwayat puasa"
+  },
+  "finish": {
+    "title": "Selesai",
+    "confirm": "Yakin ingin mengakhiri puasa ini?",
+    "tooQuick": "Puasa ini terlalu singkat dan akan dihapus. Lanjutkan?",
+    "tooQuickSub": "Durasi puasa kurang dari 2 jam.",
+    "failed": "Puasa ini akan ditandai gagal. Lanjutkan?",
+    "failedSub": "Durasi puasa kurang dari 16 jam.",
+    "reached": "Target tercapai. Akhiri sekarang?",
+    "notReached": "Target belum tercapai. Tetap akhiri?",
+    "endBeforeStart": "Waktu selesai harus setelah waktu mulai.",
+    "startBeforeLast": "Waktu mulai harus setelah puasa terakhir."
+  },
+  "info": {
+    "shield": {
+      "title": "Perisai",
+      "message": "Perisai menjaga streak-mu tetap berlaku di hari istirahat tanpa puasa.",
+      "effectTitle": "Fungsi · kamu punya {{count}}/{{max}}",
+      "effect1": "Setiap hari kosong di antara dua puasa memakai 1 perisai. Streak tetap berlaku dan Kebiasaan tidak berubah.",
+      "effect2": "Istirahat tanpa perisai akan memutus streak, Kebiasaan turun dan Retain kembali ke 0.",
+      "effect3": "Kamu bisa menyimpan hingga {{max}} perisai; kelebihannya hilang.",
+      "longTitle": "Puasa panjang",
+      "long1": "Puasa 48 jam+ dapat 1 perisai, 72 jam+ dapat 2.",
+      "long2": "Istirahat adalah bagian dari puasa panjang: tubuh butuh waktu untuk makan lagi dan pulih. Perisai membuatmu bisa istirahat di hari-hari itu tanpa kehilangan streak.",
+      "milestoneTitle": "Tonggak Kebiasaan",
+      "milestone1": "Mencapai Kebiasaan 35%, 70%, dan 100% masing-masing memberi 1 perisai.",
+      "milestone2": "Jika Kebiasaan turun lalu naik lagi, tonggak bisa didapat kembali.",
+      "retainTitle": "Retain",
+      "retain1": "Saat Kebiasaan 100%, poin dari setiap puasa masuk ke Retain.",
+      "retain2": "25 Retain otomatis menjadi 1 perisai."
+    },
+    "body": {
+      "title": "Apa arti bar ini?",
+      "message": "Setiap bar menunjukkan seberapa besar puasa mendukung proses alami tubuhmu.",
+      "alwaysTitle": "Selalu berjalan",
+      "always1": "Proses ini selalu berjalan di tubuhmu, bahkan saat tidak berpuasa.",
+      "always2": "Ini bukan saklar yang baru menyala pada jam tertentu.",
+      "levelsTitle": "Arti level 1–5",
+      "levels1": "Setiap level berarti puasa makin mendukung proses itu, naik seiring waktu puasa.",
+      "levels2": "Bar penuh bukan berarti prosesnya paling kuat saat ini, hanya dukungan dari puasa lebih tinggi.",
+      "estimateTitle": "Hanya perkiraan",
+      "estimate1": "Patokan jam hanyalah perkiraan dan berbeda tiap orang: makan terakhir, aktivitas, tidur…",
+      "estimate2": "Ini bukan diagnosis atau saran medis."
+    }
+  },
+  "tip": {
+    "disableHint": "Tips bisa dimatikan di Pengaturan → Tips pemula",
+    "habit": {
+      "title": "Bagaimana Kebiasaan dihitung?",
+      "line1": "Setiap puasa 16 jam atau lebih: +3%, ditambah 0,2% per jam di atas 16 jam (20 jam → +3,8%).",
+      "line2": "Puasa di bawah 16 jam tidak menambah poin.",
+      "line3": "Setiap hari kosong di antara puasa memakai 1 perisai. Tanpa perisai, Kebiasaan turun — makin lama jeda, makin besar penurunannya.",
+      "line4": "Di 100%: poin pindah ke Retain, dan 25 Retain menjadi 1 perisai."
+    }
+  },
+  "process": {
+    "glucoseControl": "Kontrol glukosa",
+    "fatBurning": "Pembakaran lemak",
+    "growthHormone": "Hormon pertumbuhan",
+    "ketosis": "Ketosis",
+    "autophagy": "Autofagi",
+    "cellRenewal": "Pembaruan sel",
+    "immuneRenewal": "Pembaruan imun",
+    "level": {
+      "start": "Mulai",
+      "standard": "Standar",
+      "good": "Baik",
+      "high": "Tinggi",
+      "peak": "Puncak",
+      "max": "Maks",
+      "drop": "Turun",
+      "stable": "Stabil",
+      "optimal": "Optimal",
+      "init": "Awal",
+      "warm": "Pemanasan",
+      "burn": "Membakar",
+      "trace": "Jejak",
+      "light": "Ringan",
+      "active": "Aktif",
+      "deep": "Dalam",
+      "better": "Membaik",
+      "rise": "Naik",
+      "boost": "Dorongan",
+      "prime": "Persiapan",
+      "ready": "Siap",
+      "stronger": "Lebih kuat"
+    }
+  },
+  "targets": {
+    "level": {
+      "Novice": "Pemula",
+      "Veteran": "Berpengalaman",
+      "Expert": "Ahli",
+      "Master": "Master"
+    },
+    "16h": {
+      "label": "Intermiten",
+      "title": "Populer & mudah dimulai",
+      "description": "Membantu tubuh memakai cadangan lemak sebagai energi dan meningkatkan sensitivitas insulin.",
+      "advice": "(16 jam) Standar! Makan antara pukul 12.00–20.00.",
+      "adviceLong": "Ini standar emas dan paling mudah dijalani. Cukup lewati sarapan dan habiskan kalori dalam jendela makan 12.00–20.00. Minum sekitar 2 L air selama puasa."
+    },
+    "18h": {
+      "label": "Pembakar lemak",
+      "title": "Pembakaran lemak ekstra",
+      "description": "Memperpanjang ketosis dan mulai menyentuh autofagi.",
+      "advice": "(18 jam) Sedikit lebih tinggi dari 16/8.",
+      "adviceLong": "Dua jam lebih lama dari 16/8 membantu memaksimalkan pembakaran lemak dan memulai autofagi. Selama 18 jam ini, kopi hitam atau teh hijau tanpa gula bisa membantu melewati rasa lapar."
+    },
+    "20h": {
+      "label": "Pejuang",
+      "title": "Mode pejuang",
+      "description": "Memaksimalkan pembakaran lemak dan membantu menjaga massa otot.",
+      "advice": "(20 jam) Jendela makan 4 jam. Cukupi protein.",
+      "adviceLong": "Jendela makannya sangat sempit (hanya 4 jam). Fokus pada protein yang cukup (daging, ikan, telur) dan serat untuk menjaga otot. Hindari makan terlalu cepat agar pencernaan tidak terbebani."
+    },
+    "23h": {
+      "label": "OMAD",
+      "title": "Sekali makan sehari",
+      "description": "Mendorong autofagi dan memberi istirahat mendalam bagi pencernaan.",
+      "advice": "(23 jam) Satu-satunya makananmu harus bergizi lengkap.",
+      "adviceLong": "Puasa hampir 24 jam penuh (mis. makan malam hari ini, lalu tidak makan sampai makan malam besok). Satu kali makan itu harus makanan utuh, kaya lemak sehat dan protein. Dengarkan tubuhmu jika sering melakukannya."
+    },
+    "36h": {
+      "label": "Biksu",
+      "title": "Tantangan seharian penuh",
+      "description": "Memberi usus waktu pemulihan panjang dan membantu meredakan peradangan.",
+      "advice": "(36 jam) Pilih hari dengan sedikit aktivitas berat.",
+      "adviceLong": "Sehari semalam penuh tanpa makan (mis. selesai makan malam Senin, lewati Selasa, makan lagi Rabu pagi). Pilih hari kerja yang ringan dan tambahkan elektrolit (garam mineral) agar tetap segar."
+    },
+    "48h": {
+      "label": "Diperpanjang",
+      "title": "Puasa mendalam tingkat lanjut",
+      "description": "Menghabiskan cadangan glikogen sepenuhnya, mendorong tubuh menata ulang penggunaan energinya.",
+      "advice": "(48 jam) Elektrolit wajib.",
+      "adviceLong": "Puasa sepanjang ini perlu elektrolit setiap hari (garam, kalium, magnesium) agar tekanan darah stabil. Jika merasa lemas atau pusing berkepanjangan, segera hentikan puasa."
+    },
+    "72h": {
+      "label": "Berkepanjangan",
+      "title": "Tantangan ekstrem",
+      "description": "Mencapai autofagi mendalam. Butuh persiapan matang dan kehati-hatian.",
+      "advice": "(72 jam) Hanya untuk yang sangat berpengalaman.",
+      "adviceLong": "Lakukan sesekali saja, setelah tubuh sangat terbiasa berpuasa. Saat berbuka, jangan langsung makan besar; mulailah dengan kaldu tulang atau makanan ringan untuk melindungi lambung."
+    }
+  },
+  "term": {
+    "habit": "Kebiasaan",
+    "retain": "Retain",
+    "target": "Target",
+    "targetHours": "Target {{hours}} jam",
+    "points": "Poin",
+    "pts": "{{value}} poin",
+    "history": "Riwayat",
+    "progress": "Progres",
+    "weight": "Berat",
+    "note": "Catatan",
+    "mood": "Suasana hati",
+    "camera": "Kamera",
+    "gallery": "Galeri",
+    "error": "Kesalahan"
+  },
+  "fastingSheet": {
+    "completed": "Selesai",
+    "result": "Hasil",
+    "keepGoing": "Lanjutkan untuk mencapai target",
+    "now": "SEKARANG",
+    "atTarget": "DI TARGET",
+    "endFasting": "Akhiri puasa"
+  },
+  "lastFast": {
+    "interrupted": "Terhenti",
+    "completed": "Selesai",
+    "endedEarly": "Berakhir lebih awal",
+    "freeFasting": "Puasa bebas",
+    "targetProgress": "Progres target"
+  },
+  "habitSheet": {
+    "title": "Indeks kebiasaan",
+    "sessions_one": "{{count}} sesi",
+    "sessions_other": "{{count}} sesi",
+    "fastingSession": "Sesi puasa",
+    "overRest_one": "Istirahat kelebihan {{count}} hari",
+    "overRest_other": "Istirahat kelebihan {{count}} hari",
+    "shieldIncrease": "Perisai didapat",
+    "restDays_one": "Istirahat {{count}} hari",
+    "restDays_other": "Istirahat {{count}} hari"
+  },
+  "habitDetail": {
+    "title": "Log kebiasaan",
+    "habitPoints": "Poin kebiasaan",
+    "shields": "Perisai",
+    "fastDetail": "Detail puasa",
+    "restDay": "Hari istirahat",
+    "overRest": "Istirahat terlalu lama"
+  },
+  "habitMilestone": {
+    "title": "Progres"
+  },
+  "fullHabit": {
+    "title": "Kebiasaan terbentuk",
+    "maintainTitle": "Masuk tahap pemeliharaan",
+    "maintainBody": "Setiap kali kamu menjaga kebiasaan, poin ditambahkan ke Retain.",
+    "retainTitle": "Retain kebiasaan",
+    "retainSub": "Poin pemeliharaan",
+    "note": "25 Retain otomatis ditukar menjadi 1 Perisai. Jika kebiasaan terputus, semua Retain kembali ke 0."
+  },
+  "streak": {
+    "milestone": {
+      "title": "Tonggak streak tercapai!",
+      "subtitle": "Kamu sedang membangun kebiasaan puasa yang tak terbendung!",
+      "button": "Pertahankan! 🔥"
+    },
+    "rest": {
+      "title": "Hari istirahat aktif!",
+      "subtitle": "Pemulihan bagian dari perjalanan. Streak-mu tetap kuat!",
+      "button": "Terus jalan! 🌿"
+    },
+    "fresh": {
+      "title": "Awal yang baru",
+      "subtitle": "Setiap master pernah gagal. Ayo bangun lagi hari ini!",
+      "button": "Mulai lagi sekarang 🚀"
+    },
+    "best": "TERBAIK",
+    "daysStreak": "Hari beruntun",
+    "over": "Streak melewati {{count}} hari!",
+    "consistency": "Konsistensi"
+  },
+  "result": {
+    "completed": {
+      "title": "Puasa selesai!",
+      "subtitle": "Kerja bagus menjaga disiplin!"
+    },
+    "endedEarly": {
+      "title": "Puasa berakhir lebih awal",
+      "subtitle": "Setiap jam berarti! Progresmu sudah disimpan."
+    },
+    "extended": {
+      "title": "Puasa panjang selesai!",
+      "subtitle": "Daya tahan luar biasa! Hadiah ekstra terbuka."
+    },
+    "fastingTime": "Waktu puasa",
+    "targetProgress": "Target {{hours}} jam · {{percent}}%",
+    "shieldFrom": {
+      "longFast": "Puasa panjang",
+      "retain": "Menjaga kebiasaan",
+      "milestone": "Tonggak tercapai"
+    }
+  },
+  "note": {
+    "today": "Catatan hari ini",
+    "forDate": "Catatan {{date}}",
+    "placeholder": "Bagaimana perasaanmu hari ini?",
+    "weightDigitsOnly": "Hanya angka.",
+    "weightOneDot": "Hanya satu titik desimal.",
+    "weightIntMax": "Maksimal 4 digit sebelum desimal.",
+    "weightDecMax": "Maksimal 1 digit setelah desimal."
+  },
+  "image": {
+    "saveError": "Gagal menyimpan foto. Coba lagi.",
+    "deleteError": "Gagal menghapus foto. Coba lagi.",
+    "deleteTitle": "Hapus foto",
+    "deleteConfirm": "Hapus foto hari ini?",
+    "addTitle": "Tambah foto",
+    "yourPhoto": "Fotomu",
+    "addAPhoto": "Tambahkan foto",
+    "capture": "Abadikan momen",
+    "chooseSource": "Pilih kamera atau galeri"
+  },
+  "history": {
+    "title": "Riwayat puasa",
+    "total": "Total",
+    "average": "Rata-rata",
+    "recent": "Puasa terbaru",
+    "status": {
+      "cancelled": "Dibatalkan",
+      "fasting": "Berlangsung",
+      "free": "Bebas",
+      "reached": "Target tercapai",
+      "notReached": "Belum tercapai"
+    },
+    "actions": "Tindakan"
+  },
+  "startTime": {
+    "invalid": "Waktu tidak valid",
+    "overlap": "Bertabrakan dengan puasa sebelumnya!",
+    "max24h": "Hanya bisa mulai paling awal 24 jam sebelumnya!",
+    "future": "Tidak bisa memilih waktu di masa depan!",
+    "title": "Pilih waktu mulai puasa",
+    "hint": "Ketuk jam atau tanggal untuk memilih waktu mulai",
+    "earlier": "Mulai lebih awal",
+    "confirm": "Konfirmasi mulai"
+  },
+  "endTime": {
+    "title": "Pilih waktu selesai",
+    "confirm": "Konfirmasi selesai",
+    "future": {
+      "title": "Waktu tidak valid",
+      "desc": "Waktu ini ada di masa depan."
+    },
+    "tooQuick": {
+      "title": "Puasa ini akan dibatalkan",
+      "desc": "Terlalu singkat untuk dicatat."
+    },
+    "failed": {
+      "title": "Puasa ini akan ditandai gagal",
+      "desc": "Belum mencapai waktu minimum untuk menyelesaikan puasa."
+    },
+    "completed": {
+      "title": "Puasa ini akan selesai",
+      "desc": "Cukup lama untuk dicatat."
+    }
+  },
+  "targetSheet": {
+    "choose": "Pilih target ini",
+    "clear": "Hapus target"
+  },
+  "fastDetail": {
+    "reachedTarget": "Target tercapai",
+    "notReachedTarget": "Target belum tercapai",
+    "targetHours": "Target: {{hours}} jam",
+    "over": "Lebih {{duration}}",
+    "remaining": "Sisa {{duration}}",
+    "review": "Ulasan sesi",
+    "bodyAtEnd": "Kondisi tubuh di akhir",
+    "metrics": "Data tercatat",
+    "advice": "Saran"
+  },
+  "date": {
+    "weekday": {
+      "0": "Min",
+      "1": "Sen",
+      "2": "Sel",
+      "3": "Rab",
+      "4": "Kam",
+      "5": "Jum",
+      "6": "Sab"
+    },
+    "month": {
+      "0": "Jan",
+      "1": "Feb",
+      "2": "Mar",
+      "3": "Apr",
+      "4": "Mei",
+      "5": "Jun",
+      "6": "Jul",
+      "7": "Agu",
+      "8": "Sep",
+      "9": "Okt",
+      "10": "Nov",
+      "11": "Des"
+    },
+    "monthNarrow": {
+      "0": "J",
+      "1": "F",
+      "2": "M",
+      "3": "A",
+      "4": "M",
+      "5": "J",
+      "6": "J",
+      "7": "A",
+      "8": "S",
+      "9": "O",
+      "10": "N",
+      "11": "D"
+    }
+  },
+  "journey": {
+    "savedImage": "Gambar tersimpan di galeri.",
+    "saveImage": "Simpan gambar",
+    "style": "Gaya",
+    "mode": {
+      "mood": "Emosi",
+      "fasting": "Proses puasa"
+    },
+    "dayButton": "Hari",
+    "weekButton": "Mgg",
+    "stat": {
+      "days_one": "hari",
+      "days_other": "hari",
+      "hours_one": "jam",
+      "hours_other": "jam",
+      "logs_one": "catatan",
+      "logs_other": "catatan"
+    },
+    "statsLine": "{{days}} hari · {{hours}} jam · {{logs}} catatan",
+    "legend": {
+      "mood": {
+        "0": "Buruk sekali",
+        "1": "Buruk",
+        "2": "Biasa",
+        "3": "Baik",
+        "4": "Sangat baik"
+      }
+    },
+    "info": {
+      "title": "Cara membaca perjalanan",
+      "message": "Hal-hal yang tidak dijelaskan oleh keterangan ikon.",
+      "fast1": "Setiap sel diwarnai berdasarkan total durasi puasa terpanjang di hari itu.",
+      "fast2": "Puasa yang melewati beberapa hari mewarnai semuanya, lebih terang di hari pertama dan makin gelap menjelang akhir.",
+      "fast3": "Sel dengan ikon perisai adalah hari istirahat yang dilindungi perisai.",
+      "mood1": "Sel berbingkai warna utama adalah hari yang memiliki catatan.",
+      "actionsTitle": "Tindakan",
+      "action1": "Ketuk hari kosong untuk menambah suasana hati dan catatan; ketuk hari berisi data untuk melihat detail.",
+      "action2": "Angka di bawah tiap ikon adalah jumlah hari dalam setahun pada level itu.",
+      "action3": "Gunakan tombol Mgg/Hari di sudut kisi untuk mengganti tata letak. Gambar yang disimpan mengikuti tata letak saat ini."
+    }
+  },
+  "layout": {
+    "title": "Tata letak piksel",
+    "subtitle": "Pilih cara perjalananmu ditampilkan",
+    "weekly": "Mingguan",
+    "monthly": "Bulanan",
+    "vertical": "↓ Vertikal",
+    "horizontal": "→ Horizontal"
+  },
+  "iconPack": {
+    "title": "Pilih paket ikon",
+    "tabMood": "Emosi",
+    "tabTarget": "Target",
+    "level": "Lv. {{level}}"
+  },
+  "packs": {
+    "ionicons_faces": "Tampilan minimalis modern dengan Ionicons",
+    "material_emoticons": "Wajah emosi halus dari Material Community",
+    "weather_vibes": "Tunjukkan suasana hati dengan ikon cuaca",
+    "gaming_energy": "Emosi berupa bar energi ala game",
+    "pixel_vibe": "Emosi gaya piksel dan emoji piktogram",
+    "default_emoji_targets": "Target ditampilkan dengan emoji klasik",
+    "ionicons_targets": "Ikon minimalis yang halus dari Ionicons",
+    "material_energy_targets": "Menunjukkan tantangan lewat energi dan api",
+    "feather_minimal_targets": "Desain garis halus dari Feather Icons"
+  },
+  "pixelDetail": {
+    "title": "Jurnal harian",
+    "noMood": "Belum ada suasana hati",
+    "dailyFast": "⏱️ Puasa harian",
+    "dailyNote": "📝 Catatan harian",
+    "relatedFasts": "PUASA TERKAIT",
+    "hoursToday": "jam hari ini",
+    "hoursFasted": "JAM BERPUASA",
+    "weightHint": "Ketuk untuk mengubah",
+    "addWeight": "Tambah berat",
+    "dayNote": "CATATAN HARI INI",
+    "notePlaceholder": "Tambahkan catatan untuk hari ini...",
+    "photos": "FOTO",
+    "addPhoto": "Tambah foto",
+    "photoHint": "Tambahkan foto untuk hari ini",
+    "updatePhoto": "Perbarui foto",
+    "changePhoto": "Ganti foto",
+    "photoFrom": "Foto dari"
+  },
+  "dayModal": {
+    "todayMood": "Suasana hati hari ini",
+    "moodFor": "Suasana hati {{date}}",
+    "todayWeight": "Berat hari ini",
+    "weightFor": "Berat {{date}}"
+  },
+  "stats": {
+    "subtitle": "Pantau progresmu",
+    "dashboard": "Dasbor",
+    "currentStreak": "Streak saat ini",
+    "days_one": "hari",
+    "days_other": "hari",
+    "record": "Rekor",
+    "shields": "Perisai",
+    "section": "Statistik",
+    "totalFasting": "Total puasa",
+    "completed": "Selesai",
+    "averageFast": "Rata-rata puasa",
+    "longestFast": "Puasa terlama",
+    "activeDays": "Hari aktif",
+    "maxStreak": "Streak terpanjang",
+    "shieldsUsed": "Perisai terpakai",
+    "unit": {
+      "hours": "jam",
+      "times": "kali",
+      "days": "hari"
+    },
+    "distribution": {
+      "title": "Distribusi puasa",
+      "subtitle": "Sebaran sesi puasamu",
+      "range": "{{from}}–{{to}} jam",
+      "over": "{{from}}+ jam",
+      "fasts_one": "puasa",
+      "fasts_other": "puasa"
+    },
+    "chart": {
+      "title": "Berat & progres puasa",
+      "subtitle": "Progresmu dari waktu ke waktu",
+      "fasting": "Puasa",
+      "noData": "Tidak ada data",
+      "noWeight": "- Tidak ada data berat",
+      "hoursUnit": "Jam"
+    },
+    "range": {
+      "title": "Rentang waktu",
+      "day_one": "{{count}} hari",
+      "day_other": "{{count}} hari",
+      "week_one": "{{count}} minggu",
+      "week_other": "{{count}} minggu",
+      "month_one": "{{count}} bulan",
+      "month_other": "{{count}} bulan",
+      "unit": {
+        "day": "hari",
+        "week": "minggu",
+        "month": "bulan"
+      }
+    }
+  },
+  "goal": {
+    "currentWeightTitle": "Berat saat ini",
+    "currentWeightMessage": "Masukkan berat saat ini",
+    "targetMessage": "Atur target berat",
+    "setCurrent": "Catat berat saat ini",
+    "setCurrentHint": "Tambahkan berat untuk mulai memantau progres",
+    "weightGoal": "Target berat",
+    "setTarget": "Atur target",
+    "currentWeight": "Berat saat ini",
+    "setTargetHint": "Atur target berat untuk memantau progres",
+    "toGo": "Sisa {{value}} kg",
+    "reached": "Target tercapai"
+  },
+  "ach": {
+    "title": "Pencapaian",
+    "unlocked": "{{unlocked}} / {{total}} terbuka",
+    "empty": "Belum ada pencapaian",
+    "claim": "Klaim",
+    "done": "Tercapai",
+    "notDone": "Belum",
+    "empty_slot": "Kosong",
+    "tier": {
+      "BRONZE": "PERUNGGU",
+      "SILVER": "PERAK",
+      "GOLD": "EMAS",
+      "DIAMOND": "BERLIAN"
+    },
+    "fasting_hours": {
+      "name": "Total puasa",
+      "description": "Total jam berpuasa.",
+      "item_one": "{{count}} jam puasa",
+      "item_other": "{{count}} jam puasa"
+    },
+    "invalid_fasts": {
+      "name": "Puasa tidak valid",
+      "description": "Jumlah sesi puasa tidak valid."
+    },
+    "failed_fasts": {
+      "name": "Puasa gagal",
+      "description": "Jumlah sesi puasa yang gagal."
+    },
+    "completed_fasts": {
+      "name": "Puasa selesai",
+      "description": "Jumlah sesi puasa yang selesai.",
+      "item_one": "Selesaikan puasa pertamamu",
+      "item_other": "Selesaikan {{count}} puasa"
+    },
+    "active_days": {
+      "name": "Hari aktif",
+      "description": "Jumlah hari kamu aktif di aplikasi.",
+      "item_one": "{{count}} hari aktif",
+      "item_other": "{{count}} hari aktif"
+    },
+    "habit": {
+      "name": "Kebiasaan",
+      "description": "Skor kebiasaan puasamu.",
+      "item_one": "Capai kebiasaan {{count}}%",
+      "item_other": "Capai kebiasaan {{count}}%"
+    },
+    "longest_fast": {
+      "name": "Puasa terlama",
+      "description": "Puasa terlama yang pernah kamu selesaikan.",
+      "item_one": "Selesaikan puasa {{count}} jam",
+      "item_other": "Selesaikan puasa {{count}} jam"
+    },
+    "max_streak": {
+      "name": "Streak terpanjang",
+      "description": "Streak puasa terpanjangmu.",
+      "item_one": "Capai streak {{count}} hari",
+      "item_other": "Capai streak {{count}} hari"
+    },
+    "total_shields": {
+      "name": "Total perisai",
+      "description": "Jumlah perisai yang didapat.",
+      "item_one": "Dapatkan perisai pertamamu",
+      "item_other": "Dapatkan {{count}} perisai"
+    },
+    "retain_circles": {
+      "name": "Master Retain",
+      "description": "Putaran Retain yang selesai saat kebiasaan penuh.",
+      "item_one": "Selesaikan putaran Retain pertamamu",
+      "item_other": "Selesaikan {{count}} putaran Retain"
+    }
+  },
+  "modal": {
+    "notClosable": {
+      "title": "Tidak dapat ditutup",
+      "body": "Selesaikan langkah ini dulu!"
+    }
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "section": {
+      "showcase": "Etalase",
+      "appearance": "Tampilan",
+      "general": "Umum",
+      "sound": "Suara & getar",
+      "notifications": "Notifikasi",
+      "data": "Data",
+      "about": "Tentang"
+    },
+    "showcaseExport": "Tampilkan di gambar perjalanan",
+    "showcaseExportDesc": "Tambahkan lencana ke gambar yang disimpan",
+    "showcaseEmpty": "Belum ada lencana. Capai tonggak pencapaian lalu ketuk Klaim di tab Statistik.",
+    "showcasePick": "Pilih hingga {{max}} lencana untuk dipamerkan.",
+    "selectedCount": "Dipilih {{count}}/{{max}}",
+    "darkMode": "Mode gelap",
+    "darkModeDesc": "Gunakan tampilan gelap di seluruh aplikasi",
+    "theme": "Tema",
+    "language": "Bahasa",
+    "weekStart": "Minggu dimulai",
+    "monday": "Senin",
+    "sunday": "Minggu",
+    "mondayDesc": "Senin → Minggu",
+    "sundayDesc": "Minggu → Sabtu",
+    "beginnerTips": "Tips pemula",
+    "beginnerTipsDesc": "Tampilkan penjelasan singkat soal kebiasaan dan perisai",
+    "vibration": "Getar",
+    "sound": "Suara",
+    "soundDesc": "Suara saat mulai, selesai, dan hadiah",
+    "touchSound": "Suara sentuh",
+    "touchSoundDesc": "Klik singkat saat ketuk dan alih",
+    "targetReached": "Target tercapai",
+    "targetReachedDesc": "Beri tahu saat target puasa tercapai",
+    "dailyReminder": "Pengingat harian",
+    "dailyReminderDesc": "Pengingat harian untuk mulai puasa",
+    "reminderTime": "Waktu pengingat",
+    "backup": "Cadangkan & pulihkan",
+    "backupDesc": "Google Drive atau file cadangan",
+    "reset": "Atur ulang pengaturan",
+    "resetDesc": "Kembalikan pengaturan ke bawaan",
+    "resetConfirmTitle": "Atur ulang pengaturan?",
+    "resetConfirmBody": "Tema, tata letak, suara, dan notifikasi kembali ke bawaan. Data puasamu tetap tersimpan.",
+    "resetOk": "Atur ulang",
+    "privacy": "Privasi",
+    "privacyDesc": "Privasi dan izin data",
+    "privacyBody": "FastFast bekerja offline. Puasa, catatan, dan berat badanmu hanya disimpan di perangkat ini dan tidak pernah dikirim ke server kami. Cadangan disimpan di file milikmu atau di Google Drive milikmu sendiri.",
+    "health": "Penafian kesehatan",
+    "rate": "Beri nilai aplikasi",
+    "rateDesc": "Suka aplikasinya? Beri penilaian",
+    "rateThanks": "Terima kasih!",
+    "rateLater": "Penilaian tersedia setelah aplikasi ada di toko.",
+    "feedback": "Masukan",
+    "feedbackDesc": "Sampaikan pendapat atau laporkan masalah",
+    "noEmailTitle": "Tidak ada aplikasi email",
+    "noEmailBody": "Pasang aplikasi email untuk mengirim masukan.",
+    "about": "Tentang",
+    "aboutBody": "Versi {{version}}\n\nPuasa intermiten dengan streak, perisai, dan setahun dalam piksel.",
+    "version": "Versi {{version}}",
+    "expoGoTitle": "Tidak tersedia di Expo Go",
+    "expoGoBody": "Notifikasi butuh versi pengembangan atau versi toko.",
+    "notifOffTitle": "Notifikasi nonaktif",
+    "notifOffBody": "Izinkan notifikasi FastFast di pengaturan sistem.",
+    "openSettings": "Buka pengaturan"
+  },
+  "account": {
+    "title": "Akun",
+    "guestHint": "Masuk dengan Google untuk mencadangkan ke Drive"
+  },
+  "backup": {
+    "subtitle": "Datamu ada di perangkat ini. Cadangan adalah salinan untuk dipulihkan nanti.",
+    "drive": "Google Drive",
+    "file": "File",
+    "signIn": "Masuk dengan Google",
+    "signInDesc": "Cadangkan ke Google Drive milikmu",
+    "notSignedIn": "Belum masuk",
+    "lastBackup": "Cadangan terakhir {{time}}",
+    "never": "Belum ada cadangan",
+    "backUpNow": "Cadangkan sekarang",
+    "backingUp": "Mencadangkan…",
+    "restoreDrive": "Pulihkan dari Drive",
+    "restoreDriveDesc": "Ganti data di perangkat ini dengan cadangan Drive",
+    "restoring": "Memulihkan…",
+    "signOut": "Keluar",
+    "signOutTitle": "Keluar?",
+    "signOutBody": "Datamu tetap di perangkat ini. Cadangan di Google Drive tetap tersimpan.",
+    "signInFailedTitle": "Gagal masuk",
+    "signInFailedBody": "Gagal masuk dengan Google. Coba lagi.",
+    "confirmTitle": "Cadangkan ke Google Drive?",
+    "confirmReplace": "Cadangan dari {{time}} akan diganti dengan data dan foto saat ini.",
+    "confirmFirst": "Data dan foto saat ini akan disimpan ke Google Drive-mu.",
+    "backUp": "Cadangkan",
+    "doneTitle": "Tercadangkan",
+    "doneWithPhotos": "Data dan {{count}} foto baru tersimpan di Google Drive.",
+    "doneBody": "Datamu tersimpan di Google Drive.",
+    "failedTitle": "Gagal mencadangkan",
+    "failedBody": "Gagal mencadangkan ke Google Drive. Periksa koneksi lalu coba lagi.",
+    "restoredTitle": "Dipulihkan",
+    "restoredBody": "Datamu telah dipulihkan.",
+    "restoredMissing": "Data dipulihkan. {{count}} foto tidak ditemukan di Drive.",
+    "restoreFailedTitle": "Gagal memulihkan",
+    "restoreFailedDrive": "Gagal memulihkan dari Google Drive.",
+    "readFailed": "Gagal membaca cadangan di Google Drive.",
+    "noneTitle": "Tidak ada cadangan",
+    "noneBody": "Belum ada cadangan FastFast di akun Google ini.",
+    "restoreDriveTitle": "Pulihkan dari Google Drive?",
+    "restoreConfirm": "Cadangan dari {{time}}. Semua data saat ini di perangkat akan diganti.",
+    "restoreFileConfirm": "Cadangan dari {{time}}. Semua data saat ini akan diganti. File tidak menyertakan foto.",
+    "restoreFileTitle": "Pulihkan dari file?",
+    "restoreFileFailed": "Gagal memulihkan file cadangan ini.",
+    "exportFile": "Ekspor file cadangan",
+    "exporting": "Mengekspor…",
+    "exportFileDesc": "Hanya data, bagikan atau simpan di mana saja",
+    "exportFailedTitle": "Gagal mengekspor",
+    "exportFailedBody": "Gagal membuat file cadangan.",
+    "restoreFile": "Pulihkan dari file",
+    "restoreFileDesc": "Pilih file cadangan FastFast",
+    "importFailedTitle": "Gagal mengimpor",
+    "importFailedBody": "File ini bukan cadangan FastFast yang valid."
+  },
+  "theme": {
+    "title": "Tema",
+    "subtitle": "Pilih tampilan aplikasi",
+    "notPurchased": "Belum dibeli",
+    "freeUntil": "Gratis hingga",
+    "purchase": "Beli",
+    "unavailable": "Tidak tersedia",
+    "premium": "Premium",
+    "limited": "Terbatas",
+    "dark": "Gelap",
+    "light": "Terang"
+  },
+  "notify": {
+    "targetTitle": "🎉 Target tercapai!",
+    "targetBody": "Kamu sudah berpuasa {{hours}} jam. Akhiri sesi untuk mencatatnya.",
+    "dailyTitle": "Saatnya berpuasa ⏱️",
+    "dailyBody": "Mulai puasa hari ini untuk menjaga streak dan kebiasaan."
+  },
+  "perm": {
+    "saveImage": "FastFast perlu izin untuk menyimpan gambar ke galeri.",
+    "camera": "FastFast perlu akses kamera untuk mengambil foto.",
+    "gallery": "FastFast perlu akses foto untuk memilih gambar.",
+    "saveFailed": "Gagal menyimpan gambar. Coba lagi."
+  },
+  "widget": {
+    "fasting": "BERPUASA",
+    "ready": "SIAP",
+    "notFasting": "Belum puasa",
+    "tapToOpen": "Ketuk untuk membuka FastFast",
+    "started": "Mulai",
+    "done": "Selesai"
+  },
+  "notFound": {
+    "title": "Ups!",
+    "body": "Layar ini tidak ada.",
+    "home": "Ke layar utama!"
+  }
+}

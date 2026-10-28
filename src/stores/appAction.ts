@@ -22,8 +22,8 @@ import { handleLogin } from "@/utils/login";
 import { useAppStore } from "./appStore";
 import { initializeDashboard } from "./dashboardAction";
 import { initializePixel } from "./pixelAction";
+import { toSupportedLanguage } from "@/providers/Language";
 
-const SUPPORTED_LANGUAGES = ["vi", "en", "ja", "zh"];
 
 /**
  * Dữ liệu được load một lần từ SQLite khi app khởi động.
@@ -64,14 +64,9 @@ export interface AppInitResult {
  * Lấy language từ AppSettings hoặc system locale.
  */
 function resolveLanguage(settings: AppSettings | null): string {
-  let locale =
-    settings?.language || Localization.getLocales()[0]?.languageCode || "vi";
-
-  if (!SUPPORTED_LANGUAGES.includes(locale.toString())) {
-    locale = "en";
-  }
-
-  return locale.toString();
+  return toSupportedLanguage(
+    settings?.language || Localization.getLocales()[0]?.languageCode,
+  );
 }
 
 /**

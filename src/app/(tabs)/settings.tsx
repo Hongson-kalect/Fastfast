@@ -1,5 +1,5 @@
 import { TAB_BAR_SPACE } from "@/constants/design";
-import { Alert, Linking, Pressable, ScrollView, View } from "react-native";
+import { Linking, Pressable, ScrollView, View } from "react-native";
 
 import { SettingsItem } from "@/components/settings/SettingsItem";
 import { SettingsSection } from "@/components/settings/SettingsSection";
@@ -7,27 +7,26 @@ import { SettingsSwitchItem } from "@/components/settings/SettingsSwitchItem";
 import { SettingsValueItem } from "@/components/settings/SettingsValueItem";
 import { ThemedText } from "@/components/themed-text";
 
-import AchievementBadge from "@/components/AchievementBadge";
+import AchievementBadge, {
+  achievementItemTitle,
+  achievementName,
+} from "@/components/AchievementBadge";
 import AchievementShowcase, {
   SHOWCASE_LIMIT,
 } from "@/components/AchievementShowcase";
 import { SettingsAccountCard } from "@/components/settings/SettingsAccountCard";
+import { BackupSheet } from "@/components/settings/BackupSheet";
 import { ACHIEVEMENTS } from "@/constants/achievements";
 import ThemeBottomSheet from "@/components/settings/ThemeBottomSheet";
 import { ThemeKey } from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { AppSettings } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
-import { useT } from "@/providers/Language";
+import { SUPPORTED_LANGUAGES, useT } from "@/providers/Language";
 import { reloadAppData, toggleDarkMode, updateTheme } from "@/stores/appAction";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
-import {
-  exportBackup,
-  pickBackup,
-  resetSettings,
-  restoreBackup,
-} from "@/utils/backup";
+import { resetSettings } from "@/utils/backup";
 import { feedback } from "@/utils/feedback";
 import {
   cancelTargetReached,
@@ -38,12 +37,14 @@ import {
   setDailyReminder,
 } from "@/utils/notifications";
 import { capitalize } from "@/utils/text";
+import { getDriveBackupTime } from "@/utils/driveBackup";
+import { GoogleAccount, getSignedInAccount } from "@/utils/googleAuth";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Constants from "expo-constants";
 import * as StoreReview from "expo-store-review";
 import { useSQLiteContext } from "expo-sqlite";
 import i18n from "i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
@@ -51,15 +52,8 @@ import { useShallow } from "zustand/react/shallow";
 const FEEDBACK_EMAIL = "";
 const DEFAULT_REMINDER = { hour: 20, minute: 0 };
 
-const LANGUAGES = [
-  { value: "vi", label: "Tiếng Việt", description: "Vietnamese" },
-  { value: "en", label: "English", description: "Tiếng Anh" },
-];
 
-const WEEK_STARTS = [
-  { value: "monday", label: "Monday", description: "Weeks run Monday → Sunday" },
-  { value: "sunday", label: "Sunday", description: "Weeks run Sunday → Saturday" },
-] as const;
+const WEEK_STARTS = ["monday", "sunday"] as const;
 
 export default function SettingsScreen() {
   const { settings, updateSetting, currentFastSession, userProfile } = useAppStore(
@@ -76,6 +70,22 @@ export default function SettingsScreen() {
 
   const [isDarkMode, setIsDarkMode] = useState(settings?.is_dark_mode ?? true);
   const [showReminderPicker, setShowReminderPicker] = useState(false);
+
+  // Tài khoản Google và lần sao lưu Drive gần nhất, chỉ để hiển thị;
+  // thao tác sao lưu nằm trong BackupSheet
+  const [account, setAccount] = useState<GoogleAccount | null>(null);
+  const [lastDriveBackup, setLastDriveBackup] = useState<Date | null>(null);
+
+  useEffect(() => {
+    getSignedInAccount().then((signedIn) => {
+      setAccount(signedIn);
+      if (signedIn) {
+        getDriveBackupTime()
+          .then(setLastDriveBackup)
+          .catch(() => setLastDriveBackup(null));
+      }
+    });
+  }, []);
   const db = useSQLiteContext();
   const dbService = useDBService();
 
@@ -124,12 +134,17 @@ export default function SettingsScreen() {
 
   const handleLanguage = () =>
     chooseOption(
-      "Language",
-      LANGUAGES,
+      t("settings.language"),
+      SUPPORTED_LANGUAGES,
       settings?.language || i18n.language,
       async (value) => {
         await saveSetting("language", value);
-        i18n.changeLanguage(value);
+        await i18n.changeLanguage(value);
+        // Thông báo đã lên lịch giữ chữ lúc tạo: lên lịch lại theo ngôn ngữ mới
+        if (reminder) setDailyReminder(dbService, reminder);
+        if (currentFastSession && !currentFastSession.end_time) {
+          scheduleTargetReached(dbService, currentFastSession);
+        }
       },
     );
 
@@ -152,8 +167,8 @@ export default function SettingsScreen() {
       return [
         {
           value: item.id,
-          label: achievement.name,
-          description: item.title,
+          label: achievementName(achievement),
+          description: achievementItemTitle(achievement, item),
           icon: (
             <AchievementBadge achievement={achievement} item={item} size={40} />
           ),
@@ -164,23 +179,22 @@ export default function SettingsScreen() {
     if (!options.length) {
       addModal({
         type: "alert",
-        title: "Showcase",
-        message:
-          "Chưa có huy hiệu nào. Đạt mốc thành tựu và bấm Nhận trong tab Stats để mở khoá.",
+        title: t("settings.section.showcase"),
+        message: t("settings.showcaseEmpty"),
       });
       return;
     }
 
     addModal({
       type: "checkbox",
-      title: "Showcase",
-      message: `Chọn tối đa ${SHOWCASE_LIMIT} huy hiệu để khoe.`,
+      title: t("settings.section.showcase"),
+      message: t("settings.showcasePick", { max: SHOWCASE_LIMIT }),
       options,
       values: (settings?.showcase_achievements ?? []).filter((id) =>
         confirmed.has(id),
       ),
       max: SHOWCASE_LIMIT,
-      okText: "Lưu",
+      okText: t("common.save"),
       onConfirm: (values) =>
         saveSetting("showcase_achievements", values as string[]),
     });
@@ -188,17 +202,33 @@ export default function SettingsScreen() {
 
   const handleWeekStart = () =>
     chooseOption(
-      "Week starts on",
-      WEEK_STARTS,
+      t("settings.weekStart"),
+      WEEK_STARTS.map((value) => ({
+        value,
+        label: t(`settings.${value}`),
+        description: t(`settings.${value}Desc`),
+      })),
       settings?.week_starts_on ?? "monday",
       (value) => saveSetting("week_starts_on", value),
     );
 
   const showNotificationUnsupported = () =>
-    Alert.alert(
-      "Not available in Expo Go",
-      "Notifications need a development or store build of FastFast.",
-    );
+    addModal({
+      type: "alert",
+      title: t("settings.expoGoTitle"),
+      message: t("settings.expoGoBody"),
+    });
+
+  const showNotificationsOff = () =>
+    addModal({
+      type: "confirm",
+      title: t("settings.notifOffTitle"),
+      message: t("settings.notifOffBody"),
+      okText: t("settings.openSettings"),
+      onOk: () => {
+        Linking.openSettings();
+      },
+    });
 
   const handleTargetNotification = async (value: boolean) => {
     if (value && !isNotificationSupported) {
@@ -207,14 +237,7 @@ export default function SettingsScreen() {
     }
 
     if (value && !(await ensureNotificationPermission())) {
-      Alert.alert(
-        "Notifications are off",
-        "Allow notifications for FastFast in system settings.",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Open settings", onPress: () => Linking.openSettings() },
-        ],
-      );
+      showNotificationsOff();
       return;
     }
 
@@ -235,16 +258,7 @@ export default function SettingsScreen() {
     }
 
     const ok = await setDailyReminder(dbService, value ? (reminder ?? DEFAULT_REMINDER) : null);
-    if (!ok) {
-      Alert.alert(
-        "Notifications are off",
-        "Allow notifications for FastFast in system settings.",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Open settings", onPress: () => Linking.openSettings() },
-        ],
-      );
-    }
+    if (!ok) showNotificationsOff();
   };
 
   const handleReminderTime = (_event: unknown, date?: Date) => {
@@ -253,74 +267,31 @@ export default function SettingsScreen() {
     setDailyReminder(dbService, { hour: date.getHours(), minute: date.getMinutes() });
   };
 
-  const handleExport = async () => {
-    try {
-      await exportBackup(db);
-    } catch (e) {
-      console.warn("export backup error", e);
-      feedback("error");
-      Alert.alert("Backup failed", "Could not create the backup file.");
-    }
-  };
-
-  const handleImport = async () => {
-    try {
-      const backup = await pickBackup();
-      if (!backup) return;
-
-      Alert.alert(
-        "Restore backup?",
-        `Backup from ${new Date(backup.exportedAt).toLocaleString()}. All current data on this device will be replaced.`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Restore",
-            style: "destructive",
-            onPress: async () => {
-              await restoreBackup(db, backup);
-              await reloadAppData(db);
-              // Id thông báo không được khôi phục → lên lịch lại
-              const restored = useAppStore.getState().settings?.daily_reminder;
-              if (restored) await setDailyReminder(dbService, restored);
-              feedback("fastComplete");
-              Alert.alert("Restored", "Your data has been restored.");
-            },
-          },
-        ],
-      );
-    } catch (e) {
-      console.warn("import backup error", e);
-      feedback("error");
-      Alert.alert("Restore failed", "This file is not a valid FastFast backup.");
-    }
-  };
-
-  const handleBackup = () =>
-    Alert.alert("Backup & Restore", "Your data is stored only on this device.", [
-      { text: "Export backup", onPress: handleExport },
-      { text: "Restore from file", onPress: handleImport },
-      { text: "Cancel", style: "cancel" },
-    ]);
+  const openBackupSheet = () =>
+    present(
+      <BackupSheet
+        onAccountChange={setAccount}
+        onBackupTimeChange={setLastDriveBackup}
+        onRestored={() =>
+          setIsDarkMode(useAppStore.getState().settings?.is_dark_mode ?? true)
+        }
+      />,
+    );
 
   const handleResetSettings = () =>
-    Alert.alert(
-      "Reset settings?",
-      "Theme, layout, sound and notification settings go back to default. Your fasting data is kept.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Reset",
-          style: "destructive",
-          onPress: async () => {
-            await setDailyReminder(dbService, null);
-            await cancelTargetReached(dbService);
-            await resetSettings(db);
-            await reloadAppData(db);
-            setIsDarkMode(useAppStore.getState().settings?.is_dark_mode ?? true);
-          },
-        },
-      ],
-    );
+    addModal({
+      type: "confirm",
+      title: t("settings.resetConfirmTitle"),
+      message: t("settings.resetConfirmBody"),
+      okText: t("settings.resetOk"),
+      onOk: async () => {
+        await setDailyReminder(dbService, null);
+        await cancelTargetReached(dbService);
+        await resetSettings(db);
+        await reloadAppData(db);
+        setIsDarkMode(useAppStore.getState().settings?.is_dark_mode ?? true);
+      },
+    });
 
   const handleRate = async () => {
     try {
@@ -331,13 +302,21 @@ export default function SettingsScreen() {
     } catch (e) {
       console.warn("store review error", e);
     }
-    Alert.alert("Thank you!", "Rating will be available once the app is on the store.");
+    addModal({
+      type: "alert",
+      title: t("settings.rateThanks"),
+      message: t("settings.rateLater"),
+    });
   };
 
   const handleFeedback = () => {
     const subject = encodeURIComponent(`FastFast ${version} feedback`);
     Linking.openURL(`mailto:${FEEDBACK_EMAIL}?subject=${subject}`).catch(() =>
-      Alert.alert("No email app", "Please install an email app to send feedback."),
+      addModal({
+        type: "alert",
+        title: t("settings.noEmailTitle"),
+        message: t("settings.noEmailBody"),
+      }),
     );
   };
 
@@ -359,22 +338,20 @@ export default function SettingsScreen() {
         <View className="pb-6">
           <View className="flex-row items-center">
             <ThemedText size="xxxl" weight="semibold">
-              Settings
+              {t("settings.title")}
             </ThemedText>
           </View>
         </View>
 
         {/* Account */}
         <SettingsAccountCard
-          name={undefined}
-          email={undefined}
-          onPress={() => {
-            // TODO: account screen
-          }}
+          name={account?.name ?? undefined}
+          email={account?.email}
+          onPress={openBackupSheet}
         />
 
         {/* Showcase */}
-        <SettingsSection title="Showcase">
+        <SettingsSection title={t("settings.section.showcase")}>
           <Pressable onPress={handleShowcase} className="px-4 py-4 active:opacity-80">
             <AchievementShowcase
               itemIds={settings?.showcase_achievements ?? []}
@@ -384,19 +361,19 @@ export default function SettingsScreen() {
 
           <SettingsSwitchItem
             icon="image"
-            title="Show in Journey export"
-            description="Add your showcase badges to the saved image"
+            title={t("settings.showcaseExport")}
+            description={t("settings.showcaseExportDesc")}
             value={settings?.showcase_in_export ?? true}
             onChange={(value) => saveSetting("showcase_in_export", value)}
           />
         </SettingsSection>
 
         {/* Appearance */}
-        <SettingsSection title="Appearance">
+        <SettingsSection title={t("settings.section.appearance")}>
           <SettingsSwitchItem
             icon="moon"
-            title="Dark mode"
-            description="Use dark appearance throughout the app"
+            title={t("settings.darkMode")}
+            description={t("settings.darkModeDesc")}
             value={isDarkMode}
             onChange={(value) => {
               setIsDarkMode(value);
@@ -406,19 +383,19 @@ export default function SettingsScreen() {
 
           <SettingsValueItem
             icon="droplet"
-            title="Theme"
+            title={t("settings.theme")}
             value={capitalize(settings?.theme || "default")}
             onPress={openThemeModal}
           />
         </SettingsSection>
 
         {/* General */}
-        <SettingsSection title="General">
+        <SettingsSection title={t("settings.section.general")}>
           <SettingsValueItem
             icon="globe"
-            title="Language"
+            title={t("settings.language")}
             value={
-              LANGUAGES.find((lang) => lang.value === (settings?.language || i18n.language))
+              SUPPORTED_LANGUAGES.find((lang) => lang.value === (settings?.language || i18n.language))
                 ?.label ?? "English"
             }
             onPress={handleLanguage}
@@ -426,60 +403,60 @@ export default function SettingsScreen() {
 
           <SettingsValueItem
             icon="calendar"
-            title="Week starts on"
-            value={settings?.week_starts_on === "sunday" ? "Sunday" : "Monday"}
+            title={t("settings.weekStart")}
+            value={t(`settings.${settings?.week_starts_on === "sunday" ? "sunday" : "monday"}`)}
             onPress={handleWeekStart}
           />
 
           <SettingsSwitchItem
             icon="help-circle"
-            title="Beginner tips"
-            description="Show short explanations of how habit and shields work"
+            title={t("settings.beginnerTips")}
+            description={t("settings.beginnerTipsDesc")}
             value={settings?.beginner_tips ?? true}
             onChange={(value) => saveSetting("beginner_tips", value)}
           />
         </SettingsSection>
 
         {/* Sound */}
-        <SettingsSection title="Sound & Haptics">
+        <SettingsSection title={t("settings.section.sound")}>
           <SettingsSwitchItem
             icon="smartphone"
-            title="Vibration"
+            title={t("settings.vibration")}
             value={settings?.vibration_enabled ?? true}
             onChange={(value) => saveSetting("vibration_enabled", value)}
           />
 
           <SettingsSwitchItem
             icon="volume-2"
-            title="Sound"
-            description="Sounds for starting, finishing and rewards"
+            title={t("settings.sound")}
+            description={t("settings.soundDesc")}
             value={settings?.sound_enabled ?? true}
             onChange={(value) => saveSetting("sound_enabled", value)}
           />
 
           <SettingsSwitchItem
             icon="mouse-pointer"
-            title="Touch sound"
-            description="Short clicks for taps and toggles"
+            title={t("settings.touchSound")}
+            description={t("settings.touchSoundDesc")}
             value={settings?.touch_sound_enabled ?? true}
             onChange={(value) => saveSetting("touch_sound_enabled", value)}
           />
         </SettingsSection>
 
         {/* Notifications */}
-        <SettingsSection title="Notifications">
+        <SettingsSection title={t("settings.section.notifications")}>
           <SettingsSwitchItem
             icon="check-circle"
-            title="Target reached"
-            description="Notify when your fasting target is reached"
+            title={t("settings.targetReached")}
+            description={t("settings.targetReachedDesc")}
             value={isNotificationSupported && (settings?.notify_target_reached ?? true)}
             onChange={handleTargetNotification}
           />
 
           <SettingsSwitchItem
             icon="bell"
-            title="Daily reminder"
-            description="A reminder to start your fast every day"
+            title={t("settings.dailyReminder")}
+            description={t("settings.dailyReminderDesc")}
             value={!!reminder}
             onChange={handleDailyReminder}
           />
@@ -487,7 +464,7 @@ export default function SettingsScreen() {
           {reminder && (
             <SettingsValueItem
               icon="clock"
-              title="Reminder time"
+              title={t("settings.reminderTime")}
               value={formatReminderTime(reminder)}
               onPress={() => setShowReminderPicker(true)}
             />
@@ -504,83 +481,86 @@ export default function SettingsScreen() {
         )}
 
         {/* Data */}
-        <SettingsSection title="Data">
+        <SettingsSection title={t("settings.section.data")}>
           <SettingsValueItem
             icon="database"
-            title="Backup & Restore"
-            description="Export or import your data"
-            value=""
-            onPress={handleBackup}
+            title={t("settings.backup")}
+            description={t("settings.backupDesc")}
+            value={lastDriveBackup ? lastDriveBackup.toLocaleDateString(i18n.language) : ""}
+            onPress={openBackupSheet}
           />
 
           <SettingsItem
             icon="refresh-cw"
-            title="Reset settings"
-            description="Restore app settings to default"
+            title={t("settings.reset")}
+            description={t("settings.resetDesc")}
             danger
             showChevron
             onPress={handleResetSettings}
           />
         </SettingsSection>
 
-        {/* Privacy */}
-        <SettingsSection title="Privacy & Health">
+        {/* About */}
+        <SettingsSection title={t("settings.section.about")}>
           <SettingsValueItem
             icon="lock"
-            title="Privacy"
-            description="Privacy and data permissions"
+            title={t("settings.privacy")}
+            description={t("settings.privacyDesc")}
             value=""
             onPress={() =>
-              Alert.alert(
-                "Privacy",
-                "FastFast works offline. Your fasts, notes and weight are stored only on this device and are never sent to a server. Backups are files you export and keep yourself.",
-              )
+              addModal({
+                type: "alert",
+                title: t("settings.privacy"),
+                message: t("settings.privacyBody"),
+              })
             }
           />
 
           <SettingsValueItem
             icon="heart"
-            title="Health disclaimer"
+            title={t("settings.health")}
             value=""
             onPress={() =>
-              Alert.alert(t("onboarding.health.title"), t("onboarding.health.body"))
+              addModal({
+                type: "alert",
+                title: t("onboarding.health.title"),
+                message: t("onboarding.health.body"),
+              })
             }
           />
-        </SettingsSection>
 
-        {/* About */}
-        <SettingsSection title="About">
           <SettingsValueItem
             icon="star"
-            title="Rate the app"
-            description="Enjoying the app? Leave a rating"
+            title={t("settings.rate")}
+            description={t("settings.rateDesc")}
             value=""
             onPress={handleRate}
           />
 
           <SettingsValueItem
             icon="message-circle"
-            title="Feedback"
-            description="Tell us what you think or report a problem"
+            title={t("settings.feedback")}
+            description={t("settings.feedbackDesc")}
             value=""
             onPress={handleFeedback}
           />
 
           <SettingsValueItem
             icon="info"
-            title="About"
+            title={t("settings.about")}
             value=""
             onPress={() =>
-              Alert.alert(
-                "FastFast",
-                `Version ${version}\n\nIntermittent fasting with streaks, shields and a year in pixels.`,
-              )
+              addModal({
+                type: "alert",
+                title: "FastFast",
+                message: t("settings.aboutBody", { version }),
+              })
             }
           />
 
           <View className="items-center border-t border-text-base/5 py-4">
             <ThemedText size="xs" color="text" opacity="low">
-              Version {version}
+              {t("settings.version", { version })}
             </ThemedText>
           </View>
         </SettingsSection>

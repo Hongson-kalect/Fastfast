@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
+import { useT } from "@/providers/Language";
 
 interface FastCount {
   above_16: number;
@@ -161,29 +162,30 @@ const FastLevelItem = React.memo(
 );
 
 export const FastLevelBarChart = ({ fastStatistics }: Props) => {
+  const t = useT();
   const levels = [
     {
-      label: "16-20 hrs",
+      label: t("stats.distribution.range", { from: 16, to: 20 }),
       count: fastStatistics.above_16,
     },
     {
-      label: "20-24 hrs",
+      label: t("stats.distribution.range", { from: 20, to: 24 }),
       count: fastStatistics.above_20,
     },
     {
-      label: "24-36 hrs",
+      label: t("stats.distribution.range", { from: 24, to: 36 }),
       count: fastStatistics.above_24,
     },
     {
-      label: "36-48 hrs",
+      label: t("stats.distribution.range", { from: 36, to: 48 }),
       count: fastStatistics.above_36,
     },
     {
-      label: "48-72 hrs",
+      label: t("stats.distribution.range", { from: 48, to: 72 }),
       count: fastStatistics.above_48,
     },
     {
-      label: "72+ hrs",
+      label: t("stats.distribution.over", { from: 72 }),
       count: fastStatistics.above_72,
     },
   ];
@@ -198,11 +200,11 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
       <View className="mb-4 flex-row items-center justify-between">
         <View className="flex-1">
           <ThemedText size="md" weight="bold" color="title">
-            Fast Distribution
+            {t("stats.distribution.title")}
           </ThemedText>
 
           <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
-            Distribution of your fasting sessions
+            {t("stats.distribution.subtitle")}
           </ThemedText>
         </View>
 
@@ -212,7 +214,7 @@ export const FastLevelBarChart = ({ fastStatistics }: Props) => {
           </ThemedText>
 
           <ThemedText size="xxs" color="text" opacity="half">
-            fasts
+            {t("stats.distribution.fasts", { count: Number(total) })}
           </ThemedText>
         </View>
       </View>

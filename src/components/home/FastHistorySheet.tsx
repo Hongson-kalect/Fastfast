@@ -11,6 +11,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type HeaderProps = {
   data: FastSession[];
@@ -83,6 +84,7 @@ function FastHistorySheet() {
 /* Header                                                                     */
 /* -------------------------------------------------------------------------- */
 export const FastHistoryHeader = ({ data }: HeaderProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const stats = useMemo(() => {
@@ -129,7 +131,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
           <FontAwesome5 name="history" size={18} color={theme.primary} />
 
           <ThemedText size="xl" weight="bold" color="title">
-            Fasts history
+            {t("history.title")}
           </ThemedText>
         </View>
 
@@ -147,19 +149,19 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
       <View className="flex-row gap-2">
         <StatCard
           value={formatTime(stats.totalDuration)}
-          label="Total"
+          label={t("history.total")}
           color={theme.primary}
         />
 
         <StatCard
           value={formatTime(stats.averageDuration)}
-          label="Average"
+          label={t("history.average")}
           color={theme.info}
         />
 
         <StatCard
           value={`${stats.successRate}%`}
-          label="Target"
+          label={t("term.target")}
           color={theme.success}
         />
       </View>
@@ -167,7 +169,7 @@ export const FastHistoryHeader = ({ data }: HeaderProps) => {
       {/* Section label */}
       <View className="mt-5 px-1">
         <ThemedText size="xs" weight="medium" color="text" opacity="low">
-          Recent fasts
+          {t("history.recent")}
         </ThemedText>
       </View>
     </View>
@@ -210,6 +212,7 @@ const StatCard = ({ value, label, color }: StatCardProps) => {
 /* Item                                                                       */
 /* -------------------------------------------------------------------------- */
 export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const { addModal, closeCurrentModal } = useModalStore(
     useShallow((state) => ({
@@ -249,7 +252,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const status = (() => {
     if (isFailed) {
       return {
-        label: "Bị hủy",
+        label: t("history.status.cancelled"),
         color: theme.error,
         icon: "x-circle" as const,
       };
@@ -257,7 +260,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
 
     if (isActive) {
       return {
-        label: "Đang nhịn",
+        label: t("history.status.fasting"),
         color: theme.primary,
         icon: "clock" as const,
       };
@@ -265,7 +268,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
 
     if (!hasTarget) {
       return {
-        label: "Tự do",
+        label: t("history.status.free"),
         color: theme.success,
         icon: "zap" as const,
       };
@@ -273,14 +276,14 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
 
     if (reached) {
       return {
-        label: "Đạt mục tiêu",
+        label: t("history.status.reached"),
         color: theme.success,
         icon: "check-circle" as const,
       };
     }
 
     return {
-      label: "Chưa đạt",
+      label: t("history.status.notReached"),
       color: theme.warning,
       icon: "alert-circle" as const,
     };
@@ -309,10 +312,10 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
   const handleLongPress = () => {
     addModal({
       type: "menu",
-      title: "Fast actions",
+      title: t("history.actions"),
       menuOptions: [
         {
-          label: "Delete",
+          label: t("common.delete"),
           onPress: () => {
             onDelete(item.id);
             closeCurrentModal();
@@ -397,7 +400,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
                       weight="medium"
                       colorHex={target.colors.accent}
                     >
-                      {target?.label}
+                      {target ? t(`targets.${target.id}.label`) : null}
                     </ThemedText>
                   </View>
                 ) : (
@@ -412,7 +415,7 @@ export const FastHistoryItem = ({ item, onDelete }: ItemProps) => {
                       weight="semibold"
                       colorHex={theme.success}
                     >
-                      Tự do
+                      {t("history.status.free")}
                     </ThemedText>
                   </View>
                 )}

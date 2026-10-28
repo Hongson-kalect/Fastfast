@@ -19,6 +19,7 @@ import {
   scheduleTargetReached,
 } from "@/utils/notifications";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 interface TargetSheetProps {
   onSelectTarget?: (target: FastingTargetItem) => void;
@@ -26,6 +27,7 @@ interface TargetSheetProps {
 }
 
 const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
+  const t = useT();
   const dbService = useDBService();
   const { settings, updateSetting, theme, setCurrentFastSession } = useAppStore(
     useShallow((state) => ({
@@ -161,7 +163,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                   >
                     <View>
                       <ThemedText size="xl" weight="semibold" color="text">
-                        {item.label}
+                        {t(`targets.${item.id}.label`)}
                       </ThemedText>
 
                       <ThemedText
@@ -170,7 +172,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         color="text"
                         style={{ marginTop: 2 }}
                       >
-                        {item.title}
+                        {t(`targets.${item.id}.title`)}
                       </ThemedText>
                     </View>
 
@@ -187,7 +189,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         weight="medium"
                         colorHex={item.colors.badgeText}
                       >
-                        {item.level}
+                        {t(`targets.level.${item.level}`)}
                       </ThemedText>
                     </View>
                   </View>
@@ -202,7 +204,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                       lineHeight: 22,
                     }}
                   >
-                    {item.description}
+                    {t(`targets.${item.id}.description`)}
                   </ThemedText>
 
                   {active && (
@@ -240,7 +242,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                       weight="bold"
                       colorHex={item.colors.accent}
                     >
-                      💡 {item.advice}
+                      💡 {t(`targets.${item.id}.advice`)}
                     </ThemedText>
 
                     <ThemedText
@@ -252,7 +254,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                         lineHeight: 23,
                       }}
                     >
-                      {item.adviceLong}
+                      {t(`targets.${item.id}.adviceLong`)}
                     </ThemedText>
 
                     <Pressable
@@ -267,7 +269,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                       }}
                     >
                       <ThemedText size="lg" weight="bold" colorHex={getContrastTextColor(item.colors.accent)}>
-                        {isCurrent ? "Xác nhận" : "Chọn mục tiêu này"}
+                        {isCurrent ? t("common.confirm") : t("targetSheet.choose")}
                       </ThemedText>
                     </Pressable>
 
@@ -290,7 +292,7 @@ const TargetSheet = ({ onSelectTarget, currentFast }: TargetSheetProps) => {
                             opacity="medium"
                             style={{ textDecorationLine: "underline" }}
                           >
-                            Hủy mục tiêu
+                            {t("targetSheet.clear")}
                           </ThemedText>
                         </Pressable>
                       </View>

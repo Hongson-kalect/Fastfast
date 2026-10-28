@@ -2,6 +2,7 @@ import { View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 import { ThemedText } from "@/components/themed-text";
+import { useT } from "@/providers/Language";
 
 type Props = {
   habitPercent: number;
@@ -20,11 +21,12 @@ const HabitMilestone = ({
   primaryColor,
   textColor,
 }: Props) => {
+  const t = useT();
   return (
     <View className="bg-background2/80 p-4 rounded-2xl border border-text-base/5 my-4">
       <View className="flex-row justify-between items-center mb-4">
         <ThemedText size="xs" weight="semibold" color="text" opacity="medium">
-          Tiến trình
+          {t("habitMilestone.title")}
         </ThemedText>
       </View>
 

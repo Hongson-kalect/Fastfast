@@ -6,6 +6,7 @@ import { getLocalTodayStr } from "@/utils/timer";
 import { useMemo } from "react";
 import { View } from "react-native";
 import { ThemedText } from "./themed-text";
+import { useT } from "@/providers/Language";
 
 type FastDetailProps = {
   fast: FastSession;
@@ -209,6 +210,7 @@ function Timeline({
 }
 
 export function FastDetail({ fast }: FastDetailProps) {
+  const t = useT();
   const durationHours = fast.duration / S_PER_HOUR;
   const targetHours = fast.target_duration;
   const theme = useAppStore((state) => state.theme);
@@ -232,12 +234,12 @@ export function FastDetail({ fast }: FastDetailProps) {
 
   const status =
     fast?.status === "failed"
-      ? "Bị Hủy"
+      ? t("history.status.cancelled")
       : !fast?.end_time
-        ? "Đang nhịn"
+        ? t("history.status.fasting")
         : reached
-          ? "Đã đạt mục tiêu"
-          : "Chưa đạt mục tiêu";
+          ? t("fastDetail.reachedTarget")
+          : t("fastDetail.notReachedTarget");
 
   const statusColor =
     fast.status === "failed"
@@ -273,7 +275,7 @@ export function FastDetail({ fast }: FastDetailProps) {
                   letterSpacing: 1,
                 }}
               >
-                {target.label}
+                {t(`targets.${target.id}.label`)}
               </ThemedText>
             </View>
           )}
@@ -323,7 +325,7 @@ export function FastDetail({ fast }: FastDetailProps) {
                 color="text"
                 numberOfLines={1}
               >
-                {target.title}
+                {t(`targets.${target.id}.title`)}
               </ThemedText>
 
               <ThemedText
@@ -332,7 +334,7 @@ export function FastDetail({ fast }: FastDetailProps) {
                 opacity="half"
                 style={{ marginTop: 2 }}
               >
-                Mục tiêu: {target.hours} giờ
+                {t("fastDetail.targetHours", { hours: target.hours })}
               </ThemedText>
             </View>
 
@@ -359,8 +361,8 @@ export function FastDetail({ fast }: FastDetailProps) {
 
             <ThemedText size="xxs" weight="semibold" colorHex={targetColor}>
               {reached
-                ? `Vượt ${formatSignedDuration(difference)}`
-                : `Còn ${formatDuration(difference)}`}
+                ? t("fastDetail.over", { duration: formatSignedDuration(difference) })
+                : t("fastDetail.remaining", { duration: formatDuration(difference) })}
             </ThemedText>
           </View>
         </View>
@@ -381,7 +383,7 @@ export function FastDetail({ fast }: FastDetailProps) {
               paddingHorizontal: 4,
             }}
           >
-            Đánh giá phiên
+            {t("fastDetail.review")}
           </ThemedText>
 
           <View className="flex-row items-center rounded-xl border border-text-base/10 bg-background2 p-3.5">
@@ -399,7 +401,7 @@ export function FastDetail({ fast }: FastDetailProps) {
               </ThemedText>
 
               <ThemedText size="xxs" color="text" opacity="medium">
-                Trạng thái cơ thể lúc kết thúc
+                {t("fastDetail.bodyAtEnd")}
               </ThemedText>
             </View>
           </View>
@@ -421,7 +423,7 @@ export function FastDetail({ fast }: FastDetailProps) {
               paddingHorizontal: 4,
             }}
           >
-            Chỉ số ghi nhận
+            {t("fastDetail.metrics")}
           </ThemedText>
 
           <View className="flex-row flex-wrap gap-2 rounded-xl border border-text-base/10 bg-background2 p-3.5">
@@ -469,12 +471,12 @@ export function FastDetail({ fast }: FastDetailProps) {
               paddingHorizontal: 4,
             }}
           >
-            Lời khuyên
+            {t("fastDetail.advice")}
           </ThemedText>
 
           <View className="rounded-xl border border-text-base/10 bg-background2 px-3 py-2">
             <ThemedText size="xxs" color="text" opacity="medium">
-              {target.adviceLong}
+              {t(`targets.${target.id}.adviceLong`)}
             </ThemedText>
           </View>
         </View>

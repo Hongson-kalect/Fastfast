@@ -4,6 +4,7 @@ import {
   AchievementItem,
 } from "@/constants/achievements";
 import { Image } from "expo-image";
+import i18n from "i18next";
 import { View } from "react-native";
 import { ThemedText } from "./themed-text";
 
@@ -27,6 +28,28 @@ export const badgeLabel = (achievement: Achievement, item: AchievementItem) => {
     default:
       return `×${compact(item.target)}`;
   }
+};
+
+/** Tên thành tựu theo ngôn ngữ đang chọn. */
+export const achievementName = (achievement: Achievement) =>
+  i18n.t(`ach.${achievement.id}.name`);
+
+/** Mô tả thành tựu theo ngôn ngữ đang chọn. */
+export const achievementDescription = (achievement: Achievement) =>
+  i18n.t(`ach.${achievement.id}.description`);
+
+/** Tên một mốc, VD "Complete 25 fasts"; mốc 1 dùng dạng số ít ("your first fast"). */
+export const achievementItemTitle = (
+  achievement: Achievement,
+  item: AchievementItem,
+) => {
+  const count =
+    typeof item.target !== "number"
+      ? 1
+      : achievement.input === "duration"
+        ? item.target / SECONDS_IN_HOUR
+        : item.target;
+  return i18n.t(`ach.${achievement.id}.item`, { count });
 };
 
 /** Tìm thành tựu và mốc theo id mốc (id mốc là duy nhất toàn bộ). */

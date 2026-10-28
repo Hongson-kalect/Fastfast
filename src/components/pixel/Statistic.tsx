@@ -9,6 +9,7 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
 import PixelLegend from "./PixelLegend";
+import { useT } from "@/providers/Language";
 
 type Props = {
   trackingType: "mood" | "fasting";
@@ -23,6 +24,7 @@ type Props = {
 };
 const PixelStatistic = React.memo(
   ({ setTrackingType, trackingType, stats, onSaveImage }: Props) => {
+  const t = useT();
     const theme = useAppStore((state) => state.theme);
 
     const { present } = useBottomSheet();
@@ -45,7 +47,7 @@ const PixelStatistic = React.memo(
                 {stats.fastDays}
               </ThemedText>
               <ThemedText size="xxs" color="text" opacity="medium">
-                days
+                {t("journey.stat.days", { count: stats.fastDays })}
               </ThemedText>
             </View>
 
@@ -55,7 +57,7 @@ const PixelStatistic = React.memo(
                 {fixed(stats.fastHour)}
               </ThemedText>
               <ThemedText size="xxs" color="text" opacity="medium">
-                hours
+                {t("journey.stat.hours", { count: Math.round(stats.fastHour) })}
               </ThemedText>
             </View>
 
@@ -69,7 +71,7 @@ const PixelStatistic = React.memo(
                 {fixed(stats.logDays)}
               </ThemedText>
               <ThemedText size="xxs" color="text" opacity="medium">
-                logs
+                {t("journey.stat.logs", { count: stats.logDays })}
               </ThemedText>
             </View>
           </View>
@@ -85,7 +87,7 @@ const PixelStatistic = React.memo(
           >
             <Ionicons name="image-outline" size={14} color={theme.primary} />
             <ThemedText size="xs" weight="bold" color="primary">
-              Lưu ảnh
+              {t("journey.saveImage")}
             </ThemedText>
           </Pressable>
         </View>
@@ -106,7 +108,7 @@ const PixelStatistic = React.memo(
               color={theme.warning}
             />
             <ThemedText size="xs" weight="bold" color="warning">
-              Style
+              {t("journey.style")}
             </ThemedText>
           </Pressable>
 
@@ -121,8 +123,8 @@ const PixelStatistic = React.memo(
           >
             {(
               [
-                { value: "mood", label: "Emotion" },
-                { value: "fasting", label: "Fast process" },
+                { value: "mood", label: t("journey.mode.mood") },
+                { value: "fasting", label: t("journey.mode.fasting") },
               ] as const
             ).map((option) => {
               const active = trackingType === option.value;

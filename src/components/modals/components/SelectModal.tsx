@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import { ThemedText } from "@/components/themed-text";
 import {
   BasicModalOptions,
@@ -184,7 +185,7 @@ export const CheckboxModal = (
 
       {max !== Infinity && (
         <ThemedText size="xs" color="text" opacity="low" className="mt-1">
-          Đã chọn {values.length}/{max}
+          {i18n.t("settings.selectedCount", { count: values.length, max })}
         </ThemedText>
       )}
 
@@ -211,7 +212,7 @@ export const CheckboxModal = (
           className="h-12 flex-1 items-center justify-center rounded-full bg-text-base/10"
         >
           <ThemedText size="sm" weight="semibold" color="text" opacity="medium">
-            {modal.cancelText || "Cancel"}
+            {modal.cancelText || i18n.t("common.cancel")}
           </ThemedText>
         </TouchableOpacity>
 
@@ -230,7 +231,7 @@ export const CheckboxModal = (
             weight="semibold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            {modal.okText || "OK"}
+            {modal.okText || i18n.t("common.ok")}
           </ThemedText>
         </TouchableOpacity>
       </View>

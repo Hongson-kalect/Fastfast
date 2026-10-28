@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type StatCardProps = {
   icon: React.ComponentProps<typeof Ionicons>["name"];
@@ -128,6 +129,7 @@ type Props = {
 };
 
 export const StatisticsSection = ({ fastStatistics }: Props) => {
+  const t = useT();
   // Chuẩn hóa hệ màu: Ưu tiên Theme Primary (#7F92F8) & Accent có nghĩa
   const { userProfile, theme } = useAppStore(
     useShallow((state) => ({ userProfile: state.userProfile, theme: state.theme })),
@@ -135,63 +137,63 @@ export const StatisticsSection = ({ fastStatistics }: Props) => {
   const gridStats: StatCardProps[] = [
     {
       icon: "timer-outline",
-      title: "Total fasting",
+      title: t("stats.totalFasting"),
       value: Math.round(fastStatistics.total_hours * 10) / 10,
-      unit: "hours",
+      unit: t("stats.unit.hours"),
       color: theme.primary,
     },
     {
       icon: "checkmark-circle-outline",
-      title: "Completed",
+      title: t("stats.completed"),
       value: fastStatistics.total_sessions,
-      unit: "times",
+      unit: t("stats.unit.times"),
       color: theme.success,
     },
     {
       icon: "time-outline",
-      title: "Average fast",
+      title: t("stats.averageFast"),
       value: Math.round(fastStatistics.avg_hours * 10) / 10,
-      unit: "hours",
+      unit: t("stats.unit.hours"),
       color: theme.primary,
     },
     {
       icon: "trophy-outline",
-      title: "Longest fast",
+      title: t("stats.longestFast"),
       value: Math.round(fastStatistics.max_hours * 10) / 10,
-      unit: "hours",
+      unit: t("stats.unit.hours"),
       color: theme.warning,
     },
     {
       icon: "calendar-outline",
-      title: "Active days",
+      title: t("stats.activeDays"),
       value: userProfile?.active_days || 0,
-      unit: "days",
+      unit: t("stats.unit.days"),
       color: theme.primary,
     },
     {
       icon: "flame-outline",
-      title: "Max streak",
+      title: t("stats.maxStreak"),
       value: userProfile?.max_streak || 0,
-      unit: "days",
+      unit: t("stats.unit.days"),
       color: theme.primary,
     },
   ];
 
   // Streak đã có card riêng (StreakHero) ở đầu Dashboard → thay ô Max streak bằng số khiên đã dùng
   const stats: StatCardProps[] = [
-    ...gridStats.filter((item) => item.title !== "Max streak"),
+    ...gridStats.filter((item) => item.icon !== "flame-outline"),
     {
       icon: "shield-checkmark-outline",
-      title: "Shields used",
+      title: t("stats.shieldsUsed"),
       value: userProfile?.total_shield_used || 0,
-      unit: "times",
+      unit: t("stats.unit.times"),
       color: theme.info,
     },
   ];
 
   return (
     <View className="mt-7">
-      <SectionTitle title="Thống kê" />
+      <SectionTitle title={t("stats.section")} />
 
       <View className="flex-row flex-wrap justify-between gap-y-3">
         {stats.map((item) => (

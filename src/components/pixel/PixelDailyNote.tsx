@@ -2,7 +2,12 @@ import { useDBService } from "@/hooks/useDBService";
 import { useAppStore } from "@/stores/appStore";
 import useModalStore from "@/stores/modalStore";
 import { getContrastTextColor } from "@/utils/color";
-import { deleteSavedImage, selectPhoto, takePhoto } from "@/utils/image";
+import {
+  deleteSavedImage,
+  resolveImageUri,
+  selectPhoto,
+  takePhoto,
+} from "@/utils/image";
 import { getLocalTodayStr } from "@/utils/timer";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -11,6 +16,7 @@ import { Toast } from "toastify-react-native";
 import { ThemedText } from "../themed-text";
 import { DailyNoteModal } from "./modals/DailyNoteModal";
 import { WeightModal } from "./modals/WeightModal";
+import { useT } from "@/providers/Language";
 
 export type ModalNote = {
   note?: string;
@@ -28,6 +34,7 @@ export default function PixelDailyNote({
   updateSheetNote,
   date = getLocalTodayStr(),
 }: Props) {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [noteModalVisible, setNoteModalVisible] = useState(false);
@@ -65,8 +72,8 @@ export default function PixelDailyNote({
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
       Toast.show({
         type: "error",
-        text1: "Lỗi",
-        text2: "Không thể lưu ảnh!",
+        text1: t("term.error"),
+        text2: t("image.saveError"),
         useModal: true,
       });
     }
@@ -83,8 +90,8 @@ export default function PixelDailyNote({
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
       Toast.show({
         type: "error",
-        text1: "Lỗi",
-        text2: "Không thể lưu ảnh!",
+        text1: t("term.error"),
+        text2: t("image.saveError"),
         useModal: true,
       });
     }
@@ -94,7 +101,7 @@ export default function PixelDailyNote({
     if (note?.image_uri) {
       addModal({
         type: "confirm",
-        title: "Cập nhật ảnh",
+        title: t("pixelDetail.updatePhoto"),
         okText: (
           <View className="flex-row items-center justify-center gap-2">
             <MaterialIcons
@@ -108,7 +115,7 @@ export default function PixelDailyNote({
               weight="bold"
               colorHex={getContrastTextColor(theme.primary)}
             >
-              Đổi ảnh
+              {t("pixelDetail.changePhoto")}
             </ThemedText>
           </View>
         ),
@@ -117,7 +124,7 @@ export default function PixelDailyNote({
             <MaterialIcons name="delete" size={25} color={theme.text} />
 
             <ThemedText size="sm" weight="bold" color="text">
-              Xóa ảnh
+              {t("image.deleteTitle")}
             </ThemedText>
           </View>
         ),
@@ -136,7 +143,7 @@ export default function PixelDailyNote({
   const handleDeleteImage = async () => {
     addModal({
       type: "confirm",
-      title: "Xóa ảnh",
+      title: t("image.deleteTitle"),
       okText: (
         <View className="flex-row items-center justify-center gap-2">
           <MaterialIcons
@@ -150,7 +157,7 @@ export default function PixelDailyNote({
             weight="bold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            Xóa
+            {t("common.delete")}
           </ThemedText>
         </View>
       ),
@@ -164,7 +171,7 @@ export default function PixelDailyNote({
   const handleAddPhoto = () => {
     addModal({
       type: "confirm",
-      title: "Hình ảnh từ",
+      title: t("pixelDetail.photoFrom"),
       okText: (
         <View className="flex-row items-center justify-center gap-2">
           <MaterialIcons
@@ -178,7 +185,7 @@ export default function PixelDailyNote({
             weight="bold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            Gallery
+            {t("term.gallery")}
           </ThemedText>
         </View>
       ),
@@ -187,7 +194,7 @@ export default function PixelDailyNote({
           <MaterialIcons name="photo-camera" size={25} color={theme.text} />
 
           <ThemedText size="sm" weight="bold" color="text">
-            Camera
+            {t("term.camera")}
           </ThemedText>
         </View>
       ),
@@ -214,11 +221,11 @@ export default function PixelDailyNote({
 
           <View className="gap-y-1">
             <ThemedText size="sm" weight="semibold">
-              Cân nặng
+              {t("term.weight")}
             </ThemedText>
 
             <ThemedText size="xxs" color="text" opacity="medium">
-              {note?.weight ? "Nhấn để chỉnh sửa" : "Thêm cân nặng"}
+              {note?.weight ? t("pixelDetail.weightHint") : t("pixelDetail.addWeight")}
             </ThemedText>
           </View>
         </View>
@@ -265,13 +272,13 @@ export default function PixelDailyNote({
               opacity="medium"
               style={{ letterSpacing: 1.2 }}
             >
-              GHI CHÚ TRONG NGÀY
+              {t("pixelDetail.dayNote")}
             </ThemedText>
           </View>
 
           <View className="flex-row items-center gap-x-1">
             <ThemedText size="xxs" color="primary" opacity="medium">
-              {note?.note ? "Chỉnh sửa" : "Thêm"}
+              {note?.note ? t("common.edit") : t("common.add")}
             </ThemedText>
             <Ionicons name="chevron-forward" size={14} color={theme.primary} />
           </View>
@@ -295,7 +302,7 @@ export default function PixelDailyNote({
               opacity="low"
               style={{ fontStyle: "italic" }}
             >
-              Thêm ghi chú cho ngày này...
+              {t("pixelDetail.notePlaceholder")}
             </ThemedText>
           </View>
         )}
@@ -316,13 +323,13 @@ export default function PixelDailyNote({
               opacity="medium"
               style={{ letterSpacing: 1.2 }}
             >
-              HÌNH ẢNH
+              {t("pixelDetail.photos")}
             </ThemedText>
           </View>
 
           <View className="flex-row items-center gap-x-1">
             <ThemedText size="xxs" color="primary" opacity="medium">
-              {note?.image_uri ? "Chỉnh sửa" : "Thêm ảnh"}
+              {note?.image_uri ? t("common.edit") : t("pixelDetail.addPhoto")}
             </ThemedText>
             <Ionicons name="chevron-forward" size={14} color={theme.primary} />
           </View>
@@ -331,7 +338,7 @@ export default function PixelDailyNote({
         {note?.image_uri ? (
           <View className="overflow-hidden rounded-xl bg-background">
             <Image
-              source={{ uri: note.image_uri }}
+              source={{ uri: resolveImageUri(note.image_uri) ?? undefined }}
               className="aspect-9/16 w-full rounded-xl"
               resizeMode="cover"
             />
@@ -345,7 +352,7 @@ export default function PixelDailyNote({
               style={{ opacity: 0.45 }}
             />
             <ThemedText size="xxs" color="text" opacity="low">
-              Thêm hình ảnh cho ngày này
+              {t("pixelDetail.photoHint")}
             </ThemedText>
           </View>
         )}

@@ -13,6 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import Counter from "./Counter";
+import { useT } from "@/providers/Language";
 
 type Props = {
   isCounting: boolean;
@@ -69,22 +70,24 @@ export const CircleCounterContent = ({
   ringColor,
   diameter,
 }: Props) => {
+  const t = useT();
   const active = isCounting && !!currentFast;
   const targetHours = Number(settings?.target || 0);
   const targetLabel = currentTarget
-    ? `${currentTarget.label} · ${targetHours}h`
-    : "Chọn mục tiêu";
+    ? `${t(`targets.${currentTarget.id}.label`)} · ${targetHours}h`
+    : t("counter.chooseTarget");
   const reached = active && targetHours > 0 && counter >= targetHours * 3_600;
 
   let subtitle: string;
   if (active) {
-    if (reached) subtitle = "🎉 Đã đạt mục tiêu";
-    else if (finishEstimate) subtitle = `Xong lúc ${getRelativeDate(finishEstimate)}`;
-    else subtitle = "Chế độ tự do";
+    if (reached) subtitle = t("counter.reached");
+    else if (finishEstimate)
+      subtitle = t("counter.finishAt", { time: getRelativeDate(finishEstimate) });
+    else subtitle = t("counter.freeMode");
   } else {
     subtitle = finishEstimate
-      ? `Nếu bắt đầu bây giờ: ${getRelativeDate(finishEstimate)}`
-      : "Chế độ tự do";
+      ? t("counter.ifStartNow", { time: getRelativeDate(finishEstimate) })
+      : t("counter.freeMode");
   }
 
   return (
@@ -120,7 +123,7 @@ export const CircleCounterContent = ({
             opacity={active ? "full" : "half"}
             style={{ letterSpacing: 1.5, textTransform: "uppercase" }}
           >
-            {active ? (phaseTitle ?? "Đang nhịn") : "Sẵn sàng"}
+            {active ? (phaseTitle ?? t("counter.fasting")) : t("counter.ready")}
           </ThemedText>
 
           <Counter
@@ -155,8 +158,10 @@ export const CircleCounterContent = ({
           <Feather name="clock" size={12} color={theme.text + "99"} />
           <ThemedText size="xs" color="text" opacity="medium">
             {active
-              ? `Bắt đầu ${getRelativeTime(new Date(currentFast!.start_time))}`
-              : "Lịch sử nhịn"}
+              ? t("counter.startedAt", {
+                  time: getRelativeTime(new Date(currentFast!.start_time)),
+                })
+              : t("counter.history")}
           </ThemedText>
         </Pressable>
       </View>

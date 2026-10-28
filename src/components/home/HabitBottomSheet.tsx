@@ -17,6 +17,7 @@ import { HabitDetailModal } from "./HabitDetailModal";
 import HabitMilestone from "./HabitMilestone";
 import Waterball from "./Waterball";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 interface HabitBottomSheetProps {
   habitPercent?: number; // Ví dụ: 45% (0 -> 100)
@@ -25,6 +26,7 @@ interface HabitBottomSheetProps {
 }
 
 const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
+  const t = useT();
   const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
   const dbService = useDBService();
 
@@ -60,7 +62,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
             style={{ textAlign: "center" }}
             className="mt-4 italic"
           >
-            Không có dữ liệu
+            {t("common.noData")}
           </ThemedText>
         </View>
       }
@@ -80,6 +82,7 @@ const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
   );
 
   const habitPercent = habit?.habit_snap || 0;
+  const t = useT();
   const shieldCount = habit?.shield_snap || 0;
   const habitRetain = habit?.habit_retain || 0;
 
@@ -97,7 +100,7 @@ const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
         <View className="flex-row items-center gap-2">
           <Ionicons name="sparkles" size={20} color={theme.primary} />
           <ThemedText size="xl" weight="bold" color="text">
-            Habit Index
+            {t("habitSheet.title")}
           </ThemedText>
         </View>
 
@@ -144,12 +147,12 @@ const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
       {/* 4. TIP CÁCH TÍNH */}
       <View className="mb-4">
         <BeginnerTip
-          title="Habit được tính thế nào?"
+          title={t("tip.habit.title")}
           lines={[
-            "Mỗi phiên nhịn từ 16h trở lên: +3%, cộng thêm 0,2% cho mỗi giờ quá 16h (nhịn 20h → +3,8%).",
-            "Phiên dưới 16h không được cộng.",
-            "Mỗi ngày bỏ trống giữa hai phiên dùng 1 shield. Hết shield thì Habit bị trừ, nghỉ càng lâu trừ càng nhiều.",
-            "Đạt 100%: điểm chuyển sang Retain, đủ 25 Retain đổi 1 shield.",
+            t("tip.habit.line1"),
+            t("tip.habit.line2"),
+            t("tip.habit.line3"),
+            t("tip.habit.line4"),
           ]}
         />
       </View>
@@ -158,11 +161,11 @@ const HabitBottomSheetHeader: React.FC<{ habitCount: number }> = ({
       <View className="flex-1">
         <View className="mb-3 flex-row items-center justify-between">
           <ThemedText size="sm" weight="semibold" opacity="medium">
-            Lịch sử
+            {t("term.history")}
           </ThemedText>
 
           <ThemedText size="xs" color="text" opacity="medium">
-            {habitCount} phiên
+            {t("habitSheet.sessions", { count: habitCount })}
           </ThemedText>
         </View>
       </View>
@@ -174,6 +177,7 @@ type HabitLogComProps = {
   log: HabitLog & FastSession;
 };
 export const HabitLogComponent = ({ log }: HabitLogComProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const addModal = useModalStore((state) => state.addModal);
 
@@ -232,11 +236,13 @@ export const HabitLogComponent = ({ log }: HabitLogComProps) => {
   const title =
     isFastSuccess !== null
       ? isFastSuccess
-        ? (target?.label ?? log.description ?? "Fasting session")
-        : `You over rest ${overrestDays} day(s)`
+        ? target
+          ? t(`targets.${target.id}.label`)
+          : (log.description ?? t("habitSheet.fastingSession"))
+        : t("habitSheet.overRest", { count: overrestDays })
       : isShieldIncrease
-        ? (log.description ?? "Shield increase")
-        : `Rest ${Math.abs(shieldDelta)} days`;
+        ? (log.description ?? t("habitSheet.shieldIncrease"))
+        : t("habitSheet.restDays", { count: Math.abs(shieldDelta) });
 
   const dateLabel = log.end_time
     ? getLocalTodayStr(new Date(log.end_time))

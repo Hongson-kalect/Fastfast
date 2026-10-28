@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import AlertModal from "@/components/modals/components/AlertModal";
 import ConfirmModal from "@/components/modals/components/ConfirmModal";
 import CustomModal from "@/components/modals/components/CustomModal";
@@ -186,8 +187,8 @@ const GlobalModalComponent = () => {
     if (currentModal.closable === false) {
       return Toast.show({
         type: "error",
-        text1: "Tác vụ không thể đóng",
-        text2: "Vui lòng hoàn thành hoạt động!",
+        text1: i18n.t("modal.notClosable.title"),
+        text2: i18n.t("modal.notClosable.body"),
       });
     }
     currentModal?.onDismiss?.();

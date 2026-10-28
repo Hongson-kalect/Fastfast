@@ -18,6 +18,7 @@ import PixelDailyFast from "./PixelDailyFast";
 import PixelDailyNote, { ModalNote } from "./PixelDailyNote";
 import { MoodModal } from "./modals/MoodModal";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type DetailType = {
   dateString: string; // YYYY-MM-DD
@@ -83,6 +84,7 @@ const getFastSegmentsForDay = (
 };
 
 const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
+  const t = useT();
   const dbService = useDBService();
   const { theme, settings } = useAppStore(
     useShallow((state) => ({ theme: state.theme, settings: state.settings })),
@@ -233,7 +235,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
       <View className="flex-row items-center justify-between border-b border-text-base/10 px-4 pb-3 pt-3">
         <View className="flex-1">
           <ThemedText size="xxs" color="text" opacity="medium">
-            Nhật ký ngày
+            {t("pixelDetail.title")}
           </ThemedText>
 
           <ThemedText size="xl" weight="bold" color="title" className="mt-0.5">
@@ -264,7 +266,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
           ) : (
             <View className="rounded-full border border-text-base/5 bg-text-base/5 px-2.5 py-1">
               <ThemedText size="xxs" color="text" opacity="medium">
-                Chưa có mood
+                {t("pixelDetail.noMood")}
               </ThemedText>
             </View>
           )}
@@ -294,7 +296,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
               color={activeTab === "fasting" ? "primary" : "text"}
               opacity={activeTab === "fasting" ? "full" : "medium"}
             >
-              ⏱️ Daily Fast
+              {t("pixelDetail.dailyFast")}
             </ThemedText>
           </TouchableOpacity>
 
@@ -318,7 +320,7 @@ const PixelDetailSheet = ({ dateString, log = [], note }: DetailType) => {
               color={activeTab === "mood" ? "primary" : "text"}
               opacity={activeTab === "mood" ? "full" : "medium"}
             >
-              📝 Daily Note
+              {t("pixelDetail.dailyNote")}
             </ThemedText>
           </TouchableOpacity>
         </View>

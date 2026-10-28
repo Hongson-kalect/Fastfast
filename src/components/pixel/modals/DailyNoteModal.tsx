@@ -7,6 +7,7 @@ import { getContrastTextColor } from "@/utils/color";
 import { getLocalTodayStr } from "@/utils/timer";
 import { Ionicons } from "@expo/vector-icons";
 import { NoteModalShell } from "./NoteModalShell";
+import { useT } from "@/providers/Language";
 
 type Props = {
   visible: boolean;
@@ -23,6 +24,7 @@ export const DailyNoteModal = ({
   dateStr,
   onSave,
 }: Props) => {
+  const t = useT();
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
@@ -55,7 +57,7 @@ export const DailyNoteModal = ({
     <NoteModalShell
       visible={visible}
       setVisible={setVisible}
-      title={date === today ? "Today Note" : `Note ${date}`}
+      title={date === today ? t("note.today") : t("note.forDate", { date })}
       icon="pen"
     >
       <View className="gap-y-4">
@@ -67,7 +69,7 @@ export const DailyNoteModal = ({
           numberOfLines={5}
           textAlignVertical="top"
           cursorColor={theme.text}
-          placeholder="How did you feel today?"
+          placeholder={t("note.placeholder")}
           placeholderTextColor={`${theme.text}55`}
           className="min-h-32 rounded-2xl border border-text-base/10 bg-background px-4 py-3 text-sm text-text-base"
         />
@@ -86,7 +88,7 @@ export const DailyNoteModal = ({
             weight="semibold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            Save
+            {t("common.save")}
           </ThemedText>
         </TouchableOpacity>
       </View>

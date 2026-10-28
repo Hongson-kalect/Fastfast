@@ -4,6 +4,7 @@ import { DailyLog, FastSession } from "@/interfaces/db.type";
 import { DissectedDay } from "@/utils/home/timespliter";
 import { ThemedText } from "../themed-text";
 import { DailyFastSessionCard } from "./DailySessionFast";
+import { useT } from "@/providers/Language";
 
 type Props = {
   circularSegments: CircularTimelineSegment[];
@@ -22,6 +23,7 @@ export default function PixelDailyFast({
   log,
   fastObj,
 }: Props) {
+  const t = useT();
   return (
     <View className="gap-y-5">
       <View className="items-center justify-center rounded-2xl border border-text-base/10 bg-background2 p-5">
@@ -44,7 +46,7 @@ export default function PixelDailyFast({
               color="text"
               style={{ letterSpacing: 1 }}
             >
-              CÁC PHIÊN LIÊN QUAN
+              {t("pixelDetail.relatedFasts")}
             </ThemedText>
 
             <ThemedText size="xs" color="text" opacity="medium">

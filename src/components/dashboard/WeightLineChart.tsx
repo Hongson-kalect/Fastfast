@@ -1,4 +1,5 @@
 import { fonts } from "@/configs/fonts";
+import { CHART_RANGES } from "@/constants/data";
 import { useBottomSheet } from "@/providers/BottomSheet";
 import { useAppStore } from "@/stores/appStore";
 import { Feather } from "@expo/vector-icons";
@@ -20,6 +21,7 @@ import { Bar, CartesianChart, Line, useChartPressState } from "victory-native";
 import { ThemedText } from "../themed-text";
 import ChartRangeSheet from "./ChartRangeSheet";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type Props = {
   data: { x: string; fast: number; weight: number | null }[];
@@ -32,6 +34,7 @@ const WeightLineChart = ({
   onInteractionStart,
   onInteractionEnd,
 }: Props) => {
+  const t = useT();
   const font = useFont(fonts.MulishRegular, 7);
   const font2 = useFont(fonts.MulishBold, 12);
   const font3 = useFont(fonts.MulishRegular, 11);
@@ -161,11 +164,11 @@ const WeightLineChart = ({
       <View className="mb-3 flex-row items-center justify-between">
         <View>
           <ThemedText size="md" weight="bold" color="title">
-            Weight & Fast progress
+            {t("stats.chart.title")}
           </ThemedText>
 
           <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
-            Your progress over time
+            {t("stats.chart.subtitle")}
           </ThemedText>
         </View>
 
@@ -175,7 +178,12 @@ const WeightLineChart = ({
           className="flex-row items-center gap-1.5 rounded-full bg-background2 px-3 py-1.5"
         >
           <ThemedText size="xxs" weight="semibold" color="text">
-            {settings?.chart_range || 7} days
+            {(() => {
+              const range =
+                CHART_RANGES.find((item) => item.key === settings?.chart_range) ??
+                CHART_RANGES[0];
+              return t(`stats.range.${range.unit}`, { count: range.value });
+            })()}
           </ThemedText>
 
           <Feather name="chevron-down" size={13} color={theme.text} />
@@ -418,7 +426,7 @@ const WeightLineChart = ({
             style={{ backgroundColor: theme.secondary }}
           />
           <ThemedText size="xxs" color="text" opacity="medium">
-            Weight
+            {t("term.weight")}
           </ThemedText>
         </View>
 
@@ -428,7 +436,7 @@ const WeightLineChart = ({
             style={{ backgroundColor: theme.primary }}
           />
           <ThemedText size="xxs" color="text" opacity="medium">
-            Fasting
+            {t("stats.chart.fasting")}
           </ThemedText>
         </View>
 
@@ -443,7 +451,7 @@ const WeightLineChart = ({
               }}
             />
             <ThemedText size="xxs" color="text" opacity="medium">
-              Target
+              {t("term.target")}
             </ThemedText>
           </View>
         )}
@@ -459,6 +467,11 @@ type TooltipProps = {
 };
 const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
   const theme = useAppStore((state) => state.theme);
+  const t = useT();
+  // Worklet chạy trên luồng UI, không gọi t() bên trong được → dịch sẵn ở đây
+  const noDataLabel = t("stats.chart.noData");
+  const noWeightLabel = t("stats.chart.noWeight");
+  const hoursUnit = t("stats.chart.hoursUnit");
   const width = useWindowDimensions().width;
   const p1 = useDerivedValue(() =>
     vec(state.x.position.value, chartBounds.top),
@@ -477,17 +490,17 @@ const ActiveTooltip = ({ chartBounds, state, length }: TooltipProps) => {
     const raw = state.y.weight.value.value;
 
     if (raw == null) {
-      return "No Data";
+      return noDataLabel;
     }
 
     const val = Math.round(raw * 10) / 10;
-    return val ? `- ${val} Kg` : "- No weight data";
+    return val ? `- ${val} kg` : noWeightLabel;
   });
 
   const fastText = useDerivedValue(() => {
     const raw = state.y.fast.value.value;
     const val = Math.round(raw * 10) / 10;
-    return `- ${val} Hours`;
+    return `- ${val} ${hoursUnit}`;
   });
 
   const barWidth = (width - 64 - 80) / length;

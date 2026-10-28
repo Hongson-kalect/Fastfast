@@ -1,4 +1,5 @@
 import { SHIELD_LIMIT } from "@/database/schema/habit_logs";
+import { useT } from "@/providers/Language";
 import { useAppStore } from "@/stores/appStore";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
@@ -37,69 +38,59 @@ export const InfoSections = ({ sections }: { sections: Section[] }) => (
 );
 
 export const ShieldInfo = () => {
+  const t = useT();
   const shieldCount = useAppStore((state) => state.habit?.shield_snap ?? 0);
 
   return (
     <InfoSections
       sections={[
         {
-          title: `Tác dụng · bạn đang có ${shieldCount}/${SHIELD_LIMIT}`,
+          title: t("info.shield.effectTitle", {
+            count: shieldCount,
+            max: SHIELD_LIMIT,
+          }),
           lines: [
-            "Mỗi ngày bỏ trống giữa hai phiên nhịn sẽ dùng 1 shield. Chuỗi vẫn hợp lệ và Habit giữ nguyên.",
-            "Hết shield mà vẫn nghỉ thì chuỗi bị ngắt, Habit bị trừ và Retain về 0.",
-            `Giữ tối đa ${SHIELD_LIMIT} shield, nhận thêm khi đã đầy sẽ bị bỏ.`,
+            t("info.shield.effect1"),
+            t("info.shield.effect2"),
+            t("info.shield.effect3", { max: SHIELD_LIMIT }),
           ],
         },
         {
-          title: "Phiên nhịn dài",
-          lines: [
-            "Nhịn từ 48h được +1 shield, từ 72h được +2.",
-            "Nghỉ ngơi là một phần của phiên nhịn dài: cơ thể cần thời gian ăn lại và hồi phục. Shield cho bạn nghỉ những ngày đó mà chuỗi vẫn hợp lệ.",
-          ],
+          title: t("info.shield.longTitle"),
+          lines: [t("info.shield.long1"), t("info.shield.long2")],
         },
         {
-          title: "Mốc Habit",
-          lines: [
-            "Habit chạm 35%, 70% và 100% mỗi mốc được +1 shield.",
-            "Nếu Habit tụt xuống rồi leo lại, mốc có thể nhận lại.",
-          ],
+          title: t("info.shield.milestoneTitle"),
+          lines: [t("info.shield.milestone1"), t("info.shield.milestone2")],
         },
         {
-          title: "Retain",
-          lines: [
-            "Khi Habit đã 100%, điểm từ mỗi phiên nhịn dồn vào Retain.",
-            "Đủ 25 Retain tự đổi thành 1 shield.",
-          ],
+          title: t("info.shield.retainTitle"),
+          lines: [t("info.shield.retain1"), t("info.shield.retain2")],
         },
       ]}
     />
   );
 };
 
-export const BodyProgressInfo = () => (
-  <InfoSections
-    sections={[
-      {
-        title: "Cơ chế luôn diễn ra",
-        lines: [
-          "Các cơ chế này vốn luôn hoạt động trong cơ thể, kể cả khi bạn không nhịn.",
-          "Chúng không phải công tắc chỉ \"bật\" khi đến một mốc giờ nhất định.",
-        ],
-      },
-      {
-        title: "Mức 1–5 nghĩa là gì",
-        lines: [
-          "Mỗi mức thể hiện việc nhịn ăn đang hỗ trợ cơ chế đó nhiều hơn, tăng dần theo thời gian nhịn.",
-          "Thanh đầy không có nghĩa cơ chế đang mạnh nhất lúc này, chỉ là mức hỗ trợ từ việc nhịn ăn đã cao hơn.",
-        ],
-      },
-      {
-        title: "Chỉ là ước lượng",
-        lines: [
-          "Mốc giờ chỉ mang tính phỏng đoán, mỗi người khác nhau tuỳ bữa ăn trước, vận động, giấc ngủ…",
-          "Đây không phải chẩn đoán hay lời khuyên y khoa.",
-        ],
-      },
-    ]}
-  />
-);
+export const BodyProgressInfo = () => {
+  const t = useT();
+
+  return (
+    <InfoSections
+      sections={[
+        {
+          title: t("info.body.alwaysTitle"),
+          lines: [t("info.body.always1"), t("info.body.always2")],
+        },
+        {
+          title: t("info.body.levelsTitle"),
+          lines: [t("info.body.levels1"), t("info.body.levels2")],
+        },
+        {
+          title: t("info.body.estimateTitle"),
+          lines: [t("info.body.estimate1"), t("info.body.estimate2")],
+        },
+      ]}
+    />
+  );
+};

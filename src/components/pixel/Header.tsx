@@ -7,6 +7,7 @@ import { Pressable, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { PixelInfo } from "./PixelInfo";
 import PixelStatistic from "./Statistic";
+import { useT } from "@/providers/Language";
 
 type Props = {
   stats: { fastDays: number; fastHour: number; logDays: number };
@@ -25,6 +26,7 @@ const PixelHeader = ({
 
   onSaveImage,
 }: Props) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
   const addModal = useModalStore((state) => state.addModal);
 
@@ -32,10 +34,10 @@ const PixelHeader = ({
     feedback("tap");
     addModal({
       type: "alert",
-      title: "Đọc lịch Journey",
-      message: "Những điểm mà dải chú thích icon chưa nói hết.",
+      title: t("journey.info.title"),
+      message: t("journey.info.message"),
       middle: <PixelInfo />,
-      okText: "Đã hiểu",
+      okText: t("common.gotIt"),
     });
   };
 
@@ -44,7 +46,7 @@ const PixelHeader = ({
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center gap-2">
           <ThemedText size="xxxl" weight="semibold">
-            Journey
+            {t("tabs.journey")}
           </ThemedText>
           <Pressable hitSlop={10} onPress={openPixelInfo}>
             <FontAwesome6

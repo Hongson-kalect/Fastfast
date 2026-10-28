@@ -1,7 +1,11 @@
 import { useAppStore } from "@/stores/appStore";
 import { View } from "react-native";
-import AchievementBadge, { findAchievementItem } from "./AchievementBadge";
+import AchievementBadge, {
+  achievementName,
+  findAchievementItem,
+} from "./AchievementBadge";
 import { ThemedText } from "./themed-text";
+import { useT } from "@/providers/Language";
 
 export const SHOWCASE_LIMIT = 3;
 
@@ -18,6 +22,7 @@ const AchievementShowcase = ({
   size?: number;
   showEmpty?: boolean;
 }) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   const badges = itemIds
@@ -40,7 +45,7 @@ const AchievementShowcase = ({
             numberOfLines={1}
             className="mt-1"
           >
-            {achievement.name}
+            {achievementName(achievement)}
           </ThemedText>
         </View>
       ))}
@@ -63,7 +68,7 @@ const AchievementShowcase = ({
             </ThemedText>
           </View>
           <ThemedText size="xxs" color="text" opacity="low" className="mt-1">
-            Trống
+            {t("ach.empty_slot")}
           </ThemedText>
         </View>
       ))}

@@ -11,6 +11,7 @@ import { getWeight } from "@/utils/home/fast";
 import { getLocalTodayStr } from "@/utils/timer";
 import { NoteModalShell } from "./NoteModalShell";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 type Props = {
   visible: boolean;
@@ -27,6 +28,7 @@ export const WeightModal = ({
   weight,
   onSave,
 }: Props) => {
+  const t = useT();
   const today = getLocalTodayStr();
   const date = dateStr ?? today;
 
@@ -113,7 +115,7 @@ export const WeightModal = ({
     <NoteModalShell
       visible={visible}
       setVisible={setVisible}
-      title={date === today ? "Today Weight" : `Weight ${date}`}
+      title={date === today ? t("dayModal.todayWeight") : t("dayModal.weightFor", { date })}
       icon="weight-scale"
     >
       <View className="gap-y-4">
@@ -176,7 +178,7 @@ export const WeightModal = ({
             weight="semibold"
             colorHex={getContrastTextColor(theme.primary)}
           >
-            Save
+            {t("common.save")}
           </ThemedText>
         </TouchableOpacity>
       </View>

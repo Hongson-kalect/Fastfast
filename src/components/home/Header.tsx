@@ -10,13 +10,14 @@ import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
 import { ShieldInfo } from "./InfoContent";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
-const greeting = (date = new Date()) => {
+const greetingKey = (date = new Date()) => {
   const hour = date.getHours();
-  if (hour < 11) return "Chào buổi sáng";
-  if (hour < 14) return "Chào buổi trưa";
-  if (hour < 18) return "Chào buổi chiều";
-  return "Chào buổi tối";
+  if (hour < 11) return "home.greeting.morning";
+  if (hour < 14) return "home.greeting.noon";
+  if (hour < 18) return "home.greeting.afternoon";
+  return "home.greeting.evening";
 };
 
 const Pill = ({
@@ -54,6 +55,7 @@ const HomeHeader = () => {
   );
   const { present } = useBottomSheet();
   const addModal = useModalStore((state) => state.addModal);
+  const t = useT();
 
   const openHabitModal = () => {
     feedback("tap");
@@ -67,10 +69,10 @@ const HomeHeader = () => {
     feedback("tap");
     addModal({
       type: "alert",
-      title: "Shield",
-      message: "Shield giữ chuỗi của bạn hợp lệ trong những ngày nghỉ không nhịn.",
+      title: t("info.shield.title"),
+      message: t("info.shield.message"),
       middle: <ShieldInfo />,
-      okText: "Đã hiểu",
+      okText: t("common.gotIt"),
     });
   };
 
@@ -80,13 +82,13 @@ const HomeHeader = () => {
     <View className="flex-row items-center justify-between pt-2">
       <View className="gap-2">
         <ThemedText size="sm" color="text" opacity="medium">
-          {greeting()} 👋
+          {t(greetingKey())} 👋
         </ThemedText>
 
         <View className="flex-row gap-2">
           <Pill
             icon={<Ionicons name="flame" size={15} color={theme.warning} />}
-            value={`${userProfile?.current_streak ?? 0} ngày`}
+            value={t("home.streakDays", { count: userProfile?.current_streak ?? 0 })}
             color={theme.warning}
           />
           <Pill

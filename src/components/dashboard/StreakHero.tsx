@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 const MiniStat = ({
   icon,
@@ -32,6 +33,7 @@ const MiniStat = ({
 
 /** Card nổi bật đầu Dashboard: streak hiện tại + kỷ lục, khiên, độ bền thói quen. */
 export const StreakHero = () => {
+  const t = useT();
   const { userProfile, habit, theme } = useAppStore(
     useShallow((state) => ({
       userProfile: state.userProfile,
@@ -61,7 +63,7 @@ export const StreakHero = () => {
             colorHex={theme.warning}
             style={{ letterSpacing: 1.2, textTransform: "uppercase" }}
           >
-            Streak hiện tại
+            {t("stats.currentStreak")}
           </ThemedText>
           <View className="flex-row items-end gap-2">
             <ThemedText size="displayLarge" weight="extrabold" color="title">
@@ -74,7 +76,7 @@ export const StreakHero = () => {
               opacity="medium"
               style={{ marginBottom: 8 }}
             >
-              ngày
+              {t("stats.days", { count: streak })}
             </ThemedText>
           </View>
         </View>
@@ -90,17 +92,17 @@ export const StreakHero = () => {
       <View className="mt-4 flex-row justify-between border-t border-text-base/10 pt-4">
         <MiniStat
           icon={<Ionicons name="trophy" size={13} color={theme.warning} />}
-          label="Kỷ lục"
-          value={`${userProfile?.max_streak ?? 0} ngày`}
+          label={t("stats.record")}
+          value={t("home.streakDays", { count: userProfile?.max_streak ?? 0 })}
         />
         <MiniStat
           icon={<FontAwesome5 name="shield-alt" size={11} color={theme.info} />}
-          label="Khiên"
+          label={t("stats.shields")}
           value={habit?.shield_snap ?? 0}
         />
         <MiniStat
           icon={<Ionicons name="sparkles" size={13} color={theme.primary} />}
-          label="Thói quen"
+          label={t("term.habit")}
           value={`${Math.round(habit?.habit_snap ?? 0)}%`}
         />
       </View>

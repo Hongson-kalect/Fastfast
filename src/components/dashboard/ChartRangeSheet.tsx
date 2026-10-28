@@ -7,6 +7,7 @@ import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 interface Props {
   currentTargetHours?: number;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const ChartRangeSheet = ({ onSelectTarget }: Props) => {
+  const t = useT();
   const { hide } = useBottomSheet();
   const dbService = useDBService();
   const { theme, settings, updateSetting } = useAppStore(
@@ -44,7 +46,7 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
         color="text"
         style={{ marginTop: 16, marginBottom: 12 }}
       >
-        Khoảng thời gian
+        {t("stats.range.title")}
       </ThemedText>
 
       <View className="flex-row flex-wrap -mx-1.5">
@@ -79,11 +81,7 @@ const ChartRangeSheet = ({ onSelectTarget }: Props) => {
                   color="text"
                   opacity={isSelected ? "high" : "medium"}
                 >
-                  {item.unit === "day"
-                    ? "ngày"
-                    : item.unit === "week"
-                      ? "tuần"
-                      : "tháng"}
+                  {t(`stats.range.unit.${item.unit}`)}
                 </ThemedText>
 
                 {isSelected && (

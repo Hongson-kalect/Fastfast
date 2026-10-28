@@ -7,6 +7,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
+import { useT } from "@/providers/Language";
 
 interface HabitDetailModalProps {
   log?: HabitLog & FastSession;
@@ -19,6 +20,7 @@ export const HabitDetailModal = ({
   onClose,
   targetInfo,
 }: HabitDetailModalProps) => {
+  const t = useT();
   const theme = useAppStore((state) => state.theme);
 
   if (!log) return null;
@@ -47,7 +49,7 @@ export const HabitDetailModal = ({
                 letterSpacing: 1,
               }}
             >
-              Habit Log
+              {t("habitDetail.title")}
             </ThemedText>
 
             <ThemedText
@@ -75,7 +77,7 @@ export const HabitDetailModal = ({
                 color="text"
                 opacity="medium"
               >
-                Điểm Habit
+                {t("habitDetail.habitPoints")}
               </ThemedText>
 
               <ThemedText
@@ -108,7 +110,7 @@ export const HabitDetailModal = ({
                 color="text"
                 opacity="medium"
               >
-                Retain
+                {t("term.retain")}
               </ThemedText>
 
               <ThemedText
@@ -141,7 +143,7 @@ export const HabitDetailModal = ({
                 color="text"
                 opacity="medium"
               >
-                Số Khiên
+                {t("habitDetail.shields")}
               </ThemedText>
 
               <View className="mt-1 flex-row items-center gap-1">
@@ -187,7 +189,7 @@ export const HabitDetailModal = ({
                 letterSpacing: 1,
               }}
             >
-              Chi tiết phiên Fast
+              {t("habitDetail.fastDetail")}
             </ThemedText>
 
             <FastDetail fast={log} />
@@ -199,7 +201,7 @@ export const HabitDetailModal = ({
               color="text"
               opacity="medium"
             >
-              Ngày nghỉ
+              {t("habitDetail.restDay")}
             </ThemedText>
           </View>
         ) : log.habit_delta && log.habit_delta < 0 ? (
@@ -209,7 +211,7 @@ export const HabitDetailModal = ({
               color="text"
               opacity="medium"
             >
-              Quá đà
+              {t("habitDetail.overRest")}
             </ThemedText>
           </View>
         ) : null}

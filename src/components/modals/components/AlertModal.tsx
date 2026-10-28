@@ -1,3 +1,4 @@
+import i18n from "i18next";
 import { ThemedText } from "@/components/themed-text";
 import { AlertModalOptions, BasicModalOptions } from "@/providers/Modal";
 import { useAppStore } from "@/stores/appStore";
@@ -56,7 +57,7 @@ const AlertModal = (modal: Props) => {
         }}
       >
         <ThemedText size="sm" weight="semibold" colorHex={getContrastTextColor(theme.primary)}>
-          {modal.okText || "OK"}
+          {modal.okText || i18n.t("common.ok")}
         </ThemedText>
       </Pressable>
     </View>

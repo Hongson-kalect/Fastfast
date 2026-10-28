@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
+import { startWidgetSync } from "@/widgets/widgetState";
 SplashScreen.preventAutoHideAsync();
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -29,6 +30,9 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
   const db = useSQLiteContext();
   const dbService = useDBService();
+
+  // Đồng bộ phiên nhịn sang widget màn hình chính (Android)
+  useEffect(() => startWidgetSync(), []);
 
   useEffect(() => {
     if (!db) return;

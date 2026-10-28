@@ -6,9 +6,8 @@ import { useAppStore } from "@/stores/appStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import { View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useT } from "@/providers/Language";
 
-// Nhãn theo mood_level 0 → 4
-const MOOD_LABELS = ["Rất tệ", "Tệ", "Bình thường", "Tốt", "Rất tốt"];
 
 // Ô của mức cuối không có giới hạn trên → "72h+"
 const fastLabel = (index: number) => {
@@ -21,6 +20,7 @@ const fastLabel = (index: number) => {
 
 /** Dải chú thích icon của lịch pixel: icon + số ngày, nhãn ở dòng dưới. */
 const PixelLegend = ({ viewMode }: { viewMode: ViewMode }) => {
+  const t = useT();
   const settings = useAppStore((state) => state.settings);
   const counter = usePixelStore((state) => state.counter);
 
@@ -34,7 +34,7 @@ const PixelLegend = ({ viewMode }: { viewMode: ViewMode }) => {
           icon: item.icon[isDark ? "dark" : "light"],
           color: isDark ? item.color.dark : item.color.light,
           count: counter.mood[index as 0 | 1 | 2 | 3 | 4],
-          label: MOOD_LABELS[index],
+          label: t(`journey.legend.mood.${index}`),
         }),
       )
     : TARGET_PACKS[settings?.target_pack ?? "default"].targets.map(

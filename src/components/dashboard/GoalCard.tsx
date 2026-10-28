@@ -21,8 +21,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/providers/Language";
 
 export const GoalCard = () => {
+  const t = useT();
   const dbService = useDBService();
   const { weight, theme, updateSetting, updateWeight } = useAppStore(
     useShallow((state) => ({
@@ -80,8 +82,8 @@ export const GoalCard = () => {
     addModal({
       type: "input",
       keyboardType: "numeric",
-      title: "Current Weight",
-      message: "Enter your current weight",
+      title: t("goal.currentWeightTitle"),
+      message: t("goal.currentWeightMessage"),
       onOk: async (value) => {
         const val = Number(value);
         if (val && val > 0) {
@@ -96,8 +98,8 @@ export const GoalCard = () => {
     addModal({
       type: "input",
       keyboardType: "numeric",
-      title: "Target",
-      message: "Set your weight target",
+      title: t("term.target"),
+      message: t("goal.targetMessage"),
       placeholder: targetWeight?.toString(),
       onOk: async (value) => {
         const target = Number(value);
@@ -134,7 +136,7 @@ export const GoalCard = () => {
 
           <View className="flex-1">
             <ThemedText size="sm" weight="semibold" color="title">
-              Set your current weight
+              {t("goal.setCurrent")}
             </ThemedText>
             <ThemedText
               size="xxs"
@@ -142,7 +144,7 @@ export const GoalCard = () => {
               opacity="medium"
               className="mt-0.5"
             >
-              Add your weight to start tracking progress
+              {t("goal.setCurrentHint")}
             </ThemedText>
           </View>
 
@@ -166,7 +168,7 @@ export const GoalCard = () => {
       <View className="flex-row items-start justify-between">
         <View>
           <ThemedText size="xxs" color="text" opacity="medium">
-            Weight goal
+            {t("goal.weightGoal")}
           </ThemedText>
 
           {weightTarget ? (
@@ -188,7 +190,7 @@ export const GoalCard = () => {
               hitSlop={6}
             >
               <ThemedText size="sm" weight="semibold" color="warning">
-                Set weight target
+                {t("goal.setTarget")}
               </ThemedText>
 
               <Feather name="arrow-right" size={14} color={theme.warning} />
@@ -213,7 +215,7 @@ export const GoalCard = () => {
           </View>
 
           <ThemedText size="xxs" color="text" opacity="low" className="mt-0.5">
-            Current weight
+            {t("goal.currentWeight")}
           </ThemedText>
         </Pressable>
       </View>
@@ -265,7 +267,7 @@ export const GoalCard = () => {
             opacity="medium"
             style={{ textAlign: "center" }}
           >
-            Set a target weight to track your progress
+            {t("goal.setTargetHint")}
           </ThemedText>
         </View>
       )}
@@ -274,7 +276,7 @@ export const GoalCard = () => {
       {targetWeight && (
         <View className="mt-3 flex-row items-center justify-between">
           <ThemedText size="xxs" color="text" opacity="low">
-            Progress
+            {t("term.progress")}
           </ThemedText>
 
           <ThemedText
@@ -282,7 +284,7 @@ export const GoalCard = () => {
             weight="semibold"
             color={remaining > 0 ? "success" : "primary"}
           >
-            {remaining > 0 ? `${fixed(remaining)} kg to go` : "Goal reached"}
+            {remaining > 0 ? t("goal.toGo", { value: fixed(remaining) }) : t("goal.reached")}
           </ThemedText>
         </View>
       )}

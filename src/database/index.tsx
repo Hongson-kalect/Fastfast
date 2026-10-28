@@ -212,7 +212,21 @@ const generateSeedData = `
 ${userSeedData}
 `;
 
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
+
+/**
+ * Đổi đường dẫn ảnh tuyệt đối (kiểu cũ) thành tên file. Đường dẫn tuyệt đối
+ * hỏng khi cài lại app hay khôi phục sang máy khác. Chạy lại được nhiều lần.
+ */
+export const normalizeImagePaths = async (db: SQLiteDatabase) => {
+  for (const table of ["daily_notes", "user_profile"]) {
+    await db.runAsync(
+      `UPDATE "${table}"
+       SET image_uri = replace(image_uri, rtrim(image_uri, replace(image_uri, '/', '')), '')
+       WHERE image_uri LIKE '%/%';`,
+    );
+  }
+};
 export const initDatabase = async (db: SQLiteDatabase) => {
   try {
     // ⚡ 1. Tối ưu hiệu năng đọc/ghi cho SQLite (WAL mode)
@@ -269,6 +283,10 @@ const handleMigrate = async (db: SQLiteDatabase, version: number) => {
         await db.execAsync(generateSeedData);
         console.log("✅ Seed data inserted successfully");
       }
+    }
+
+    if (version === 2) {
+      await normalizeImagePaths(db);
     }
 
     // Cập nhật version trong cùng transaction
