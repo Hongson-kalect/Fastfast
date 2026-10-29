@@ -2,7 +2,12 @@ import { Feather } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { getThemeAccess, ThemeItem, themes } from "@/constants/themes";
+import {
+  getLimitedThemeStatus,
+  getThemeAccess,
+  ThemeItem,
+  themes,
+} from "@/constants/themes";
 import { useDBService } from "@/hooks/useDBService";
 import { UserAsset } from "@/interfaces/db.type";
 import { useBottomSheet } from "@/providers/BottomSheet";
@@ -12,6 +17,7 @@ import useModalStore from "@/stores/modalStore";
 import { useEffect, useState } from "react";
 import { Toast } from "toastify-react-native";
 import { getContrastTextColor } from "@/utils/color";
+import i18n from "i18next";
 import { useShallow } from "zustand/react/shallow";
 
 type ThemeBottomSheetProps = {
@@ -68,7 +74,8 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
       return isPremiumUser;
     }
 
-    return false;
+    // Theme limited: ai cũng dùng được trong dịp sự kiện
+    return getThemeAccess(themeData, false) === "free";
   };
 
   const dbService = useDBService();
@@ -342,29 +349,34 @@ const ThemeBottomSheet: React.FC<ThemeBottomSheetProps> = ({
                             opacity="full"
                             color={"success"}
                           >
-                            {themeData.freeEndAt}
+                            {getLimitedThemeStatus(themeData).until?.toLocaleDateString(
+                              i18n.language,
+                            )}
                           </ThemedText>
                         </View>
 
-                        <Pressable
-                          onPress={() => onPurchased(themeId)}
-                          hitSlop={8}
-                          style={{
-                            backgroundColor: colors.primary,
-                          }}
-                          className="flex-row items-center px-4 py-2 rounded-xl"
-                        >
-                          <Feather name="unlock" size={14} color={"white"} />
-
-                          <ThemedText
-                            size="sm"
-                            opacity="full"
-                            colorHex={getContrastTextColor(theme.primary)}
-                            className="ml-1"
+                        {/* saleDays = 0: theme chỉ để miễn phí trong dịp, không có gì để mua */}
+                        {themeData.saleDays > 0 && (
+                          <Pressable
+                            onPress={() => onPurchased(themeId)}
+                            hitSlop={8}
+                            style={{
+                              backgroundColor: colors.primary,
+                            }}
+                            className="flex-row items-center px-4 py-2 rounded-xl"
                           >
-                            {t("theme.purchase")}
-                          </ThemedText>
-                        </Pressable>
+                            <Feather name="unlock" size={14} color={"white"} />
+
+                            <ThemedText
+                              size="sm"
+                              opacity="full"
+                              colorHex={getContrastTextColor(theme.primary)}
+                              className="ml-1"
+                            >
+                              {t("theme.purchase")}
+                            </ThemedText>
+                          </Pressable>
+                        )}
                       </View>
                     ) : access === "premium" ? (
                       <Pressable

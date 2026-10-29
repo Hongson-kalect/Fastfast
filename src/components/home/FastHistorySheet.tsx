@@ -11,6 +11,7 @@ import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FastDetail } from "../FastDetail";
 import { ThemedText } from "../themed-text";
 import { useT } from "@/providers/Language";
@@ -44,6 +45,7 @@ const formatTime = (seconds: number) => {
 function FastHistorySheet() {
   const dbService = useDBService();
   const db = useSQLiteContext();
+  const { bottom } = useSafeAreaInsets();
 
   const [history, setHistory] = useState<FastSession[]>([]);
 
@@ -74,6 +76,7 @@ function FastHistorySheet() {
       )}
       contentContainerStyle={{
         gap: 2,
+        paddingBottom: bottom + 40,
       }}
       ListHeaderComponent={<FastHistoryHeader data={history} />}
       ListEmptyComponent={

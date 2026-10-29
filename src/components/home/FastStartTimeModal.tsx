@@ -12,8 +12,7 @@ type Props = {
   minTime?: number | null;
   onSubmit: (startTime: number) => void;
 };
-// Bản phát hành chỉ cho bắt đầu sớm tối đa 24 giờ; bản dev không giới hạn để test lịch sử dài
-const MAX_DELAY_MS = __DEV__ ? Infinity : 24 * 60 * 60 * 1000;
+// Không giới hạn lùi về quá khứ (chọn ngày bằng date picker); chỉ chặn trước lúc phiên trước kết thúc
 
 const START_PRESETS = [
   { label: "2h", minutes: 120 },
@@ -51,11 +50,6 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
   const validateTime = (time: number) => {
     if (minTime && time < minTime) {
       showError(t("startTime.overlap"));
-      return false;
-    }
-
-    if (time < now.getTime() - MAX_DELAY_MS) {
-      showError(t("startTime.max24h"));
       return false;
     }
 
@@ -221,6 +215,7 @@ const FastStartTimeModal = ({ minTime, onSubmit }: Props) => {
           mode={pickerMode}
           is24Hour
           maximumDate={now}
+          minimumDate={minTime ? new Date(minTime) : undefined}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onValueChange={handlePickerChange}
         />

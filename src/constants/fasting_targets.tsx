@@ -319,6 +319,71 @@ export const TARGET_PACKS: { [key: string]: TargetPack } = {
       },
     ],
   },
+
+  // 5. CHRISTMAS (đi kèm theme christmas; chỉ dùng chuỗi để widget vẽ được)
+  christmas_targets: {
+    id: "christmas_targets",
+    name: "Christmas",
+    description: "Mốc Giáng sinh từ bông tuyết đến ông già Noel",
+    targets: [
+      {
+        id: "target_16",
+        targetHours: 16,
+        label: "16 Hours",
+        description: "Standard 16:8 Fasting",
+        icon: "❄️",
+        color: { light: "#E0F2FE", dark: "#0C3A5B" },
+      },
+      {
+        id: "target_18",
+        targetHours: 18,
+        label: "18 Hours",
+        description: "18:6 Fasting",
+        icon: "🔔",
+        color: { light: "#FEF3C7", dark: "#4A3209" },
+      },
+      {
+        id: "target_20",
+        targetHours: 20,
+        label: "20 Hours",
+        description: "Warrior Fast",
+        icon: "🧦",
+        color: { light: "#FEE2E2", dark: "#5A1418" },
+      },
+      {
+        id: "target_23",
+        targetHours: 23,
+        label: "23 Hours",
+        description: "OMAD (One Meal A Day)",
+        icon: "🕯️",
+        color: { light: "#FFEDD5", dark: "#5C2B0E" },
+      },
+      {
+        id: "target_36",
+        targetHours: 36,
+        label: "36 Hours",
+        description: "Monk Fast",
+        icon: "🦌",
+        color: { light: "#F5E6D3", dark: "#3F2A17" },
+      },
+      {
+        id: "target_48",
+        targetHours: 48,
+        label: "48 Hours",
+        description: "2-Day Reset",
+        icon: "🎁",
+        color: { light: "#DCFCE7", dark: "#0F3D22" },
+      },
+      {
+        id: "target_72",
+        targetHours: 72,
+        label: "72 Hours",
+        description: "Prolonged Fast",
+        icon: "🎅",
+        color: { light: "#FFE4E6", dark: "#6B1020" },
+      },
+    ],
+  },
 };
 
 // Target Pack mặc định

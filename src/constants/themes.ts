@@ -1,3 +1,5 @@
+import { lunarToSolar } from "@/utils/lunar";
+
 
 export type ThemeType = {
   primary: string;
@@ -16,18 +18,27 @@ export type ThemeType = {
 };
 type PremiumThemeType = { type: "premium" };
 type NormalThemeType = { type: "normal" };
+/** Theme theo sự kiện, lặp lại hằng năm: miễn phí trong dịp sự kiện, bán thêm
+ * `saleDays` ngày, rồi khoá đến lần sau (người đã mua giữ mãi) */
 type LimitedThemeType = {
   type: "limited";
+  /** Ngày tính theo âm lịch Việt Nam (UTC+7) thay vì dương lịch */
   isMoonTime?: boolean;
-  freeStartAt: string;
-  freeEndAt: string;
-  saleEndAt?: string;
+  /** "MM-DD", ngày đầu được dùng miễn phí */
+  freeFrom: string;
+  /** "MM-DD", ngày cuối được dùng miễn phí (tính cả ngày đó); nhỏ hơn
+   * `freeFrom` nghĩa là vắt sang năm sau */
+  freeTo: string;
+  /** Số ngày còn bán sau ngày miễn phí cuối; 0 = không bán (chỉ miễn phí trong dịp, hết dịp là khoá) */
+  saleDays: number;
 };
 export type ThemeItem = {
   light: ThemeType;
   dark: ThemeType;
   /** Bộ icon đi kèm theme (key trong EMOTION_PACKS / TARGET_PACKS); chọn theme sẽ hỏi có đổi không */
   iconPacks?: { emotion?: string; target?: string };
+  /** Bộ effect trang trí (key trong EFFECTS); cường độ do cài đặt `effect_intensity` */
+  effect?: "christmas";
 } & (PremiumThemeType | NormalThemeType | LimitedThemeType);
 
 // Nền xanh than nhẹ thay vì xám trung tính để có chiều sâu; card sáng hơn nền một bậc
@@ -221,8 +232,11 @@ export const themes: { [key: string]: ThemeItem } = {
   // ─────────────────────────────────────────────
   rose: {
     type: "limited",
-    freeStartAt: "2026-09-21",
-    freeEndAt: "2026-09-28",
+    // Quanh Trung thu (15/8 âm lịch)
+    isMoonTime: true,
+    freeFrom: "08-11",
+    freeTo: "08-18",
+    saleDays: 7,
     light: {
       primary: "#E11D48",
       secondary: "#BE123C",
@@ -447,6 +461,57 @@ export const themes: { [key: string]: ThemeItem } = {
       card: "#11142A",
     },
   },
+  // ─────────────────────────────────────────────
+  // CHRISTMAS — đỏ, xanh thông, vàng nến (limited, tháng 12)
+  // Theme tạo không khí sự kiện / để chia sẻ: miễn phí cả tháng, không bán
+  // ─────────────────────────────────────────────
+  christmas: {
+    type: "limited",
+    freeFrom: "12-01",
+    freeTo: "12-31",
+    saleDays: 0,
+    iconPacks: { emotion: "christmas_mood", target: "christmas_targets" },
+    effect: "christmas",
+    light: {
+      primary: "#C0262D",
+      secondary: "#15803D",
+      tertiary: "#C9961A",
+
+      success: "#15803D",
+      error: "#DC2626",
+      warning: "#D97706",
+      info: "#0369A1",
+
+      title: "#2A0E10",
+      text: "#4A3A36",
+
+      buttonText: "#FFFFFF",
+
+      background: "#FFFAF4",
+      background2: "#F8EEE2",
+      card: "#FFFFFF",
+    },
+
+    dark: {
+      primary: "#E5484D",
+      secondary: "#3DBE7F",
+      tertiary: "#F2C14E",
+
+      success: "#4ADE80",
+      error: "#F87171",
+      warning: "#FBBF24",
+      info: "#60A5FA",
+
+      title: "#FFF4E6",
+      text: "#EDE3D6",
+
+      buttonText: "#FFFFFF",
+
+      background: "#0C1511",
+      background2: "#16241D",
+      card: "#121E18",
+    },
+  },
 } satisfies Record<string, ThemeItem>;
 
 export type ThemeKey = keyof typeof themes;
@@ -472,6 +537,58 @@ type ThemeAccessState =
   | "purchase"
   | "unavailable";
 
+const parseMonthDay = (value: string) => {
+  const [month, day] = value.split("-").map(Number);
+  return { month, day };
+};
+
+/** Ngày "MM-DD" của năm `year` (âm lịch nếu isMoonTime), lúc 0h giờ máy */
+const resolveDay = (value: string, year: number, isMoonTime?: boolean) => {
+  const { month, day } = parseMonthDay(value);
+  return isMoonTime
+    ? lunarToSolar(day, month, year)
+    : new Date(year, month - 1, day);
+};
+
+const addDays = (date: Date, days: number) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+/** Dịp sự kiện bắt đầu trong năm `year`: [freeStart, freeEnd) rồi [freeEnd, saleEnd) */
+const getLimitedWindow = (theme: LimitedThemeType, year: number) => {
+  const crossesYear = theme.freeTo < theme.freeFrom;
+  const freeStart = resolveDay(theme.freeFrom, year, theme.isMoonTime);
+  const lastFreeDay = resolveDay(
+    theme.freeTo,
+    crossesYear ? year + 1 : year,
+    theme.isMoonTime,
+  );
+  const freeEnd = addDays(lastFreeDay, 1);
+  return { freeStart, lastFreeDay, freeEnd, saleEnd: addDays(freeEnd, theme.saleDays) };
+};
+
+/**
+ * Trạng thái theme limited tại `now`: "free" trong dịp sự kiện, "purchase" trong
+ * `saleDays` ngày sau đó, còn lại "unavailable". Xét cả dịp bắt đầu năm trước
+ * vì dịp vắt qua năm mới / thời gian bán có thể kéo sang năm nay.
+ */
+export const getLimitedThemeStatus = (
+  theme: ThemeItem,
+  now = new Date(),
+): { state: "free" | "purchase" | "unavailable"; until?: Date } => {
+  if (theme.type !== "limited") return { state: "unavailable" };
+
+  const year = now.getFullYear();
+  for (const event of [getLimitedWindow(theme, year - 1), getLimitedWindow(theme, year)]) {
+    if (now >= event.freeStart && now < event.freeEnd) {
+      return { state: "free", until: event.lastFreeDay };
+    }
+    if (now >= event.freeEnd && now < event.saleEnd) {
+      return { state: "purchase", until: addDays(event.saleEnd, -1) };
+    }
+  }
+  return { state: "unavailable" };
+};
+
 export const getThemeAccess = (
   themeData: ThemeItem,
   owned: boolean,
@@ -487,21 +604,5 @@ export const getThemeAccess = (
     return "premium";
   }
 
-  const freeStart = themeData.freeStartAt
-    ? new Date(themeData.freeStartAt)
-    : null;
-
-  const freeEnd = themeData.freeEndAt ? new Date(themeData.freeEndAt) : null;
-
-  const saleEnd = themeData.saleEndAt ? new Date(themeData.saleEndAt) : null;
-
-  if ((!freeStart || now >= freeStart) && (!freeEnd || now <= freeEnd)) {
-    return "free";
-  }
-
-  if (!saleEnd || now <= saleEnd) {
-    return "purchase";
-  }
-
-  return "unavailable";
+  return getLimitedThemeStatus(themeData, now).state;
 };

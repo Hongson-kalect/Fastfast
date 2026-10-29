@@ -6,9 +6,12 @@ import i18n from "i18next";
 import useModalStore from "@/stores/modalStore";
 import {
   BackupFile,
+  deleteRestoreSnapshot,
   exportBackup,
   pickBackup,
+  readRestoreSnapshot,
   restoreBackup,
+  saveRestoreSnapshot,
 } from "@/utils/backup";
 import {
   DriveQuotaError,
@@ -59,6 +62,8 @@ export const BackupSheet = ({
   const [account, setAccount] = useState<GoogleAccount | null>(null);
   const [lastBackup, setLastBackup] = useState<Date | null>(null);
   const [busy, setBusy] = useState<Busy>(null);
+  // Thời điểm của bản chụp dữ liệu trước lần khôi phục gần nhất (để hoàn tác)
+  const [snapshotAt, setSnapshotAt] = useState<Date | null>(null);
 
   const updateAccount = (next: GoogleAccount | null) => {
     setAccount(next);
@@ -75,12 +80,24 @@ export const BackupSheet = ({
       .then(updateLastBackup)
       .catch(() => updateLastBackup(null));
 
+  const loadSnapshot = () =>
+    readRestoreSnapshot().then((snapshot) =>
+      setSnapshotAt(snapshot ? new Date(snapshot.exportedAt) : null),
+    );
+
   useEffect(() => {
     getSignedInAccount().then((signedIn) => {
       setAccount(signedIn);
       if (signedIn) loadBackupTime();
     });
+    loadSnapshot();
   }, []);
+
+  // Ghi nhớ tài khoản Drive gắn với dữ liệu trên máy; null = chưa gắn (VD vừa nhập từ file)
+  const linkAccount = async (email: string | null) => {
+    useAppStore.getState().updateSetting({ backup_account: email });
+    await dbService.setting("backup_account", email);
+  };
 
   const showError = (title: string, message: string) => {
     feedback("error");
@@ -112,16 +129,48 @@ export const BackupSheet = ({
       }),
     );
 
+  // Đăng nhập tài khoản khác với tài khoản đang gắn dữ liệu: hỏi dùng dữ liệu nào
+  const askAccountSwitch = (linked: string, email: string) =>
+    new Promise<"restore" | "keep" | "cancel">((resolve) => {
+      let chosen = false;
+      addModal({
+        type: "radio",
+        title: t("backup.switchTitle"),
+        message: t("backup.switchBody", { linked, email }),
+        options: [
+          {
+            value: "restore",
+            label: t("backup.switchRestore", { email }),
+            description: t("backup.switchRestoreDesc"),
+          },
+          {
+            value: "keep",
+            label: t("backup.switchKeep"),
+            description: t("backup.switchKeepDesc", { email }),
+          },
+          { value: "cancel", label: t("backup.switchCancel", { email }) },
+        ],
+        onSelect: (value) => {
+          chosen = true;
+          resolve(value as "restore" | "keep" | "cancel");
+        },
+        onDismiss: () => {
+          if (!chosen) resolve("cancel");
+        },
+      });
+    });
+
+  /**
+   * Đăng nhập Google. Trả về tài khoản khi có thể tiếp tục thao tác đang làm;
+   * null khi huỷ, lỗi, hoặc người dùng chọn khôi phục dữ liệu của tài khoản mới
+   * (luồng khôi phục chạy riêng).
+   */
   const signIn = async (): Promise<GoogleAccount | null> => {
     if (!(await confirmDriveAccess())) return null;
     setBusy("signin");
+    let signedIn: GoogleAccount | null = null;
     try {
-      const signedIn = await signInWithGoogle();
-      if (signedIn) {
-        updateAccount(signedIn);
-        loadBackupTime();
-      }
-      return signedIn;
+      signedIn = await signInWithGoogle();
     } catch (e) {
       console.warn("google sign in error", e);
       showError(t("backup.signInFailedTitle"), t("backup.signInFailedBody"));
@@ -129,6 +178,29 @@ export const BackupSheet = ({
     } finally {
       setBusy(null);
     }
+    if (!signedIn) return null;
+
+    const linked = useAppStore.getState().settings?.backup_account;
+    const choice =
+      linked && linked !== signedIn.email
+        ? await askAccountSwitch(linked, signedIn.email)
+        : "keep";
+
+    if (choice === "cancel") {
+      await signOutGoogle();
+      return null;
+    }
+
+    updateAccount(signedIn);
+    loadBackupTime();
+
+    if (choice === "restore") {
+      restoreFromGoogleDrive(signedIn);
+      return null;
+    }
+    // Chọn giữ dữ liệu: gắn luôn tài khoản mới. Lần đăng nhập đầu chỉ gắn khi sao lưu / khôi phục xong
+    if (linked) await linkAccount(signedIn.email);
+    return signedIn;
   };
 
   const signOut = () =>
@@ -144,10 +216,11 @@ export const BackupSheet = ({
       },
     });
 
-  const runDriveBackup = async () => {
+  const runDriveBackup = async (email: string) => {
     setBusy("backup");
     try {
       const { uploadedImages } = await backupToDrive(db);
+      await linkAccount(email);
       updateLastBackup(new Date());
       feedback("fastComplete");
       addModal({
@@ -171,7 +244,8 @@ export const BackupSheet = ({
 
   const backUpToDrive = async () => {
     if (busy) return;
-    if (!account && !(await signIn())) return;
+    const current = account ?? (await signIn());
+    if (!current) return;
 
     addModal({
       type: "confirm",
@@ -182,16 +256,20 @@ export const BackupSheet = ({
       okText: t("backup.backUp"),
       // Đóng modal ngay, kết quả báo bằng modal khác khi xong
       onOk: () => {
-        runDriveBackup();
+        runDriveBackup(current.email);
       },
     });
   };
 
-  const runDriveRestore = async (backup: BackupFile) => {
+  const runDriveRestore = async (backup: BackupFile, email: string) => {
     setBusy("restore");
     try {
+      // Giữ một bản dữ liệu hiện tại để hoàn tác nếu khôi phục nhầm
+      await saveRestoreSnapshot(db);
       const { missingImages } = await restoreFromDrive(db, backup);
       await afterRestore();
+      await linkAccount(email);
+      loadSnapshot();
       addModal({
         type: "alert",
         title: t("backup.restoredTitle"),
@@ -207,9 +285,11 @@ export const BackupSheet = ({
     }
   };
 
-  const restoreFromGoogleDrive = async () => {
+  /** `signedIn`: tài khoản vừa đăng nhập (state `account` chưa kịp cập nhật) */
+  const restoreFromGoogleDrive = async (signedIn?: GoogleAccount) => {
     if (busy) return;
-    if (!account && !(await signIn())) return;
+    const current = signedIn ?? account ?? (await signIn());
+    if (!current) return;
 
     setBusy("restore");
     let backup: BackupFile | null = null;
@@ -241,7 +321,7 @@ export const BackupSheet = ({
       }),
       okText: t("common.restore"),
       onOk: () => {
-        runDriveRestore(found);
+        runDriveRestore(found, current.email);
       },
     });
   };
@@ -282,8 +362,12 @@ export const BackupSheet = ({
       onOk: async () => {
         setBusy("import");
         try {
+          await saveRestoreSnapshot(db);
           await restoreBackup(db, found);
           await afterRestore();
+          // Dữ liệu từ file không rõ thuộc tài khoản nào: bỏ gắn, lần sao lưu tới sẽ gắn lại
+          await linkAccount(null);
+          loadSnapshot();
           addModal({
             type: "alert",
             title: t("backup.restoredTitle"),
@@ -291,6 +375,44 @@ export const BackupSheet = ({
           });
         } catch (e) {
           console.warn("file restore error", e);
+          showError(t("backup.restoreFailedTitle"), t("backup.restoreFileFailed"));
+        } finally {
+          setBusy(null);
+        }
+      },
+    });
+  };
+
+  // Quay lại dữ liệu trước lần khôi phục gần nhất
+  const undoRestore = async () => {
+    if (busy || !snapshotAt) return;
+    const snapshot = await readRestoreSnapshot();
+    if (!snapshot) {
+      setSnapshotAt(null);
+      return;
+    }
+    addModal({
+      type: "confirm",
+      title: t("backup.undoTitle"),
+      message: t("backup.undoBody", {
+        time: new Date(snapshot.exportedAt).toLocaleString(i18n.language),
+      }),
+      okText: t("common.restore"),
+      onOk: async () => {
+        setBusy("import");
+        try {
+          await restoreBackup(db, snapshot);
+          await afterRestore();
+          await linkAccount(null);
+          deleteRestoreSnapshot();
+          setSnapshotAt(null);
+          addModal({
+            type: "alert",
+            title: t("backup.undoneTitle"),
+            message: t("backup.undoneBody"),
+          });
+        } catch (e) {
+          console.warn("undo restore error", e);
           showError(t("backup.restoreFailedTitle"), t("backup.restoreFileFailed"));
         } finally {
           setBusy(null);
@@ -332,7 +454,7 @@ export const BackupSheet = ({
           icon="download-cloud"
           title={busy === "restore" ? t("backup.restoring") : t("backup.restoreDrive")}
           description={t("backup.restoreDriveDesc")}
-          onPress={restoreFromGoogleDrive}
+          onPress={() => restoreFromGoogleDrive()}
         />
         {account ? (
           <SettingsItem
@@ -358,6 +480,16 @@ export const BackupSheet = ({
           description={t("backup.restoreFileDesc")}
           onPress={importFile}
         />
+        {snapshotAt ? (
+          <SettingsItem
+            icon="rotate-ccw"
+            title={t("backup.undoRestore")}
+            description={t("backup.undoRestoreDesc", {
+              time: snapshotAt.toLocaleString(i18n.language),
+            })}
+            onPress={undoRestore}
+          />
+        ) : null}
       </SettingsSection>
     </View>
   );

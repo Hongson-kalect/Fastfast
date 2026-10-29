@@ -10,9 +10,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-  Alert,
   Image,
-  Modal,
   Pressable,
   TouchableOpacity,
   View,
@@ -22,6 +20,7 @@ import Animated, {
   SlideInDown,
   SlideOutDown,
 } from "react-native-reanimated";
+import AppModal from "../modals/AppModal";
 import { ThemedText } from "../themed-text";
 import { useDBService } from "@/hooks/useDBService";
 import { useShallow } from "zustand/react/shallow";
@@ -55,11 +54,16 @@ export const PhotoPickerModal = ({
       }
     } catch (error) {
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
-      Alert.alert(t("term.error"), t("image.saveError"));
+      addModal({
+        type: "alert",
+        title: t("term.error"),
+        message: t("image.saveError"),
+      });
     }
   };
 
   const dbService = useDBService()
+  const addModal = useModalStore((state) => state.addModal);
 
   const handleTakePhoto = async () => {
     try {
@@ -71,36 +75,41 @@ export const PhotoPickerModal = ({
       }
     } catch (error) {
       console.error("Lỗi chọn hoặc lưu ảnh:", error);
-      Alert.alert(t("term.error"), t("image.saveError"));
+      addModal({
+        type: "alert",
+        title: t("term.error"),
+        message: t("image.saveError"),
+      });
     }
   };
 
   const handleDeletePhoto = () => {
-    Alert.alert(t("image.deleteTitle"), t("image.deleteConfirm"), [
-      {
-        text: t("common.cancel"),
-        style: "cancel",
-      },
-      {
-        text: t("common.delete"),
-        style: "destructive",
-        onPress: async() => {
-          try {
-            await dbService.setDailyNote(undefined, undefined, null);
-            // Chỉ xóa file nếu ảnh nằm trong document/images.
-            deleteSavedImage(photoUri);
+    addModal({
+      type: "confirm",
+      title: t("image.deleteTitle"),
+      message: t("image.deleteConfirm"),
+      okText: t("common.delete"),
+      cancelText: t("common.cancel"),
+      onOk: async () => {
+        try {
+          await dbService.setDailyNote(undefined, undefined, null);
+          // Chỉ xóa file nếu ảnh nằm trong document/images.
+          deleteSavedImage(photoUri);
 
-            // Cập nhật dữ liệu ảnh của ngày đang xem.
-            updateImage(undefined);
+          // Cập nhật dữ liệu ảnh của ngày đang xem.
+          updateImage(undefined);
 
-            setVisible(false);
-          } catch (error) {
-            console.error("Lỗi xóa ảnh:", error);
-            Alert.alert(t("term.error"), t("image.deleteError"));
-          }
-        },
+          setVisible(false);
+        } catch (error) {
+          console.error("Lỗi xóa ảnh:", error);
+          addModal({
+            type: "alert",
+            title: t("term.error"),
+            message: t("image.deleteError"),
+          });
+        }
       },
-    ]);
+    });
   };
 
   const [, setPreviewVisible] = useState(false);
@@ -110,7 +119,6 @@ export const PhotoPickerModal = ({
     setPreviewVisible(true);
   };
 
-  const addModal = useModalStore((state) => state.addModal);
   const handleAddPhoto = () => {
     addModal({
       type: "confirm",
@@ -154,9 +162,8 @@ export const PhotoPickerModal = ({
   const backdropOpacity = isDark ? "70" : "75";
 
   return (
-    <Modal
+    <AppModal
       visible={visible}
-      transparent
       animationType="fade"
       onRequestClose={() => setVisible(false)}
     >
@@ -320,6 +327,6 @@ export const PhotoPickerModal = ({
           </Pressable>
         </Animated.View>
       </Pressable>
-    </Modal>
+    </AppModal>
   );
 };

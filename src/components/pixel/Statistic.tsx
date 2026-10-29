@@ -7,7 +7,7 @@ import { fixed } from "@/utils/numberLimit";
 import { RADIUS } from "@/constants/design";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { ThemedText } from "../themed-text";
 import { PackPickerBottomSheet } from "./IconPackSheet";
@@ -24,9 +24,10 @@ type Props = {
   };
 
   onSaveImage: () => void;
+  isSavingImage?: boolean;
 };
 const PixelStatistic = React.memo(
-  ({ setTrackingType, trackingType, stats, onSaveImage }: Props) => {
+  ({ setTrackingType, trackingType, stats, onSaveImage, isSavingImage }: Props) => {
   const t = useT();
     const theme = useAppStore((state) => state.theme);
     const heatmap = useAppStore((state) => state.settings?.pixel_heatmap ?? false);
@@ -91,13 +92,20 @@ const PixelStatistic = React.memo(
           <Pressable
             hitSlop={10}
             onPress={onSaveImage}
+            // Vẽ + chụp cả năm mất vài giây: khoá nút để không bấm chồng
+            disabled={isSavingImage}
             style={{
               borderRadius: RADIUS.pill,
               backgroundColor: theme.primary + "1F",
+              opacity: isSavingImage ? 0.6 : 1,
             }}
             className="items-center flex-row px-3.5 py-2 gap-1.5"
           >
-            <Ionicons name="image-outline" size={14} color={theme.primary} />
+            {isSavingImage ? (
+              <ActivityIndicator size={14} color={theme.primary} />
+            ) : (
+              <Ionicons name="image-outline" size={14} color={theme.primary} />
+            )}
             <ThemedText size="xs" weight="bold" color="primary">
               {t("journey.saveImage")}
             </ThemedText>

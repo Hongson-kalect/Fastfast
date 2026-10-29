@@ -105,7 +105,7 @@
     "title": "Terminar",
     "confirm": "¿Seguro que quieres terminar este ayuno?",
     "tooQuick": "Este ayuno es demasiado corto y se eliminará. ¿Continuar?",
-    "tooQuickSub": "El ayuno dura menos de 2 horas.",
+    "tooQuickSub": "El ayuno dura menos de 1 hora.",
     "failed": "Este ayuno se marcará como fallido. ¿Continuar?",
     "failedSub": "El ayuno dura menos de 16 horas.",
     "reached": "Alcanzaste tu meta. ¿Terminar ahora?",
@@ -285,7 +285,13 @@
     "overRest_other": "Descansaste {{count}} días de más",
     "shieldIncrease": "Escudo ganado",
     "restDays_one": "Descanso de {{count}} día",
-    "restDays_other": "Descanso de {{count}} días"
+    "restDays_other": "Descanso de {{count}} días",
+    "motivation": {
+      "full": "👑 ¡Maestro de la disciplina! Has mantenido un ritmo perfecto.",
+      "strong": "🔥 Tu hábito es muy sólido, ¡sigue así!",
+      "forming": "🌱 ¡Estás formando un gran hábito!",
+      "start": "💡 Tu camino acaba de empezar: ¡aguanta unos ayunos más!"
+    }
   },
   "habitDetail": {
     "title": "Registro de hábito",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Hora no válida",
     "overlap": "¡Se solapa con tu ayuno anterior!",
-    "max24h": "¡Solo puedes adelantar el inicio hasta 24 horas!",
     "future": "¡No puedes elegir una hora futura!",
     "title": "Elige la hora de inicio",
     "hint": "Toca la hora o la fecha para elegir cuándo empezaste",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Metas representadas con emojis clásicos",
     "ionicons_targets": "Iconos minimalistas y fluidos de Ionicons",
     "material_energy_targets": "Muestra el desafío con energía y llamas",
-    "feather_minimal_targets": "Diseño de trazo fino de Feather Icons"
+    "feather_minimal_targets": "Diseño de trazo fino de Feather Icons",
+    "christmas_mood": "Estados navideños: de congelado a pura alegría festiva",
+    "christmas_targets": "Metas navideñas, del copo de nieve a Papá Noel"
   },
   "pixelDetail": {
     "title": "Diario del día",
@@ -770,7 +777,12 @@
     "expoGoBody": "Las notificaciones requieren una build de desarrollo o de la tienda.",
     "notifOffTitle": "Las notificaciones están desactivadas",
     "notifOffBody": "Permite las notificaciones de FastFast en los ajustes del sistema.",
-    "openSettings": "Abrir ajustes"
+    "openSettings": "Abrir ajustes",
+    "effects": "Efectos del tema",
+    "effectsDesc": "Decoraciones en los botones, como nieve y motivos",
+    "effectOff": "Desactivado",
+    "effectLight": "Suave",
+    "effectStrong": "Intenso"
   },
   "account": {
     "title": "Cuenta",
@@ -831,7 +843,20 @@
     "permContinue": "Continuar",
     "permLater": "Ahora no",
     "quotaTitle": "El almacenamiento de Google está lleno",
-    "quotaBody": "Tu almacenamiento de Google (compartido por Drive, Gmail y Fotos) no tiene espacio. Tu copia anterior sigue a salvo. Libera espacio o usa Exportar archivo de copia para guardarla en otro sitio."
+    "quotaBody": "Tu almacenamiento de Google (compartido por Drive, Gmail y Fotos) no tiene espacio. Tu copia anterior sigue a salvo. Libera espacio o usa Exportar archivo de copia para guardarla en otro sitio.",
+    "switchTitle": "¿Cambiar la cuenta de copia?",
+    "switchBody": "Los datos de este teléfono se respaldan en {{linked}}. Acabas de iniciar sesión como {{email}}.",
+    "switchRestore": "Usar los datos de {{email}}",
+    "switchRestoreDesc": "Reemplaza los datos del teléfono con la copia de esta cuenta. Tus datos actuales se guardan para poder deshacerlo.",
+    "switchKeep": "Mantener los datos del teléfono",
+    "switchKeepDesc": "A partir de ahora se respaldará en {{email}}. Su copia anterior, si existe, se reemplazará en la próxima copia.",
+    "switchCancel": "Cancelar y cerrar sesión de {{email}}",
+    "undoRestore": "Deshacer la última restauración",
+    "undoRestoreDesc": "Volver a tus datos de {{time}}",
+    "undoTitle": "¿Deshacer la restauración?",
+    "undoBody": "Los datos del teléfono volverán a como estaban el {{time}}, antes de la última restauración.",
+    "undoneTitle": "Restauración deshecha",
+    "undoneBody": "Tus datos volvieron a como estaban antes de la restauración."
   },
   "theme": {
     "title": "Tema",
@@ -847,7 +872,9 @@
     "iconsTitle": "¿Usar los iconos a juego?",
     "iconsBody": "El tema {{theme}} trae sus propios iconos de ánimo y ayuno. ¿Cambiar a ellos? Puedes cambiarlos cuando quieras en Trayecto.",
     "iconsUse": "Usar iconos",
-    "iconsKeep": "Mantener"
+    "iconsKeep": "Mantener",
+    "eventEndedTitle": "El tema del evento terminó",
+    "eventEndedBody": "El tema {{theme}} solo estaba disponible durante su evento, así que FastFast volvió a {{fallback}}."
   },
   "notify": {
     "targetTitle": "🎉 ¡Meta alcanzada!",
@@ -872,7 +899,9 @@
     "end": "Terminar",
     "lastFast": "Último ayuno",
     "endedAgo": "terminó hace {{time}}",
-    "target": "Meta"
+    "target": "Meta",
+    "hours": "{{n}} h",
+    "lessThanHour": "< 1 h"
   },
   "notFound": {
     "title": "¡Vaya!",

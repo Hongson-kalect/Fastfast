@@ -4,9 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   Pressable,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -22,6 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { runOnJS } from "react-native-worklets";
 import { ThemedText } from "../themed-text";
+import AppModal from "./AppModal";
 
 type Props = {
   show: boolean;
@@ -186,17 +184,9 @@ export default function ModalWrapper({
   }
 
   return (
-    <Modal
-      transparent
-      visible={mounted}
-      animationType="none"
-      statusBarTranslucent
-      onRequestClose={onCancel}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
+    // AppModal render vào cửa sổ chính để né bàn phím được (Modal của RN không nhận
+    // sự kiện bàn phím khi edge-to-edge)
+    <AppModal visible={mounted} onRequestClose={onCancel}>
         {/* 2. Cho phép chạm vào backdrop để vừa tắt keyboard vừa handle cancel */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
@@ -229,10 +219,13 @@ export default function ModalWrapper({
             </Pressable>
 
             {/* Modal */}
+            {/* flexShrink theo cả chuỗi để khung co lại theo maxHeight / chỗ trống khi
+                bàn phím mở, nhờ đó ScrollView bên trong mới cuộn được */}
             <View
               style={{
                 width: Math.min(width - 32, 520),
                 maxHeight: height * 0.82,
+                flexShrink: 1,
               }}
             >
               <Animated.View
@@ -240,11 +233,12 @@ export default function ModalWrapper({
                   .damping(40)
                   .stiffness(100)
                   .mass(1)}
-                style={contentStyle}
+                style={[{ flexShrink: 1 }, contentStyle]}
               >
                 <View
                   className="overflow-hidden"
                   style={{
+                    flexShrink: 1,
                     // Nền card + viền mảnh để modal nổi khỏi nền tối, bo góc theo design tokens
                     backgroundColor: theme.card,
                     borderRadius: RADIUS.xl,
@@ -290,6 +284,7 @@ export default function ModalWrapper({
 
                   {/* Content */}
                   <Animated.ScrollView
+                    style={{ flexShrink: 1 }}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     bounces={false}
@@ -319,8 +314,7 @@ export default function ModalWrapper({
             </View>
           </View>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </Modal>
+    </AppModal>
   );
 }
 

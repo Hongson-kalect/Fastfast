@@ -105,7 +105,7 @@
     "title": "Finish",
     "confirm": "Are you sure you want to finish this fast?",
     "tooQuick": "This fast is too short and will be deleted. Continue?",
-    "tooQuickSub": "The fast is shorter than 2 hours.",
+    "tooQuickSub": "The fast is shorter than 1 hour.",
     "failed": "This fast will be marked as failed. Continue?",
     "failedSub": "The fast is shorter than 16 hours.",
     "reached": "You reached your target. Finish now?",
@@ -285,7 +285,13 @@
     "overRest_other": "Rested {{count}} days too many",
     "shieldIncrease": "Shield earned",
     "restDays_one": "Rest {{count}} day",
-    "restDays_other": "Rest {{count}} days"
+    "restDays_other": "Rest {{count}} days",
+    "motivation": {
+      "full": "👑 Master of discipline! You've kept a perfect pace.",
+      "strong": "🔥 Your habit is rock solid — keep it up!",
+      "forming": "🌱 You're building a great habit!",
+      "start": "💡 Your journey has just begun — stick with it for a few more fasts!"
+    }
   },
   "habitDetail": {
     "title": "Habit log",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Invalid time",
     "overlap": "This overlaps your previous fast!",
-    "max24h": "You can start at most 24 hours earlier!",
     "future": "You can't pick a time in the future!",
     "title": "Choose fast start time",
     "hint": "Tap the time or date to choose when you started",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Target levels shown with classic emojis",
     "ionicons_targets": "Smooth, minimal icons from Ionicons",
     "material_energy_targets": "Shows the challenge with energy and flames",
-    "feather_minimal_targets": "Fine-line design from Feather Icons"
+    "feather_minimal_targets": "Fine-line design from Feather Icons",
+    "christmas_mood": "Christmas moods: from frozen to full holiday cheer",
+    "christmas_targets": "Christmas milestones from snowflake to Santa"
   },
   "pixelDetail": {
     "title": "Daily journal",
@@ -770,7 +777,12 @@
     "expoGoBody": "Notifications need a development or store build of FastFast.",
     "notifOffTitle": "Notifications are off",
     "notifOffBody": "Allow notifications for FastFast in system settings.",
-    "openSettings": "Open settings"
+    "openSettings": "Open settings",
+    "effects": "Theme effects",
+    "effectsDesc": "Decorations on buttons, like snow and patterns",
+    "effectOff": "Off",
+    "effectLight": "Light",
+    "effectStrong": "Strong"
   },
   "account": {
     "title": "Account",
@@ -831,7 +843,20 @@
     "permContinue": "Continue",
     "permLater": "Not now",
     "quotaTitle": "Google storage is full",
-    "quotaBody": "Your Google storage (shared by Drive, Gmail and Photos) has no space left. Your previous backup is still safe. Free up some space, or use Export backup file to save a copy elsewhere."
+    "quotaBody": "Your Google storage (shared by Drive, Gmail and Photos) has no space left. Your previous backup is still safe. Free up some space, or use Export backup file to save a copy elsewhere.",
+    "switchTitle": "Switch backup account?",
+    "switchBody": "Data on this phone is backed up to {{linked}}. You just signed in as {{email}}.",
+    "switchRestore": "Use the data of {{email}}",
+    "switchRestoreDesc": "Replace the data on this phone with this account's backup. Your current data is kept so you can undo.",
+    "switchKeep": "Keep the data on this phone",
+    "switchKeepDesc": "Back up to {{email}} from now on. Its existing backup, if any, will be replaced on the next backup.",
+    "switchCancel": "Cancel and sign out of {{email}}",
+    "undoRestore": "Undo last restore",
+    "undoRestoreDesc": "Go back to your data from {{time}}",
+    "undoTitle": "Undo restore?",
+    "undoBody": "Data on this phone will go back to how it was at {{time}}, before the last restore.",
+    "undoneTitle": "Restore undone",
+    "undoneBody": "Your data is back to how it was before the restore."
   },
   "theme": {
     "title": "Theme",
@@ -847,7 +872,9 @@
     "iconsTitle": "Use matching icons?",
     "iconsBody": "The {{theme}} theme comes with its own mood and fast icons. Switch to them? You can change icons anytime in Journey.",
     "iconsUse": "Use icons",
-    "iconsKeep": "Keep current"
+    "iconsKeep": "Keep current",
+    "eventEndedTitle": "Event theme ended",
+    "eventEndedBody": "The {{theme}} theme was only available during its event, so FastFast switched back to {{fallback}}."
   },
   "notify": {
     "targetTitle": "🎉 Target reached!",
@@ -872,7 +899,9 @@
     "end": "End",
     "lastFast": "Last fast",
     "endedAgo": "ended {{time}} ago",
-    "target": "Target"
+    "target": "Target",
+    "hours": "{{n}}h",
+    "lessThanHour": "< 1h"
   },
   "notFound": {
     "title": "Oops!",

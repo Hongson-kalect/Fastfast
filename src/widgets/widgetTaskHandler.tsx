@@ -1,9 +1,6 @@
 import type { WidgetTaskHandlerProps } from "react-native-android-widget";
-import { MoodLevel } from "@/interfaces/db.type";
 import { CompactFastWidget } from "./CompactFastWidget";
 import { FastTimerWidget } from "./FastTimerWidget";
-import { setMoodFromWidget, startFastFromWidget } from "./widgetActions";
-import { WIDGET_ACTIONS } from "./widgetDisplay";
 import {
   COMPACT_WIDGET_NAME,
   FAST_WIDGET_NAME,
@@ -17,8 +14,9 @@ const WIDGETS = {
 };
 
 /**
- * Hệ thống gọi khi widget được thêm, đổi cỡ, tới chu kỳ cập nhật 30 phút,
- * hoặc khi người dùng bấm nút trên widget.
+ * Hệ thống gọi khi widget được thêm, đổi cỡ hoặc tới chu kỳ cập nhật 30 phút.
+ * Nút trên widget không chạy ở đây mà mở app qua deep link: chạy nền bằng
+ * headless JS bị hệ điều hành (vivo, Xiaomi...) chặn khi app đã bị vuốt bỏ.
  */
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
   const Widget = WIDGETS[props.widgetInfo.widgetName as keyof typeof WIDGETS];
@@ -38,14 +36,6 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
     case "WIDGET_UPDATE":
     case "WIDGET_RESIZED":
       render(await loadWidgetState());
-      break;
-    case "WIDGET_CLICK":
-      if (props.clickAction === WIDGET_ACTIONS.startFast) {
-        render(await startFastFromWidget());
-      } else if (props.clickAction === WIDGET_ACTIONS.setMood) {
-        const level = Number(props.clickActionData?.level) as MoodLevel;
-        render(await setMoodFromWidget(level));
-      }
       break;
     default:
       break;

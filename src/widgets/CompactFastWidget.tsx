@@ -4,12 +4,12 @@
 import { FlexWidget, TextWidget } from "react-native-android-widget";
 import {
   FINISH_URI,
-  formatShortDuration,
+  formatShortHours,
   getIdleDisplay,
   getWidgetColors,
   HexColor,
   isFastingState,
-  WIDGET_ACTIONS,
+  START_URI,
 } from "./widgetDisplay";
 import type { FastWidgetState } from "./widgetState";
 
@@ -30,22 +30,24 @@ export function CompactFastWidget({
   const idle = getIdleDisplay(state);
   const now = Date.now();
 
+  // Chỉ giờ tròn: widget không được vẽ lại liên tục nên số phút sẽ sai.
   // Không nhịn: phiên trước (làm mờ) > mục tiêu > 0
   const timeText = isFasting
-    ? formatShortDuration(now - state!.startTime!)
+    ? formatShortHours(now - state!.startTime!)
     : idle.kind === "last"
-      ? formatShortDuration(idle.durationMs)
+      ? formatShortHours(idle.durationMs)
       : idle.kind === "target"
         ? `${idle.hours}h`
-        : "0:00";
+        : "0h";
 
   const isRow = width >= ROW_MIN_WIDTH;
   const buttonSize = isRow ? 34 : 26;
 
   const button = (
     <FlexWidget
-      clickAction={isFasting ? "OPEN_URI" : WIDGET_ACTIONS.startFast}
-      clickActionData={isFasting ? { uri: FINISH_URI } : undefined}
+      // Mở app để app bắt đầu/kết thúc phiên
+      clickAction="OPEN_URI"
+      clickActionData={{ uri: isFasting ? FINISH_URI : START_URI }}
       style={{
         width: buttonSize,
         height: buttonSize,

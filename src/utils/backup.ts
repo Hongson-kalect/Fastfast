@@ -13,7 +13,8 @@ const BACKUP_APP = "fastfast";
 const BACKUP_VERSION = 1;
 
 // Id thông báo chỉ có nghĩa trên máy đã tạo ra chúng
-const DEVICE_SETTING_KEYS = ["target_notification_id", "daily_reminder_id"];
+// backup_account: tài khoản Drive gắn với dữ liệu trên máy, đặt lại sau mỗi lần khôi phục
+const DEVICE_SETTING_KEYS = ["target_notification_id", "daily_reminder_id", "backup_account"];
 
 export type BackupFile = {
   app: string;
@@ -102,6 +103,33 @@ export const pickBackup = async (): Promise<BackupFile | null> => {
   if (picked.canceled) return null;
 
   return parseBackup(await picked.result.text());
+};
+
+// Bản chụp dữ liệu ngay trước lần khôi phục gần nhất, để hoàn tác khi khôi phục nhầm
+// (VD khôi phục bản sao lưu của tài khoản Google khác). Chỉ giữ 1 bản, không kèm ảnh
+// (ảnh trên máy không bị xoá khi khôi phục).
+const SNAPSHOT_NAME = "fastfast-before-restore.json";
+
+export const saveRestoreSnapshot = async (db: SQLiteDatabase) => {
+  const file = new File(Paths.document, SNAPSHOT_NAME);
+  file.create({ overwrite: true });
+  file.write(JSON.stringify(await buildBackup(db)));
+};
+
+/** Bản chụp trước lần khôi phục gần nhất, null nếu không có / hỏng. */
+export const readRestoreSnapshot = async (): Promise<BackupFile | null> => {
+  const file = new File(Paths.document, SNAPSHOT_NAME);
+  if (!file.exists) return null;
+  try {
+    return parseBackup(await file.text());
+  } catch {
+    return null;
+  }
+};
+
+export const deleteRestoreSnapshot = () => {
+  const file = new File(Paths.document, SNAPSHOT_NAME);
+  if (file.exists) file.delete();
 };
 
 /** Ghi đè dữ liệu hiện tại bằng bản sao lưu (chỉ các bảng/cột đang tồn tại). */

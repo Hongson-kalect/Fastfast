@@ -2,6 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
+import { ButtonEffect } from "@/components/effect/slots";
 import { ThemedText } from "@/components/themed-text";
 import { RADIUS } from "@/constants/design";
 import { getEmotionPack, MoodLevel } from "@/constants/emotions";
@@ -53,6 +54,14 @@ export const SwapMoodButton = ({
       }}
       className={`h-16 w-16 flex-row items-center justify-center border ${loading ? "opacity-60" : ""} ${className}`}
     >
+      {/* Nằm dưới nội dung để emoji mood và huy hiệu ghi chú không bị che */}
+      <ButtonEffect
+        variant="secondary"
+        radius={RADIUS.md}
+        color={color}
+        isCounting={false}
+      />
+
       {loading ? (
         <ActivityIndicator color={theme.primary} />
       ) : (

@@ -1,7 +1,7 @@
+import AppModal from "@/components/modals/AppModal";
 
 import type { ReactNode } from "react";
 import {
-  Modal,
   Pressable,
   TouchableOpacity,
   View,
@@ -36,9 +36,8 @@ export const NoteModalShell = ({
   const isDark = settings?.is_dark_mode ?? true;
 
   return (
-    <Modal
+    <AppModal
       visible={visible}
-      transparent
       animationType="fade"
       onRequestClose={() => setVisible(false)}
     >
@@ -98,6 +97,6 @@ export const NoteModalShell = ({
           </Pressable>
         </Animated.View>
       </Pressable>
-    </Modal>
+    </AppModal>
   );
 };

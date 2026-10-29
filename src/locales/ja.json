@@ -105,7 +105,7 @@
     "title": "終了",
     "confirm": "このファスティングを終了しますか？",
     "tooQuick": "短すぎるため、この記録は削除されます。続けますか？",
-    "tooQuickSub": "2時間未満です。",
+    "tooQuickSub": "1時間未満です。",
     "failed": "この記録は未達成になります。続けますか？",
     "failedSub": "16時間未満です。",
     "reached": "目標を達成しました。今すぐ終了しますか？",
@@ -285,7 +285,13 @@
     "overRest_other": "{{count}}日休みすぎ",
     "shieldIncrease": "シールド獲得",
     "restDays_one": "{{count}}日休息",
-    "restDays_other": "{{count}}日休息"
+    "restDays_other": "{{count}}日休息",
+    "motivation": {
+      "full": "👑 規律の達人！完璧なペースを保っています。",
+      "strong": "🔥 習慣がしっかり定着しています。この調子で！",
+      "forming": "🌱 とても良い習慣が身につきつつあります！",
+      "start": "💡 旅は始まったばかり。あと数回続けてみましょう！"
+    }
   },
   "habitDetail": {
     "title": "習慣ログ",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "無効な時刻",
     "overlap": "前回のファスティングと重なっています！",
-    "max24h": "開始を早められるのは最大24時間です！",
     "future": "未来の時刻は選べません！",
     "title": "開始時刻を選択",
     "hint": "時刻か日付をタップして開始時点を選択",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "定番の絵文字で目標を表示",
     "ionicons_targets": "Ioniconsのなめらかでミニマルなアイコン",
     "material_energy_targets": "エネルギーと炎で難易度を表現",
-    "feather_minimal_targets": "Feather Iconsの繊細な線のデザイン"
+    "feather_minimal_targets": "Feather Iconsの繊細な線のデザイン",
+    "christmas_mood": "クリスマスの気分：凍えそうから祝日気分まで",
+    "christmas_targets": "雪の結晶からサンタまでのクリスマス目標"
   },
   "pixelDetail": {
     "title": "1日の記録",
@@ -770,7 +777,12 @@
     "expoGoBody": "通知には開発版またはストア版が必要です。",
     "notifOffTitle": "通知がオフです",
     "notifOffBody": "システム設定でFastFastの通知を許可してください。",
-    "openSettings": "設定を開く"
+    "openSettings": "設定を開く",
+    "effects": "テーマ効果",
+    "effectsDesc": "ボタンに雪や模様などの飾りを表示",
+    "effectOff": "オフ",
+    "effectLight": "控えめ",
+    "effectStrong": "強め"
   },
   "account": {
     "title": "アカウント",
@@ -831,7 +843,20 @@
     "permContinue": "続ける",
     "permLater": "あとで",
     "quotaTitle": "Googleの保存容量がいっぱいです",
-    "quotaBody": "Googleの保存容量（ドライブ・Gmail・フォトで共有）に空きがありません。前回のバックアップはそのまま残っています。容量を空けるか、「バックアップファイルを書き出す」で別の場所に保存してください。"
+    "quotaBody": "Googleの保存容量（ドライブ・Gmail・フォトで共有）に空きがありません。前回のバックアップはそのまま残っています。容量を空けるか、「バックアップファイルを書き出す」で別の場所に保存してください。",
+    "switchTitle": "バックアップ用アカウントを切り替えますか？",
+    "switchBody": "この端末のデータは {{linked}} にバックアップされています。今 {{email}} でログインしました。",
+    "switchRestore": "{{email}} のデータを使う",
+    "switchRestoreDesc": "端末のデータをこのアカウントのバックアップで置き換えます。現在のデータは元に戻せるよう保存されます。",
+    "switchKeep": "端末のデータを残す",
+    "switchKeepDesc": "今後は {{email}} にバックアップします。このアカウントの既存のバックアップは次回のバックアップで置き換えられます。",
+    "switchCancel": "キャンセルして {{email}} からログアウト",
+    "undoRestore": "前回の復元を取り消す",
+    "undoRestoreDesc": "{{time}} のデータに戻す",
+    "undoTitle": "復元を取り消しますか？",
+    "undoBody": "端末のデータは前回の復元前、{{time}} の状態に戻ります。",
+    "undoneTitle": "復元を取り消しました",
+    "undoneBody": "データは復元前の状態に戻りました。"
   },
   "theme": {
     "title": "テーマ",
@@ -847,7 +872,9 @@
     "iconsTitle": "テーマのアイコンを使いますか？",
     "iconsBody": "{{theme}} テーマには専用の気分・ファスティングアイコンがあります。切り替えますか？ジャーニーでいつでも変更できます。",
     "iconsUse": "使う",
-    "iconsKeep": "今のまま"
+    "iconsKeep": "今のまま",
+    "eventEndedTitle": "イベントテーマが終了しました",
+    "eventEndedBody": "{{theme}} テーマはイベント期間中のみ利用できます。{{fallback}} テーマに戻しました。"
   },
   "notify": {
     "targetTitle": "🎉 目標達成！",
@@ -872,7 +899,9 @@
     "end": "終了",
     "lastFast": "前回",
     "endedAgo": "{{time}}前に終了",
-    "target": "目標"
+    "target": "目標",
+    "hours": "{{n}}時間",
+    "lessThanHour": "1時間未満"
   },
   "notFound": {
     "title": "おっと！",

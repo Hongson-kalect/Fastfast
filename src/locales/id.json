@@ -105,7 +105,7 @@
     "title": "Selesai",
     "confirm": "Yakin ingin mengakhiri puasa ini?",
     "tooQuick": "Puasa ini terlalu singkat dan akan dihapus. Lanjutkan?",
-    "tooQuickSub": "Durasi puasa kurang dari 2 jam.",
+    "tooQuickSub": "Durasi puasa kurang dari 1 jam.",
     "failed": "Puasa ini akan ditandai gagal. Lanjutkan?",
     "failedSub": "Durasi puasa kurang dari 16 jam.",
     "reached": "Target tercapai. Akhiri sekarang?",
@@ -285,7 +285,13 @@
     "overRest_other": "Istirahat kelebihan {{count}} hari",
     "shieldIncrease": "Perisai didapat",
     "restDays_one": "Istirahat {{count}} hari",
-    "restDays_other": "Istirahat {{count}} hari"
+    "restDays_other": "Istirahat {{count}} hari",
+    "motivation": {
+      "full": "👑 Ahli disiplin! Kamu menjaga ritme dengan sempurna.",
+      "strong": "🔥 Kebiasaanmu sangat kuat, pertahankan!",
+      "forming": "🌱 Kamu sedang membangun kebiasaan yang sangat baik!",
+      "start": "💡 Perjalananmu baru dimulai, bertahanlah beberapa puasa lagi!"
+    }
   },
   "habitDetail": {
     "title": "Log kebiasaan",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Waktu tidak valid",
     "overlap": "Bertabrakan dengan puasa sebelumnya!",
-    "max24h": "Hanya bisa mulai paling awal 24 jam sebelumnya!",
     "future": "Tidak bisa memilih waktu di masa depan!",
     "title": "Pilih waktu mulai puasa",
     "hint": "Ketuk jam atau tanggal untuk memilih waktu mulai",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Target ditampilkan dengan emoji klasik",
     "ionicons_targets": "Ikon minimalis yang halus dari Ionicons",
     "material_energy_targets": "Menunjukkan tantangan lewat energi dan api",
-    "feather_minimal_targets": "Desain garis halus dari Feather Icons"
+    "feather_minimal_targets": "Desain garis halus dari Feather Icons",
+    "christmas_mood": "Suasana hati Natal: dari membeku hingga penuh keceriaan",
+    "christmas_targets": "Target Natal dari kepingan salju hingga Sinterklas"
   },
   "pixelDetail": {
     "title": "Jurnal harian",
@@ -770,7 +777,12 @@
     "expoGoBody": "Notifikasi butuh versi pengembangan atau versi toko.",
     "notifOffTitle": "Notifikasi nonaktif",
     "notifOffBody": "Izinkan notifikasi FastFast di pengaturan sistem.",
-    "openSettings": "Buka pengaturan"
+    "openSettings": "Buka pengaturan",
+    "effects": "Efek tema",
+    "effectsDesc": "Hiasan pada tombol, seperti salju dan motif",
+    "effectOff": "Mati",
+    "effectLight": "Ringan",
+    "effectStrong": "Kuat"
   },
   "account": {
     "title": "Akun",
@@ -831,7 +843,20 @@
     "permContinue": "Lanjutkan",
     "permLater": "Nanti saja",
     "quotaTitle": "Penyimpanan Google penuh",
-    "quotaBody": "Penyimpanan Google-mu (dipakai bersama Drive, Gmail, dan Foto) sudah penuh. Cadangan sebelumnya tetap aman. Kosongkan ruang, atau gunakan Ekspor file cadangan untuk menyimpan salinan di tempat lain."
+    "quotaBody": "Penyimpanan Google-mu (dipakai bersama Drive, Gmail, dan Foto) sudah penuh. Cadangan sebelumnya tetap aman. Kosongkan ruang, atau gunakan Ekspor file cadangan untuk menyimpan salinan di tempat lain.",
+    "switchTitle": "Ganti akun cadangan?",
+    "switchBody": "Data di ponsel ini dicadangkan ke {{linked}}. Kamu baru masuk sebagai {{email}}.",
+    "switchRestore": "Pakai data {{email}}",
+    "switchRestoreDesc": "Ganti data di ponsel dengan cadangan akun ini. Data saat ini disimpan agar bisa dibatalkan.",
+    "switchKeep": "Simpan data di ponsel",
+    "switchKeepDesc": "Mulai sekarang dicadangkan ke {{email}}. Cadangan lama akun ini (jika ada) akan diganti pada pencadangan berikutnya.",
+    "switchCancel": "Batal dan keluar dari {{email}}",
+    "undoRestore": "Batalkan pemulihan terakhir",
+    "undoRestoreDesc": "Kembali ke data dari {{time}}",
+    "undoTitle": "Batalkan pemulihan?",
+    "undoBody": "Data di ponsel akan kembali seperti pada {{time}}, sebelum pemulihan terakhir.",
+    "undoneTitle": "Pemulihan dibatalkan",
+    "undoneBody": "Datamu kembali seperti sebelum pemulihan."
   },
   "theme": {
     "title": "Tema",
@@ -847,7 +872,9 @@
     "iconsTitle": "Pakai ikon yang serasi?",
     "iconsBody": "Tema {{theme}} punya ikon suasana hati dan puasa sendiri. Ganti ke ikon itu? Kamu bisa mengubahnya kapan saja di Perjalanan.",
     "iconsUse": "Pakai",
-    "iconsKeep": "Tetap"
+    "iconsKeep": "Tetap",
+    "eventEndedTitle": "Tema acara telah berakhir",
+    "eventEndedBody": "Tema {{theme}} hanya tersedia selama acaranya, jadi FastFast kembali ke {{fallback}}."
   },
   "notify": {
     "targetTitle": "🎉 Target tercapai!",
@@ -872,7 +899,9 @@
     "end": "Akhiri",
     "lastFast": "Puasa terakhir",
     "endedAgo": "selesai {{time}} lalu",
-    "target": "Target"
+    "target": "Target",
+    "hours": "{{n}} jam",
+    "lessThanHour": "< 1 jam"
   },
   "notFound": {
     "title": "Ups!",

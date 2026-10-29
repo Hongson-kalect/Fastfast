@@ -187,7 +187,8 @@ export const getFastSessionByIds = async (
   }
 };
 
-export const TOO_QUICK_DURATION = 30 * 60; // 30 phút, ví dụ
+// Dưới 1 giờ (chưa tới giai đoạn đường huyết đầu tiên) thì xoá phiên, không tính là failed
+export const TOO_QUICK_DURATION = 60 * 60;
 export const MIN_FAST_DURATION = 16 * 3600; // 16 giờ, ví dụ
 export const MAX_FAST_HOURS = 100;
 const LONG_FAST_GRACE_HOURS = 0.25; // 15 phút

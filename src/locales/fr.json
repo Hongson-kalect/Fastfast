@@ -105,7 +105,7 @@
     "title": "Terminer",
     "confirm": "Voulez-vous vraiment terminer ce jeûne ?",
     "tooQuick": "Ce jeûne est trop court et sera supprimé. Continuer ?",
-    "tooQuickSub": "Le jeûne dure moins de 2 heures.",
+    "tooQuickSub": "Le jeûne dure moins d'une heure.",
     "failed": "Ce jeûne sera marqué comme échoué. Continuer ?",
     "failedSub": "Le jeûne dure moins de 16 heures.",
     "reached": "Objectif atteint. Terminer maintenant ?",
@@ -285,7 +285,13 @@
     "overRest_other": "{{count}} jours de repos en trop",
     "shieldIncrease": "Bouclier gagné",
     "restDays_one": "{{count}} jour de repos",
-    "restDays_other": "{{count}} jours de repos"
+    "restDays_other": "{{count}} jours de repos",
+    "motivation": {
+      "full": "👑 Maître de la discipline ! Vous avez gardé un rythme parfait.",
+      "strong": "🔥 Votre habitude est très solide, continuez comme ça !",
+      "forming": "🌱 Vous êtes en train de prendre une excellente habitude !",
+      "start": "💡 Votre parcours ne fait que commencer : tenez bon encore quelques jeûnes !"
+    }
   },
   "habitDetail": {
     "title": "Journal d'habitude",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Heure invalide",
     "overlap": "Chevauche votre jeûne précédent !",
-    "max24h": "Vous pouvez avancer le début de 24 heures maximum !",
     "future": "Impossible de choisir une heure future !",
     "title": "Heure de début du jeûne",
     "hint": "Touchez l'heure ou la date pour choisir le début",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Objectifs représentés par des emojis classiques",
     "ionicons_targets": "Des icônes minimalistes et fluides d'Ionicons",
     "material_energy_targets": "Le défi illustré par l'énergie et les flammes",
-    "feather_minimal_targets": "Un design en traits fins de Feather Icons"
+    "feather_minimal_targets": "Un design en traits fins de Feather Icons",
+    "christmas_mood": "Humeurs de Noël : du grand froid à la joie des fêtes",
+    "christmas_targets": "Paliers de Noël, du flocon au Père Noël"
   },
   "pixelDetail": {
     "title": "Journal du jour",
@@ -770,7 +777,12 @@
     "expoGoBody": "Les notifications nécessitent une version de développement ou du store.",
     "notifOffTitle": "Les notifications sont désactivées",
     "notifOffBody": "Autorisez les notifications de FastFast dans les réglages du système.",
-    "openSettings": "Ouvrir les réglages"
+    "openSettings": "Ouvrir les réglages",
+    "effects": "Effets du thème",
+    "effectsDesc": "Décorations sur les boutons, comme neige et motifs",
+    "effectOff": "Désactivé",
+    "effectLight": "Léger",
+    "effectStrong": "Intense"
   },
   "account": {
     "title": "Compte",
@@ -831,7 +843,20 @@
     "permContinue": "Continuer",
     "permLater": "Plus tard",
     "quotaTitle": "Le stockage Google est plein",
-    "quotaBody": "Votre stockage Google (partagé entre Drive, Gmail et Photos) est plein. Votre sauvegarde précédente reste intacte. Libérez de l'espace ou utilisez Exporter un fichier de sauvegarde pour garder une copie ailleurs."
+    "quotaBody": "Votre stockage Google (partagé entre Drive, Gmail et Photos) est plein. Votre sauvegarde précédente reste intacte. Libérez de l'espace ou utilisez Exporter un fichier de sauvegarde pour garder une copie ailleurs.",
+    "switchTitle": "Changer de compte de sauvegarde ?",
+    "switchBody": "Les données de ce téléphone sont sauvegardées sur {{linked}}. Vous venez de vous connecter avec {{email}}.",
+    "switchRestore": "Utiliser les données de {{email}}",
+    "switchRestoreDesc": "Remplace les données du téléphone par la sauvegarde de ce compte. Vos données actuelles sont conservées pour pouvoir annuler.",
+    "switchKeep": "Garder les données du téléphone",
+    "switchKeepDesc": "Les sauvegardes iront désormais sur {{email}}. Son ancienne sauvegarde, s'il y en a une, sera remplacée à la prochaine sauvegarde.",
+    "switchCancel": "Annuler et se déconnecter de {{email}}",
+    "undoRestore": "Annuler la dernière restauration",
+    "undoRestoreDesc": "Revenir à vos données du {{time}}",
+    "undoTitle": "Annuler la restauration ?",
+    "undoBody": "Les données du téléphone reviendront à leur état du {{time}}, avant la dernière restauration.",
+    "undoneTitle": "Restauration annulée",
+    "undoneBody": "Vos données sont revenues à leur état d'avant la restauration."
   },
   "theme": {
     "title": "Thème",
@@ -847,7 +872,9 @@
     "iconsTitle": "Utiliser les icônes assorties ?",
     "iconsBody": "Le thème {{theme}} a ses propres icônes d'humeur et de jeûne. Les utiliser ? Vous pouvez les changer à tout moment dans Parcours.",
     "iconsUse": "Utiliser",
-    "iconsKeep": "Garder"
+    "iconsKeep": "Garder",
+    "eventEndedTitle": "Le thème de l'événement est terminé",
+    "eventEndedBody": "Le thème {{theme}} n'était disponible que pendant son événement : FastFast est revenu à {{fallback}}."
   },
   "notify": {
     "targetTitle": "🎉 Objectif atteint !",
@@ -872,7 +899,9 @@
     "end": "Terminer",
     "lastFast": "Dernier jeûne",
     "endedAgo": "terminé il y a {{time}}",
-    "target": "Objectif"
+    "target": "Objectif",
+    "hours": "{{n}} h",
+    "lessThanHour": "< 1 h"
   },
   "notFound": {
     "title": "Oups !",

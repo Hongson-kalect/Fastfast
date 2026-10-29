@@ -1,3 +1,4 @@
+import { ButtonEffect } from "@/components/effect/slots";
 import { RADIUS } from "@/constants/design";
 import { useAppStore } from "@/stores/appStore";
 import Feather from "@expo/vector-icons/Feather";
@@ -46,6 +47,13 @@ export const SwapImageButton = ({
       ) : (
         <Feather name="camera" size={22} color={theme.text + "CC"} />
       )}
+
+      <ButtonEffect
+        variant="secondary"
+        radius={RADIUS.md}
+        color={theme.primary}
+        isCounting={false}
+      />
     </TouchableOpacity>
   );
 };

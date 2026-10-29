@@ -49,6 +49,8 @@ const DayPixel = memo(
     // khi cha là cột không có chiều cao cố định (layout cuộn ngang).
     const baseClass = "items-center justify-center rounded-md border";
     const sizeStyle = { width: size, height: size };
+    // Icon co theo ô: ô nhỏ (lưới tháng) không bị emoji tràn, ô lớn giữ cỡ 14 như cũ
+    const iconSize = Math.min(14, Math.round(size * 0.48));
 
     // Ngày tương lai luôn disabled.
     if (isFuture) {
@@ -111,7 +113,7 @@ const DayPixel = memo(
         }
       } else if (shieldLog) {
         icon = (
-          <FontAwesome5 name="shield-alt" size={14} color={theme.primary} />
+          <FontAwesome5 name="shield-alt" size={iconSize} color={theme.primary} />
         );
       }
     }
@@ -126,6 +128,7 @@ const DayPixel = memo(
         <ThemedText
           size="sm"
           weight="medium"
+          style={{ fontSize: iconSize, lineHeight: iconSize + 4 }}
           colorHex={
             day.isCurrentYear ? theme.background : `${theme.background}33`
           }

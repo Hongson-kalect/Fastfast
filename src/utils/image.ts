@@ -3,7 +3,12 @@ import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
 import i18n from "i18next";
-import { Alert } from "react-native";
+import { Platform } from "react-native";
+import useModalStore from "@/stores/modalStore";
+
+// Thông báo bằng modal của app thay cho Alert của hệ điều hành
+const showAlert = (title: string, message: string) =>
+  useModalStore.getState().addModal({ type: "alert", title, message });
 
 /**
  * Lưu ảnh (file URI trong cache) vào thư viện ảnh của máy.
@@ -15,7 +20,7 @@ export const saveToGallery = async (cacheUri: string): Promise<boolean> => {
       "photo",
     ]);
     if (!permission.granted) {
-      Alert.alert(i18n.t("common.permission"), i18n.t("perm.saveImage"));
+      showAlert(i18n.t("common.permission"), i18n.t("perm.saveImage"));
       return false;
     }
 
@@ -23,7 +28,7 @@ export const saveToGallery = async (cacheUri: string): Promise<boolean> => {
     return true;
   } catch (error) {
     console.error("Lỗi khi lưu ảnh vào Gallery:", error);
-    Alert.alert(i18n.t("common.error"), i18n.t("perm.saveFailed"));
+    showAlert(i18n.t("common.error"), i18n.t("perm.saveFailed"));
     return false;
   }
 };
@@ -108,7 +113,7 @@ export const takePhoto = async (): Promise<string | null> => {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
 
   if (!permission.granted) {
-    Alert.alert(i18n.t("common.permission"), i18n.t("perm.camera"));
+    showAlert(i18n.t("common.permission"), i18n.t("perm.camera"));
     return null;
   }
 
@@ -132,11 +137,15 @@ export const takePhoto = async (): Promise<string | null> => {
  * Trả về tên file ảnh đã lưu, hoặc null nếu người dùng hủy.
  */
 export const selectPhoto = async (): Promise<string | null> => {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-  if (!permission.granted) {
-    Alert.alert(i18n.t("common.permission"), i18n.t("perm.gallery"));
-    return null;
+  // Android 13+ dùng trình chọn ảnh của hệ thống, không cần quyền đọc thư viện
+  // (app không khai báo READ_MEDIA_IMAGES theo chính sách ảnh/video của Google Play)
+  const usesSystemPicker = Platform.OS === "android" && Number(Platform.Version) >= 33;
+  if (!usesSystemPicker) {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      showAlert(i18n.t("common.permission"), i18n.t("perm.gallery"));
+      return null;
+    }
   }
 
   const result = await ImagePicker.launchImageLibraryAsync({

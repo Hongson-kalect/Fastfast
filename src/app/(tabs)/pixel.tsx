@@ -9,6 +9,7 @@ import PixelDetailSheet from "@/components/pixel/PixelDetailSheet";
 import { generateYearGrid } from "@/components/pixel/PixelInYear";
 import MonthPixel, {
   generateMonthGrid,
+  MONTH_GAP,
   MONTH_LABELS,
   MonthDayItem,
 } from "@/components/pixel/MonthPixel";
@@ -26,6 +27,7 @@ import {
   updatePixelNote,
   updatePixelViewMode,
 } from "@/stores/pixelAction";
+import useModalStore from "@/stores/modalStore";
 import { usePixelStore } from "@/stores/pixelStore";
 import { getContrastTextColor } from "@/utils/color";
 import { runDbTask } from "@/utils/dbError";
@@ -35,7 +37,6 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Alert,
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -67,8 +68,8 @@ type ScrollButton = "back" | "forward" | null;
 type GridItem = WeekItem | MonthDayItem;
 
 // Chia đều chiều dài còn lại cho `count` ô vuông
-const fitCells = (length: number, count: number) =>
-  Math.floor((length - CELL_GAP * (count - 1)) / count);
+const fitCells = (length: number, count: number, gap: number) =>
+  Math.floor((length - gap * (count - 1)) / count);
 
 const PixelScreen = () => {
   const t = useT();
@@ -107,9 +108,11 @@ const PixelScreen = () => {
   // Ô vuông lấy layout dọc làm chuẩn: 7 ngày hoặc 12 tháng chia đều chiều rộng
   // (màn hình − padding − cột nhãn). Layout ngang dùng cùng kích thước cho nhất quán.
   const cellCount = isMonth ? 12 : 7;
-  const pixelSize = fitCells(width - H_PADDING * 2 - LABEL_WIDTH, cellCount);
+  // Lưới tháng 12 ô nên ô nhỏ: thu gap lại để ô to hơn một chút
+  const cellGap = isMonth ? MONTH_GAP : CELL_GAP;
+  const pixelSize = fitCells(width - H_PADDING * 2 - LABEL_WIDTH, cellCount, cellGap);
   // Chiều dài một hàng/cột theo trục cuộn
-  const itemLength = pixelSize + CELL_GAP;
+  const itemLength = pixelSize + cellGap;
 
   const sundayFirst = settings?.week_starts_on === "sunday";
   const weekdays = (sundayFirst ? SUNDAY_FIRST : MONDAY_FIRST).map((day) =>
@@ -260,7 +263,11 @@ const PixelScreen = () => {
   const [isExporting, setIsExporting] = useState(false);
   const isCapturing = useRef(false);
 
-  const handleExport = () => setIsExporting(true);
+  const addModal = useModalStore((state) => state.addModal);
+  const handleExport = () => {
+    if (isExporting) return;
+    setIsExporting(true);
+  };
 
   const captureExport = async () => {
     if (isCapturing.current) return;
@@ -273,11 +280,19 @@ const PixelScreen = () => {
       if (!uri) return;
 
       if (await saveToGallery(uri)) {
-        Alert.alert(t("common.success"), t("journey.savedImage"));
+        addModal({
+          type: "alert",
+          title: t("common.success"),
+          message: t("journey.savedImage"),
+        });
       }
     } catch (error) {
       console.error("Export image error:", error);
-      Alert.alert(t("term.error"), t("image.saveError"));
+      addModal({
+        type: "alert",
+        title: t("term.error"),
+        message: t("image.saveError"),
+      });
     } finally {
       isCapturing.current = false;
       setIsExporting(false);
@@ -439,6 +454,7 @@ const PixelScreen = () => {
       <View style={{ paddingHorizontal: 20 }}>
         <PixelHeader
           onSaveImage={handleExport}
+          isSavingImage={isExporting}
           stats={stats}
           year={year}
           setYear={async (year) => await loadPixelYear(dbService, year)}
@@ -452,7 +468,7 @@ const PixelScreen = () => {
         <View className="flex-1 flex-row" style={{ paddingLeft: H_PADDING }}>
           <View className="bg-background">
             {weekButton}
-            <View className="gap-1">
+            <View style={{ gap: cellGap }}>
               {axisLabels.map((label) => (
                 <View
                   key={label}
@@ -473,7 +489,7 @@ const PixelScreen = () => {
         <View className="flex-1" style={{ paddingHorizontal: H_PADDING }}>
           <View className="flex-row items-end mb-2 border-b border-text-base/10">
             {weekButton}
-            <View className="flex-row gap-1">
+            <View className="flex-row" style={{ gap: cellGap }}>
               {axisLabels.map((label) => (
                 <View
                   key={label}

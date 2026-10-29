@@ -1,3 +1,4 @@
+import AppModal from "@/components/modals/AppModal";
 import { getEmotionPack } from "@/constants/emotions";
 import { useDBService } from "@/hooks/useDBService";
 import { MoodLevel } from "@/interfaces/db.type";
@@ -7,7 +8,6 @@ import { getLocalTodayStr } from "@/utils/timer";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
-  Modal,
   Pressable,
   Text,
   TextInput,
@@ -125,9 +125,8 @@ const NoteModal = ({
   const backdropOpacity = isDark ? "70" : "75";
 
   return (
-    <Modal
+    <AppModal
       visible={visible}
-      transparent
       animationType="fade"
       onRequestClose={() => setVisible(false)}
     >
@@ -350,7 +349,7 @@ const NoteModal = ({
           </Pressable>
         </Animated.View>
       </Pressable>
-    </Modal>
+    </AppModal>
   );
 };
 

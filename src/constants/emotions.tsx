@@ -536,6 +536,50 @@ export const EMOTION_PACKS: { [key: string]: EmotionPack } = {
       },
     ],
   },
+
+  // 7. CHRISTMAS (đi kèm theme christmas; chỉ dùng chuỗi để widget vẽ được)
+  christmas_mood: {
+    id: "christmas_mood",
+    name: "Christmas",
+    description: "Cảm xúc Giáng sinh: từ lạnh cóng đến rộn ràng ngày lễ",
+    emotions: [
+      {
+        id: "mood_0",
+        level: 0,
+        label: "Awful",
+        icon: { light: "🥶", dark: "🥶" },
+        color: { light: "#E0F2FE", dark: "#0C3A5B" },
+      },
+      {
+        id: "mood_1",
+        level: 1,
+        label: "Bad",
+        icon: { light: "🌨️", dark: "🌨️" },
+        color: { light: "#E2E8F0", dark: "#1E293B" },
+      },
+      {
+        id: "mood_2",
+        level: 2,
+        label: "Okay",
+        icon: { light: "⛄", dark: "⛄" },
+        color: { light: "#F1F5F9", dark: "#24323F" },
+      },
+      {
+        id: "mood_3",
+        level: 3,
+        label: "Good",
+        icon: { light: "🎁", dark: "🎁" },
+        color: { light: "#FEE2E2", dark: "#5A1418" },
+      },
+      {
+        id: "mood_4",
+        level: 4,
+        label: "Great",
+        icon: { light: "🎄", dark: "🎄" },
+        color: { light: "#DCFCE7", dark: "#0F3D22" },
+      },
+    ],
+  },
 };
 
 // Pack mặc định ban đầu

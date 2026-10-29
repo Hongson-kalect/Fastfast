@@ -105,7 +105,7 @@
     "title": "结束",
     "confirm": "确定要结束这次断食吗？",
     "tooQuick": "本次断食太短，将被删除。继续吗？",
-    "tooQuickSub": "断食时间少于 2 小时。",
+    "tooQuickSub": "断食时间少于 1 小时。",
     "failed": "本次断食将记为失败。继续吗？",
     "failedSub": "断食时间少于 16 小时。",
     "reached": "已达成目标，现在结束吗？",
@@ -285,7 +285,13 @@
     "overRest_other": "多休息了 {{count}} 天",
     "shieldIncrease": "获得护盾",
     "restDays_one": "休息 {{count}} 天",
-    "restDays_other": "休息 {{count}} 天"
+    "restDays_other": "休息 {{count}} 天",
+    "motivation": {
+      "full": "👑 自律大师！你一直保持着完美的节奏。",
+      "strong": "🔥 习惯已经非常稳固，继续保持！",
+      "forming": "🌱 你正在养成很好的习惯！",
+      "start": "💡 旅程才刚开始，再坚持几次断食吧！"
+    }
   },
   "habitDetail": {
     "title": "习惯记录",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "时间无效",
     "overlap": "与上一次断食时间重叠！",
-    "max24h": "最多只能提前 24 小时开始！",
     "future": "不能选择未来的时间！",
     "title": "选择断食开始时间",
     "hint": "点按时间或日期选择开始时刻",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "用经典表情表示目标",
     "ionicons_targets": "来自 Ionicons 的流畅简约图标",
     "material_energy_targets": "用能量和火焰表现挑战难度",
-    "feather_minimal_targets": "来自 Feather Icons 的精致线条设计"
+    "feather_minimal_targets": "来自 Feather Icons 的精致线条设计",
+    "christmas_mood": "圣诞心情：从冻僵到节日欢乐",
+    "christmas_targets": "从雪花到圣诞老人的圣诞目标"
   },
   "pixelDetail": {
     "title": "当日日志",
@@ -770,7 +777,12 @@
     "expoGoBody": "通知需要开发版或商店版应用。",
     "notifOffTitle": "通知已关闭",
     "notifOffBody": "请在系统设置中允许 FastFast 发送通知。",
-    "openSettings": "打开设置"
+    "openSettings": "打开设置",
+    "effects": "主题特效",
+    "effectsDesc": "在按钮上显示积雪、花纹等装饰",
+    "effectOff": "关闭",
+    "effectLight": "轻微",
+    "effectStrong": "强烈"
   },
   "account": {
     "title": "账号",
@@ -831,7 +843,20 @@
     "permContinue": "继续",
     "permLater": "以后再说",
     "quotaTitle": "Google 存储空间已满",
-    "quotaBody": "你的 Google 存储空间（云端硬盘、Gmail 和相册共用）已满。之前的备份仍然安全。请释放一些空间，或使用“导出备份文件”将副本保存到其他地方。"
+    "quotaBody": "你的 Google 存储空间（云端硬盘、Gmail 和相册共用）已满。之前的备份仍然安全。请释放一些空间，或使用“导出备份文件”将副本保存到其他地方。",
+    "switchTitle": "要切换备份账号吗？",
+    "switchBody": "此手机上的数据正备份到 {{linked}}。你刚刚登录了 {{email}}。",
+    "switchRestore": "使用 {{email}} 的数据",
+    "switchRestoreDesc": "用此账号的备份替换手机上的数据。当前数据会保留一份以便撤销。",
+    "switchKeep": "保留手机上的数据",
+    "switchKeepDesc": "今后备份到 {{email}}。该账号已有的备份（如有）会在下次备份时被替换。",
+    "switchCancel": "取消并退出 {{email}}",
+    "undoRestore": "撤销上次恢复",
+    "undoRestoreDesc": "回到 {{time}} 的数据",
+    "undoTitle": "撤销恢复？",
+    "undoBody": "手机上的数据将回到上次恢复前 {{time}} 的状态。",
+    "undoneTitle": "已撤销恢复",
+    "undoneBody": "你的数据已回到恢复前的状态。"
   },
   "theme": {
     "title": "主题",
@@ -847,7 +872,9 @@
     "iconsTitle": "使用配套图标吗？",
     "iconsBody": "{{theme}} 主题自带心情和断食图标。要切换吗？随时可在历程中更改。",
     "iconsUse": "使用",
-    "iconsKeep": "保持不变"
+    "iconsKeep": "保持不变",
+    "eventEndedTitle": "活动主题已结束",
+    "eventEndedBody": "{{theme}} 主题仅在活动期间可用，已为你切换回 {{fallback}} 主题。"
   },
   "notify": {
     "targetTitle": "🎉 已达成目标！",
@@ -872,7 +899,9 @@
     "end": "结束",
     "lastFast": "上次断食",
     "endedAgo": "{{time}}前结束",
-    "target": "目标"
+    "target": "目标",
+    "hours": "{{n}}小时",
+    "lessThanHour": "不到1小时"
   },
   "notFound": {
     "title": "哎呀！",

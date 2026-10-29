@@ -2,45 +2,37 @@
 "use no memo";
 
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import { getLocalTodayStr } from "@/utils/timer";
 import {
   DEFAULT_LABELS,
   FINISH_URI,
-  formatClock,
-  formatDuration,
-  formatElapsedShort,
+  formatHours,
+  formatWhen,
   getIdleDisplay,
   getWidgetColors,
   HexColor,
   isFastingState,
-  WIDGET_ACTIONS,
+  START_URI,
 } from "./widgetDisplay";
 import type { FastWidgetState } from "./widgetState";
 
-const DEFAULT_MOODS = ["😫", "😮‍💨", "🙂", "😃", "🥰"].map((emoji) => ({
-  emoji,
-  color: "#88888833",
-}));
-
-// Đủ cao mới hiện hàng chọn mood, widget thấp chỉ còn phần thời gian
-const MOOD_ROW_MIN_HEIGHT = 150;
+// Thấp hơn mức này (widget 4×1) thì gộp số giờ, mục tiêu và nút vào một hàng
+const SHORT_HEIGHT = 100;
+const PADDING = 14;
 
 const PillButton = ({
   label,
   color,
   textColor,
-  clickAction,
-  clickActionData,
+  uri,
 }: {
   label: string;
   color: HexColor;
   textColor: HexColor;
-  clickAction: string;
-  clickActionData?: Record<string, unknown>;
+  uri: string;
 }) => (
   <FlexWidget
-    clickAction={clickAction}
-    clickActionData={clickActionData}
+    clickAction="OPEN_URI"
+    clickActionData={{ uri }}
     style={{
       backgroundColor: color,
       borderRadius: 999,
@@ -55,9 +47,53 @@ const PillButton = ({
   </FlexWidget>
 );
 
-/** Widget màn hình chính: trạng thái phiên nhịn, nút bắt đầu/kết thúc, chọn mood hôm nay. */
+/**
+ * Tên mục tiêu + số giờ, VD "Chiến binh · 20h". Chiếm tối đa `width`;
+ * thiếu chỗ thì cắt tên, số giờ luôn hiện.
+ */
+const TargetLabel = ({
+  name,
+  hours,
+  width,
+  color,
+}: {
+  name?: string;
+  hours: number;
+  width: number;
+  color: HexColor;
+}) => (
+  <FlexWidget
+    style={{
+      width,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+    }}
+  >
+    {name ? (
+      <FlexWidget style={{ flex: 1, alignItems: "flex-end" }}>
+        <TextWidget
+          text={name}
+          maxLines={1}
+          truncate="END"
+          style={{ fontSize: 12, fontWeight: "bold", color, textAlign: "right" }}
+        />
+      </FlexWidget>
+    ) : null}
+    <TextWidget
+      text={name ? ` · ${hours}h` : `${hours}h`}
+      style={{ fontSize: 12, fontWeight: "bold", color }}
+    />
+  </FlexWidget>
+);
+
+/**
+ * Widget màn hình chính: trạng thái phiên nhịn, số giờ, tiến độ tới mục tiêu.
+ * Chỉ hiển thị; nút bấm mở app để app thực hiện.
+ */
 export function FastTimerWidget({
   state,
+  width = 0,
   height = 0,
 }: {
   state: FastWidgetState | null;
@@ -66,62 +102,135 @@ export function FastTimerWidget({
 }) {
   const colors = getWidgetColors(state);
   const labels = { ...DEFAULT_LABELS, ...state?.labels };
-  const moods = state?.moods ?? DEFAULT_MOODS;
-  const todayMood =
-    state?.mood && state.mood.date === getLocalTodayStr() ? state.mood.level : null;
-
   const isFasting = isFastingState(state);
   const idle = getIdleDisplay(state);
   const now = Date.now();
+  const isShort = height > 0 && height < SHORT_HEIGHT;
 
+  const targetHours = isFasting ? state?.targetHours : state?.defaultTarget;
   const targetEnd =
-    isFasting && state?.targetHours
-      ? state.startTime! + state.targetHours * 3600 * 1000
+    isFasting && targetHours
+      ? state!.startTime! + targetHours * 3_600_000
       : null;
-  // Có mục tiêu: tiến độ tới mục tiêu; nhịn tự do: thanh đầy; chưa nhịn: thanh rỗng
-  const progress = !isFasting
-    ? 0
-    : targetEnd
-      ? Math.min(1, (now - state!.startTime!) / (targetEnd - state!.startTime!))
-      : 1;
+  const progress = targetEnd
+    ? Math.min(1, (now - state!.startTime!) / (targetEnd - state!.startTime!))
+    : 0;
+  const reached = progress >= 1;
+  const accent = reached ? colors.success : colors.primary;
 
-  // Không nhịn: hiện thời lượng phiên trước (làm mờ, như bị đóng băng) > mục tiêu > 0
-  const mainText = isFasting
-    ? formatDuration(now - state!.startTime!)
+  // Không nhịn: số giờ phiên trước, làm mờ như bị đóng băng
+  const hoursText = isFasting
+    ? formatHours(now - state!.startTime!, labels)
     : idle.kind === "last"
-      ? formatDuration(idle.durationMs)
-      : idle.kind === "target"
-        ? `${idle.hours}h`
-        : formatDuration(0);
+      ? formatHours(idle.durationMs, labels)
+      : formatHours(0, labels);
+  const hoursColor = isFasting
+    ? reached
+      ? colors.success
+      : colors.text
+    : (`${colors.text}66` as HexColor);
 
-  const subText = isFasting
-    ? `${labels.started} ${formatClock(state!.startTime!)}${
-        targetEnd ? ` · ${labels.done} ${formatClock(targetEnd)}` : ""
-      }`
+  const footerLeft = isFasting
+    ? formatWhen(state!.startTime!, labels)
     : idle.kind === "last"
-      ? `${labels.lastFast} · ${labels.endedAgo.replace(
-          "{time}",
-          formatElapsedShort(now - idle.endTime),
-        )}`
-      : idle.kind === "target"
-        ? labels.target
-        : labels.tapToOpen;
+      ? `${labels.lastFast} · ${formatWhen(idle.endTime, labels)}`
+      : labels.tapToOpen;
+  const footerRight = targetEnd ? formatWhen(targetEnd, labels) : "";
 
-  const showMoods = height >= MOOD_ROW_MIN_HEIGHT;
+  const dimText = `${colors.text}AA` as HexColor;
+
+  const button = isFasting ? (
+    <PillButton
+      label={`■ ${labels.end}`}
+      color={`${colors.text}1A` as HexColor}
+      textColor={colors.text}
+      uri={FINISH_URI}
+    />
+  ) : (
+    <PillButton
+      label={`▶ ${labels.start}`}
+      color={colors.primary}
+      textColor="#FFFFFF"
+      uri={START_URI}
+    />
+  );
+
+  const target = targetHours ? (
+    <TargetLabel
+      name={state?.targetNames?.[String(targetHours)]}
+      hours={targetHours}
+      // Nhãn mục tiêu chiếm tối đa nửa phải của widget
+      width={Math.max(60, Math.floor((width || 300) / 2) - PADDING)}
+      color={isFasting ? accent : dimText}
+    />
+  ) : null;
+
+  const bar =
+    isFasting && targetEnd ? (
+      <FlexWidget
+        style={{
+          width: "match_parent",
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: `${colors.text}22` as HexColor,
+          flexDirection: "row",
+        }}
+      >
+        <FlexWidget
+          style={{
+            height: 6,
+            borderRadius: 3,
+            flex: Math.max(progress, 0.02),
+            backgroundColor: accent,
+          }}
+        />
+        <FlexWidget style={{ height: 6, flex: Math.max(1 - progress, 0) }} />
+      </FlexWidget>
+    ) : null;
+
+  const container = {
+    height: "match_parent" as const,
+    width: "match_parent" as const,
+    backgroundColor: colors.background,
+    borderRadius: 24,
+    padding: PADDING,
+    justifyContent: "space-between" as const,
+  };
+
+  // 4×1: [14 giờ   Chiến binh · 20h] [nút], thanh tiến độ bên dưới
+  if (isShort) {
+    return (
+      <FlexWidget clickAction="OPEN_APP" style={{ ...container, padding: 10 }}>
+        <FlexWidget
+          style={{
+            width: "match_parent",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <FlexWidget style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            <TextWidget
+              text={hoursText}
+              style={{ fontSize: 20, fontWeight: "bold", color: hoursColor }}
+            />
+            {targetHours ? (
+              <TextWidget
+                text={` · ${targetHours}h`}
+                style={{ fontSize: 12, fontWeight: "bold", color: dimText }}
+              />
+            ) : null}
+          </FlexWidget>
+          {button}
+        </FlexWidget>
+        {bar}
+      </FlexWidget>
+    );
+  }
 
   return (
-    <FlexWidget
-      clickAction="OPEN_APP"
-      style={{
-        height: "match_parent",
-        width: "match_parent",
-        backgroundColor: colors.background,
-        borderRadius: 24,
-        padding: 14,
-        justifyContent: "space-between",
-      }}
-    >
-      {/* Nhãn trạng thái + streak, nút thao tác bên phải */}
+    <FlexWidget clickAction="OPEN_APP" style={container}>
+      {/* Trạng thái + streak, nút ở góc phải trên */}
       <FlexWidget
         style={{
           width: "match_parent",
@@ -142,30 +251,15 @@ export function FastTimerWidget({
           />
           {state?.streak ? (
             <TextWidget
-              text={`  🔥 ${state.streak}`}
-              style={{ fontSize: 12, fontWeight: "bold", color: colors.text }}
+              text={`  ·  🔥 ${state.streak}`}
+              style={{ fontSize: 12, fontWeight: "bold", color: dimText }}
             />
           ) : null}
         </FlexWidget>
-
-        {isFasting ? (
-          <PillButton
-            label={`■ ${labels.end}`}
-            color={`${colors.text}1A` as HexColor}
-            textColor={colors.text}
-            clickAction="OPEN_URI"
-            clickActionData={{ uri: FINISH_URI }}
-          />
-        ) : (
-          <PillButton
-            label={`▶ ${labels.start}`}
-            color={colors.primary}
-            textColor="#FFFFFF"
-            clickAction={WIDGET_ACTIONS.startFast}
-          />
-        )}
+        {button}
       </FlexWidget>
 
+      {/* Số giờ (trái) + mục tiêu (phải), ngay trên thanh tiến độ */}
       <FlexWidget style={{ width: "match_parent" }}>
         <FlexWidget
           style={{
@@ -173,90 +267,41 @@ export function FastTimerWidget({
             flexDirection: "row",
             alignItems: "flex-end",
             justifyContent: "space-between",
+            marginBottom: 6,
           }}
         >
           <TextWidget
-            text={mainText}
-            style={{
-              fontSize: 28,
-              fontWeight: "bold",
-              color: isFasting ? colors.text : (`${colors.text}66` as HexColor),
-            }}
+            text={hoursText}
+            style={{ fontSize: 28, fontWeight: "bold", color: hoursColor }}
           />
-          {isFasting && targetEnd ? (
+          {target}
+        </FlexWidget>
+
+        {bar}
+
+        {/* Hai mốc giờ dưới hai đầu thanh: bắt đầu — đạt mục tiêu */}
+        <FlexWidget
+          style={{
+            width: "match_parent",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 6,
+          }}
+        >
+          <TextWidget
+            text={footerLeft}
+            maxLines={1}
+            truncate="END"
+            style={{ fontSize: 12, color: dimText }}
+          />
+          {footerRight ? (
             <TextWidget
-              text={`${Math.floor(progress * 100)}%`}
-              style={{ fontSize: 13, fontWeight: "bold", color: colors.primary }}
+              text={footerRight}
+              style={{ fontSize: 12, color: dimText }}
             />
           ) : null}
         </FlexWidget>
-
-        {/* Thanh tiến độ, luôn hiện để bố cục widget không bị trống */}
-        <FlexWidget
-          style={{
-            width: "match_parent",
-            height: 6,
-            borderRadius: 3,
-            marginTop: 6,
-            backgroundColor: `${colors.text}22` as HexColor,
-            flexDirection: "row",
-          }}
-        >
-          {progress > 0 ? (
-            <FlexWidget
-              style={{
-                height: 6,
-                borderRadius: 3,
-                flex: Math.max(progress, 0.02),
-                backgroundColor: colors.primary,
-              }}
-            />
-          ) : null}
-          <FlexWidget style={{ height: 6, flex: Math.max(1 - progress, 0) }} />
-        </FlexWidget>
-
-        <TextWidget
-          text={subText}
-          style={{
-            fontSize: 12,
-            marginTop: 6,
-            color: `${colors.text}AA` as HexColor,
-          }}
-        />
       </FlexWidget>
-
-      {/* Chạm để lưu mood hôm nay, mood đang chọn được tô màu */}
-      {showMoods ? (
-        <FlexWidget
-          style={{
-            width: "match_parent",
-            flexDirection: "row",
-            flexGap: 6,
-          }}
-        >
-          {moods.map((mood, level) => (
-            <FlexWidget
-              key={level}
-              clickAction={WIDGET_ACTIONS.setMood}
-              clickActionData={{ level }}
-              style={{
-                flex: 1,
-                height: 34,
-                borderRadius: 12,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: (level === todayMood
-                  ? mood.color
-                  : `${colors.text}0D`) as HexColor,
-                borderWidth: level === todayMood ? 2 : 0,
-                borderColor: colors.primary,
-              }}
-            >
-              <TextWidget text={mood.emoji} style={{ fontSize: 17 }} />
-            </FlexWidget>
-          ))}
-        </FlexWidget>
-      ) : null}
     </FlexWidget>
   );
 }

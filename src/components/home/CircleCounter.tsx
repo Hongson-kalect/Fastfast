@@ -26,6 +26,7 @@ import { CircleCounterContent } from "./CircleCounterContent";
 import { useFastCounter } from "@/hooks/useFastCounter";
 import FastHistorySheet from "./FastHistorySheet";
 import { FastingCircle } from "./FastingCircle";
+import { CardEffect } from "../effect/slots";
 import FastingSheet from "./FastingSheet";
 import TargetSheet from "./TargetSheet";
 import { useShallow } from "zustand/react/shallow";
@@ -210,6 +211,9 @@ export const CircleCounter = ({
         overflow: "hidden",
       }}
     >
+      {/* Hoa văn nền của effect theme, dưới vòng tròn */}
+      <CardEffect />
+
       <View
         key="skia-counter-render"
         style={{ width: width, height: width }}

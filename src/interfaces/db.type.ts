@@ -17,8 +17,12 @@ export interface AppSettings {
   pixel_view_type?: "week" | "month";
   pixel_view_orientation?: "horizontal" | "vertical";
   theme?: string;
+  /** Theme trước khi chuyển sang theme limited; hết dịp sự kiện thì quay về theme này */
+  previous_theme?: string;
   emotion_pack?: string;
   target_pack?: string;
+  /** Cường độ hiệu ứng trang trí của theme (tuyết...), mặc định "light" */
+  effect_intensity?: "off" | "light" | "strong";
   language?: string;
   onboarding_done?: boolean;
 
@@ -41,6 +45,9 @@ export interface AppSettings {
   daily_reminder?: { hour: number; minute: number } | null;
   target_notification_id?: string | null;
   daily_reminder_id?: string | null;
+
+  /** Email Google Drive mà dữ liệu trên máy đang sao lưu vào (để cảnh báo khi đổi tài khoản) */
+  backup_account?: string | null;
 }
 
 // 2. Interface cho bảng user_profile

@@ -13,6 +13,7 @@ import { Tabs } from "expo-router";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useT } from "@/providers/Language";
+import { TabBarEffect } from "@/components/effect/slots";
 
 const TAB_ICONS = {
   index: "clock",
@@ -56,6 +57,7 @@ const MainTab = () => {
             />
           </View>
         ),
+        tabBarBackground: () => <TabBarEffect />,
         tabBarLabelStyle: {
           fontSize: 11,
           fontFamily: FontByWeight.semibold,

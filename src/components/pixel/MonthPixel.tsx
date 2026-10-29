@@ -19,6 +19,9 @@ export const MONTH_LABELS = [
   "Dec",
 ];
 
+// Lưới tháng có 12 ô/hàng nên ô nhỏ hơn lưới tuần: gap hẹp hơn gap-1 (4px)
+export const MONTH_GAP = 2;
+
 // Một "hàng" của layout tháng: cùng một ngày (1–31) ở cả 12 tháng
 export type MonthDayItem = { day: number };
 
@@ -90,7 +93,9 @@ const MonthPixel = React.memo(
           >
             {label}
           </View>
-          <View className="flex-row gap-1">{cells}</View>
+          <View className="flex-row" style={{ gap: MONTH_GAP }}>
+            {cells}
+          </View>
         </View>
       );
     }
@@ -103,7 +108,7 @@ const MonthPixel = React.memo(
         >
           {label}
         </View>
-        <View className="gap-1">{cells}</View>
+        <View style={{ gap: MONTH_GAP }}>{cells}</View>
       </View>
     );
   },

@@ -105,7 +105,7 @@
     "title": "종료",
     "confirm": "이 단식을 종료할까요?",
     "tooQuick": "너무 짧아서 이 기록은 삭제돼요. 계속할까요?",
-    "tooQuickSub": "단식 시간이 2시간 미만이에요.",
+    "tooQuickSub": "단식 시간이 1시간 미만이에요.",
     "failed": "이 단식은 실패로 기록돼요. 계속할까요?",
     "failedSub": "단식 시간이 16시간 미만이에요.",
     "reached": "목표를 달성했어요. 지금 종료할까요?",
@@ -285,7 +285,13 @@
     "overRest_other": "{{count}}일 과하게 쉼",
     "shieldIncrease": "실드 획득",
     "restDays_one": "{{count}}일 휴식",
-    "restDays_other": "{{count}}일 휴식"
+    "restDays_other": "{{count}}일 휴식",
+    "motivation": {
+      "full": "👑 절제의 달인! 완벽한 페이스를 유지하고 있어요.",
+      "strong": "🔥 습관이 아주 탄탄해요. 계속 이어가세요!",
+      "forming": "🌱 아주 좋은 습관을 만들어 가고 있어요!",
+      "start": "💡 여정이 막 시작됐어요. 몇 번만 더 꾸준히 해 봐요!"
+    }
   },
   "habitDetail": {
     "title": "습관 기록",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "잘못된 시간",
     "overlap": "이전 단식과 시간이 겹쳐요!",
-    "max24h": "최대 24시간 전까지만 시작할 수 있어요!",
     "future": "미래 시간은 선택할 수 없어요!",
     "title": "단식 시작 시간 선택",
     "hint": "시간이나 날짜를 눌러 시작 시점을 고르세요",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "클래식 이모지로 목표를 표시해요",
     "ionicons_targets": "Ionicons의 부드럽고 미니멀한 아이콘",
     "material_energy_targets": "에너지와 불꽃으로 도전 정도를 표현해요",
-    "feather_minimal_targets": "Feather Icons의 섬세한 선 디자인"
+    "feather_minimal_targets": "Feather Icons의 섬세한 선 디자인",
+    "christmas_mood": "크리스마스 기분: 꽁꽁 언 날부터 들뜬 연말까지",
+    "christmas_targets": "눈송이부터 산타까지 크리스마스 목표"
   },
   "pixelDetail": {
     "title": "하루 기록",
@@ -770,7 +777,12 @@
     "expoGoBody": "알림은 개발 빌드나 스토어 버전에서만 작동해요.",
     "notifOffTitle": "알림이 꺼져 있어요",
     "notifOffBody": "시스템 설정에서 FastFast 알림을 허용해 주세요.",
-    "openSettings": "설정 열기"
+    "openSettings": "설정 열기",
+    "effects": "테마 효과",
+    "effectsDesc": "버튼에 눈, 무늬 같은 장식을 표시해요",
+    "effectOff": "끄기",
+    "effectLight": "약하게",
+    "effectStrong": "강하게"
   },
   "account": {
     "title": "계정",
@@ -831,7 +843,20 @@
     "permContinue": "계속",
     "permLater": "나중에",
     "quotaTitle": "Google 저장용량이 가득 찼어요",
-    "quotaBody": "Google 저장용량(드라이브, Gmail, 포토 공용)이 가득 찼어요. 이전 백업은 그대로 안전해요. 공간을 확보하거나 백업 파일 내보내기로 다른 곳에 저장하세요."
+    "quotaBody": "Google 저장용량(드라이브, Gmail, 포토 공용)이 가득 찼어요. 이전 백업은 그대로 안전해요. 공간을 확보하거나 백업 파일 내보내기로 다른 곳에 저장하세요.",
+    "switchTitle": "백업 계정을 바꿀까요?",
+    "switchBody": "이 휴대폰의 데이터는 {{linked}}에 백업되고 있어요. 방금 {{email}}로 로그인했어요.",
+    "switchRestore": "{{email}}의 데이터 사용",
+    "switchRestoreDesc": "휴대폰의 데이터를 이 계정의 백업으로 바꿔요. 현재 데이터는 되돌릴 수 있도록 보관돼요.",
+    "switchKeep": "휴대폰의 데이터 유지",
+    "switchKeepDesc": "이제부터 {{email}}에 백업해요. 이 계정의 기존 백업이 있다면 다음 백업 때 바뀌어요.",
+    "switchCancel": "취소하고 {{email}}에서 로그아웃",
+    "undoRestore": "마지막 복원 되돌리기",
+    "undoRestoreDesc": "{{time}}의 데이터로 돌아가기",
+    "undoTitle": "복원을 되돌릴까요?",
+    "undoBody": "휴대폰의 데이터가 마지막 복원 전인 {{time}} 상태로 돌아가요.",
+    "undoneTitle": "복원을 되돌렸어요",
+    "undoneBody": "데이터가 복원 전 상태로 돌아갔어요."
   },
   "theme": {
     "title": "테마",
@@ -847,7 +872,9 @@
     "iconsTitle": "어울리는 아이콘을 쓸까요?",
     "iconsBody": "{{theme}} 테마에는 전용 기분·단식 아이콘이 있어요. 바꿀까요? 여정에서 언제든 바꿀 수 있어요.",
     "iconsUse": "사용",
-    "iconsKeep": "유지"
+    "iconsKeep": "유지",
+    "eventEndedTitle": "이벤트 테마가 끝났어요",
+    "eventEndedBody": "{{theme}} 테마는 이벤트 기간에만 쓸 수 있어서 {{fallback}} 테마로 돌아왔어요."
   },
   "notify": {
     "targetTitle": "🎉 목표 달성!",
@@ -872,7 +899,9 @@
     "end": "종료",
     "lastFast": "지난 단식",
     "endedAgo": "{{time}} 전 종료",
-    "target": "목표"
+    "target": "목표",
+    "hours": "{{n}}시간",
+    "lessThanHour": "1시간 미만"
   },
   "notFound": {
     "title": "앗!",

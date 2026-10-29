@@ -6,6 +6,7 @@ import {
   defaultDark,
   extractTheme,
   ThemeKey,
+  themes,
   ThemeType,
 } from "@/constants/themes";
 import { createDBService } from "@/database";
@@ -241,6 +242,16 @@ export async function updateTheme(
   const { settings } = useAppStore.getState();
 
   const isDarkMode = settings?.is_dark_mode ?? true;
+  const currentId = settings?.theme || "default";
+
+  // Sang theme limited thì nhớ theme đang dùng để quay về khi hết dịp sự kiện
+  const rememberPrevious =
+    themes[themeId]?.type === "limited" &&
+    themeId !== currentId &&
+    themes[currentId]?.type !== "limited";
+  if (rememberPrevious) {
+    await dbService.setting("previous_theme", currentId);
+  }
 
   await dbService.changeTheme(themeId);
 
@@ -253,6 +264,7 @@ export async function updateTheme(
     settings: {
       ...(settings ?? {}),
       theme: themeId.toString(),
+      ...(rememberPrevious ? { previous_theme: currentId } : {}),
     },
     theme,
   });

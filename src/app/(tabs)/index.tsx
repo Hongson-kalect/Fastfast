@@ -6,6 +6,7 @@ import { BodyProgressInfo } from "@/components/home/InfoContent";
 import { RecentFastCard } from "@/components/home/LastFastLog";
 import { SwapButton } from "@/components/home/SwapButton";
 import { SectionTitle } from "@/components/SectionTitle";
+import { ScreenEffect } from "@/components/effect/slots";
 import { RADIUS } from "@/constants/design";
 import {
   MIN_FAST_DURATION,
@@ -120,13 +121,14 @@ const HomeScreen = () => {
     [isCounting, startTime, currentFastSession, handleFinishFast, startFast],
   );
 
-  // Nút Kết thúc trên widget mở app qua fastfast://?widgetAction=finish
+  // Nút trên widget mở app qua fastfast://?widgetAction=start|finish
   const { widgetAction } = useLocalSearchParams<{ widgetAction?: string }>();
   useEffect(() => {
     // Chờ app nạp xong dữ liệu mới biết có đang nhịn hay không
-    if (widgetAction !== "finish" || !settings) return;
+    if (!widgetAction || !settings) return;
     router.setParams({ widgetAction: undefined });
-    if (isCounting) handleFinishFast();
+    if (widgetAction === "finish" && isCounting) handleFinishFast();
+    if (widgetAction === "start" && !isCounting) startFast();
   }, [widgetAction, settings, isCounting]);
 
   const openBodyProgressInfo = () => {
@@ -145,6 +147,8 @@ const HomeScreen = () => {
 
   return (
     <View style={{ paddingTop: inset.top, paddingBottom: inset.bottom }} className="flex-1 bg-background">
+      {/* Effect nền của theme (tuyết rơi thưa), nằm dưới nội dung */}
+      <ScreenEffect />
       {/* Tối ưu StatusBar bằng SafeAreaView chuẩn xác */}
         <ScrollView
           showsVerticalScrollIndicator={false}

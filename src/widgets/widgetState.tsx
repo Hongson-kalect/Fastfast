@@ -1,16 +1,13 @@
 import { FASTING_TARGETS } from "@/constants/data";
-import { EMOTION_PACKS, getEmotionPack } from "@/constants/emotions";
 import { useAppStore } from "@/stores/appStore";
-import { onMoodChange } from "@/utils/moodEvents";
 import { TargetFrame } from "@/utils/targetColor";
-import { getLocalTodayStr } from "@/utils/timer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "i18next";
 import { Platform } from "react-native";
 
 /**
  * Ảnh chụp trạng thái cho widget. Widget chạy trong headless JS nên không đọc
- * được store khi app đã tắt; app ghi ảnh chụp này mỗi khi phiên, theme hay mood đổi.
+ * được store khi app đã tắt; app ghi ảnh chụp này mỗi khi phiên, streak, theme hay ngôn ngữ đổi.
  */
 export type FastWidgetState = {
   startTime: number | null;
@@ -19,11 +16,9 @@ export type FastWidgetState = {
   /** Mục tiêu đang chọn, hiện khi chưa có phiên nào */
   defaultTarget?: number | null;
   streak?: number;
-  /** Mood hôm nay; widget bỏ qua khi date không còn là hôm nay */
-  mood?: { date: string; level: number } | null;
-  /** 5 mức mood (0–4) theo bộ cảm xúc đang dùng */
-  moods?: { emoji: string; color: string }[];
-  colors: { card: string; text: string; primary: string };
+  /** Tên mục tiêu đã dịch theo số giờ, VD { "20": "Chiến binh" } */
+  targetNames?: Record<string, string>;
+  colors: { card: string; text: string; primary: string; success?: string };
   /** Khung giờ + màu các mục tiêu, để widget tô màu như vòng tròn ở Home */
   targetFrames?: TargetFrame[];
   /** Nhãn đã dịch sẵn theo ngôn ngữ app, vì headless JS không có i18n của app */
@@ -43,6 +38,11 @@ export type WidgetLabels = {
   /** Có chỗ trống {time}, widget tự điền thời gian */
   endedAgo: string;
   target: string;
+  /** Có chỗ trống {n}, VD "14 giờ" */
+  hours?: string;
+  lessThanHour?: string;
+  /** Thứ viết tắt, CN → T7 (index theo Date.getDay()) */
+  weekdays?: string[];
 };
 
 const STORAGE_KEY = "fastfast.widget.state";
@@ -61,16 +61,9 @@ export const loadWidgetState = async (): Promise<FastWidgetState | null> => {
 export const saveWidgetState = (state: FastWidgetState) =>
   AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
-const snapshot = (): Omit<FastWidgetState, "mood"> => {
+const snapshot = (): FastWidgetState => {
   const { currentFastSession, theme, settings, userProfile } =
     useAppStore.getState();
-  const isDark = settings?.is_dark_mode ?? true;
-
-  // Widget chỉ vẽ được chữ: bộ cảm xúc dùng icon dạng component thì lấy emoji mặc định
-  const pack = getEmotionPack(settings?.emotion_pack);
-  const emotions = pack.emotions.every((item) => typeof item.icon.light === "string")
-    ? pack.emotions
-    : EMOTION_PACKS.default.emotions;
 
   return {
     startTime: currentFastSession?.start_time ?? null,
@@ -78,11 +71,18 @@ const snapshot = (): Omit<FastWidgetState, "mood"> => {
     targetHours: currentFastSession?.target_duration ?? null,
     defaultTarget: settings?.target ?? null,
     streak: userProfile?.current_streak ?? 0,
-    moods: emotions.map((item) => ({
-      emoji: String(item.icon[isDark ? "dark" : "light"]),
-      color: item.color[isDark ? "dark" : "light"],
-    })),
-    colors: { card: theme.card, text: theme.text, primary: theme.primary },
+    targetNames: Object.fromEntries(
+      FASTING_TARGETS.map((item) => [
+        String(item.hours),
+        i18n.t(`targets.${item.id}.label`),
+      ]),
+    ),
+    colors: {
+      card: theme.card,
+      text: theme.text,
+      primary: theme.primary,
+      success: theme.success,
+    },
     targetFrames: FASTING_TARGETS.map((item) => ({
       hours: item.hours,
       toHours: item.toHours,
@@ -100,6 +100,9 @@ const snapshot = (): Omit<FastWidgetState, "mood"> => {
       lastFast: i18n.t("widget.lastFast"),
       endedAgo: i18n.t("widget.endedAgo", { time: "{time}" }),
       target: i18n.t("widget.target"),
+      hours: i18n.t("widget.hours", { n: "{n}" }),
+      lessThanHour: i18n.t("widget.lessThanHour"),
+      weekdays: Array.from({ length: 7 }, (_, day) => i18n.t(`date.weekday.${day}`)),
     },
   };
 };
@@ -126,36 +129,7 @@ export const renderWidgets = async (state: FastWidgetState) => {
   });
 };
 
-const pushToWidget = async () => {
-  // Mood không có trong store của app nên giữ từ lần ghi trước
-  const previous = await loadWidgetState();
-  await renderWidgets({ ...snapshot(), mood: previous?.mood ?? null });
-};
-
-// Màn hình trong app đăng ký để nạp lại khi widget ghi dữ liệu (app đang chạy nền)
-const changeListeners = new Set<() => void>();
-
-export const onWidgetDataChange = (listener: () => void) => {
-  changeListeners.add(listener);
-  return () => {
-    changeListeners.delete(listener);
-  };
-};
-
-export const emitWidgetDataChange = () => {
-  changeListeners.forEach((listener) => listener());
-};
-
-/** Gọi khi mood của một ngày đổi; widget chỉ quan tâm mood hôm nay. */
-export const syncWidgetMood = async (date: string, level: number | null) => {
-  if (Platform.OS !== "android" || date !== getLocalTodayStr()) return;
-  const previous = await loadWidgetState();
-  if (!previous) return;
-  await renderWidgets({
-    ...previous,
-    mood: level == null ? null : { date, level },
-  });
-};
+const pushToWidget = () => renderWidgets(snapshot());
 
 /** Theo dõi phiên nhịn, streak, theme và ngôn ngữ, đẩy sang widget khi đổi. Trả về hàm huỷ. */
 export const startWidgetSync = () => {
@@ -168,11 +142,6 @@ export const startWidgetSync = () => {
   };
   i18n.on("languageChanged", onLanguageChanged);
 
-  // App tự đổi mood (Home, Journey) → cập nhật mood trên widget
-  const offMoodChange = onMoodChange((date, level) => {
-    syncWidgetMood(date, level).catch((e) => console.warn("widget sync error", e));
-  });
-
   const unsubscribe = useAppStore.subscribe((state, prev) => {
     const session = state.currentFastSession;
     const prevSession = prev.currentFastSession;
@@ -182,7 +151,6 @@ export const startWidgetSync = () => {
       session?.target_duration !== prevSession?.target_duration ||
       state.userProfile?.current_streak !== prev.userProfile?.current_streak ||
       state.settings?.target !== prev.settings?.target ||
-      state.settings?.emotion_pack !== prev.settings?.emotion_pack ||
       state.theme !== prev.theme
     ) {
       pushToWidget().catch((e) => console.warn("widget sync error", e));
@@ -191,7 +159,6 @@ export const startWidgetSync = () => {
 
   return () => {
     unsubscribe();
-    offMoodChange();
     i18n.off("languageChanged", onLanguageChanged);
   };
 };

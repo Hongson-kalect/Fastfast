@@ -9,6 +9,7 @@ import CircularProgress from "../CircleProgress";
 import { ThemedText } from "../themed-text";
 import HabitBottomSheet from "./HabitBottomSheet";
 import { ShieldInfo } from "./InfoContent";
+import { ButtonEffect } from "../effect/slots";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/providers/Language";
 
@@ -42,6 +43,7 @@ const Pill = ({
     <ThemedText size="sm" weight="bold" colorHex={color}>
       {value}
     </ThemedText>
+    <ButtonEffect variant="chip" radius={RADIUS.pill} color={color} isCounting={false} />
   </Pressable>
 );
 
@@ -123,6 +125,7 @@ const HomeHeader = () => {
             </View>
           )}
         />
+        <ButtonEffect variant="chip" radius={32} color={theme.primary} isCounting={false} />
       </Pressable>
     </View>
   );

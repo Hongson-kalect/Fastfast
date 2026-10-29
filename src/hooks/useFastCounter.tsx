@@ -13,17 +13,25 @@ export const useFastCounter = () => {
   const endTime = useAppStore(
     (state) => state.currentFastSession?.end_time ?? null,
   );
-  const [counter, setCounter] = useState(0);
+  const compute = () => {
+    if (!startTime) return 0;
+    const end = endTime ?? Date.now();
+    // Giờ bắt đầu ở tương lai (chỉnh giờ máy, đổi múi giờ) không được thành đếm ngược
+    return Math.max(0, Math.floor((end - startTime) / 1000));
+  };
+
+  const [counter, setCounter] = useState(compute);
+  // Đổi phiên thì tính lại ngay trong lần render đó: nếu chờ useEffect, frame đầu
+  // sau khi bấm Bắt đầu vẫn hiện thời lượng của phiên trước
+  const [source, setSource] = useState({ startTime, endTime });
+  if (source.startTime !== startTime || source.endTime !== endTime) {
+    setSource({ startTime, endTime });
+    setCounter(compute());
+  }
 
   useEffect(() => {
-    const tick = () => {
-      if (!startTime) return setCounter(0);
-      const end = endTime ?? Date.now();
-      // Giờ bắt đầu ở tương lai (chỉnh giờ máy, đổi múi giờ) không được thành đếm ngược
-      setCounter(Math.max(0, Math.floor((end - startTime) / 1000)));
-    };
+    const tick = () => setCounter(compute());
 
-    tick();
     if (!startTime || endTime) return;
 
     const interval = setInterval(tick, 1000);

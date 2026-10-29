@@ -16,6 +16,7 @@ type Props = {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   onSaveImage: () => void;
+  isSavingImage?: boolean;
 };
 const PixelHeader = ({
   stats,
@@ -25,6 +26,7 @@ const PixelHeader = ({
   setYear,
 
   onSaveImage,
+  isSavingImage,
 }: Props) => {
   const t = useT();
   const theme = useAppStore((state) => state.theme);
@@ -76,6 +78,7 @@ const PixelHeader = ({
           trackingType={viewMode}
           setTrackingType={setViewMode}
           onSaveImage={onSaveImage}
+          isSavingImage={isSavingImage}
         />
       </View>
     </>

@@ -105,7 +105,7 @@
     "title": "Kết thúc",
     "confirm": "Bạn chắc chắn muốn kết thúc phiên nhịn?",
     "tooQuick": "Phiên này quá ngắn và sẽ bị xoá. Tiếp tục?",
-    "tooQuickSub": "Thời gian nhịn dưới 2 giờ.",
+    "tooQuickSub": "Thời gian nhịn dưới 1 giờ.",
     "failed": "Phiên này sẽ bị đánh dấu thất bại. Tiếp tục?",
     "failedSub": "Thời gian nhịn dưới 16 giờ.",
     "reached": "Bạn đã đạt mục tiêu. Kết thúc ngay?",
@@ -285,7 +285,13 @@
     "overRest_other": "Nghỉ quá {{count}} ngày",
     "shieldIncrease": "Nhận thêm shield",
     "restDays_one": "Nghỉ {{count}} ngày",
-    "restDays_other": "Nghỉ {{count}} ngày"
+    "restDays_other": "Nghỉ {{count}} ngày",
+    "motivation": {
+      "full": "👑 Bậc thầy kỷ luật! Bạn đã duy trì phong độ hoàn hảo.",
+      "strong": "🔥 Thói quen cực kỳ vững chắc, tiếp tục phát huy nhé!",
+      "forming": "🌱 Bạn đang hình thành thói quen rất tốt!",
+      "start": "💡 Mới bắt đầu hành trình, hãy kiên trì thêm vài phiên nữa!"
+    }
   },
   "habitDetail": {
     "title": "Nhật ký Habit",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Thời gian không hợp lệ",
     "overlap": "Trùng thời gian với phiên trước đó!",
-    "max24h": "Chỉ được phép bắt đầu sớm tối đa 24 giờ!",
     "future": "Không thể chọn thời gian ở tương lai!",
     "title": "Chọn thời gian bắt đầu nhịn",
     "hint": "Chạm vào giờ hoặc ngày để chọn thời điểm bắt đầu",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Mốc mục tiêu biểu thị bằng Emoji truyền thống",
     "ionicons_targets": "Bộ icon tối giản, mượt mà từ Ionicons",
     "material_energy_targets": "Thể hiện độ thử thách qua năng lượng và ngọn lửa",
-    "feather_minimal_targets": "Thiết kế nét mảnh tinh xảo từ Feather Icons"
+    "feather_minimal_targets": "Thiết kế nét mảnh tinh xảo từ Feather Icons",
+    "christmas_mood": "Cảm xúc Giáng sinh: từ lạnh cóng đến rộn ràng ngày lễ",
+    "christmas_targets": "Mốc Giáng sinh từ bông tuyết đến ông già Noel"
   },
   "pixelDetail": {
     "title": "Nhật ký ngày",
@@ -770,7 +777,12 @@
     "expoGoBody": "Thông báo cần bản build dev hoặc bản trên cửa hàng.",
     "notifOffTitle": "Thông báo đang tắt",
     "notifOffBody": "Hãy cho phép FastFast gửi thông báo trong cài đặt hệ thống.",
-    "openSettings": "Mở cài đặt"
+    "openSettings": "Mở cài đặt",
+    "effects": "Hiệu ứng theme",
+    "effectsDesc": "Trang trí trên các nút như tuyết đọng, hoa văn",
+    "effectOff": "Tắt",
+    "effectLight": "Nhẹ",
+    "effectStrong": "Mạnh"
   },
   "account": {
     "title": "Tài khoản",
@@ -831,7 +843,20 @@
     "permContinue": "Tiếp tục",
     "permLater": "Để sau",
     "quotaTitle": "Bộ nhớ Google đã đầy",
-    "quotaBody": "Bộ nhớ Google của bạn (dùng chung cho Drive, Gmail và Photos) đã hết chỗ. Bản sao lưu trước đó vẫn an toàn. Hãy giải phóng bớt dung lượng, hoặc dùng Xuất file sao lưu để lưu một bản ở nơi khác."
+    "quotaBody": "Bộ nhớ Google của bạn (dùng chung cho Drive, Gmail và Photos) đã hết chỗ. Bản sao lưu trước đó vẫn an toàn. Hãy giải phóng bớt dung lượng, hoặc dùng Xuất file sao lưu để lưu một bản ở nơi khác.",
+    "switchTitle": "Đổi tài khoản sao lưu?",
+    "switchBody": "Dữ liệu trên máy đang được sao lưu vào {{linked}}. Bạn vừa đăng nhập {{email}}.",
+    "switchRestore": "Dùng dữ liệu của {{email}}",
+    "switchRestoreDesc": "Thay dữ liệu trên máy bằng bản sao lưu của tài khoản này. Dữ liệu hiện tại được giữ lại để hoàn tác.",
+    "switchKeep": "Giữ dữ liệu trên máy",
+    "switchKeepDesc": "Từ giờ sao lưu vào {{email}}. Bản sao lưu cũ của tài khoản này (nếu có) sẽ bị thay ở lần sao lưu tới.",
+    "switchCancel": "Huỷ và đăng xuất {{email}}",
+    "undoRestore": "Hoàn tác lần khôi phục",
+    "undoRestoreDesc": "Quay lại dữ liệu lúc {{time}}",
+    "undoTitle": "Hoàn tác khôi phục?",
+    "undoBody": "Dữ liệu trên máy sẽ quay về như lúc {{time}}, trước lần khôi phục gần nhất.",
+    "undoneTitle": "Đã hoàn tác",
+    "undoneBody": "Dữ liệu đã quay về như trước lần khôi phục."
   },
   "theme": {
     "title": "Chủ đề",
@@ -847,7 +872,9 @@
     "iconsTitle": "Dùng icon đi kèm?",
     "iconsBody": "Theme {{theme}} có bộ icon mood và fast riêng. Đổi sang bộ này không? Bạn có thể đổi lại bất cứ lúc nào trong Hành trình.",
     "iconsUse": "Dùng icon",
-    "iconsKeep": "Giữ nguyên"
+    "iconsKeep": "Giữ nguyên",
+    "eventEndedTitle": "Theme sự kiện đã kết thúc",
+    "eventEndedBody": "Theme {{theme}} chỉ dùng được trong dịp sự kiện, FastFast đã chuyển về theme {{fallback}}."
   },
   "notify": {
     "targetTitle": "🎉 Đã đạt mục tiêu!",
@@ -872,7 +899,9 @@
     "end": "Kết thúc",
     "lastFast": "Phiên trước",
     "endedAgo": "kết thúc {{time}} trước",
-    "target": "Mục tiêu"
+    "target": "Mục tiêu",
+    "hours": "{{n}} giờ",
+    "lessThanHour": "< 1 giờ"
   },
   "notFound": {
     "title": "Ối!",

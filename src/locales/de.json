@@ -105,7 +105,7 @@
     "title": "Beenden",
     "confirm": "Möchtest du dieses Fasten wirklich beenden?",
     "tooQuick": "Dieses Fasten ist zu kurz und wird gelöscht. Fortfahren?",
-    "tooQuickSub": "Das Fasten dauert weniger als 2 Stunden.",
+    "tooQuickSub": "Das Fasten dauert weniger als 1 Stunde.",
     "failed": "Dieses Fasten wird als nicht geschafft markiert. Fortfahren?",
     "failedSub": "Das Fasten dauert weniger als 16 Stunden.",
     "reached": "Ziel erreicht. Jetzt beenden?",
@@ -285,7 +285,13 @@
     "overRest_other": "{{count}} Ruhetage zu viel",
     "shieldIncrease": "Schild erhalten",
     "restDays_one": "{{count}} Ruhetag",
-    "restDays_other": "{{count}} Ruhetage"
+    "restDays_other": "{{count}} Ruhetage",
+    "motivation": {
+      "full": "👑 Meister der Disziplin! Du hast ein perfektes Tempo gehalten.",
+      "strong": "🔥 Deine Gewohnheit ist richtig gefestigt – weiter so!",
+      "forming": "🌱 Du baust gerade eine tolle Gewohnheit auf!",
+      "start": "💡 Deine Reise hat gerade erst begonnen – bleib noch ein paar Fasten dran!"
+    }
   },
   "habitDetail": {
     "title": "Gewohnheitsprotokoll",
@@ -387,7 +393,6 @@
   "startTime": {
     "invalid": "Ungültige Zeit",
     "overlap": "Überschneidet sich mit deinem letzten Fasten!",
-    "max24h": "Du kannst höchstens 24 Stunden früher starten!",
     "future": "Du kannst keine Zeit in der Zukunft wählen!",
     "title": "Startzeit wählen",
     "hint": "Tippe auf Uhrzeit oder Datum, um den Start zu wählen",
@@ -534,7 +539,9 @@
     "default_emoji_targets": "Zielstufen als klassische Emojis",
     "ionicons_targets": "Schlichte, runde Symbole von Ionicons",
     "material_energy_targets": "Zeigt die Herausforderung mit Energie und Flammen",
-    "feather_minimal_targets": "Feines Liniendesign von Feather Icons"
+    "feather_minimal_targets": "Feines Liniendesign von Feather Icons",
+    "christmas_mood": "Weihnachtsstimmungen: von eiskalt bis festlich froh",
+    "christmas_targets": "Weihnachtliche Meilensteine von der Schneeflocke bis zum Weihnachtsmann"
   },
   "pixelDetail": {
     "title": "Tagebuch",
@@ -770,7 +777,12 @@
     "expoGoBody": "Mitteilungen brauchen eine Entwicklungs- oder Store-Version.",
     "notifOffTitle": "Mitteilungen sind aus",
     "notifOffBody": "Erlaube Mitteilungen für FastFast in den Systemeinstellungen.",
-    "openSettings": "Einstellungen öffnen"
+    "openSettings": "Einstellungen öffnen",
+    "effects": "Theme-Effekte",
+    "effectsDesc": "Verzierungen auf Schaltflächen, etwa Schnee und Muster",
+    "effectOff": "Aus",
+    "effectLight": "Leicht",
+    "effectStrong": "Stark"
   },
   "account": {
     "title": "Konto",
@@ -831,7 +843,20 @@
     "permContinue": "Weiter",
     "permLater": "Nicht jetzt",
     "quotaTitle": "Google-Speicher ist voll",
-    "quotaBody": "Dein Google-Speicher (geteilt von Drive, Gmail und Fotos) ist voll. Dein vorheriges Backup bleibt erhalten. Gib Speicher frei oder nutze Backup-Datei exportieren, um eine Kopie woanders zu speichern."
+    "quotaBody": "Dein Google-Speicher (geteilt von Drive, Gmail und Fotos) ist voll. Dein vorheriges Backup bleibt erhalten. Gib Speicher frei oder nutze Backup-Datei exportieren, um eine Kopie woanders zu speichern.",
+    "switchTitle": "Backup-Konto wechseln?",
+    "switchBody": "Die Daten auf diesem Telefon werden in {{linked}} gesichert. Du hast dich gerade mit {{email}} angemeldet.",
+    "switchRestore": "Daten von {{email}} verwenden",
+    "switchRestoreDesc": "Ersetzt die Daten auf dem Telefon durch das Backup dieses Kontos. Deine aktuellen Daten bleiben zum Rückgängigmachen erhalten.",
+    "switchKeep": "Daten auf dem Telefon behalten",
+    "switchKeepDesc": "Ab jetzt wird in {{email}} gesichert. Ein vorhandenes Backup dieses Kontos wird beim nächsten Sichern ersetzt.",
+    "switchCancel": "Abbrechen und von {{email}} abmelden",
+    "undoRestore": "Letzte Wiederherstellung rückgängig machen",
+    "undoRestoreDesc": "Zurück zu deinen Daten vom {{time}}",
+    "undoTitle": "Wiederherstellung rückgängig machen?",
+    "undoBody": "Die Daten auf dem Telefon werden auf den Stand vom {{time}} zurückgesetzt, vor der letzten Wiederherstellung.",
+    "undoneTitle": "Rückgängig gemacht",
+    "undoneBody": "Deine Daten sind wieder auf dem Stand vor der Wiederherstellung."
   },
   "theme": {
     "title": "Design",
@@ -847,7 +872,9 @@
     "iconsTitle": "Passende Icons verwenden?",
     "iconsBody": "Das Design {{theme}} bringt eigene Stimmungs- und Fasten-Icons mit. Wechseln? Du kannst sie jederzeit im Verlauf ändern.",
     "iconsUse": "Verwenden",
-    "iconsKeep": "Behalten"
+    "iconsKeep": "Behalten",
+    "eventEndedTitle": "Event-Theme beendet",
+    "eventEndedBody": "Das Theme {{theme}} war nur während des Events verfügbar, daher hat FastFast zu {{fallback}} zurückgewechselt."
   },
   "notify": {
     "targetTitle": "🎉 Ziel erreicht!",
@@ -872,7 +899,9 @@
     "end": "Beenden",
     "lastFast": "Letztes Fasten",
     "endedAgo": "vor {{time}} beendet",
-    "target": "Ziel"
+    "target": "Ziel",
+    "hours": "{{n}} Std.",
+    "lessThanHour": "< 1 Std."
   },
   "notFound": {
     "title": "Hoppla!",

@@ -11,6 +11,7 @@ import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BeginnerTip } from "../BeginnerTip";
 import { ThemedText } from "../themed-text";
 import { HabitDetailModal } from "./HabitDetailModal";
@@ -29,6 +30,7 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
   const t = useT();
   const [habitLogs, setHabitLogs] = useState<(HabitLog & FastSession)[]>([]);
   const dbService = useDBService();
+  const { bottom } = useSafeAreaInsets();
 
   const getHabitLogs = async () => {
     const res = await dbService?.getHabitLogs();
@@ -50,6 +52,8 @@ const HabitBottomSheet: React.FC<HabitBottomSheetProps> = (props) => {
       )}
       contentContainerStyle={{
         gap: 2,
+        // Mục cuối không dính sát thanh điều hướng
+        paddingBottom: bottom + 40,
       }}
       ListHeaderComponent={
         <HabitBottomSheetHeader habitCount={habitLogs.length} />

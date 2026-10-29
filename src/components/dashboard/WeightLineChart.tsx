@@ -55,6 +55,7 @@ const WeightLineChart = ({
   };
 
   const isDenseData = data.length > 15;
+  const maxXTicks = Math.max(2, Math.floor((width - 120) / 40));
   const activeBarFont = isDenseData ? font : font3;
   const activeLineFont = isDenseData ? font : font2;
   const charWidthOffset = isDenseData ? 3 : 4;
@@ -263,7 +264,8 @@ const WeightLineChart = ({
             xAxis={{
               font,
               labelColor: theme.text + "88",
-              tickCount: data.length,
+              // Mỗi nhãn cần ~40px: nhiều cột (30 ngày, 24 tuần...) chỉ hiện một số nhãn
+              tickCount: Math.min(data.length, maxXTicks),
             }}
             domainPadding={{
               top: 400 / 6,
@@ -300,7 +302,9 @@ const WeightLineChart = ({
                     />
                   </Bar>
 
+                  {/* Nhiều cột (30 ngày, 24 tuần...) thì số trên cột đè nhau: chỉ xem qua tooltip */}
                   {!isActive &&
+                    !isDenseData &&
                     points.fast.map((point, index) => {
                       const val = chartData[index]?.fast;
 

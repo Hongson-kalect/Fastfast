@@ -6,6 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { ThemedText } from "../../themed-text";
 import { useT } from "@/providers/Language";
+import { ButtonEffect } from "@/components/effect/slots";
 
 type SwapFastButtonProps = {
   isCounting: boolean;
@@ -63,8 +64,10 @@ export const SwapFastButton = ({
     >
       {isCounting ? (
         <View
-          className="h-16 items-center justify-center border-2 px-6"
+          className="items-center justify-center border-2 px-6"
           style={{
+            // Cùng chiều cao với nút gradient "Bắt đầu" (h-16 của NativeWind chỉ ra 56px)
+            height: 64,
             borderRadius: RADIUS.pill,
             borderColor: color,
             backgroundColor: color + "14",
@@ -88,6 +91,13 @@ export const SwapFastButton = ({
           {content}
         </LinearGradient>
       )}
+
+      <ButtonEffect
+        variant="primary"
+        radius={RADIUS.pill}
+        color={color}
+        isCounting={isCounting}
+      />
     </Pressable>
   );
 };

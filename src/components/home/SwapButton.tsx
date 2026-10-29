@@ -22,7 +22,6 @@ import { SwapImageButton } from "./SwapButton/SwapImageButton";
 import { SwapMoodButton } from "./SwapButton/SwapMoodButton";
 import { runDbTask } from "@/utils/dbError";
 import { useFocusEffect } from "expo-router";
-import { onWidgetDataChange } from "@/widgets/widgetState";
 import { useShallow } from "zustand/react/shallow";
 
 type SwapButtonProps = {
@@ -188,12 +187,6 @@ export const SwapButton = React.memo(
       detectTodayNote();
       getCurrentWeight();
     }, [dbService]));
-
-    // Chọn mood trên widget khi app đang chạy nền: nạp lại ghi chú hôm nay
-    useEffect(
-      () => onWidgetDataChange(() => detectTodayNote()),
-      [dbService],
-    );
 
     useEffect(() => {
       if (!todayNote) return;

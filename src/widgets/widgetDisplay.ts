@@ -5,13 +5,10 @@ import type { FastWidgetState, WidgetLabels } from "./widgetState";
 
 export type HexColor = `#${string}`;
 
-/** clickAction của các nút; widgetTaskHandler xử lý ngay trong headless JS */
-export const WIDGET_ACTIONS = {
-  startFast: "START_FAST",
-  setMood: "SET_MOOD",
-} as const;
-
-// Kết thúc phiên cần xác nhận và hiện kết quả nên mở app thay vì làm ngay trên widget
+// Nút trên widget mở app rồi để app thực hiện: thao tác chạy nền trên widget
+// không chạy được khi hệ điều hành đã buộc dừng app
+export const START_URI = "fastfast://?widgetAction=start";
+// Kết thúc phiên cần xác nhận và hiện kết quả
 export const FINISH_URI = "fastfast://?widgetAction=finish";
 
 // Dùng khi trạng thái cũ chưa có nhãn (ghi trước khi có đa ngôn ngữ)
@@ -27,6 +24,9 @@ export const DEFAULT_LABELS: WidgetLabels = {
   lastFast: "Last fast",
   endedAgo: "Ended {time} ago",
   target: "Target",
+  hours: "{n}h",
+  lessThanHour: "< 1h",
+  weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 };
 
 export const pad = (n: number) => String(n).padStart(2, "0");
@@ -36,23 +36,28 @@ export const formatClock = (time: number) => {
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-// Widget Android không tự đếm từng giây: hiển thị giờ:phút, cập nhật khi app
-// đổi trạng thái và theo chu kỳ 30 phút của hệ thống.
-export const formatDuration = (ms: number) => {
-  const minutes = Math.max(0, Math.floor(ms / 60000));
-  return `${Math.floor(minutes / 60)}h ${pad(minutes % 60)}m`;
+// Widget chỉ được vẽ lại khi app đổi trạng thái, theo chu kỳ 30 phút, và không
+// cập nhật gì khi hệ điều hành đã buộc dừng app. Vì vậy chỉ hiện giờ tròn
+// (sai lệch vài chục phút không lộ) và các mốc giờ cố định (luôn đúng).
+
+/** Số giờ tròn xuống theo ngôn ngữ app, VD "14 giờ", "< 1 giờ". */
+export const formatHours = (ms: number, labels: WidgetLabels) => {
+  const hours = Math.floor(Math.max(0, ms) / 3_600_000);
+  return hours < 1
+    ? (labels.lessThanHour ?? DEFAULT_LABELS.lessThanHour!)
+    : (labels.hours ?? DEFAULT_LABELS.hours!).replace("{n}", String(hours));
 };
 
-/** Như formatDuration nhưng bỏ giờ khi bằng 0, VD "2m", "3h 05m". */
-export const formatElapsedShort = (ms: number) => {
-  const minutes = Math.max(0, Math.floor(ms / 60000));
-  return minutes < 60 ? `${minutes}m` : formatDuration(ms);
-};
+/** Dạng ngắn cho widget mini, VD "14h". */
+export const formatShortHours = (ms: number) =>
+  `${Math.floor(Math.max(0, ms) / 3_600_000)}h`;
 
-/** Dạng gọn cho widget nhỏ, VD "16:05". */
-export const formatShortDuration = (ms: number) => {
-  const minutes = Math.max(0, Math.floor(ms / 60000));
-  return `${Math.floor(minutes / 60)}:${pad(minutes % 60)}`;
+/** Mốc giờ: hôm nay chỉ giờ ("20:15"), ngày khác thêm thứ viết tắt ("T3 20:15"). */
+export const formatWhen = (time: number, labels: WidgetLabels) => {
+  const date = new Date(time);
+  if (date.toDateString() === new Date().toDateString()) return formatClock(time);
+  const weekdays = labels.weekdays ?? DEFAULT_LABELS.weekdays!;
+  return `${weekdays[date.getDay()]} ${formatClock(time)}`;
 };
 
 export const isFastingState = (state: FastWidgetState | null) =>
@@ -93,5 +98,6 @@ export const getWidgetColors = (state: FastWidgetState | null) => {
     background: (state?.colors.card ?? "#FFFFFF") as HexColor,
     text: (state?.colors.text ?? "#262626") as HexColor,
     primary: primary as HexColor,
+    success: (state?.colors.success ?? "#4ADE80") as HexColor,
   };
 };

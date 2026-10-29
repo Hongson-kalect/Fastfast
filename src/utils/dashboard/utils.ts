@@ -47,7 +47,8 @@ export const initChartData = (chartRange: ChartRangeConfig) => {
     if (chartRange.unit === "week") {
       res.push({
         key: getBucketKey(dayPointer, "week"),
-        x: `Week ${getWeek(dayPointer)}`,
+        // Nhãn ngắn: "Week 42" chiếm gấp đôi chỗ và đè nhau khi có 12–24 cột
+        x: `W${getWeek(dayPointer)}`,
         weight: 0,
         fast: 0,
         date,

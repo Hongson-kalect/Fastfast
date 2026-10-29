@@ -10,6 +10,7 @@ import { ThemedText } from "@/components/themed-text";
 import AchievementBadge, {
   achievementItemTitle,
   achievementName,
+  findAchievementItem,
 } from "@/components/AchievementBadge";
 import AchievementShowcase, {
   SHOWCASE_LIMIT,
@@ -54,6 +55,12 @@ const DEFAULT_REMINDER = { hour: 20, minute: 0 };
 
 
 const WEEK_STARTS = ["monday", "sunday"] as const;
+const EFFECT_INTENSITIES = ["off", "light", "strong"] as const;
+const EFFECT_LABEL_KEYS = {
+  off: "settings.effectOff",
+  light: "settings.effectLight",
+  strong: "settings.effectStrong",
+} as const;
 
 export default function SettingsScreen() {
   const { settings, updateSetting, currentFastSession, userProfile } = useAppStore(
@@ -144,6 +151,18 @@ export default function SettingsScreen() {
     });
   };
 
+  const effectIntensity = settings?.effect_intensity ?? "light";
+  const handleEffect = () =>
+    chooseOption(
+      t("settings.effects"),
+      EFFECT_INTENSITIES.map((value) => ({
+        value,
+        label: t(EFFECT_LABEL_KEYS[value]),
+      })),
+      effectIntensity,
+      (value) => saveSetting("effect_intensity", value),
+    );
+
   const openThemeModal = () => {
     present(
       <ThemeBottomSheet
@@ -218,9 +237,19 @@ export default function SettingsScreen() {
       title: t("settings.section.showcase"),
       message: t("settings.showcasePick", { max: SHOWCASE_LIMIT }),
       options,
-      values: (settings?.showcase_achievements ?? []).filter((id) =>
-        confirmed.has(id),
-      ),
+      // Huy hiệu đã chọn ở bậc thấp hơn được đổi sang bậc cao nhất của cùng thành tựu,
+      // nếu không nó vẫn chiếm chỗ nhưng không có trong danh sách để bỏ chọn
+      values: [
+        ...new Set(
+          (settings?.showcase_achievements ?? []).flatMap((id) => {
+            const achievementId = findAchievementItem(id)?.achievement.id;
+            const option = options.find(
+              (entry) => findAchievementItem(entry.value)?.achievement.id === achievementId,
+            );
+            return option ? [option.value] : [];
+          }),
+        ),
+      ],
       max: SHOWCASE_LIMIT,
       okText: t("common.save"),
       onConfirm: (values) =>
@@ -415,6 +444,17 @@ export default function SettingsScreen() {
             value={capitalize(settings?.theme || "default")}
             onPress={openThemeModal}
           />
+
+          {/* Chỉ hiện khi theme đang dùng có hiệu ứng trang trí */}
+          {themes[settings?.theme || "default"]?.effect && (
+            <SettingsValueItem
+              icon="star"
+              title={t("settings.effects")}
+              description={t("settings.effectsDesc")}
+              value={t(EFFECT_LABEL_KEYS[effectIntensity])}
+              onPress={handleEffect}
+            />
+          )}
         </SettingsSection>
 
         {/* General */}

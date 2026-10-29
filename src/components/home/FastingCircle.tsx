@@ -93,13 +93,12 @@ export const FastingCircle = ({
             <>
               <Path
                 path={circlePath}
+                // Độ đậm tăng theo tiến trình nhưng luôn đủ thấy (~25% → ~87%)
                 color={
-                  progress === 1
-                    ? color + "dd"
-                    : color +
-                      Math.floor(progress * 100)
-                        .toString(16)
-                        .padStart(2, "0")
+                  color +
+                  Math.round(0x40 + progress * (0xdd - 0x40))
+                    .toString(16)
+                    .padStart(2, "0")
                 }
                 style="stroke"
                 strokeWidth={strokeWidth}

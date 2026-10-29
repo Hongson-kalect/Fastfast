@@ -12,10 +12,13 @@ import * as Font from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { StatusBar, View } from "react-native";
+import { AppState, StatusBar, View } from "react-native";
 import FastEndTimeModal from "./home/FastEndTimeModal";
 import { StreakCheckModal } from "./home/StreakModal";
 import { startWidgetSync } from "@/widgets/widgetState";
+import { enforceThemeAccess } from "@/utils/themeAccess";
+import { capitalize } from "@/utils/text";
+import i18n from "i18next";
 SplashScreen.preventAutoHideAsync();
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -33,6 +36,32 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // Đồng bộ phiên nhịn sang widget màn hình chính (Android)
   useEffect(() => startWidgetSync(), []);
+
+  // Theme limited hết dịp sự kiện: đổi về theme trước / mặc định và báo người dùng.
+  // Kiểm tra lúc mở app và mỗi lần app quay lại foreground (dịp có thể hết khi app đang mở)
+  useEffect(() => {
+    if (!db || !isDBReady) return;
+
+    const check = () =>
+      runDbTask("theme access", async () => {
+        const changed = await enforceThemeAccess(db);
+        if (!changed) return;
+        addModal({
+          type: "alert",
+          title: i18n.t("theme.eventEndedTitle"),
+          message: i18n.t("theme.eventEndedBody", {
+            theme: capitalize(changed.from),
+            fallback: capitalize(changed.to),
+          }),
+        });
+      });
+
+    check();
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") check();
+    });
+    return () => subscription.remove();
+  }, [db, isDBReady, addModal]);
 
   useEffect(() => {
     if (!db) return;

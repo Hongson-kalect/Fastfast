@@ -279,6 +279,10 @@ export function hydrateDashboard(data: DashboardHydrationData): void {
  * Data cũ vẫn được giữ trong Zustand trong lúc
  * query DB để UI không bị nhấp nháy.
  */
+// Yêu cầu refresh đến khi đang refresh: chạy lại một lần sau khi xong,
+// nếu bỏ qua thì dữ liệu vừa ghi (VD cân nặng mới) không lên chart
+let pendingRefresh: { db: DBService; chartType: ChartRangeConfig } | null = null;
+
 export async function refreshDashboard(
   db: DBService,
   chartType: ChartRangeConfig,
@@ -286,6 +290,7 @@ export async function refreshDashboard(
   const store = useDashboardStore.getState();
 
   if (store.isRefreshing) {
+    pendingRefresh = { db, chartType };
     return;
   }
 
@@ -303,7 +308,38 @@ export async function refreshDashboard(
       isRefreshing: false,
     });
   }
+
+  if (pendingRefresh) {
+    const next = pendingRefresh;
+    pendingRefresh = null;
+    await refreshDashboard(next.db, next.chartType);
+  }
 }
+
+/**
+ * Huy hiệu đang khoe là bậc thấp hơn của cùng thành tựu → thay bằng bậc vừa nhận.
+ * Nếu không, bậc cũ vẫn nằm trong danh sách khoe nhưng bị ẩn khỏi bộ chọn
+ * (bộ chọn chỉ đưa ra bậc cao nhất) nên không bỏ chọn được.
+ */
+const upgradeShowcaseItem = async (dbService: DBService, itemId: string) => {
+  const { settings, updateSetting } = useAppStore.getState();
+  const showcase = settings?.showcase_achievements ?? [];
+  const achievement = ACHIEVEMENTS.find((entry) =>
+    entry.items.some((item) => item.id === itemId),
+  );
+  if (!achievement || !showcase.length) return;
+
+  const tierOf = (id: string) =>
+    achievement.items.findIndex((item) => item.id === id);
+  const newTier = tierOf(itemId);
+  const index = showcase.findIndex((id) => tierOf(id) >= 0);
+  if (index < 0 || tierOf(showcase[index]) >= newTier) return;
+
+  const next = [...showcase];
+  next[index] = itemId;
+  updateSetting({ showcase_achievements: next });
+  await dbService.setting("showcase_achievements", next);
+};
 
 export const claimAchievementMilestone = async (
   dbService: DBService,
@@ -319,6 +355,8 @@ export const claimAchievementMilestone = async (
   if (!milestone || milestone.is_confirmed) return;
 
   await dbService.confirmAchievementMilestone(milestone.id);
+
+  await upgradeShowcaseItem(dbService, milestone.achievement_item_id);
 
   const newMilestone = currentMilestones.map((item) => {
     if (item.id === milestoneId) {

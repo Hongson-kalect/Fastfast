@@ -20,11 +20,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
 const DashboardScreen = () => {
-  const { currentFastSession, settings, userProfile } = useAppStore(
+  const { currentFastSession, settings, userProfile, weight } = useAppStore(
     useShallow((state) => ({
       currentFastSession: state.currentFastSession,
       settings: state.settings,
       userProfile: state.userProfile,
+      // Cập nhật cân nặng ngay trên Dashboard (GoalCard) không đổi focus → phải tự nạp lại chart
+      weight: state.weight,
     })),
   );
 
@@ -78,6 +80,7 @@ const DashboardScreen = () => {
       chartType,
       currentFastSession,
       userProfile?.id,
+      weight,
     ]),
   );
 

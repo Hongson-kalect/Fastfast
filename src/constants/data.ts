@@ -403,9 +403,10 @@ export interface ChartRangeConfig {
 
 export const CHART_RANGES: ChartRangeConfig[] = [
   { key: "7d", label: "7 ngày qua", unit: "day", value: 7, day:7 },
-  { key: "30d", label: "30 ngày qua", unit: "day", value: 30, day:7 },
+  // day: số ngày dữ liệu cần truy vấn, phải phủ hết các cột của khoảng
+  { key: "30d", label: "30 ngày qua", unit: "day", value: 30, day:30 },
   { key: "12w", label: "12 tuần qua", unit: "week", value: 12, day:84 },
-  { key: "24w", label: "24 tuần qua", unit: "week", value: 24, day:164},
+  { key: "24w", label: "24 tuần qua", unit: "week", value: 24, day:168},
   { key: "12m", label: "12 tháng qua", unit: "month", value: 12, day: 365 },
   { key: "24m", label: "24 tháng qua", unit: "month", value: 24, day: 730 },
 ];

@@ -164,9 +164,15 @@ export const applyStreakReward = (
   const streakGain = Math.max(getDaysDiff(baseline, endDate), 0);
 
   oldProfile.active_days = oldProfile.active_days + streakGain;
-  // Phiên nhập lùi (kết thúc trước mốc streak hiện tại) không được kéo streak_date lùi lại,
-  // nếu không lần reconcile tiếp theo sẽ coi khoảng từ đó tới hôm nay là ngày nghỉ.
-  if (!oldProfile.streak_date || endDate > oldProfile.streak_date) {
+  // Đang có streak: phiên nhập lùi (kết thúc trước mốc streak hiện tại) không được kéo
+  // streak_date lùi lại, nếu không lần reconcile tiếp theo sẽ coi khoảng từ đó tới hôm nay là ngày nghỉ.
+  // Chưa có streak: streak mới chỉ kéo dài tới ngày kết thúc phiên, nên streak_date phải lùi về đó
+  // để reconcile phạt khoảng nghỉ từ đó tới hôm nay (phiên 27 ngày trước không được giữ streak).
+  if (
+    !oldProfile.streak_date ||
+    !hasStreak ||
+    endDate > oldProfile.streak_date
+  ) {
     oldProfile.streak_date = endDate;
   }
   oldProfile.current_streak = oldProfile.current_streak + streakGain;

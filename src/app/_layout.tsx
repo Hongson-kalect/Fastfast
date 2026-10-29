@@ -6,9 +6,9 @@ import "../global.css";
 import { Portal, Provider } from "react-native-paper";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AppWrapper } from "@/components/AppWrapper";
+import { TouchEffectRoot } from "@/components/effect/TouchEffectRoot";
 import { DATABASE_NAME, initDatabase } from "@/database";
 import { BottomSheetProvider } from "@/providers/BottomSheet";
 import { LanguageProvider } from "@/providers/Language";
@@ -53,7 +53,8 @@ export default function TabLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <MenuProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
+            {/* GestureHandlerRootView kèm lớp hiệu ứng chạm của theme */}
+            <TouchEffectRoot>
               <Provider>
                 <LanguageProvider>
                   <BottomSheetProvider>
@@ -73,7 +74,7 @@ export default function TabLayout() {
                   </Portal>
                 </LanguageProvider>
               </Provider>
-            </GestureHandlerRootView>
+            </TouchEffectRoot>
           </MenuProvider>
         </ThemeProvider>
       </QueryClientProvider>

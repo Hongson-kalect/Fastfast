@@ -6,13 +6,13 @@ import { getLocalTodayStr } from "@/utils/timer";
 import { View } from "react-native";
 import AchievementShowcase from "../AchievementShowcase";
 import { ThemedText } from "../themed-text";
-import MonthPixel, { MONTH_LABELS, MonthDayItem } from "./MonthPixel";
+import MonthPixel, { MONTH_GAP, MONTH_LABELS, MonthDayItem } from "./MonthPixel";
 import PixelLegend from "./PixelLegend";
 import WeekPixel from "./WeekPixel";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/providers/Language";
 
-// Khớp gap-1 và w-15/h-12 trong WeekPixel/MonthPixel
+// Khớp gap-1 và w-15/h-12 trong WeekPixel/MonthPixel (lưới tháng dùng MONTH_GAP)
 const GAP = 4;
 const LABEL_SIZE = 60;
 const HEADER_SIZE = 48;
@@ -84,40 +84,49 @@ const YearExportView = ({
   let gridWidth: number;
 
   if (isHorizontal) {
-    // Cột nhãn cố định bên trái, các tuần/ngày trải ngang
+    // Cột nhãn cố định bên trái, các tuần/ngày trải ngang.
+    // Tuần ngang chia đôi thành 2 dòng để ảnh không quá dài (giống tuần dọc chia 2 cột).
     const size = isMonth ? CELL.monthHorizontal : CELL.weekHorizontal;
-    const items = isMonth ? monthGrid : gridData;
+    const gap = isMonth ? MONTH_GAP : GAP;
     const axisLabels = isMonth ? monthLabels : weekdays;
-    gridWidth = LABEL_SIZE + items.length * (size + GAP);
+    const half = Math.ceil(gridData.length / 2);
+    const rows: (WeekItem | MonthDayItem)[][] = isMonth
+      ? [monthGrid]
+      : [gridData.slice(0, half), gridData.slice(half)];
+    gridWidth = LABEL_SIZE + Math.max(...rows.map((r) => r.length)) * (size + gap);
 
     grid = (
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ width: LABEL_SIZE, paddingTop: HEADER_SIZE, gap: GAP }}>
-          {axisLabels.map((label) => (
-            <View
-              key={label}
-              style={{ height: size }}
-              className="items-center justify-center"
-            >
-              <ThemedText size="xxs" color="text" opacity="medium">
-                {label}
-              </ThemedText>
+      <View style={{ gap: PADDING }}>
+        {rows.map((items, rowIndex) => (
+          <View key={rowIndex} style={{ flexDirection: "row" }}>
+            <View style={{ width: LABEL_SIZE, paddingTop: HEADER_SIZE, gap }}>
+              {axisLabels.map((label) => (
+                <View
+                  key={label}
+                  style={{ height: size }}
+                  className="items-center justify-center"
+                >
+                  <ThemedText size="xxs" color="text" opacity="medium">
+                    {label}
+                  </ThemedText>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-        <View style={{ flexDirection: "row", gap: GAP }}>
-          {items.map((item) => renderItem(item, size))}
-        </View>
+            <View style={{ flexDirection: "row", gap }}>
+              {items.map((item) => renderItem(item, size))}
+            </View>
+          </View>
+        ))}
       </View>
     );
   } else if (isMonth) {
     // 31 hàng ngày × 12 cột tháng
     const size = CELL.monthVertical;
-    gridWidth = LABEL_SIZE + 12 * size + 11 * GAP;
+    gridWidth = LABEL_SIZE + 12 * size + 11 * MONTH_GAP;
 
     grid = (
-      <View style={{ gap: GAP }}>
-        <View style={{ flexDirection: "row", paddingLeft: LABEL_SIZE, gap: GAP }}>
+      <View style={{ gap: MONTH_GAP }}>
+        <View style={{ flexDirection: "row", paddingLeft: LABEL_SIZE, gap: MONTH_GAP }}>
           {monthLabels.map((label) => (
             <View key={label} style={{ width: size }} className="items-center">
               <ThemedText size="xxs" color="text" opacity="medium">

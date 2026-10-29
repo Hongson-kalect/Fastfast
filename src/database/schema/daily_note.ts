@@ -1,6 +1,5 @@
 import { logDbError } from "@/utils/dbError";
 import { DailyNote, MoodLevel } from "@/interfaces/db.type";
-import { emitMoodChange } from "@/utils/moodEvents";
 import { getLocalTodayStr } from "@/utils/timer";
 import { SQLiteDatabase } from "expo-sqlite";
 
@@ -81,8 +80,6 @@ export const setDailyNote = async (
       hasNote ? 1 : 0,
       hasImage ? 1 : 0,
     ]);
-
-    if (hasMood) emitMoodChange(dateStr, mood ?? null);
   } catch (e) {
     logDbError("error on setDailyNote", e);
   }
